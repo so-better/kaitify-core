@@ -1,0 +1,37 @@
+{
+	"name": "alex-editor",
+	"version": "0.0.1",
+	"private": false,
+	"type": "module",
+	"author": "lingkai",
+	"main": "lib/alex-editor.umd.js",
+	"module": "lib/alex-editor.es.js",
+	"license": "MIT",
+	"description": "一个基于Vue3的轻量级底层富文本编辑器",
+	"scripts": {
+		"dev": "vite",
+		"lib": "vite build"
+	},
+	"dependencies": {
+		"dap-util": "^1.2.11",
+		"vue": "^3.2.47"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^4.1.0",
+		"less": "^3.0.4",
+		"less-loader": "^5.0.0",
+		"terser": "^5.16.9",
+		"unplugin-auto-import": "^0.15.3",
+		"vite": "^4.3.2",
+		"vite-plugin-vue-setup-extend": "^0.4.0"
+	},
+	"browserslist": [
+		"> 1%",
+		"last 2 versions",
+		"not dead"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lovelin0523/alex-editor"
+	}
+}
