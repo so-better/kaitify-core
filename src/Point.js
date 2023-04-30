@@ -3,7 +3,9 @@ class AlexPoint {
 	constructor(node, offset) {
 		this.element = null
 		this.offset = 0
-		this._init(node, offset)
+		if (node) {
+			this._init(node, offset)
+		}
 	}
 
 	//初始化

@@ -1,4 +1,3 @@
-import { reactive } from 'vue'
 import Util from './Util'
 
 class AlexElement {
@@ -58,13 +57,6 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否已被删除
-	isDelete() {
-		const flatElements = AlexElement.flatElements()
-		return flatElements.every(item => {
-			return !this.isEqual(item)
-		})
-	}
 	//是否根元素
 	isRoot() {
 		return !this.parent
@@ -110,9 +102,6 @@ class AlexElement {
 	}
 	//查找真实节点
 	getRealNode(el) {
-		if (this.isDelete()) {
-			return null
-		}
 		if (this.isText()) {
 			const index = this.parent.children.findIndex(item => {
 				return this.isEqual(item)
@@ -131,6 +120,9 @@ class AlexElement {
 			if (index == 0) {
 				return null
 			}
+			if (AlexElement.elementStack[index - 1].isEmpty()) {
+				return AlexElement.elementStack[index - 1].getPreviousElement()
+			}
 			return AlexElement.elementStack[index - 1]
 		} else {
 			const index = this.parent.children.findIndex(item => {
@@ -138,6 +130,9 @@ class AlexElement {
 			})
 			if (index == 0) {
 				return null
+			}
+			if (this.parent.children[index - 1].isEmpty()) {
+				return this.parent.children[index - 1].getPreviousElement()
 			}
 			return this.parent.children[index - 1]
 		}
@@ -151,6 +146,9 @@ class AlexElement {
 			if (index == AlexElement.elementStack.length - 1) {
 				return null
 			}
+			if (AlexElement.elementStack[index + 1].isEmpty()) {
+				return AlexElement.elementStack[index + 1].getNextElement()
+			}
 			return AlexElement.elementStack[index + 1]
 		} else {
 			const index = this.parent.children.findIndex(item => {
@@ -158,6 +156,9 @@ class AlexElement {
 			})
 			if (index == this.parent.children.length - 1) {
 				return null
+			}
+			if (this.parent.children[index + 1].isEmpty()) {
+				return this.parent.children[index + 1].getNextElement()
 			}
 			return this.parent.children[index + 1]
 		}
@@ -485,6 +486,10 @@ class AlexElement {
 						}
 						return el
 					})
+				}
+				//只有换行符且不止一个
+				else if (hasBreak && element.children.length > 1) {
+					element.children = [element.children[0]]
 				}
 			}
 			return element
