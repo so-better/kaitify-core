@@ -63,7 +63,7 @@ const beforeInput = function (e) {
 	e.preventDefault()
 	//输入
 	if (e.inputType == 'insertText') {
-		range.insert(e.data)
+		range.insertText(e.data)
 	}
 	//删除
 	else if (e.inputType == 'deleteContentBackward') {
@@ -71,6 +71,7 @@ const beforeInput = function (e) {
 	}
 	//换行
 	else if (e.inputType == 'insertParagraph') {
+		range.insertParagraph()
 	}
 	AlexElement.formatElements()
 	renderEditor()

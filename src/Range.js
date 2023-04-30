@@ -8,11 +8,50 @@ class AlexRange {
 	}
 
 	//插入文本
-	insert(data) {
+	insertText(data) {
 		//对空格进行处理
-		data = data.replace(/\s+/g, val => {
-			return '&nbsp;'
+		data = data.replace(/\s+/g, () => {
+			console.log(data)
+			const span = document.createElement('span')
+			span.innerHTML = '&nbsp;'
+			return span.innerText
 		})
+		//起点和终点在一个位置
+		if (this.anchor.isEqual(this.focus)) {
+			//如果是文本
+			if (this.anchor.element.isText()) {
+				let val = this.anchor.element.textContent
+				this.anchor.element.textContent = val.substring(0, this.anchor.offset) + data + val.substring(this.anchor.offset)
+				this.anchor.offset = this.anchor.offset + data.length
+				this.focus.offset = this.anchor.offset
+			}
+			//如果是自闭合元素
+			else {
+				const index = this.anchor.element.parent.children.findIndex(el => {
+					return this.anchor.element.isEqual(el)
+				})
+				const textEl = new AlexElement('text', null, null, null, null, data)
+				this.anchor.element.parent.children.splice(this.anchor.offset == 0 ? index : index + 1, 0, textEl)
+				textEl.parent = this.anchor.element.parent
+				this.anchor.moveToEnd(textEl)
+				this.focus.moveToEnd(textEl)
+			}
+		}
+		//起点和终点不在一个位置，即存在选区
+		else {
+			this.delete()
+			this.insertText(data)
+		}
+	}
+
+	//换行
+	insertParagraph() {
+		//起点和终点在一个位置
+		if (this.anchor.isEqual(this.focus)) {
+		}
+		//起点和终点不在一个位置，即存在选区
+		else {
+		}
 	}
 
 	//删除内容
@@ -32,7 +71,7 @@ class AlexRange {
 					if (anchorBlock.isContains(previousElement)) {
 						this.anchor.moveToEnd(previousElement)
 						this.focus.moveToEnd(previousElement)
-						this.delete()
+						this.deleteInSameElement()
 					}
 					//和当前焦点元素不在同一个块内
 					else {
