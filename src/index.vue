@@ -19,7 +19,6 @@ let range = null
 AlexElement.elementStack = AlexElement.parseHtml(props.modelValue, props.renderRules)
 //进行格式化
 AlexElement.formatElements()
-console.log(AlexElement.elementStack)
 
 //渲染编辑器dom内容
 const renderEditor = function () {
@@ -31,7 +30,7 @@ const renderEditor = function () {
 }
 //初始化设置range
 const initRange = function () {
-	const firstElement = AlexElement.elementStack[0]
+	const firstElement = AlexElement.elementStack[0].getRealNode(el.value)
 	const anchor = new AlexPoint(firstElement, 0)
 	const focus = new AlexPoint(firstElement, 0)
 	range = new AlexRange(el.value, anchor, focus)
@@ -73,17 +72,15 @@ const beforeInput = function (e) {
 	//换行
 	else if (e.inputType == 'insertParagraph') {
 	}
+	AlexElement.formatElements()
+	renderEditor()
+	range.setCusor()
 }
 //中文输入结束
 const compositionend = function (e) {
 	e.preventDefault()
 	console.log(e.data)
 }
-
-// 数据结构更新后执行以下三个方法进行重置
-// AlexElement.formatElements()
-// renderEditor()
-// range.restore()
 </script>
 <template>
 	<div ref="el" @beforeinput="beforeInput" @compositionend="compositionend" :contenteditable="!disabled"></div>

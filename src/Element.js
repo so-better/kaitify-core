@@ -42,13 +42,19 @@ class AlexElement {
 	}
 	//是否空
 	isEmpty() {
-		//行内和块元素没有子元素认为是空
-		if ((this.isInline() || this.isBlock()) && !this.hasChildren()) {
-			return true
-		}
 		//文本节点没有值认为是空
 		if (this.isText() && !this.textContent) {
 			return true
+		}
+		//行内和块元素
+		if (this.isInline() || this.isBlock()) {
+			if (!this.hasChildren()) {
+				return true
+			}
+			const allEmpty = this.children.every(el => {
+				return !el || el.isEmpty()
+			})
+			return allEmpty
 		}
 		return false
 	}
@@ -237,6 +243,50 @@ class AlexElement {
 		this.children = [element]
 		element.parent = this
 	}
+	//合并块元素
+	mergeBlock() {
+		if (!this.isBlock()) {
+			return
+		}
+		//获取前一个兄弟元素
+		const previousElement = this.getPreviousElement()
+		//如果存在，也必然是块元素
+		if (previousElement) {
+			previousElement.children.push(...this.children)
+			previousElement.children.forEach(el => {
+				el.parent = previousElement
+			})
+			if (this.isRoot()) {
+				const index = AlexElement.elementStack.findIndex(el => {
+					return this.isEqual(el)
+				})
+				AlexElement.elementStack.splice(index, 1)
+			} else {
+				const index = this.parent.children.findIndex(el => {
+					return this.isEqual(el)
+				})
+				this.parent.children.splice(index, 1)
+			}
+		}
+		//前一个兄弟元素不存在，则将自身与父元素合并
+		else if (!this.isRoot()) {
+			this.parent.children.push(...this.children)
+			this.parent.children.forEach(el => {
+				el.parent = this.parent
+			})
+			if (this.isRoot()) {
+				const index = AlexElement.elementStack.findIndex(el => {
+					return this.isEqual(el)
+				})
+				AlexElement.elementStack.splice(index, 1)
+			} else {
+				const index = this.parent.children.findIndex(el => {
+					return this.isEqual(el)
+				})
+				this.parent.children.splice(index, 1)
+			}
+		}
+	}
 	//判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement
@@ -407,15 +457,6 @@ class AlexElement {
 			//空节点移除
 			if (element.isEmpty()) {
 				element = null
-			}
-			//子节点都是null
-			else if (element.hasChildren()) {
-				const allEmpty = element.children.every(el => {
-					return !el
-				})
-				if (allEmpty) {
-					return null
-				}
 			}
 			return element
 		},

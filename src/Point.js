@@ -23,8 +23,13 @@ class AlexPoint {
 			const key = node.getAttribute('data-alex-editor-element')
 			const element = AlexElement.getElementByKey(key)
 			if (element.hasChildren()) {
-				this.element = element.children[offset]
-				this.offset = 0
+				if (element.children[offset]) {
+					this.element = element.children[offset]
+					this.offset = 0
+				} else {
+					this.element = element.children[offset - 1]
+					this.offset = 1
+				}
 			} else {
 				this.element = element
 				this.element = 0
@@ -114,34 +119,79 @@ class AlexPoint {
 
 	//向上查询可以设置光标的元素
 	getPreviousElement() {
+		const flatElements = AlexElement.flatElements()
 		const fn = element => {
-			if (element.isText() || element.isClosed()) {
-				return element
+			const index = flatElements.findIndex(el => {
+				return element.isEqual(el)
+			})
+			if (index == 0) {
+				return null
 			}
-			//获取上一个兄弟元素
-			const previousElement = element.getPreviousElement()
-			if (previousElement) {
-				return fn(previousElement)
+			let ele = flatElements[index - 1]
+			if (ele.isText() || ele.isClosed()) {
+				return ele
 			}
-			return fn(element.parent)
+			return fn(ele)
 		}
 		return fn(this.element)
 	}
 
 	//向下查找可以设置光标的元素
-	getPreviousElement() {
+	getNextElement() {
+		const flatElements = AlexElement.flatElements()
 		const fn = element => {
-			if (element.isText() || element.isClosed()) {
-				return element
+			const index = flatElements.findIndex(el => {
+				return element.isEqual(el)
+			})
+			if (index == flatElements.length - 1) {
+				return null
 			}
-			//获取下一个兄弟元素
-			const nextElement = element.getNextElement()
-			if (nextElement) {
-				return fn(nextElement)
+			let ele = flatElements[index + 1]
+			if (ele.isText() || ele.isClosed()) {
+				return ele
 			}
-			return fn(element.parent)
+			return fn(ele)
 		}
 		return fn(this.element)
+	}
+
+	//判断同一个块元素内前面是否存在不为空的元素
+	hasPreviousNotEmpty() {
+		const blockEl = this.getBlock()
+		const flatElements = AlexElement.flatElements(blockEl.children)
+		const index = flatElements.findIndex(el => {
+			return this.element.isEqual(el)
+		})
+		if (index == 0) {
+			return false
+		}
+		let flag = false
+		for (let i = 0; i < index; i++) {
+			if (!flatElements[i].isEmpty()) {
+				flag = true
+				break
+			}
+		}
+		return flag
+	}
+	//判断同一个块元素内后面是否存在不为空的元素
+	hasNextNotEmpty() {
+		const blockEl = this.getBlock()
+		const flatElements = AlexElement.flatElements(blockEl.children)
+		const index = flatElements.findIndex(el => {
+			return this.element.isEqual(el)
+		})
+		if (index == flatElements.length - 1) {
+			return false
+		}
+		let flag = false
+		for (let i = index + 1; i < flatElements.length; i++) {
+			if (!flatElements[i].isEmpty()) {
+				flag = true
+				break
+			}
+		}
+		return flag
 	}
 }
 

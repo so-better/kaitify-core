@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-
-let value = ref(`<p><span></span><span></span></p><p data-index="e"></p><p><br><span>有br还有span还有文本</span></p><p><br>有br也有文本</p>`)
+const url = 'https://www.mvi-web.cn/mvi-resources/images/mvi_image_2_1652322363009.jpeg'
+let value = ref(`<p><img style="width:100px;" src="${url}" />我是一个文本<span style="color:#f30;">我是一个红色的文本</span></p><p><img style="width:100px;" src="${url}" /></p><p>我是一个右边是图片的文本<span><img style="width:100px;" src="${url}"/></span></p>`)
 const renderRules = function (element) {
 	// if (element.parsedom == 'p') {
 	// 	element.parsedom = 'span'
