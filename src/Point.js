@@ -57,6 +57,9 @@ class AlexPoint {
 		if (!AlexElement.isElement(element)) {
 			return
 		}
+		if (element.isEmpty()) {
+			return
+		}
 		//如果是文本
 		if (element.isText()) {
 			this.element = element
@@ -69,7 +72,9 @@ class AlexPoint {
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children)
+			const flatElements = AlexElement.flatElements(element.children).filter(el => {
+				return !el.isEmpty()
+			})
 			const length = flatElements.length
 			this.moveToEnd(flatElements[length - 1])
 		}
@@ -78,6 +83,9 @@ class AlexPoint {
 	//移动到指定元素最前
 	moveToStart(element) {
 		if (!AlexElement.isElement(element)) {
+			return
+		}
+		if (element.isEmpty()) {
 			return
 		}
 		//文本元素
@@ -92,7 +100,9 @@ class AlexPoint {
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children)
+			const flatElements = AlexElement.flatElements(element.children).filter(el => {
+				return !el.isEmpty()
+			})
 			this.moveToStart(flatElements[0])
 		}
 	}

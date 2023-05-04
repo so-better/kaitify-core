@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 const url = 'https://www.mvi-web.cn/mvi-resources/images/mvi_image_2_1652322363009.jpeg'
-let value = ref(`<p><span>3333344444</span>55555</p>`)
+let value = ref(`<p><br></p><p><span style="color:#f30;">3333344444</span>55555</p><p><img src="#" /></p>`)
 const renderRules = function (element) {
 	// if (element.parsedom == 'p') {
 	// 	element.parsedom = 'span'
