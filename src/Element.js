@@ -193,7 +193,7 @@ class AlexElement {
 		el.setAttribute('data-alex-editor-element', this.key)
 		return el
 	}
-	//添加到指定位置
+	//添加到父元素指定位置
 	addSelfTo(element, index) {
 		if (!AlexElement.isElement(element)) {
 			return
@@ -208,12 +208,56 @@ class AlexElement {
 		}
 		//如果有子元素
 		if (element.hasChildren()) {
-			element.children.splice(index, 0, this)
+			if (index >= element.children.length) {
+				element.children.push(this)
+			} else {
+				element.children.splice(index, 0, this)
+			}
 		} else {
 			element.children = [this]
 		}
 		//更新该元素的parent字段
 		this.parent = element
+	}
+	//添加到该元素之前
+	addSelfBefore(element) {
+		if (!AlexElement.isElement(element)) {
+			return
+		}
+		if (element.isRoot()) {
+			const index = AlexElement.elementStack.findIndex(el => {
+				return element.isEqual(el)
+			})
+			AlexElement.elementStack.splice(index, 0, this)
+			this.parent = null
+		} else {
+			const index = element.parent.children.findIndex(el => {
+				return element.isEqual(el)
+			})
+			this.addSelfTo(element.parent, index)
+		}
+	}
+	//添加到该元素之后
+	addSelfAfter(element) {
+		if (!AlexElement.isElement(element)) {
+			return
+		}
+		if (element.isRoot()) {
+			const index = AlexElement.elementStack.findIndex(el => {
+				return element.isEqual(el)
+			})
+			if (index == AlexElement.elementStack.length - 1) {
+				AlexElement.elementStack.push(this)
+			} else {
+				AlexElement.elementStack.splice(index + 1, 0, this)
+			}
+			this.parent = null
+		} else {
+			const index = element.parent.children.findIndex(el => {
+				return element.isEqual(el)
+			})
+			this.addSelfTo(element.parent, index + 1)
+		}
 	}
 	//克隆当前元素,deep为true表示深度克隆
 	clone(deep = true) {

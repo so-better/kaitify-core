@@ -45,14 +45,82 @@ class AlexRange {
 	}
 
 	//换行
-	insertParagraph() {
+	insertParagraph(renderRules) {
+		const p = document.createElement('p')
+		p.innerHTML = '<br>'
+		this.insertNode(p, renderRules)
+	}
+
+	//插入节点
+	insertNode(node, renderRules) {
+		const el = AlexElement.parseNode(node, renderRules)
 		//起点和终点在一个位置
 		if (this.anchor.isEqual(this.focus)) {
-		}
-		//起点和终点不在一个位置，即存在选区
-		else {
+			//前一个可以获取焦点的元素
+			const previousElement = this.anchor.getPreviousElement()
+			//后一个可以获取焦点的元素
+			const nextElement = this.anchor.getNextElement()
+			//当前焦点所在的块元素
+			const anchorBlock = this.anchor.getBlock()
+			//插入的元素是块元素
+			if (el.isBlock()) {
+				//焦点在文本上
+				if (this.anchor.element.isText()) {
+					//焦点在文本起始位置且块内前面不存在可获取焦点的元素说明起点在块元素开始位置
+					if (this.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+						//在该块之前插入
+						el.addSelfBefore(anchorBlock)
+						this.anchor.moveToStart(anchorBlock)
+						this.focus.moveToStart(anchorBlock)
+					}
+					//焦点在文本终点位置且同块内后面不存在可获取焦点的元素说明起点在块元素结束位置
+					else if (this.anchor.offset == this.anchor.element.textContent.length && !(nextElement && anchorBlock.isContains(nextElement))) {
+						//在该块之后插入
+						el.addSelfAfter(anchorBlock)
+						this.anchor.moveToStart(el)
+						this.focus.moveToStart(el)
+					}
+					//其他情况则分割块元素
+					else {
+						this.splitBlock()
+					}
+				}
+				//焦点在自闭合元素上
+				else {
+					//块内前面不存在可获取焦点的元素说明起点在块元素开始位置
+					if (!(previousElement && anchorBlock.isContains(previousElement))) {
+						//在该块之前插入
+						el.addSelfBefore(anchorBlock)
+						this.anchor.moveToStart(anchorBlock)
+						this.focus.moveToStart(anchorBlock)
+					}
+					//同块内后面不存在可获取焦点的元素说明起点在块元素结束位置
+					else if (!(nextElement && anchorBlock.isContains(nextElement))) {
+						//在该块之后插入
+						el.addSelfAfter(anchorBlock)
+						this.anchor.moveToStart(el)
+						this.focus.moveToStart(el)
+					}
+					//其他情况则分割块元素
+					else {
+						this.splitBlock()
+					}
+				}
+			}
+			//插入非块元素
+			else {
+				//焦点在文本上
+				if (this.anchor.element.isText()) {
+					const val = this.anchor.element.textContent
+					this.anchor.element.textContent = val.substring(0, this.anchor.offset)
+				} else {
+				}
+			}
 		}
 	}
+
+	//将一个块元素一分为二
+	splitBlock() {}
 
 	//删除内容
 	delete() {
@@ -195,13 +263,13 @@ class AlexRange {
 				}
 				//所在块元素不是空
 				else {
-					//同块内前面存在不为空的元素
-					if (this.anchor.hasPreviousNotEmpty()) {
+					//同块内前面存在可以获取焦点的元素
+					if (previousElement && anchorBlock.isContains(previousElement)) {
 						this.anchor.moveToEnd(previousElement)
 						this.focus.moveToEnd(previousElement)
 					}
-					//前面都是空，那么后面必然有不为空的
-					else if (this.anchor.hasNextNotEmpty()) {
+					//同块内后面存在可以获取焦点的元素
+					else if (nextElement && anchorBlock.isContains(nextElement)) {
 						this.anchor.moveToStart(nextElement)
 						this.focus.moveToStart(nextElement)
 					}
@@ -212,10 +280,6 @@ class AlexRange {
 			const index = this.anchor.element.parent.children.findIndex(el => {
 				return this.anchor.element.isEqual(el)
 			})
-			//同块内前面是否存在不为空的元素
-			const hasPreviousNotEmpty = this.anchor.hasPreviousNotEmpty()
-			//同块内后面是否存在不为空的元素
-			const hasNextNotEmpty = this.anchor.hasNextNotEmpty()
 			//删除该自闭合元素
 			this.anchor.element.parent.children.splice(index, 1)
 			//如果所在块元素为空
@@ -230,13 +294,13 @@ class AlexRange {
 			}
 			//所在块元素不是空
 			else {
-				//同块内前面存在不为空的元素
-				if (hasPreviousNotEmpty) {
+				//同块内前面存在可以获取焦点的元素
+				if (previousElement && anchorBlock.isContains(previousElement)) {
 					this.anchor.moveToEnd(previousElement)
 					this.focus.moveToEnd(previousElement)
 				}
-				//前面都是空，那么后面必然有不为空的
-				else if (hasNextNotEmpty) {
+				//同块内后面存在可以获取焦点的元素
+				else if (nextElement && anchorBlock.isContains(nextElement)) {
 					this.anchor.moveToStart(nextElement)
 					this.focus.moveToStart(nextElement)
 				}

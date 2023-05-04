@@ -130,7 +130,7 @@ class AlexPoint {
 				return null
 			}
 			let ele = flatElements[index - 1]
-			if (ele.isText() || ele.isClosed()) {
+			if ((ele.isText() || ele.isClosed()) && !ele.isEmpty()) {
 				return ele
 			}
 			return fn(ele)
@@ -149,51 +149,12 @@ class AlexPoint {
 				return null
 			}
 			let ele = flatElements[index + 1]
-			if (ele.isText() || ele.isClosed()) {
+			if ((ele.isText() || ele.isClosed()) && !ele.isEmpty()) {
 				return ele
 			}
 			return fn(ele)
 		}
 		return fn(this.element)
-	}
-
-	//判断同一个块元素内前面是否存在不为空的元素
-	hasPreviousNotEmpty() {
-		const blockEl = this.getBlock()
-		const flatElements = AlexElement.flatElements(blockEl.children)
-		const index = flatElements.findIndex(el => {
-			return this.element.isEqual(el)
-		})
-		if (index == 0) {
-			return false
-		}
-		let flag = false
-		for (let i = 0; i < index; i++) {
-			if (!flatElements[i].isEmpty()) {
-				flag = true
-				break
-			}
-		}
-		return flag
-	}
-	//判断同一个块元素内后面是否存在不为空的元素
-	hasNextNotEmpty() {
-		const blockEl = this.getBlock()
-		const flatElements = AlexElement.flatElements(blockEl.children)
-		const index = flatElements.findIndex(el => {
-			return this.element.isEqual(el)
-		})
-		if (index == flatElements.length - 1) {
-			return false
-		}
-		let flag = false
-		for (let i = index + 1; i < flatElements.length; i++) {
-			if (!flatElements[i].isEmpty()) {
-				flag = true
-				break
-			}
-		}
-		return flag
 	}
 }
 
