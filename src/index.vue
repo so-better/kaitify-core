@@ -80,6 +80,8 @@ const beforeInput = function (e) {
 		case 'insertParagraph':
 			range.insertParagraph(props.renderRules)
 			break
+		default:
+			console.log('beforeInput没有监听到的inputType', e.inputType)
 	}
 	//格式化
 	AlexElement.formatElements()
@@ -104,6 +106,15 @@ const chineseInputHandler = function (type, e) {
 		renderEditor()
 		//设置光标
 		range.setCursor()
+	}
+}
+//函数：监听键盘按下
+const keydown = function (e) {
+	switch (e.keyCode) {
+		case 9:
+			e.preventDefault()
+			console.log('Tab键按下')
+			break
 	}
 }
 
@@ -144,6 +155,6 @@ defineExpose({
 })
 </script>
 <template>
-	<div ref="$el" @beforeinput="beforeInput" @compositionstart="chineseInputHandler('start', $event)" @compositionupdate="chineseInputHandler('update', $event)" @compositionend="chineseInputHandler('end', $event)" :contenteditable="!disabled"></div>
+	<div ref="$el" @beforeinput="beforeInput" @compositionstart="chineseInputHandler('start', $event)" @compositionupdate="chineseInputHandler('update', $event)" @compositionend="chineseInputHandler('end', $event)" @keydown="keydown" :contenteditable="!disabled"></div>
 </template>
 <style lang="less"></style>
