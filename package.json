@@ -13,7 +13,6 @@
 		"lib": "vite build"
 	},
 	"dependencies": {
-		"dap-util": "^1.2.11",
 		"vue": "^3.2.47"
 	},
 	"devDependencies": {

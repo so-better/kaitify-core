@@ -270,6 +270,7 @@ class AlexElement {
 				} else {
 					el.children = [clonedChild]
 				}
+				clonedChild.parent = el
 			})
 		}
 		return el

@@ -1,6 +1,7 @@
 import alex from './index.vue'
+import AlexElement from './Element'
 alex.install = app => {
 	app.component(alex.name, alex)
 }
 
-export { alex, alex as default }
+export { AlexElement, alex, alex as default }

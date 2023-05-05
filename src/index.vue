@@ -50,12 +50,14 @@ const selectionChange = function () {
 		range = new AlexRange(el.value, anchor, focus)
 	}
 }
+
 onMounted(() => {
+	//初始化渲染编辑器内容
 	renderEditor()
+	//初始化设置range
+	initRange()
+	//如果设置了自动获取焦点
 	if (props.autofocus) {
-		if (!range) {
-			initRange()
-		}
 		range.collapseToEnd()
 	}
 	document.addEventListener('selectionchange', selectionChange)
@@ -67,24 +69,29 @@ onBeforeUnmount(() => {
 //输入内容之前
 const beforeInput = function (e) {
 	e.preventDefault()
+	//如果输入中文，则不更新编辑器
 	if (e.inputType == 'insertCompositionText') {
 		return
 	}
-	//输入
-	if (e.inputType == 'insertText') {
-		range.insertText(e.data)
-	}
-	//删除
-	else if (e.inputType == 'deleteContentBackward') {
-		range.delete()
-	}
-	//换行
-	else if (e.inputType == 'insertParagraph') {
-		range.insertParagraph(props.renderRules)
+	switch (e.inputType) {
+		//输入操作
+		case 'insertText':
+			range.insertText(e.data)
+			break
+		//删出操作
+		case 'deleteContentBackward':
+			range.delete()
+			break
+		//插入段落
+		case 'insertParagraph':
+			range.insertParagraph(props.renderRules)
+			break
+		default:
+			break
 	}
 	AlexElement.formatElements()
 	renderEditor()
-	range.setCusor()
+	range.setCursor()
 }
 //中文输入结束
 const chineseInputHandler = function (type, e) {
@@ -97,7 +104,7 @@ const chineseInputHandler = function (type, e) {
 		range.insertText(e.data)
 		AlexElement.formatElements()
 		renderEditor()
-		range.setCusor()
+		range.setCursor()
 	}
 }
 
