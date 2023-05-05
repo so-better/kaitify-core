@@ -276,7 +276,7 @@ class AlexElement {
 		return el
 	}
 	//转换成block元素
-	convertToBlock(blockName = 'p') {
+	convertToBlock() {
 		if (this.isBlock()) {
 			return
 		}
@@ -285,7 +285,7 @@ class AlexElement {
 			this.textContent = null
 		}
 		this.type = 'block'
-		this.parsedom = blockName
+		this.parsedom = AlexElement.PARAGRAPH_BLOCKNAME
 		this.children = [element]
 		element.parent = this
 	}
@@ -561,6 +561,8 @@ class AlexElement {
 	]
 	//存放编辑器的alexElement数组
 	static elementStack = []
+	//定义段落元素
+	static PARAGRAPH_BLOCKNAME = 'P'
 }
 
 export default AlexElement

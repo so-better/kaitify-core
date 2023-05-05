@@ -4,12 +4,12 @@ class AlexPoint {
 		this.element = null
 		this.offset = 0
 		if (node) {
-			this._init(node, offset)
+			this.init(node, offset)
 		}
 	}
 
 	//初始化
-	_init(node, offset) {
+	init(node, offset) {
 		//文本节点
 		if (node.nodeType == 3) {
 			const key = node.parentNode.getAttribute('data-alex-editor-element')

@@ -7,199 +7,6 @@ class AlexRange {
 		this.focus = focus
 	}
 
-	//插入文本
-	insertText(data) {
-		//对空格进行处理
-		data = data.replace(/\s+/g, () => {
-			console.log(data)
-			const span = document.createElement('span')
-			span.innerHTML = '&nbsp;'
-			return span.innerText
-		})
-		//起点和终点在一个位置
-		if (this.anchor.isEqual(this.focus)) {
-			//如果是文本
-			if (this.anchor.element.isText()) {
-				let val = this.anchor.element.textContent
-				this.anchor.element.textContent = val.substring(0, this.anchor.offset) + data + val.substring(this.anchor.offset)
-				this.anchor.offset = this.anchor.offset + data.length
-				this.focus.offset = this.anchor.offset
-			}
-			//如果是自闭合元素
-			else {
-				const textEl = new AlexElement('text', null, null, null, null, data)
-				if (this.anchor.offset == 0) {
-					textEl.addSelfBefore(this.anchor.element)
-				} else {
-					textEl.addSelfAfter(this.anchor.element)
-				}
-				this.anchor.moveToEnd(textEl)
-				this.focus.moveToEnd(textEl)
-			}
-		}
-		//起点和终点不在一个位置，即存在选区
-		else {
-			this.delete()
-			this.insertText(data)
-		}
-	}
-
-	//换行
-	insertParagraph(blockName = 'p', renderRules) {
-		//起点和终点在一个位置
-		if (this.anchor.isEqual(this.focus)) {
-			//前一个可以获取焦点的元素
-			const previousElement = this.anchor.getPreviousElement()
-			//后一个可以获取焦点的元素
-			const nextElement = this.anchor.getNextElement()
-			//当前焦点所在的块元素
-			const anchorBlock = this.anchor.getBlock()
-			//终点位置
-			const endOffset = this.anchor.element.isText() ? this.anchor.element.textContent.length : 1
-			//焦点在当前块的起点位置
-			if (this.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
-				//在该块之前插入一个新的段落
-				const paragraph = new AlexElement('block', blockName, null, null, null, null)
-				paragraph.addSelfBefore(anchorBlock)
-				this.anchor.moveToStart(anchorBlock)
-				this.focus.moveToStart(anchorBlock)
-			}
-			//焦点在当前块的终点位置
-			else if (this.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
-				//在该块之后插入一个新的段落
-				const paragraph = new AlexElement('block', blockName, null, null, null, null)
-				paragraph.addSelfAfter(anchorBlock)
-				this.anchor.moveToStart(paragraph)
-				this.focus.moveToStart(paragraph)
-			}
-			//焦点在当前块的中间部分则需要切割
-			else {
-				if (!this.anchor.isEqual(this.focus)) {
-					return
-				}
-				//获取所在块元素
-				const block = this.anchor.getBlock()
-				const newBlock = block.clone(true)
-				newBlock.addSelfAfter(block)
-				//将终点移动到块元素末尾
-				this.focus.moveToEnd(block)
-				this.delete()
-				//将终点移动到新的块元素
-				const elements = AlexElement.flatElements(block.children)
-				const index = elements.findIndex(el => {
-					return this.anchor.element.isEqual(el)
-				})
-				const newElements = AlexElement.flatElements(newBlock.children)
-				this.focus.element = newElements[index]
-				this.focus.offset = this.anchor.offset
-				this.anchor.moveToStart(newBlock)
-				this.delete()
-			}
-		} else {
-			this.delete()
-			this.insertParagraph(blockName, renderRules)
-		}
-	}
-
-	//删除内容
-	delete() {
-		//单个删除
-		if (this.anchor.isEqual(this.focus)) {
-			//前一个可以获取焦点的元素
-			const previousElement = this.anchor.getPreviousElement()
-			//当前焦点所在的块元素
-			const anchorBlock = this.anchor.getBlock()
-			//光标在焦点元素的开始处
-			if (this.anchor.offset == 0) {
-				//如果前一个可获取焦点的元素存在
-				if (previousElement) {
-					//和当前焦点元素在同一个块内
-					if (anchorBlock.isContains(previousElement)) {
-						this.anchor.moveToEnd(previousElement)
-						this.focus.moveToEnd(previousElement)
-						this.deleteInSameElement()
-					}
-					//和当前焦点元素不在同一个块内
-					else {
-						//当前焦点所在块元素和前一个块元素进行合并
-						anchorBlock.mergeBlock()
-						this.anchor.moveToEnd(previousElement)
-						this.focus.moveToEnd(previousElement)
-					}
-				}
-			}
-			//正常删除
-			else {
-				this.deleteInSameElement()
-			}
-		}
-		//批量删除
-		else {
-			//选区在一个元素内
-			if (this.anchor.element.isEqual(this.focus.element)) {
-				this.deleteInSameElement()
-			} else {
-				const flatElements = AlexElement.flatElements()
-				const anchorIndex = flatElements.findIndex(el => {
-					return this.anchor.element.isEqual(el)
-				})
-				const focusIndex = flatElements.findIndex(el => {
-					return this.focus.element.isEqual(el)
-				})
-				//获取选区之间的
-				let rangeElements = []
-				for (let i = anchorIndex + 1; i < focusIndex; i++) {
-					if (!flatElements[i].hasContains(this.anchor.element) && !flatElements[i].hasContains(this.focus.element)) {
-						rangeElements.push(flatElements[i])
-					}
-				}
-				//清空选区内容
-				rangeElements.forEach(el => {
-					if (el.isText()) {
-						el.textContent = ''
-					} else if (el.isClosed()) {
-						const index = el.parent.children.findIndex(item => {
-							return el.isEqual(item)
-						})
-						el.parent.children.splice(index, 1)
-					}
-					if (el.hasChildren()) {
-						el.children = []
-					}
-				})
-				//获取终点所在的块元素
-				const focusBlock = this.focus.getBlock()
-				//不在一个块内则需要merge
-				let hasMerge = !focusBlock.hasContains(this.anchor.element)
-				//记录删除操作之前的值
-				let focsuElement = this.focus.element
-				let focusOffset = this.focus.offset
-				let anchorElement = this.anchor.element
-				let anchorOffset = this.anchor.offset
-
-				//先执行终点处的删除逻辑
-				this.anchor.element = focsuElement
-				this.anchor.offset = 0 //如果是文本，起点从文本起点0开始；如果是自闭合元素，起点从0开始
-				this.deleteInSameElement()
-
-				//恢复终点光标位置
-				this.anchor.element = anchorElement
-				this.anchor.offset = anchorOffset
-				this.focus.element = focsuElement
-				this.focus.offset = focusOffset
-
-				//后执行起点处的删除逻辑
-				this.focus.element = anchorElement
-				this.focus.offset = this.anchor.element.isText() ? this.anchor.element.textContent.length : 1 //如果是文本从文本终点开始，如果是自闭合元素从自闭合元素终点开始
-				this.deleteInSameElement()
-
-				if (hasMerge) {
-					focusBlock.mergeBlock()
-				}
-			}
-		}
-	}
-
 	//起始和结束点都在一个元素内的删除方法
 	deleteInSameElement() {
 		if (!this.anchor.element.isEqual(this.focus.element)) {
@@ -308,6 +115,199 @@ class AlexRange {
 			offset = this.focus.offset
 		}
 		selection.collapse(node, offset)
+	}
+
+	//插入文本
+	insertText(data) {
+		//对空格进行处理
+		data = data.replace(/\s+/g, () => {
+			console.log(data)
+			const span = document.createElement('span')
+			span.innerHTML = '&nbsp;'
+			return span.innerText
+		})
+		//起点和终点在一个位置
+		if (this.anchor.isEqual(this.focus)) {
+			//如果是文本
+			if (this.anchor.element.isText()) {
+				let val = this.anchor.element.textContent
+				this.anchor.element.textContent = val.substring(0, this.anchor.offset) + data + val.substring(this.anchor.offset)
+				this.anchor.offset = this.anchor.offset + data.length
+				this.focus.offset = this.anchor.offset
+			}
+			//如果是自闭合元素
+			else {
+				const textEl = new AlexElement('text', null, null, null, null, data)
+				if (this.anchor.offset == 0) {
+					textEl.addSelfBefore(this.anchor.element)
+				} else {
+					textEl.addSelfAfter(this.anchor.element)
+				}
+				this.anchor.moveToEnd(textEl)
+				this.focus.moveToEnd(textEl)
+			}
+		}
+		//起点和终点不在一个位置，即存在选区
+		else {
+			this.delete()
+			this.insertText(data)
+		}
+	}
+
+	//换行
+	insertParagraph(renderRules) {
+		//起点和终点在一个位置
+		if (this.anchor.isEqual(this.focus)) {
+			//前一个可以获取焦点的元素
+			const previousElement = this.anchor.getPreviousElement()
+			//后一个可以获取焦点的元素
+			const nextElement = this.anchor.getNextElement()
+			//当前焦点所在的块元素
+			const anchorBlock = this.anchor.getBlock()
+			//终点位置
+			const endOffset = this.anchor.element.isText() ? this.anchor.element.textContent.length : 1
+			//焦点在当前块的起点位置
+			if (this.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+				//在该块之前插入一个新的段落
+				const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_BLOCKNAME, null, null, null, null)
+				paragraph.addSelfBefore(anchorBlock)
+				this.anchor.moveToStart(anchorBlock)
+				this.focus.moveToStart(anchorBlock)
+			}
+			//焦点在当前块的终点位置
+			else if (this.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+				//在该块之后插入一个新的段落
+				const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_BLOCKNAME, null, null, null, null)
+				paragraph.addSelfAfter(anchorBlock)
+				this.anchor.moveToStart(paragraph)
+				this.focus.moveToStart(paragraph)
+			}
+			//焦点在当前块的中间部分则需要切割
+			else {
+				if (!this.anchor.isEqual(this.focus)) {
+					return
+				}
+				//获取所在块元素
+				const block = this.anchor.getBlock()
+				const newBlock = block.clone(true)
+				newBlock.addSelfAfter(block)
+				//将终点移动到块元素末尾
+				this.focus.moveToEnd(block)
+				this.delete()
+				//将终点移动到新的块元素
+				const elements = AlexElement.flatElements(block.children)
+				const index = elements.findIndex(el => {
+					return this.anchor.element.isEqual(el)
+				})
+				const newElements = AlexElement.flatElements(newBlock.children)
+				this.focus.element = newElements[index]
+				this.focus.offset = this.anchor.offset
+				this.anchor.moveToStart(newBlock)
+				this.delete()
+			}
+		} else {
+			this.delete()
+			this.insertParagraph(renderRules)
+		}
+	}
+
+	//删除内容
+	delete() {
+		//单个删除
+		if (this.anchor.isEqual(this.focus)) {
+			//前一个可以获取焦点的元素
+			const previousElement = this.anchor.getPreviousElement()
+			//当前焦点所在的块元素
+			const anchorBlock = this.anchor.getBlock()
+			//光标在焦点元素的开始处
+			if (this.anchor.offset == 0) {
+				//如果前一个可获取焦点的元素存在
+				if (previousElement) {
+					//和当前焦点元素在同一个块内
+					if (anchorBlock.isContains(previousElement)) {
+						this.anchor.moveToEnd(previousElement)
+						this.focus.moveToEnd(previousElement)
+						this.deleteInSameElement()
+					}
+					//和当前焦点元素不在同一个块内
+					else {
+						//当前焦点所在块元素和前一个块元素进行合并
+						anchorBlock.mergeBlock()
+						this.anchor.moveToEnd(previousElement)
+						this.focus.moveToEnd(previousElement)
+					}
+				}
+			}
+			//正常删除
+			else {
+				this.deleteInSameElement()
+			}
+		}
+		//批量删除
+		else {
+			//选区在一个元素内
+			if (this.anchor.element.isEqual(this.focus.element)) {
+				this.deleteInSameElement()
+			} else {
+				const flatElements = AlexElement.flatElements()
+				const anchorIndex = flatElements.findIndex(el => {
+					return this.anchor.element.isEqual(el)
+				})
+				const focusIndex = flatElements.findIndex(el => {
+					return this.focus.element.isEqual(el)
+				})
+				//获取选区之间的
+				let rangeElements = []
+				for (let i = anchorIndex + 1; i < focusIndex; i++) {
+					if (!flatElements[i].hasContains(this.anchor.element) && !flatElements[i].hasContains(this.focus.element)) {
+						rangeElements.push(flatElements[i])
+					}
+				}
+				//清空选区内容
+				rangeElements.forEach(el => {
+					if (el.isText()) {
+						el.textContent = ''
+					} else if (el.isClosed()) {
+						const index = el.parent.children.findIndex(item => {
+							return el.isEqual(item)
+						})
+						el.parent.children.splice(index, 1)
+					}
+					if (el.hasChildren()) {
+						el.children = []
+					}
+				})
+				//获取终点所在的块元素
+				const focusBlock = this.focus.getBlock()
+				//不在一个块内则需要merge
+				let hasMerge = !focusBlock.hasContains(this.anchor.element)
+				//记录删除操作之前的值
+				let focsuElement = this.focus.element
+				let focusOffset = this.focus.offset
+				let anchorElement = this.anchor.element
+				let anchorOffset = this.anchor.offset
+
+				//先执行终点处的删除逻辑
+				this.anchor.element = focsuElement
+				this.anchor.offset = 0 //如果是文本，起点从文本起点0开始；如果是自闭合元素，起点从0开始
+				this.deleteInSameElement()
+
+				//恢复终点光标位置
+				this.anchor.element = anchorElement
+				this.anchor.offset = anchorOffset
+				this.focus.element = focsuElement
+				this.focus.offset = focusOffset
+
+				//后执行起点处的删除逻辑
+				this.focus.element = anchorElement
+				this.focus.offset = this.anchor.element.isText() ? this.anchor.element.textContent.length : 1 //如果是文本从文本终点开始，如果是自闭合元素从自闭合元素终点开始
+				this.deleteInSameElement()
+
+				if (hasMerge) {
+					focusBlock.mergeBlock()
+				}
+			}
+		}
 	}
 
 	//将真实的光标设置到指定元素开始
