@@ -44,6 +44,10 @@ const initRange = function () {
 }
 //函数：监听selection改变
 const selectionChange = function () {
+	//如果编辑器禁用则不更新range
+	if (props.disabled) {
+		return
+	}
 	//如果是中文输入则不更新range
 	if (isInputChinese) {
 		return
@@ -109,8 +113,8 @@ onMounted(() => {
 	renderEditor()
 	//初始化设置range
 	initRange()
-	//如果设置了自动获取焦点将光标定位到文档最后
-	if (props.autofocus) {
+	//如果没有禁用编辑器且设置了自动获取焦点将光标定位到文档最后
+	if (props.autofocus && !props.disabled) {
 		range.collapseToEnd()
 	}
 	//设置selection的监听更新range
@@ -130,6 +134,9 @@ defineExpose({
 	},
 	//重新渲染编辑器
 	reRender: () => {
+		if (props.disabled) {
+			return
+		}
 		AlexElement.formatElements()
 		renderEditor()
 		range.setCursor()
