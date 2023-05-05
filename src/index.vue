@@ -9,7 +9,7 @@ import _props from './Props'
 //定义属性
 let props = defineProps(_props)
 //定义事件
-defineEmits(['update:modelValue'])
+let emits = defineEmits(['update:modelValue'])
 //编辑器的dom元素
 let el = ref(null)
 //定义range
@@ -21,13 +21,14 @@ AlexElement.elementStack = AlexElement.parseHtml(props.modelValue, props.renderR
 //进行格式化
 AlexElement.formatElements()
 
-//渲染编辑器dom内容
+//渲染编辑器dom内容，同时更新modelValue的值
 const renderEditor = function () {
 	el.value.innerHTML = ''
 	AlexElement.elementStack.forEach(element => {
 		let elm = element.renderElement()
 		el.value.appendChild(elm)
 	})
+	emits('update:modelValue', el.value.innerHTML)
 }
 //初始化设置range
 const initRange = function () {
@@ -51,6 +52,7 @@ const selectionChange = function () {
 	}
 }
 
+//组件渲染后
 onMounted(() => {
 	//初始化渲染编辑器内容
 	renderEditor()
@@ -62,6 +64,7 @@ onMounted(() => {
 	}
 	document.addEventListener('selectionchange', selectionChange)
 })
+//组件卸载前
 onBeforeUnmount(() => {
 	document.removeEventListener('selectionchange', selectionChange)
 })
@@ -107,6 +110,14 @@ const chineseInputHandler = function (type, e) {
 		range.setCursor()
 	}
 }
+
+//对外暴露
+defineExpose({
+	//获取当前编辑器光标所在的range
+	getCurrentRange: () => {
+		return range
+	}
+})
 
 //中文输入开始
 </script>

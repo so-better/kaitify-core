@@ -87,11 +87,23 @@ class AlexElement {
 	}
 	//是否含有标记
 	hasMarks() {
-		return !Util.isEmptyObject(this.marks)
+		if (!this.marks) {
+			return false
+		}
+		if (Util.isObject) {
+			return !Util.isEmptyObject(this.marks)
+		}
+		return false
 	}
 	//是否含有样式
 	hasStyles() {
-		return !Util.isEmptyObject(this.styles)
+		if (!this.styles) {
+			return false
+		}
+		if (Util.isObject) {
+			return !Util.isEmptyObject(this.styles)
+		}
+		return false
 	}
 	//是否有子元素
 	hasChildren() {

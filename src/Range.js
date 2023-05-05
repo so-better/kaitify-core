@@ -310,6 +310,76 @@ class AlexRange {
 		}
 	}
 
+	//获取选区之间的元素
+	getElements() {
+		//如果起点和终点在一个地方则返回空数组
+		if (this.anchor.isEqual(this.focus)) {
+			return []
+		}
+		let elements = []
+		//如果起点和终点是一个元素内
+		if (this.anchor.element.isEqual(this.focus.element)) {
+			//文本
+			if (this.anchor.element.isText()) {
+				let val = this.anchor.element.textContent
+				this.anchor.element.textContent = val.substring(0, this.anchor.offset)
+				let newEl = new AlexElement('text', null, null, null, null, val.substring(this.anchor.offset, this.focus.offset))
+				newEl.addSelfAfter(this.anchor.element)
+				let newFocus = new AlexElement('text', null, null, null, null, val.substring(this.focus.offset))
+				newFocus.addSelfAfter(newEl)
+				this.anchor.moveToStart(newEl)
+				this.focus.moveToEnd(newEl)
+				elements = [newEl]
+			}
+			//自闭合元素
+			else {
+				elements = [this.anchor.element]
+			}
+		}
+		//起点和终点不在一个元素内
+		else {
+			const flatElements = AlexElement.flatElements()
+			const anchorIndex = flatElements.findIndex(el => {
+				return this.anchor.element.isEqual(el)
+			})
+			const focusIndex = flatElements.findIndex(el => {
+				return this.focus.element.isEqual(el)
+			})
+			//获取选区之间的元素
+			for (let i = anchorIndex + 1; i < focusIndex; i++) {
+				if (!flatElements[i].hasContains(this.anchor.element) && !flatElements[i].hasContains(this.focus.element)) {
+					elements.push(flatElements[i])
+				}
+			}
+			//起点是文本
+			if (this.anchor.element.isText()) {
+				let val = this.anchor.element.textContent
+				this.anchor.element.textContent = val.substring(0, this.anchor.offset)
+				let newEl = new AlexElement('text', null, null, null, null, val.substring(this.anchor.offset))
+				newEl.addSelfAfter(this.anchor.element)
+				elements.unshift(newEl)
+			}
+			//起点是自闭合元素且offset为0
+			else if (this.anchor.offset == 0) {
+				elements.unshift(this.anchor.element)
+			}
+
+			//终点是文本
+			if (this.focus.element.isText()) {
+				let val = this.focus.element.textContent
+				this.focus.element.textContent = val.substring(0, this.focus.offset)
+				let newEl = new AlexElement('text', null, null, null, null, val.substring(this.focus.offset))
+				newEl.addSelfAfter(this.focus.element)
+				elements.push(this.focus.element)
+			}
+			//终点是自闭合元素且offset为1
+			else {
+				elements.push(this.focus.element)
+			}
+		}
+		return elements
+	}
+
 	//将真实的光标设置到指定元素开始
 	collapseToStart(element) {
 		//指定了某个元素
@@ -339,6 +409,28 @@ class AlexRange {
 			const length = flatElements.length
 			this.collapseToEnd(flatElements[length - 1])
 		}
+	}
+
+	//设置css样式
+	setStyle(styleObject) {
+		const elements = this.getElements()
+		elements.forEach(el => {
+			if (el.isText()) {
+				let cloneEl = el.clone()
+				el.type = 'inline'
+				el.parsedom = 'span'
+				el.textContent = null
+				for (let key in styleObject) {
+					if (!el.hasStyles()) {
+						el.styles = {}
+					}
+					el.styles[key] = styleObject[key]
+				}
+				cloneEl.addSelfTo(el)
+			}
+		})
+		this.anchor.moveToEnd(elements[elements.length - 1])
+		this.focus.moveToEnd(elements[elements.length - 1])
 	}
 }
 
