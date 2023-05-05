@@ -39,12 +39,12 @@ class AlexPoint {
 		}
 	}
 
-	//是否Point类型数据
+	//api：是否Point类型数据
 	static isPoint(val) {
 		return val instanceof AlexPoint
 	}
 
-	//两个点是否相等
+	//api：两个点是否相等
 	isEqual(point) {
 		if (!AlexPoint.isPoint(point)) {
 			return false
@@ -52,7 +52,7 @@ class AlexPoint {
 		return this.element.isEqual(point.element) && this.offset == point.offset
 	}
 
-	//移动到到指定元素最后
+	//api：移动到到指定元素最后
 	moveToEnd(element) {
 		if (!AlexElement.isElement(element)) {
 			return
@@ -80,7 +80,7 @@ class AlexPoint {
 		}
 	}
 
-	//移动到指定元素最前
+	//api：移动到指定元素最前
 	moveToStart(element) {
 		if (!AlexElement.isElement(element)) {
 			return
@@ -107,7 +107,7 @@ class AlexPoint {
 		}
 	}
 
-	//获取该点所在的块元素
+	//api：获取该点所在的块元素
 	getBlock() {
 		const fn = element => {
 			if (element.isBlock()) {
@@ -118,7 +118,7 @@ class AlexPoint {
 		return fn(this.element)
 	}
 
-	//获取该点所在的行内元素
+	//api：获取该点所在的行内元素
 	getInline() {
 		const fn = element => {
 			if (element.isInline()) {
@@ -129,7 +129,7 @@ class AlexPoint {
 		return fn(this.element)
 	}
 
-	//向上查询可以设置光标的元素
+	//api：向上查询可以设置光标的元素
 	getPreviousElement() {
 		const flatElements = AlexElement.flatElements()
 		const fn = element => {
@@ -148,7 +148,7 @@ class AlexPoint {
 		return fn(this.element)
 	}
 
-	//向下查找可以设置光标的元素
+	//api：向下查找可以设置光标的元素
 	getNextElement() {
 		const flatElements = AlexElement.flatElements()
 		const fn = element => {

@@ -2,16 +2,18 @@
 import { AlexElement } from '../src'
 import { ref } from 'vue'
 const url = 'https://www.mvi-web.cn/mvi-resources/images/mvi_image_2_1652322363009.jpeg'
-let value = ref(`<p>aaaa<span>bbbb</span></p>`)
+let value = ref(`<p>aaaa<span>bbbb</span></p><p>aaaa<span>bbbb</span></p>`)
 
 const editor = ref(null)
 
 const bold = () => {
 	const range = editor.value.getCurrentRange()
 	console.log(range)
-	range.setStyle({
-		color: '#f30'
-	})
+	// range.setStyle({
+	// 	color: '#f30'
+	// })
+	range.insertParagraph()
+	editor.value.reRender()
 }
 </script>
 <template>

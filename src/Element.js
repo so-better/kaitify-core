@@ -19,27 +19,27 @@ class AlexElement {
 		//父元素
 		this.parent = null
 	}
-	//是否文本
+	//api：是否文本
 	isText() {
 		return this.type == 'text'
 	}
-	//是否块
+	//api：是否块
 	isBlock() {
 		return this.type == 'block'
 	}
-	//是否行内
+	//api：是否行内
 	isInline() {
 		return this.type == 'inline'
 	}
-	//是否闭合
+	//api：是否闭合
 	isClosed() {
 		return this.type == 'closed'
 	}
-	//是否换行符
+	//api：是否换行符
 	isBreak() {
 		return this.isClosed() && this.parsedom == 'br'
 	}
-	//是否空
+	//api：是否空
 	isEmpty() {
 		//文本节点没有值认为是空
 		if (this.isText() && !this.textContent) {
@@ -57,11 +57,11 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否根元素
+	//api：是否根元素
 	isRoot() {
 		return !this.parent
 	}
-	//是否包含指定节点
+	//api：是否包含指定节点
 	isContains(element) {
 		if (this.isEqual(element)) {
 			return true
@@ -71,21 +71,21 @@ class AlexElement {
 		}
 		return this.isContains(element.parent)
 	}
-	//判断两个Element是否相等
+	//api：判断两个Element是否相等
 	isEqual(element) {
 		if (!AlexElement.isElement(element)) {
 			return false
 		}
 		return this.key == element.key
 	}
-	//判断两个元素是否有包含关系
+	//api：判断两个元素是否有包含关系
 	hasContains(element) {
 		if (!AlexElement.isElement(element)) {
 			return false
 		}
 		return this.isContains(element) || element.isContains(this)
 	}
-	//是否含有标记
+	//api：是否含有标记
 	hasMarks() {
 		if (!this.marks) {
 			return false
@@ -95,7 +95,7 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否含有样式
+	//api：是否含有样式
 	hasStyles() {
 		if (!this.styles) {
 			return false
@@ -105,14 +105,14 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否有子元素
+	//api：是否有子元素
 	hasChildren() {
 		if (Array.isArray(this.children)) {
 			return !!this.children.length
 		}
 		return false
 	}
-	//查找真实节点
+	//api：查找真实节点
 	getRealNode(el) {
 		if (this.isText()) {
 			const index = this.parent.children.findIndex(item => {
@@ -123,7 +123,7 @@ class AlexElement {
 		}
 		return el.querySelector(`[data-alex-editor-element="${this.key}"]`)
 	}
-	//获取前一个兄弟元素
+	//api：获取前一个兄弟元素
 	getPreviousElement() {
 		if (this.isRoot()) {
 			const index = AlexElement.elementStack.findIndex(item => {
@@ -149,7 +149,7 @@ class AlexElement {
 			return this.parent.children[index - 1]
 		}
 	}
-	//获取后一个兄弟元素
+	//api：获取后一个兄弟元素
 	getNextElement() {
 		if (this.isRoot()) {
 			const index = AlexElement.elementStack.findIndex(item => {
@@ -174,6 +174,88 @@ class AlexElement {
 			}
 			return this.parent.children[index + 1]
 		}
+	}
+	//api：添加到父元素指定位置
+	addSelfTo(element, index) {
+		if (!AlexElement.isElement(element)) {
+			return
+		}
+		//当前元素无法添加到自闭合元素和文本元素中去
+		if (element.isClosed() || element.isText()) {
+			return
+		}
+		//块元素无法添加到非块元素下
+		if (this.isBlock() && !element.isBlok()) {
+			return
+		}
+		//如果有子元素
+		if (element.hasChildren()) {
+			if (index >= element.children.length) {
+				element.children.push(this)
+			} else {
+				element.children.splice(index, 0, this)
+			}
+		} else {
+			element.children = [this]
+		}
+		//更新该元素的parent字段
+		this.parent = element
+	}
+	//api：添加到该元素之前
+	addSelfBefore(element) {
+		if (!AlexElement.isElement(element)) {
+			return
+		}
+		if (element.isRoot()) {
+			const index = AlexElement.elementStack.findIndex(el => {
+				return element.isEqual(el)
+			})
+			AlexElement.elementStack.splice(index, 0, this)
+			this.parent = null
+		} else {
+			const index = element.parent.children.findIndex(el => {
+				return element.isEqual(el)
+			})
+			this.addSelfTo(element.parent, index)
+		}
+	}
+	//api：添加到该元素之后
+	addSelfAfter(element) {
+		if (!AlexElement.isElement(element)) {
+			return
+		}
+		if (element.isRoot()) {
+			const index = AlexElement.elementStack.findIndex(el => {
+				return element.isEqual(el)
+			})
+			if (index == AlexElement.elementStack.length - 1) {
+				AlexElement.elementStack.push(this)
+			} else {
+				AlexElement.elementStack.splice(index + 1, 0, this)
+			}
+			this.parent = null
+		} else {
+			const index = element.parent.children.findIndex(el => {
+				return element.isEqual(el)
+			})
+			this.addSelfTo(element.parent, index + 1)
+		}
+	}
+	//api：克隆当前元素,deep为true表示深度克隆
+	clone(deep = true) {
+		let el = new AlexElement(this.type, this.parsedom, this.marks, this.styles, null, this.textContent)
+		if (deep && this.hasChildren()) {
+			this.children.forEach(child => {
+				let clonedChild = child.clone(deep)
+				if (el.hasChildren()) {
+					el.children.push(clonedChild)
+				} else {
+					el.children = [clonedChild]
+				}
+				clonedChild.parent = el
+			})
+		}
+		return el
 	}
 	//渲染成真实dom
 	renderElement() {
@@ -203,88 +285,6 @@ class AlexElement {
 		}
 		//设置唯一key标记
 		el.setAttribute('data-alex-editor-element', this.key)
-		return el
-	}
-	//添加到父元素指定位置
-	addSelfTo(element, index) {
-		if (!AlexElement.isElement(element)) {
-			return
-		}
-		//当前元素无法添加到自闭合元素和文本元素中去
-		if (element.isClosed() || element.isText()) {
-			return
-		}
-		//块元素无法添加到非块元素下
-		if (this.isBlock() && !element.isBlok()) {
-			return
-		}
-		//如果有子元素
-		if (element.hasChildren()) {
-			if (index >= element.children.length) {
-				element.children.push(this)
-			} else {
-				element.children.splice(index, 0, this)
-			}
-		} else {
-			element.children = [this]
-		}
-		//更新该元素的parent字段
-		this.parent = element
-	}
-	//添加到该元素之前
-	addSelfBefore(element) {
-		if (!AlexElement.isElement(element)) {
-			return
-		}
-		if (element.isRoot()) {
-			const index = AlexElement.elementStack.findIndex(el => {
-				return element.isEqual(el)
-			})
-			AlexElement.elementStack.splice(index, 0, this)
-			this.parent = null
-		} else {
-			const index = element.parent.children.findIndex(el => {
-				return element.isEqual(el)
-			})
-			this.addSelfTo(element.parent, index)
-		}
-	}
-	//添加到该元素之后
-	addSelfAfter(element) {
-		if (!AlexElement.isElement(element)) {
-			return
-		}
-		if (element.isRoot()) {
-			const index = AlexElement.elementStack.findIndex(el => {
-				return element.isEqual(el)
-			})
-			if (index == AlexElement.elementStack.length - 1) {
-				AlexElement.elementStack.push(this)
-			} else {
-				AlexElement.elementStack.splice(index + 1, 0, this)
-			}
-			this.parent = null
-		} else {
-			const index = element.parent.children.findIndex(el => {
-				return element.isEqual(el)
-			})
-			this.addSelfTo(element.parent, index + 1)
-		}
-	}
-	//克隆当前元素,deep为true表示深度克隆
-	clone(deep = true) {
-		let el = new AlexElement(this.type, this.parsedom, this.marks, this.styles, null, this.textContent)
-		if (deep && this.hasChildren()) {
-			this.children.forEach(child => {
-				let clonedChild = child.clone(deep)
-				if (el.hasChildren()) {
-					el.children.push(clonedChild)
-				} else {
-					el.children = [clonedChild]
-				}
-				clonedChild.parent = el
-			})
-		}
 		return el
 	}
 	//转换成block元素
@@ -345,9 +345,29 @@ class AlexElement {
 			}
 		}
 	}
-	//判断是否该类型数据
+	//api：判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement
+	}
+	//api：根据key查询
+	static getElementByKey(key) {
+		const searchFn = elements => {
+			let element = null
+			for (let ele of elements) {
+				if (ele.key == key) {
+					element = ele
+					break
+				}
+				if (ele.hasChildren()) {
+					element = searchFn(ele.children)
+					if (element) {
+						break
+					}
+				}
+			}
+			return element
+		}
+		return searchFn(AlexElement.elementStack)
 	}
 	//将dom转为AlexElement,rendRules用于自定义转换
 	static parseNode(el, renderRules) {
@@ -398,26 +418,6 @@ class AlexElement {
 			item.parent = null
 			return item
 		})
-	}
-	//根据key查询
-	static getElementByKey(key) {
-		const searchFn = elements => {
-			let element = null
-			for (let ele of elements) {
-				if (ele.key == key) {
-					element = ele
-					break
-				}
-				if (ele.hasChildren()) {
-					element = searchFn(ele.children)
-					if (element) {
-						break
-					}
-				}
-			}
-			return element
-		}
-		return searchFn(AlexElement.elementStack)
 	}
 	//扁平化处理
 	static flatElements(elements) {
@@ -571,9 +571,9 @@ class AlexElement {
 			return element
 		}
 	]
-	//存放编辑器的alexElement数组
+	//api：存放编辑器的alexElement数组
 	static elementStack = []
-	//定义段落元素
+	//api：定义段落元素
 	static PARAGRAPH_BLOCKNAME = 'P'
 }
 

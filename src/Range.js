@@ -94,7 +94,7 @@ class AlexRange {
 		}
 	}
 
-	//设置真实的光标
+	//api：设置真实的光标
 	setCursor() {
 		//设置光标之前需要将两个点合二为一
 		if (!this.anchor.isEqual(this.focus)) {
@@ -117,7 +117,7 @@ class AlexRange {
 		selection.collapse(node, offset)
 	}
 
-	//插入文本
+	//api：插入文本
 	insertText(data) {
 		//对空格进行处理
 		data = data.replace(/\s+/g, () => {
@@ -154,8 +154,8 @@ class AlexRange {
 		}
 	}
 
-	//换行
-	insertParagraph(renderRules) {
+	//api：换行
+	insertParagraph() {
 		//起点和终点在一个位置
 		if (this.anchor.isEqual(this.focus)) {
 			//前一个可以获取焦点的元素
@@ -170,6 +170,8 @@ class AlexRange {
 			if (this.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
 				//在该块之前插入一个新的段落
 				const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_BLOCKNAME, null, null, null, null)
+				const breakEle = new AlexElement('closed', 'br', null, null, null, null)
+				breakEle.addSelfTo(paragraph, 0)
 				paragraph.addSelfBefore(anchorBlock)
 				this.anchor.moveToStart(anchorBlock)
 				this.focus.moveToStart(anchorBlock)
@@ -178,6 +180,8 @@ class AlexRange {
 			else if (this.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
 				//在该块之后插入一个新的段落
 				const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_BLOCKNAME, null, null, null, null)
+				const breakEle = new AlexElement('closed', 'br', null, null, null, null)
+				breakEle.addSelfTo(paragraph, 0)
 				paragraph.addSelfAfter(anchorBlock)
 				this.anchor.moveToStart(paragraph)
 				this.focus.moveToStart(paragraph)
@@ -207,11 +211,11 @@ class AlexRange {
 			}
 		} else {
 			this.delete()
-			this.insertParagraph(renderRules)
+			this.insertParagraph()
 		}
 	}
 
-	//删除内容
+	//api：删除内容
 	delete() {
 		//单个删除
 		if (this.anchor.isEqual(this.focus)) {
@@ -310,7 +314,7 @@ class AlexRange {
 		}
 	}
 
-	//获取选区之间的元素
+	//api：获取选区之间的元素
 	getElements() {
 		//如果起点和终点在一个地方则返回空数组
 		if (this.anchor.isEqual(this.focus)) {
@@ -380,7 +384,7 @@ class AlexRange {
 		return elements
 	}
 
-	//将真实的光标设置到指定元素开始
+	//api：将真实的光标设置到指定元素开始
 	collapseToStart(element) {
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
@@ -395,7 +399,7 @@ class AlexRange {
 		}
 	}
 
-	//光标设置到指定的元素最后
+	//api：光标设置到指定的元素最后
 	collapseToEnd(element) {
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
@@ -411,7 +415,7 @@ class AlexRange {
 		}
 	}
 
-	//设置css样式
+	//api：设置css样式
 	setStyle(styleObject) {
 		const elements = this.getElements()
 		elements.forEach(el => {
