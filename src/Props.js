@@ -2,7 +2,8 @@ export default {
 	//编辑器的值
 	modelValue: {
 		type: String,
-		default: '<p><br></p>'
+		default: '<p><br></p>',
+		required: true
 	},
 	//是否禁用
 	disabled: {

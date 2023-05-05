@@ -112,7 +112,7 @@ class AlexElement {
 		}
 		return false
 	}
-	//api：查找真实节点
+	//查找真实节点
 	getRealNode(el) {
 		if (this.isText()) {
 			const index = this.parent.children.findIndex(item => {
@@ -267,7 +267,10 @@ class AlexElement {
 		//设置属性
 		if (this.hasMarks()) {
 			for (let key in this.marks) {
-				el.setAttribute(key, this.marks[key])
+				//过滤掉事件、样式和标记
+				if (!/^on/g.test(key) && key != 'style' && key != 'data-alex-editor-element') {
+					el.setAttribute(key, this.marks[key])
+				}
 			}
 		}
 		//设置样式
