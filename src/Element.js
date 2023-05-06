@@ -129,7 +129,7 @@ class AlexElement {
 			const index = AlexElement.elementStack.findIndex(item => {
 				return this.isEqual(item)
 			})
-			if (index == 0) {
+			if (index <= 0) {
 				return null
 			}
 			if (AlexElement.elementStack[index - 1].isEmpty()) {
@@ -140,7 +140,7 @@ class AlexElement {
 			const index = this.parent.children.findIndex(item => {
 				return this.isEqual(item)
 			})
-			if (index == 0) {
+			if (index <= 0) {
 				return null
 			}
 			if (this.parent.children[index - 1].isEmpty()) {
@@ -155,7 +155,7 @@ class AlexElement {
 			const index = AlexElement.elementStack.findIndex(item => {
 				return this.isEqual(item)
 			})
-			if (index == AlexElement.elementStack.length - 1) {
+			if (index >= AlexElement.elementStack.length - 1) {
 				return null
 			}
 			if (AlexElement.elementStack[index + 1].isEmpty()) {
@@ -166,7 +166,7 @@ class AlexElement {
 			const index = this.parent.children.findIndex(item => {
 				return this.isEqual(item)
 			})
-			if (index == this.parent.children.length - 1) {
+			if (index >= this.parent.children.length - 1) {
 				return null
 			}
 			if (this.parent.children[index + 1].isEmpty()) {
@@ -337,17 +337,10 @@ class AlexElement {
 			this.parent.children.forEach(el => {
 				el.parent = this.parent
 			})
-			if (this.isRoot()) {
-				const index = AlexElement.elementStack.findIndex(el => {
-					return this.isEqual(el)
-				})
-				AlexElement.elementStack.splice(index, 1)
-			} else {
-				const index = this.parent.children.findIndex(el => {
-					return this.isEqual(el)
-				})
-				this.parent.children.splice(index, 1)
-			}
+			const index = this.parent.children.findIndex(el => {
+				return this.isEqual(el)
+			})
+			this.parent.children.splice(index, 1)
 		}
 	}
 	//api：判断是否该类型数据

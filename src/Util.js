@@ -59,9 +59,9 @@ export default {
 			return !!(parentNode.compareDocumentPosition(childNode) & 16)
 		}
 	},
-	//是否dom元素
+	//是否dom元素包括文本元素
 	isElement(el) {
-		return el && el.nodeType === 1 && el instanceof Node
+		return el && (el.nodeType === 1 || el.nodeType == 3) && el instanceof Node
 	},
 	//是否window
 	isWindow(data) {
