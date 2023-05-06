@@ -369,7 +369,7 @@ class AlexElement {
 	}
 	//将dom转为AlexElement,rendRules用于自定义转换
 	static parseNode(el, renderRules) {
-		if (!(el instanceof Node)) {
+		if (!Util.isElement(el)) {
 			return null
 		}
 		//文本节点
@@ -380,10 +380,6 @@ class AlexElement {
 				text = renderRules(text)
 			}
 			return text
-		}
-		//非元素节点返回null
-		if (el.nodeType != 1) {
-			return null
 		}
 		//以下是元素节点的转换
 		const marks = Util.getAttributes(el)
