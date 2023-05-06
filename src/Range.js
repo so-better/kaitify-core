@@ -415,7 +415,7 @@ class AlexRange {
 		}
 	}
 
-	//api：设置css样式
+	//api：根据光标设置css样式
 	setStyle(styleObject) {
 		const elements = this.getElements()
 		elements.forEach(el => {
@@ -435,6 +435,20 @@ class AlexRange {
 		})
 		this.anchor.moveToEnd(elements[elements.length - 1])
 		this.focus.moveToEnd(elements[elements.length - 1])
+	}
+
+	//api：插入dom
+	insertNode(node, renderRules) {
+		const el = AlexElement.parseNode(node, renderRules)
+		//光标
+		if (this.anchor.isEqual(this.focus)) {
+		}
+		//如果插入的是块元素
+		if (el.isBlock()) {
+		}
+		//其他元素
+		else {
+		}
 	}
 }
 

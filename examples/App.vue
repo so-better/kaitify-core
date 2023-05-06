@@ -8,12 +8,15 @@ let value = ref(`<p>aaaa<span>bbbb</span></p><p><img style="width:40px" src="${u
 const editor = ref(null)
 
 const op = () => {
-	const img = new AlexElement('closed', 'video', { src: videoUlr, autoplay: true, muted: true, controls: true }, { width: '300px' }, null, null)
+	// const img = document.createElement('img')
+	// img.src = url
+	// img.style.width = '300px'
+	// const range = editor.value.getCurrentRange()
+	// range.insertNode(img)
+	// editor.value.reRender()
+	const img = new AlexElement('closed', 'img', { src: url }, { width: '300px' }, null, null)
 	const range = editor.value.getCurrentRange()
-	range.collapseToEnd()
-	img.addSelfAfter(range.focus.element)
-	range.focus.moveToEnd(img)
-	range.focus.moveToEnd(img)
+	img.addSelfAfter(AlexElement.getElementByKey('6'))
 	editor.value.reRender()
 }
 </script>

@@ -80,6 +80,14 @@ const beforeInput = function (e) {
 		case 'insertParagraph':
 			range.insertParagraph(props.renderRules)
 			break
+		//粘贴
+		case 'insertFromPaste':
+			let text = e.dataTransfer.getData('text/plain')
+			let files = e.dataTransfer.files
+			if (text) {
+				range.insertText(text)
+			}
+			break
 		default:
 			console.log('beforeInput没有监听到的inputType', e.inputType)
 	}

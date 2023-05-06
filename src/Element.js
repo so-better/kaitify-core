@@ -301,6 +301,8 @@ class AlexElement {
 		}
 		this.type = 'block'
 		this.parsedom = AlexElement.PARAGRAPH_BLOCKNAME
+		this.marks = null
+		this.styles = null
 		this.children = [element]
 		element.parent = this
 	}
