@@ -1,7 +1,3 @@
-import alexEditor from './index.vue'
-import AlexElement from './Element'
-alexEditor.install = app => {
-	app.component(alexEditor.name, alexEditor)
-}
+import AlexEditor from './Editor'
 
-export { AlexElement, alexEditor, alexEditor as default }
+export { AlexEditor, AlexEditor as default }
