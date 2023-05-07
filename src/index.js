@@ -1,3 +1,3 @@
 import AlexEditor from './Editor'
-
-export { AlexEditor, AlexEditor as default }
+import AlexElement from './Element'
+export { AlexElement, AlexEditor, AlexEditor as default }
