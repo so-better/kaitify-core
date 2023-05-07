@@ -55,13 +55,13 @@ editor.render()
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
-| 属性        | 类型     | 说明                                                                     | 可取值     | 默认值           |
-| ----------- | -------- | ------------------------------------------------------------------------ | ---------- | ---------------- |
-| value       | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                           | -          | "\<p>\<br>\</p>" |
-| disabled    | boolean  | 是否禁用编辑器                                                           | true/false | false            |
-| renderRules | function | 自定义编辑器渲染规则                                                     | -          | -                |
-| autofocus   | boolean  | 是否自动获取焦点                                                         | true/false | false            |
-| onChange    | function | 编辑器值更新时触发，回调参数为最新的编辑器内容，同时 this 指向编辑器实例 | -          | -                |
+| 属性        | 类型     | 说明                                                                          | 可取值     | 默认值           |
+| ----------- | -------- | ----------------------------------------------------------------------------- | ---------- | ---------------- |
+| value       | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                | -          | "\<p>\<br>\</p>" |
+| disabled    | boolean  | 是否禁用编辑器                                                                | true/false | false            |
+| renderRules | function | 自定义编辑器渲染规则                                                          | -          | -                |
+| autofocus   | boolean  | 是否自动获取焦点                                                              | true/false | false            |
+| onChange    | function | 编辑器值更新时触发，回调参数为 newValue 和 oldValue，同时 this 指向编辑器实例 | -          | -                |
 
 > renderRules 函数的回调参数为 element，表示当前渲染的 AlexElement 实例，你可以针对该实例的进行你想要的操作（实例的 key、parent 和\_elm 不能进行操作，key 是禁止操作的，parent 和\_elm 操作了也没用处），但是最后需要返回一个 AlexElement 实例
 
