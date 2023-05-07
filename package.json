@@ -7,7 +7,7 @@
 	"main": "lib/alex-editor.umd.js",
 	"module": "lib/alex-editor.es.js",
 	"license": "MIT",
-	"description": "一个基于Vue3的轻量级底层富文本编辑器",
+	"description": "一个轻量级JS底层基础的富文本编辑器",
 	"scripts": {
 		"dev": "vite",
 		"lib": "vite build"
