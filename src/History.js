@@ -1,3 +1,7 @@
+import AlexElement from './Element'
+import AlexPoint from './Point'
+import AlexRange from './Range'
+
 class AlexHistory {
 	constructor() {
 		//存放历史记录的堆栈
@@ -7,14 +11,35 @@ class AlexHistory {
 	}
 
 	//入栈
-	push(stack) {
+	push(stack, range) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.index < this.stacks.length - 1) {
 			this.stacks.length = this.index + 1
 		}
-		this.stacks.push(stack)
+		//生成一个新的stack
+		const newStack = stack.map(ele => {
+			return this._cloneElement(ele)
+		})
+		//查找新stack中anchor对应的元素
+		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
+			return ele.key == range.anchor.element.key
+		})
+		//查找新stack中focus对应的元素
+		const focusElement = AlexElement.flatElements(newStack).find(ele => {
+			return ele.key == range.focus.element.key
+		})
+		//创建新的anchor
+		const anchor = new AlexPoint(anchorElement, range.anchor.offset)
+		//创建新的focus
+		const focus = new AlexPoint(focusElement, range.focus.offset)
+		//创建新的range
+		const newRange = new AlexRange(anchor, focus)
+		//推入栈中
+		this.stacks.push({
+			stack: newStack,
+			range: newRange
+		})
 		this.index += 1
-		console.log(this.stacks)
 	}
 
 	//撤销
@@ -37,7 +62,49 @@ class AlexHistory {
 			//前进1
 			this.index += 1
 		}
-		return this.stacks[this.index]
+		//获取栈中的stack和range
+		const { stack, range } = this.stacks[this.index]
+		//创建新的stack
+		const newStack = stack.map(ele => {
+			return this._cloneElement(ele)
+		})
+		//查找新stack中anchor对应的元素
+		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
+			return ele.key == range.anchor.element.key
+		})
+		//查找新stack中focus对应的元素
+		const focusElement = AlexElement.flatElements(newStack).find(ele => {
+			return ele.key == range.focus.element.key
+		})
+		//创建新的anchor
+		const anchor = new AlexPoint(anchorElement, range.anchor.offset)
+		//创建新的focus
+		const focus = new AlexPoint(focusElement, range.focus.offset)
+		//创建新的range
+		const newRange = new AlexRange(anchor, focus)
+		//返回给编辑器
+		return {
+			stack: newStack,
+			range: newRange
+		}
+	}
+
+	//复制元素，包括key也复制
+	_cloneElement(element) {
+		const el = new AlexElement(element.type, element.parsedom, element.marks, element.styles, element.textContent)
+		el.key = element.key
+		if (element.hasChildren()) {
+			element.children.forEach(child => {
+				let clonedChild = this._cloneElement(child)
+				if (el.hasChildren()) {
+					el.children.push(clonedChild)
+				} else {
+					el.children = [clonedChild]
+				}
+				clonedChild.parent = el
+			})
+		}
+		return el
 	}
 }
 

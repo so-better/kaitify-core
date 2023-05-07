@@ -1,12 +1,10 @@
-import AlexElement from './Element'
-
 class AlexRange {
 	constructor(anchor, focus) {
 		this.anchor = anchor
 		this.focus = focus
 	}
 
-	//设置真实的光标
+	//根据anchor和focus来设置真实的光标
 	setCursor() {
 		let anchorNode = null
 		let anchorOffset = null
@@ -15,8 +13,8 @@ class AlexRange {
 		//自闭合文本需要特殊处理
 		if (this.anchor.element.isClosed()) {
 			anchorNode = this.anchor.element.parent._elm
-			const index = this.anchor.element.parent.children.findIndex(el => {
-				return this.anchor.element.isEqual(el)
+			const index = this.anchor.element.parent.children.findIndex(item => {
+				return this.anchor.element.isEqual(item)
 			})
 			anchorOffset = this.anchor.offset == 1 ? index + 1 : index
 		} else {
@@ -26,8 +24,8 @@ class AlexRange {
 		//自闭合文本需要特殊处理
 		if (this.focus.element.isClosed()) {
 			focusNode = this.focus.element.parent._elm
-			const index = this.focus.element.parent.children.findIndex(el => {
-				return this.focus.element.isEqual(el)
+			const index = this.focus.element.parent.children.findIndex(item => {
+				return this.focus.element.isEqual(item)
 			})
 			focusOffset = this.focus.offset == 1 ? index + 1 : index
 		} else {

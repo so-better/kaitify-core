@@ -1,7 +1,7 @@
 import Util from './Util'
 
 class AlexElement {
-	constructor(type, parsedom, marks, styles, children, textContent) {
+	constructor(type, parsedom, marks, styles, textContent) {
 		//key值
 		this.key = Util.getUniqueKey()
 		//类型 block/inline/text/closed
@@ -12,10 +12,10 @@ class AlexElement {
 		this.marks = marks
 		//样式集合
 		this.styles = styles
-		//子元素
-		this.children = children
 		//text时的值
 		this.textContent = textContent
+		//子元素
+		this.children = null
 		//父元素
 		this.parent = null
 		//真实dom
@@ -119,7 +119,7 @@ class AlexElement {
 		if (typeof deep != 'boolean') {
 			throw new Error('The parameter must be a Boolean')
 		}
-		let el = new AlexElement(this.type, this.parsedom, this.marks, this.styles, null, this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, this.marks, this.styles, this.textContent)
 		if (deep && this.hasChildren()) {
 			this.children.forEach(child => {
 				let clonedChild = child.clone(deep)
