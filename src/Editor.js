@@ -28,6 +28,8 @@ class AlexEditor {
 		this.range = null
 		//是否正在输入中文
 		this._isInputChinese = false
+		//旧的文本内容
+		this._oldValue = options.value
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
 		//创建历史记录
@@ -37,7 +39,7 @@ class AlexEditor {
 		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化一个段落
 		if (this.stack.length == 0) {
 			const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
-			const breakEle = new AlexElement('block', 'br', null, null, null)
+			const breakEle = new AlexElement('closed', 'br', null, null, null)
 			this.addElementTo(breakEle, ele, 0)
 			this.stack = [ele]
 		}
@@ -63,11 +65,6 @@ class AlexEditor {
 		Util.on(this.$el, 'compositionstart compositionupdate compositionend', this._chineseInputHandler.bind(this))
 		//监听键盘按下
 		Util.on(this.$el, 'keydown', this._keyboardDown.bind(this))
-		console.log(this.stack)
-		const el2 = this.getElementByKey('6')
-		this.range.anchor.moveToEnd(el2)
-		this.range.focus.moveToEnd(el2)
-		this.range.setCursor()
 	}
 
 	//格式化options参数
@@ -346,14 +343,18 @@ class AlexEditor {
 			let elm = element._renderElement()
 			this.$el.appendChild(elm)
 		})
+		this._oldValue = this.value
 		this.value = this.$el.innerHTML
-		if (typeof this.onChange == 'function') {
-			this.onChange.apply(this, [this.value])
-		}
-		//unPushHistory如果是true则表示不加入历史记录中
-		if (!unPushHistory) {
-			//将本次的stack和range推入历史栈中
-			this.history.push(this.stack, this.range)
+		//值有变化
+		if (this._oldValue != this.value) {
+			if (typeof this.onChange == 'function') {
+				this.onChange.apply(this, [this.value, this._oldValue])
+			}
+			//unPushHistory如果是true则表示不加入历史记录中
+			if (!unPushHistory) {
+				//将本次的stack和range推入历史栈中
+				this.history.push(this.stack, this.range)
+			}
 		}
 	}
 	//禁用编辑器
@@ -614,11 +615,12 @@ class AlexEditor {
 		}
 		const node = document.createElement('div')
 		node.innerHTML = html
-		const data = this.parseNode(node)
-		return data.children.map(ele => {
-			ele.parent = null
-			return ele
+		let elements = []
+		Array.from(node.childNodes).forEach(el => {
+			const element = this.parseNode(el)
+			elements.push(element)
 		})
+		return elements
 	}
 	//向上查询可以设置焦点的元素
 	getPreviousElementOfPoint(point) {

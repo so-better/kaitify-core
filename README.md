@@ -67,21 +67,33 @@ editor.render()
 
 ### 编辑器内部元素渲染规范
 
-#### ==默认的强制性的不可变更的规则（执行 editor.formatElements 方法）：==
+#### 默认的强制性的不可变更的规则（执行 editor.formatElements 方法）：
 
--   **子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）**
--   **根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）**
--   **同级元素中 block 元素和其他元素不能同时存在，否则会把其他元素强转为 block 元素**
--   **执行格式化时会把空元素移除（text 元素内容为空视为空元素、block 和 inline 没有子元素视为空元素）**
--   **AlexPoint 对象的 element 属性只会是 closed 和 text 元素**
--   **删除操作中，如果 block 元素的 children 为空了，则添加一个换行符 \<br>，在删除换行符后才会清除此元素**
--   **清除一个元素的方法：如果是在遍历 editor.stack 数组则可以将遍历到的元素置为 null ；如果只是在访问具体元素时，不能直接置为 null ，可以把 text 元素的 textContent 设为空，或者 block 元素 / inline 元素的 children 设为空，或者把 closed 元素从父元素中删除掉**
--   **如果 AlexPoint 对象的 element 是 closed 元素，那么 offset 要么是 0 要么是 1
-    操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入**
+-   子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
+-   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
+-   同级元素中 block 元素和其他元素不能同时存在，否则会把其他元素强转为 block 元素
+-   执行格式化时会把空元素移除（text 元素内容为空视为空元素、block 和 inline 没有子元素视为空元素）
+-   AlexPoint 对象的 element 属性只会是 closed 和 text 元素
+-   删除操作中，如果 block 元素的 children 为空了，则添加一个换行符 \<br>，在删除换行符后才会清除此元素
+-   清除一个元素的方法：如果是在遍历 editor.stack 数组则可以将遍历到的元素置为 null ；如果只是在访问具体元素时，不能直接置为 null ，可以把 text 元素的 textContent 设为空，或者 block 元素 / inline 元素的 children 设为空，或者把 closed 元素从父元素中删除掉
+-   如果 AlexPoint 对象的 element 是 closed 元素，那么 offset 要么是 0 要么是 1
+    操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入
 
-#### ==可变更的规则（可以通过 renderRules 来变更）：==
+#### 可变更的规则（可以通过 renderRules 来变更）：
 
--   **在执行 parseHtml 和 parseNode 时， br 和 img 元素会生成 closed 元素，span 元素会生成 inline 元素**
+-   在执行 parseHtml 和 parseNode 时， br 和 img 元素会生成 closed 元素，span 元素会生成 inline 元素，其余都会生成 block 元素。如果需要修改此规则，可通过 renderRules 进行修改和覆盖
+
+```javascript
+const editor = new AlexEditor(el, {
+	renderRules: function (element) {
+		//将video元素设定为closed元素
+		if (element.parsedom == 'video') {
+			element.type = 'closed'
+		}
+		return element
+	}
+})
+```
 
 ### AlexEditor 编辑器
 
