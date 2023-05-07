@@ -133,8 +133,24 @@ class AlexElement {
 		}
 		return el
 	}
+	//转换成block元素
+	convertToBlock() {
+		if (this.isBlock()) {
+			throw new Error('This element is already of type "block"')
+		}
+		let element = this.clone(true)
+		if (this.isText()) {
+			this.textContent = null
+		}
+		this.type = 'block'
+		this.parsedom = AlexElement.paragraph
+		this.marks = null
+		this.styles = null
+		this.children = [element]
+		element.parent = this
+	}
 	//渲染成真实dom
-	renderElement() {
+	_renderElement() {
 		let el = null
 		//文本节点
 		if (this.isText()) {
@@ -161,7 +177,7 @@ class AlexElement {
 			//渲染子元素
 			if (this.hasChildren()) {
 				for (let child of this.children) {
-					let childElm = child.renderElement()
+					let childElm = child._renderElement()
 					el.appendChild(childElm)
 				}
 			}
@@ -171,22 +187,6 @@ class AlexElement {
 		//更新挂载的真实dom
 		this._elm = el
 		return el
-	}
-	//转换成block元素
-	convertToBlock() {
-		if (this.isBlock()) {
-			throw new Error('This element is already of type "block"')
-		}
-		let element = this.clone(true)
-		if (this.isText()) {
-			this.textContent = null
-		}
-		this.type = 'block'
-		this.parsedom = AlexElement.paragraph
-		this.marks = null
-		this.styles = null
-		this.children = [element]
-		element.parent = this
 	}
 	//定义段落标签
 	static paragraph = 'p'
@@ -222,12 +222,6 @@ class AlexElement {
 			case 'img':
 				element.type = 'closed'
 				element.children = null
-				break
-			case 'input':
-				element.type = 'inline'
-				element.parsedom = 'span'
-				break
-			default:
 				break
 		}
 		return element

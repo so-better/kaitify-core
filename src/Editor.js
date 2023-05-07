@@ -33,11 +33,18 @@ class AlexEditor {
 		//创建历史记录
 		this.history = new AlexHistory()
 		//格式化元素数组
-		this._formatElements()
+		this.formatElements()
+		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化一个段落
+		if (this.stack.length == 0) {
+			const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
+			const breakEle = new AlexElement('block', 'br', null, null, null)
+			this.addElementTo(breakEle, ele, 0)
+			this.stack = [ele]
+		}
 		//初始设置range
 		this._initRange()
 		//渲染dom
-		this._domRender()
+		this.domRender()
 		//编辑器禁用和启用设置
 		if (this.disabled) {
 			this.setDisabled()
@@ -56,6 +63,11 @@ class AlexEditor {
 		Util.on(this.$el, 'compositionstart compositionupdate compositionend', this._chineseInputHandler.bind(this))
 		//监听键盘按下
 		Util.on(this.$el, 'keydown', this._keyboardDown.bind(this))
+		console.log(this.stack)
+		const el2 = this.getElementByKey('6')
+		this.range.anchor.moveToEnd(el2)
+		this.range.focus.moveToEnd(el2)
+		this.range.setCursor()
 	}
 
 	//格式化options参数
@@ -86,73 +98,6 @@ class AlexEditor {
 		}
 		return opts
 	}
-	//规范stack
-	_formatElements() {
-		//格式化
-		const format = ele => {
-			//从子孙元素开始格式化
-			if (ele.hasChildren()) {
-				ele.children = ele.children.map(format)
-			}
-			//格式化自身
-			AlexElement._formatUnchangeableRules.forEach(fn => {
-				//这里的ele是每一个fn执行后的结果，需要考虑到可能被置为了null
-				if (ele) {
-					ele = fn(ele)
-				}
-			})
-			return ele
-		}
-		//移除null
-		const removeNull = ele => {
-			if (ele) {
-				if (ele.hasChildren()) {
-					ele.children.forEach(item => {
-						if (item) {
-							item = removeNull(item)
-						}
-					})
-					ele.children = ele.children.filter(item => {
-						return !!item
-					})
-				}
-			}
-			return ele
-		}
-		this.stack = this.stack
-			.map(ele => {
-				//转为块元素
-				if (!ele.isBlock()) {
-					ele.convertToBlock()
-				}
-				//格式化
-				ele = format(ele)
-				//format会导致null出现，这里需要移除null
-				ele = removeNull(ele)
-				return ele
-			})
-			.filter(ele => {
-				//移除根部的null元素
-				return !!ele
-			})
-	}
-	//渲染编辑器dom内容
-	_domRender(unPushHistory) {
-		this.$el.innerHTML = ''
-		this.stack.forEach(element => {
-			let elm = element.renderElement()
-			this.$el.appendChild(elm)
-		})
-		this.value = this.$el.innerHTML
-		if (typeof this.onChange == 'function') {
-			this.onChange.apply(this, [this.value])
-		}
-		//unPushHistory如果是true则表示不加入历史记录中
-		if (!unPushHistory) {
-			//将本次的stack和range推入历史栈中
-			this.history.push(this.stack, this.range)
-		}
-	}
 	//初始设置range
 	_initRange() {
 		const firstElement = this.stack[0]
@@ -174,6 +119,8 @@ class AlexEditor {
 		const nextElement = this.getNextElementOfPoint(this.range.anchor)
 		//当前焦点所在的块元素
 		const anchorBlock = this.range.anchor.getBlock()
+		//当前焦点所在的行内元素
+		const anchorInline = this.range.anchor.getInline()
 		//起点和终点都在文本内
 		if (this.range.anchor.element.isText()) {
 			const val = this.range.anchor.element.textContent
@@ -236,6 +183,8 @@ class AlexEditor {
 			}
 			//所在块元素不是空
 			else {
+				//删除的元素是否是换行符
+				const isBreak = this.range.anchor.element.isBreak()
 				//同块内前面存在可以获取焦点的元素
 				if (previousElement && anchorBlock.isContains(previousElement)) {
 					this.range.anchor.moveToEnd(previousElement)
@@ -245,6 +194,10 @@ class AlexEditor {
 				else if (nextElement && anchorBlock.isContains(nextElement)) {
 					this.range.anchor.moveToStart(nextElement)
 					this.range.focus.moveToStart(nextElement)
+				}
+				//如果所在行内元素存在并且行内元素是空并且删除的是换行符
+				if (anchorInline && anchorInline.isEmpty() && isBreak) {
+					this.delete()
 				}
 			}
 		}
@@ -256,7 +209,7 @@ class AlexEditor {
 			return
 		}
 		//如果是中文输入则不更新range
-		if (this.isInputChinese) {
+		if (this._isInputChinese) {
 			return
 		}
 		const selection = window.getSelection()
@@ -307,7 +260,9 @@ class AlexEditor {
 			default:
 				console.log('beforeInput没有监听到的inputType', e.inputType)
 		}
-		this.render()
+		this.formatElements()
+		this.domRender()
+		this.range.setCursor()
 	}
 	//监听中文输入
 	_chineseInputHandler(e) {
@@ -320,7 +275,9 @@ class AlexEditor {
 			//在中文输入结束后插入数据
 			this.insertText(e.data)
 			//渲染
-			this.render()
+			this.formatElements()
+			this.domRender()
+			this.range.setCursor()
 		}
 	}
 	//监听键盘按下
@@ -332,14 +289,72 @@ class AlexEditor {
 				break
 		}
 	}
-	//渲染
-	render() {
+	//规范stack
+	formatElements() {
 		//格式化
-		this._formatElements()
-		//渲染编辑器
-		this._domRender()
-		//设置光标
-		this.range.setCursor()
+		const format = ele => {
+			//从子孙元素开始格式化
+			if (ele.hasChildren()) {
+				ele.children = ele.children.map(format)
+			}
+			//格式化自身
+			AlexElement._formatUnchangeableRules.forEach(fn => {
+				//这里的ele是每一个fn执行后的结果，需要考虑到可能被置为了null
+				if (ele) {
+					ele = fn(ele)
+				}
+			})
+			return ele
+		}
+		//移除null
+		const removeNull = ele => {
+			if (ele) {
+				if (ele.hasChildren()) {
+					ele.children.forEach(item => {
+						if (item) {
+							item = removeNull(item)
+						}
+					})
+					ele.children = ele.children.filter(item => {
+						return !!item
+					})
+				}
+			}
+			return ele
+		}
+		this.stack = this.stack
+			.map(ele => {
+				//转为块元素
+				if (!ele.isBlock()) {
+					ele.convertToBlock()
+				}
+				//格式化
+				ele = format(ele)
+				//format会导致null出现，这里需要移除null
+				ele = removeNull(ele)
+				return ele
+			})
+			.filter(ele => {
+				//移除根部的null元素
+				return !!ele
+			})
+	}
+	//渲染编辑器dom内容
+	domRender(unPushHistory = false) {
+		this.$el.innerHTML = ''
+		this.stack.forEach(element => {
+			let elm = element._renderElement()
+			this.$el.appendChild(elm)
+		})
+		this.value = this.$el.innerHTML
+		if (typeof this.onChange == 'function') {
+			this.onChange.apply(this, [this.value])
+		}
+		//unPushHistory如果是true则表示不加入历史记录中
+		if (!unPushHistory) {
+			//将本次的stack和range推入历史栈中
+			this.history.push(this.stack, this.range)
+		}
 	}
 	//禁用编辑器
 	setDisabled() {
@@ -1034,30 +1049,6 @@ class AlexEditor {
 		} else {
 			this.delete()
 			this.insertElement(ele)
-		}
-	}
-	//撤销
-	undo() {
-		//获取前一个stack
-		const historyResult = this.history.get(-1)
-		if (historyResult) {
-			this.stack = historyResult.stack
-			this.range = historyResult.range
-			//渲染编辑器
-			this._domRender(true)
-			this.range.setCursor()
-		}
-	}
-	//重做
-	redo() {
-		//获取后一个stack
-		const stack = this.history.get(1)
-		if (stack) {
-			this.stack = historyResult.stack
-			this.range = historyResult.range
-			//渲染编辑器
-			this._domRender(true)
-			this.range.setCursor()
 		}
 	}
 }

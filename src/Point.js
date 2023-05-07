@@ -107,6 +107,9 @@ class AlexPoint {
 			if (element.isInline()) {
 				return element
 			}
+			if (element.isRoot()) {
+				return null
+			}
 			return fn(element.parent)
 		}
 		return fn(this.element)
