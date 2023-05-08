@@ -9,7 +9,7 @@
 	"license": "MIT",
 	"description": "一个轻量级JS底层基础的富文本编辑器",
 	"scripts": {
-		"dev": "vite",
+		"dev": "vite --host",
 		"lib": "vite build"
 	},
 	"dependencies": {

@@ -71,10 +71,8 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'compositionstart compositionupdate compositionend', this._handleChineseInput.bind(this))
 		//监听键盘按下
 		Dap.event.on(this.$el, 'keydown', this._handleKeydown.bind(this))
-		//监听编辑器复制和剪切
-		Dap.event.on(this.$el, 'copy cut', this._handleCopyCut.bind(this))
-		//监听编辑器粘贴
-		Dap.event.on(this.$el, 'paste', this._handlePaste.bind(this))
+		//监听编辑器粘贴和剪切
+		Dap.event.on(this.$el, 'paste cut', this._handleCutPaste.bind(this))
 	}
 
 	//校验函数数组，用于格式化
@@ -172,7 +170,6 @@ class AlexEditor {
 			return element
 		}
 	]
-
 	//格式化options参数
 	_formatOptions(options) {
 		let opts = {
@@ -344,6 +341,10 @@ class AlexEditor {
 	}
 	//监听beforeinput
 	_handleBeforeInput(e) {
+		//粘贴使用系统的默认行为
+		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut') {
+			return
+		}
 		e.preventDefault()
 		//插入文本
 		if (e.inputType == 'insertText') {
@@ -354,7 +355,7 @@ class AlexEditor {
 			return
 		}
 		//插入段落
-		if (e.inputType == 'insertParagraph') {
+		if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
 			this.insertParagraph()
 			this.formatElements()
 			this.domRender()
@@ -369,7 +370,7 @@ class AlexEditor {
 			this.range.setCursor()
 			return
 		}
-		console.log('beforeInput没有监听到的inputType', e.inputType)
+		console.log('beforeInput没有监听到的inputType', e.inputType, e)
 	}
 	//监听中文输入
 	_handleChineseInput(e) {
@@ -413,39 +414,27 @@ class AlexEditor {
 			}
 		}
 	}
-	//监听复制和剪切事件
-	_handleCopyCut(e) {
-		e.preventDefault()
-		const selection = window.getSelection()
-		const range = selection.getRangeAt(0)
-		const container = document.createElement('div')
-		Array.from(range.cloneContents().childNodes).forEach(item => {
-			container.appendChild(item)
-		})
-		e.clipboardData.setData('text/html', container.innerHTML)
-		e.clipboardData.setData('text/plain', container.innerText)
-		if (e.type == 'cut') {
-			this.delete()
-			this.formatElements()
-			this.domRender()
-			this.range.setCursor()
-		}
-	}
-	//监听粘贴事件
-	_handlePaste(e) {
-		const html = e.clipboardData.getData('text/html')
-		const text = e.clipboardData.getData('text/plain')
-		if (this.pasteHtml) {
-			const elements = this.parseHtml(html)
-			elements.forEach(item => {
-				this.insertElement(item)
-			})
-		} else {
-			this.insertText(text)
-		}
-		this.formatElements()
-		this.domRender()
-		this.range.setCursor()
+	//监听粘贴和剪切事件
+	_handleCutPaste(e) {
+		setTimeout(() => {
+			console.log(this.range.anchor.element._elm)
+			//起点元素的序列
+			// const index = AlexElement.flatElements(this.stack).findIndex(item => {
+			// 	return this.range.anchor.element.isEqual(item)
+			// })
+			// this.stack = this.parseHtml(this.$el.innerHTML)
+			// this.formatElements()
+			// const newElements = AlexElement.flatElements(this.stack)
+			// if (index > newElements.length - 1) {
+			// 	this.range.anchor.moveToEnd(newElements[newElements.length - 1])
+			// 	this.range.focus.moveToEnd(newElements[newElements.length - 1])
+			// } else {
+			// 	this.range.anchor.moveToStart(newElements[index])
+			// 	this.range.focus.moveToStart(newElements[index])
+			// }
+			// this.domRender()
+			// this.range.setCursor()
+		}, 0)
 	}
 	//获取最近的可设置光标的元素
 	setRecentlyPoint(point) {

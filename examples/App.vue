@@ -11,6 +11,7 @@ onMounted(() => {
 	editor = new AlexEditor(el.value, {
 		autofocus: true,
 		value: value.value,
+		pasteHtml: true,
 		renderRules: function (el) {
 			return el
 		},
@@ -22,15 +23,6 @@ onMounted(() => {
 })
 
 const undo = function () {
-	const ele = editor.parseHtml(
-		'<h1 class="QuestionHeader-title" style="font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-weight: 600; font-stretch: inherit; font-size: 22px; line-height: 32px; font-family: -apple-system, &quot;system-ui&quot;, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-optical-sizing: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; margin: 0px; font-synthesis: style; color: rgb(18, 18, 18); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;">JavaScript 如何获得粘贴的内容 ？</h1>'
-	)
-	ele.forEach(el => {
-		editor.insertElement(el)
-	})
-	editor.formatElements()
-	editor.domRender()
-	editor.range.setCursor()
 	// const ul = new AlexElement('block', 'ul', null, null, null, null)
 	// const li = new AlexElement('block', 'li', null, null, null, null)
 	// const text = new AlexElement('text', null, null, null, null, '123')
@@ -54,14 +46,12 @@ const undo = function () {
 	// editor.render()
 }
 
-const redo = function () {
-	editor.redo()
-}
+const redo = function () {}
 </script>
 <template>
 	<div>
-		<button @click="undo">撤销</button>
-		<button @click="redo">重做</button>
+		<button @click="undo">操作1</button>
+		<button @click="redo">操作2</button>
 		<div>{{ value }}</div>
 		<div ref="el" class="editor"></div>
 	</div>
