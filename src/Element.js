@@ -1,3 +1,4 @@
+import Dap from 'dap-util'
 import Util from './Util'
 
 class AlexElement {
@@ -92,8 +93,8 @@ class AlexElement {
 		if (!this.marks) {
 			return false
 		}
-		if (Util.isObject) {
-			return !Util.isEmptyObject(this.marks)
+		if (Dap.common.isObject) {
+			return !Dap.common.isEmptyObject(this.marks)
 		}
 		return false
 	}
@@ -102,8 +103,8 @@ class AlexElement {
 		if (!this.styles) {
 			return false
 		}
-		if (Util.isObject) {
-			return !Util.isEmptyObject(this.styles)
+		if (Dap.common.isObject) {
+			return !Dap.common.isEmptyObject(this.styles)
 		}
 		return false
 	}
@@ -183,7 +184,7 @@ class AlexElement {
 			}
 		}
 		//设置唯一key标记
-		Util.setData(el, 'data-alex-editor-key', this.key)
+		Dap.data.set(el, 'data-alex-editor-key', this.key)
 		//更新挂载的真实dom
 		this._elm = el
 		return el
@@ -199,10 +200,12 @@ class AlexElement {
 		const flat = arr => {
 			let result = []
 			arr.forEach(element => {
-				result.push(element)
-				if (element.hasChildren()) {
-					let arr = flat(element.children)
-					result = [...result, ...arr]
+				if (element) {
+					result.push(element)
+					if (element.hasChildren()) {
+						let arr = flat(element.children)
+						result = [...result, ...arr]
+					}
 				}
 			})
 			return result
@@ -226,69 +229,6 @@ class AlexElement {
 		}
 		return element
 	}
-	//校验函数数组，用于格式化
-	static _formatUnchangeableRules = [
-		//移除节点规则
-		function (element) {
-			//空节点移除
-			if (element.isEmpty()) {
-				element = null
-			}
-			return element
-		},
-		//子元素中换行符和非换行符元素不可同时存在
-		function (element) {
-			if (element.hasChildren()) {
-				//是否有换行符
-				let hasBreak = element.children.some(el => {
-					if (el) {
-						return el.isBreak()
-					}
-					return false
-				})
-				//是否有其他元素
-				let hasOther = element.children.some(el => {
-					if (el) {
-						return !el.isBreak()
-					}
-					return false
-				})
-				//既有换行符也有其他元素则把换行符元素都置为null
-				if (hasBreak && hasOther) {
-					element.children = element.children.map(el => {
-						if (el && el.isBreak()) {
-							return null
-						}
-						return el
-					})
-				}
-				//只有换行符且不止一个
-				else if (hasBreak && element.children.length > 1) {
-					element.children = [element.children[0]]
-				}
-			}
-			return element
-		},
-		//同级元素如果存在block，则其他元素也必须是block
-		function (element) {
-			if (element.hasChildren()) {
-				let hasBlock = element.children.some(el => {
-					if (el) {
-						return el.isBlock()
-					}
-					return false
-				})
-				if (hasBlock) {
-					element.children.forEach(el => {
-						if (el && !el.isBlock()) {
-							el.convertToBlock()
-						}
-					})
-				}
-			}
-			return element
-		}
-	]
 }
 
 export default AlexElement

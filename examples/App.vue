@@ -3,7 +3,7 @@ import { AlexEditor, AlexElement } from '../src'
 import { onMounted, ref } from 'vue'
 const videoUlr = 'https://apd-vlive.apdcdn.tc.qq.com/vhot2.qqvideo.tc.qq.com/B_9LhzPzw8agpeEeKUHV_JXruCWS6Elu7uF-K46n6AMF4/svp_50069/gzc_1000035_0bc3jicxeaafxqabmgr2h5sjaswdojfak4sa.f622.mp4?sdtfrom=v1103&guid=6ce4ad1a37373ce7fc8e377022d665ee&vkey=6A80A764007F3CCBFA95A86756538A1BBECAF0B7CFD49BCC1FF10BAFAFEA3C4730EE4BFDA1B2DE42F56E62287D6B1A5B2DECA0862FBA3D33060B414DD81F55B47E381A0C2E543BFAA1994B7709A278EDC509E60FBB99FC174363544B214148738A5D7883156B57F6BEF105C37518D7267A16DBAC6A6801C22290266289DCB44236501FF95FCFC225'
 const url = 'https://www.mvi-web.cn/mvi-resources/images/mvi_image_2_1652322363009.jpeg'
-let value = ref(`<p>3</p><p>3333</p><p><img style="width:40px" src="${url}"/></p>`)
+let value = ref(`<p><table><tbody><tr><td>3</td><td>3</td><td>3</td><td>3</td></tr></tbody></table></p><p>3</p><p>33<span style="color:#f30">44</span></p><p><img style="width:40px" src="${url}"/></p>`)
 
 const el = ref(null)
 let editor = null
@@ -11,37 +11,26 @@ onMounted(() => {
 	editor = new AlexEditor(el.value, {
 		autofocus: true,
 		value: value.value,
-		disabled: false,
 		renderRules: function (el) {
 			return el
 		},
 		onChange: function (val) {
 			//console.log(val)
-			console.log(this.value)
+			//console.log(this.value)
 		}
 	})
 })
 
 const undo = function () {
-	const pre = new AlexElement(
-		'block',
-		'pre',
-		null,
-		{
-			width: '100%',
-			padding: '6px 10px',
-			'background-color': '#f1f2f3',
-			color: '#666',
-			'font-size': '14px'
-		},
-		null
+	const ele = editor.parseHtml(
+		'<h1 class="QuestionHeader-title" style="font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-weight: 600; font-stretch: inherit; font-size: 22px; line-height: 32px; font-family: -apple-system, &quot;system-ui&quot;, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-optical-sizing: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; margin: 0px; font-synthesis: style; color: rgb(18, 18, 18); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;">JavaScript 如何获得粘贴的内容 ？</h1>'
 	)
-	const code = new AlexElement('block', 'code', null, null, null)
-	editor.addElementTo(code, pre, 0)
-	const text = new AlexElement('text', null, null, null, ' ')
-	editor.addElementTo(text, code, 0)
-	editor.insertElement(pre)
-	editor.render()
+	ele.forEach(el => {
+		editor.insertElement(el)
+	})
+	editor.formatElements()
+	editor.domRender()
+	editor.range.setCursor()
 	// const ul = new AlexElement('block', 'ul', null, null, null, null)
 	// const li = new AlexElement('block', 'li', null, null, null, null)
 	// const text = new AlexElement('text', null, null, null, null, '123')
