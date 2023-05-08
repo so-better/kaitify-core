@@ -64,6 +64,13 @@ class AlexElement {
 	isRoot() {
 		return !this.parent
 	}
+	//判断两个Element是否相等
+	isEqual(element) {
+		if (!AlexElement.isElement(element)) {
+			return false
+		}
+		return this.key == element.key
+	}
 	//是否包含指定节点
 	isContains(element) {
 		if (this.isEqual(element)) {
@@ -73,13 +80,6 @@ class AlexElement {
 			return false
 		}
 		return this.isContains(element.parent)
-	}
-	//判断两个Element是否相等
-	isEqual(element) {
-		if (!AlexElement.isElement(element)) {
-			return false
-		}
-		return this.key == element.key
 	}
 	//判断两个元素是否有包含关系
 	hasContains(element) {
@@ -200,7 +200,7 @@ class AlexElement {
 		const flat = arr => {
 			let result = []
 			arr.forEach(element => {
-				if (element) {
+				if (AlexElement.isElement(element)) {
 					result.push(element)
 					if (element.hasChildren()) {
 						let arr = flat(element.children)

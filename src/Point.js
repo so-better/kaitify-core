@@ -38,10 +38,10 @@ class AlexPoint {
 	//移动到到指定元素最后
 	moveToEnd(element) {
 		if (!AlexElement.isElement(element)) {
-			return
+			throw new Error('The argument must be an AlexElement instance')
 		}
 		if (element.isEmpty()) {
-			return
+			throw new Error('The argument cannot be an empty element')
 		}
 		//如果是文本
 		if (element.isText()) {
@@ -66,10 +66,10 @@ class AlexPoint {
 	//移动到指定元素最前
 	moveToStart(element) {
 		if (!AlexElement.isElement(element)) {
-			return
+			throw new Error('The argument must be an AlexElement instance')
 		}
 		if (element.isEmpty()) {
-			return
+			throw new Error('The argument cannot be an empty element')
 		}
 		//文本元素
 		if (element.isText()) {
