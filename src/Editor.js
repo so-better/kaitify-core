@@ -82,13 +82,17 @@ class AlexEditor {
 		element => {
 			//空节点移除
 			if (element.isEmpty()) {
-				//移除空节点时判断该节点是否是焦点元素，如果是则更新焦点元素
-				if (this.range && this.range.anchor.element.isEqual(element)) {
-					this.setRecentlyPoint(this.range.anchor)
+				//第一次执行格式化时还没有初始化的range，所以需要判断range是否存在
+				if (this.range) {
+					//移除空节点时判断该节点是否是焦点元素，如果是则更新焦点元素
+					if (this.range.anchor.element.isEqual(element)) {
+						this.setRecentlyPoint(this.range.anchor)
+					}
+					if (this.range.focus.element.isEqual(element)) {
+						this.setRecentlyPoint(this.range.focus)
+					}
 				}
-				if (this.range && this.range.focus.element.isEqual(element)) {
-					this.setRecentlyPoint(this.range.focus)
-				}
+
 				element = null
 			}
 			return element
@@ -114,12 +118,15 @@ class AlexEditor {
 				if (hasBreak && hasOther) {
 					element.children = element.children.map(el => {
 						if (el && el.isBreak()) {
-							//判断该节点是否是焦点元素，如果是则更新焦点元素
-							if (this.range && this.range.anchor.element.isEqual(el)) {
-								this.setRecentlyPoint(this.range.anchor)
-							}
-							if (this.range && this.range.focus.element.isEqual(el)) {
-								this.setRecentlyPoint(this.range.focus)
+							//第一次执行格式化时还没有初始化的range，所以需要判断range是否存在
+							if (this.range) {
+								//判断该节点是否是焦点元素，如果是则更新焦点元素
+								if (this.range.anchor.element.isEqual(el)) {
+									this.setRecentlyPoint(this.range.anchor)
+								}
+								if (this.range.focus.element.isEqual(el)) {
+									this.setRecentlyPoint(this.range.focus)
+								}
 							}
 							return null
 						}
