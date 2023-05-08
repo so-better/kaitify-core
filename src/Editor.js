@@ -286,87 +286,6 @@ class AlexEditor {
 				break
 		}
 	}
-	//规范stack
-	formatElements() {
-		//格式化
-		const format = ele => {
-			//从子孙元素开始格式化
-			if (ele.hasChildren()) {
-				ele.children = ele.children.map(format)
-			}
-			//格式化自身
-			AlexElement._formatUnchangeableRules.forEach(fn => {
-				//这里的ele是每一个fn执行后的结果，需要考虑到可能被置为了null
-				if (ele) {
-					ele = fn(ele)
-				}
-			})
-			return ele
-		}
-		//移除null
-		const removeNull = ele => {
-			if (ele) {
-				if (ele.hasChildren()) {
-					ele.children.forEach(item => {
-						if (item) {
-							item = removeNull(item)
-						}
-					})
-					ele.children = ele.children.filter(item => {
-						return !!item
-					})
-				}
-			}
-			return ele
-		}
-		this.stack = this.stack
-			.map(ele => {
-				//转为块元素
-				if (!ele.isBlock()) {
-					ele.convertToBlock()
-				}
-				//格式化
-				ele = format(ele)
-				//format会导致null出现，这里需要移除null
-				ele = removeNull(ele)
-				return ele
-			})
-			.filter(ele => {
-				//移除根部的null元素
-				return !!ele
-			})
-	}
-	//渲染编辑器dom内容
-	domRender(unPushHistory = false) {
-		this.$el.innerHTML = ''
-		this.stack.forEach(element => {
-			let elm = element._renderElement()
-			this.$el.appendChild(elm)
-		})
-		this._oldValue = this.value
-		this.value = this.$el.innerHTML
-		//值有变化
-		if (this._oldValue != this.value) {
-			if (typeof this.onChange == 'function') {
-				this.onChange.apply(this, [this.value, this._oldValue])
-			}
-			//unPushHistory如果是true则表示不加入历史记录中
-			if (!unPushHistory) {
-				//将本次的stack和range推入历史栈中
-				this.history.push(this.stack, this.range)
-			}
-		}
-	}
-	//禁用编辑器
-	setDisabled() {
-		this.disabled = true
-		this.$el.removeAttribute('contenteditable')
-	}
-	//启用编辑器
-	setEnabled() {
-		this.disabled = false
-		this.$el.setAttribute('contenteditable', true)
-	}
 	//获取指定元素的前一个兄弟元素
 	getPreviousElement(ele) {
 		if (!AlexElement.isElement(ele)) {
@@ -733,6 +652,87 @@ class AlexEditor {
 		}
 		return elements
 	}
+	//规范stack
+	formatElements() {
+		//格式化
+		const format = ele => {
+			//从子孙元素开始格式化
+			if (ele.hasChildren()) {
+				ele.children = ele.children.map(format)
+			}
+			//格式化自身
+			AlexElement._formatUnchangeableRules.forEach(fn => {
+				//这里的ele是每一个fn执行后的结果，需要考虑到可能被置为了null
+				if (ele) {
+					ele = fn(ele)
+				}
+			})
+			return ele
+		}
+		//移除null
+		const removeNull = ele => {
+			if (ele) {
+				if (ele.hasChildren()) {
+					ele.children.forEach(item => {
+						if (item) {
+							item = removeNull(item)
+						}
+					})
+					ele.children = ele.children.filter(item => {
+						return !!item
+					})
+				}
+			}
+			return ele
+		}
+		this.stack = this.stack
+			.map(ele => {
+				//转为块元素
+				if (!ele.isBlock()) {
+					ele.convertToBlock()
+				}
+				//格式化
+				ele = format(ele)
+				//format会导致null出现，这里需要移除null
+				ele = removeNull(ele)
+				return ele
+			})
+			.filter(ele => {
+				//移除根部的null元素
+				return !!ele
+			})
+	}
+	//渲染编辑器dom内容
+	domRender(unPushHistory = false) {
+		this.$el.innerHTML = ''
+		this.stack.forEach(element => {
+			let elm = element._renderElement()
+			this.$el.appendChild(elm)
+		})
+		this._oldValue = this.value
+		this.value = this.$el.innerHTML
+		//值有变化
+		if (this._oldValue != this.value) {
+			if (typeof this.onChange == 'function') {
+				this.onChange.apply(this, [this.value, this._oldValue])
+			}
+			//unPushHistory如果是true则表示不加入历史记录中
+			if (!unPushHistory) {
+				//将本次的stack和range推入历史栈中
+				this.history.push(this.stack, this.range)
+			}
+		}
+	}
+	//禁用编辑器
+	setDisabled() {
+		this.disabled = true
+		this.$el.removeAttribute('contenteditable')
+	}
+	//启用编辑器
+	setEnabled() {
+		this.disabled = false
+		this.$el.setAttribute('contenteditable', true)
+	}
 	//根据光标位置删除编辑器内容
 	delete() {
 		//单个删除
@@ -926,59 +926,6 @@ class AlexEditor {
 			this.insertParagraph()
 		}
 	}
-	//将真实的光标设置到指定元素开始
-	collapseToStart(element) {
-		//指定了某个元素
-		if (AlexElement.isElement(element)) {
-			this.range.anchor.moveToStart(element)
-			this.range.focus.moveToStart(element)
-			this.range.setCursor()
-		}
-		//文档最后面
-		else {
-			const flatElements = AlexElement.flatElements(this.stack)
-			this.collapseToStart(flatElements[0])
-		}
-	}
-	//将真实的光标设置到指定元素最后
-	collapseToEnd(element) {
-		//指定了某个元素
-		if (AlexElement.isElement(element)) {
-			this.range.anchor.moveToEnd(element)
-			this.range.focus.moveToEnd(element)
-			this.range.setCursor()
-		}
-		//文档最后面
-		else {
-			const flatElements = AlexElement.flatElements(this.stack)
-			const length = flatElements.length
-			this.collapseToEnd(flatElements[length - 1])
-		}
-	}
-	//根据光标设置css样式
-	setStyle(styleObject) {
-		if (!Util.isObject) {
-			throw new Error('The argument must be an object')
-		}
-		const elements = this.getElementsByRange()
-		elements.forEach(el => {
-			if (el.isText()) {
-				let cloneEl = el.clone()
-				el.type = 'inline'
-				el.parsedom = 'span'
-				el.textContent = null
-				for (let key in styleObject) {
-					if (!el.hasStyles()) {
-						el.styles = {}
-					}
-					el.styles[key] = styleObject[key]
-				}
-				this.addElementTo(cloneEl, el, 0)
-			}
-		})
-		this.range.anchor.moveToStart(elements[0])
-		this.range.focus.moveToEnd(elements[elements.length - 1])
-	}
 	//根据光标插入元素
 	insertElement(ele) {
 		if (!AlexElement.isElement(ele)) {
@@ -1052,6 +999,59 @@ class AlexEditor {
 			this.delete()
 			this.insertElement(ele)
 		}
+	}
+	//将真实的光标设置到指定元素开始
+	collapseToStart(element) {
+		//指定了某个元素
+		if (AlexElement.isElement(element)) {
+			this.range.anchor.moveToStart(element)
+			this.range.focus.moveToStart(element)
+			this.range.setCursor()
+		}
+		//文档最后面
+		else {
+			const flatElements = AlexElement.flatElements(this.stack)
+			this.collapseToStart(flatElements[0])
+		}
+	}
+	//将真实的光标设置到指定元素最后
+	collapseToEnd(element) {
+		//指定了某个元素
+		if (AlexElement.isElement(element)) {
+			this.range.anchor.moveToEnd(element)
+			this.range.focus.moveToEnd(element)
+			this.range.setCursor()
+		}
+		//文档最后面
+		else {
+			const flatElements = AlexElement.flatElements(this.stack)
+			const length = flatElements.length
+			this.collapseToEnd(flatElements[length - 1])
+		}
+	}
+	//根据光标设置css样式
+	setStyle(styleObject) {
+		if (!Util.isObject) {
+			throw new Error('The argument must be an object')
+		}
+		const elements = this.getElementsByRange()
+		elements.forEach(el => {
+			if (el.isText()) {
+				let cloneEl = el.clone()
+				el.type = 'inline'
+				el.parsedom = 'span'
+				el.textContent = null
+				for (let key in styleObject) {
+					if (!el.hasStyles()) {
+						el.styles = {}
+					}
+					el.styles[key] = styleObject[key]
+				}
+				this.addElementTo(cloneEl, el, 0)
+			}
+		})
+		this.range.anchor.moveToStart(elements[0])
+		this.range.focus.moveToEnd(elements[elements.length - 1])
 	}
 }
 
