@@ -98,6 +98,10 @@ class AlexEditor {
 					element.type = 'closed'
 					element.children = null
 					break
+				case 'video':
+					element.type = 'closed'
+					element.children = null
+					break
 				case 'a':
 					element.type = 'inline'
 					break
@@ -112,7 +116,6 @@ class AlexEditor {
 				case 'select':
 					element.type = 'br'
 					element.children = null
-					break
 					break
 				case 'label':
 					element.type = 'inline'
@@ -142,7 +145,6 @@ class AlexEditor {
 							'font-weight': 'bold'
 						}
 					}
-
 					break
 				case 'sup':
 					element.type = 'inline'
@@ -198,7 +200,7 @@ class AlexEditor {
 					break
 			}
 			if (typeof this.renderRules == 'function') {
-				element = this.renderRules(element)
+				element = this.renderRules.apply(this, [element])
 			}
 			return element
 		},
@@ -521,18 +523,40 @@ class AlexEditor {
 			} else {
 				let parseImageFn = []
 				Array.from(files).forEach(file => {
-					//将图片文件转为base64
-					if (file.type && file.type.startsWith('image/')) {
+					//将图片文件和视频转为base64
+					if (file.type && /^((image\/)|(video\/))/g.test(file.type)) {
 						parseImageFn.push(Dap.file.dataFileToBase64(file))
 					}
 				})
 				Promise.all(parseImageFn).then(urls => {
 					urls.forEach((url, index) => {
-						const marks = {
-							src: url
+						let el = null
+						//视频
+						if (/^(data:video\/)/g.test(url)) {
+							const marks = {
+								src: url,
+								autoplay: true,
+								muted: true,
+								controls: true
+							}
+							const styles = {
+								width: 'auto',
+								'max-width': '100%'
+							}
+							el = new AlexElement('closed', 'video', marks, styles, null)
 						}
-						const image = new AlexElement('closed', 'img', marks, null, null)
-						this.insertElement(image)
+						//图片
+						else {
+							const marks = {
+								src: url
+							}
+							const styles = {
+								width: 'auto',
+								'max-width': '100%'
+							}
+							el = new AlexElement('closed', 'img', marks, styles, null)
+						}
+						this.insertElement(el)
 						this.formatElements()
 						this.domRender(index < urls.length - 1)
 						this.range.setCursor()

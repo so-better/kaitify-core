@@ -12,8 +12,15 @@ onMounted(() => {
 		autofocus: true,
 		value: value.value,
 		htmlPaste: true,
-		renderRules: function (el) {
-			return el
+		renderRules: function (element) {
+			//将span设置为block
+			if (element.parsedom == 'span') {
+				element.type = 'block'
+				element.styles = {
+					display: 'block'
+				}
+			}
+			return element
 		},
 		onChange: function (val) {
 			//console.log(val)

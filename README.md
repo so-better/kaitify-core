@@ -50,24 +50,26 @@ editor.addElementAfter(ele, editor.range.focus.element)
 editor.range.anchor.moveToEnd(ele)
 editor.range.focus.moveToEnd(ele)
 //渲染
-editor.render()
+editor.formatElements()
+editor.domRender()
+editor.range.setCursor()
 ```
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
-| 属性        | 类型     | 说明                                                                          | 可取值     | 默认值           |
-| ----------- | -------- | ----------------------------------------------------------------------------- | ---------- | ---------------- |
-| value       | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                | -          | "\<p>\<br>\</p>" |
-| disabled    | boolean  | 是否禁用编辑器                                                                | true/false | false            |
-| renderRules | function | 自定义编辑器渲染规则                                                          | -          | -                |
-| autofocus   | boolean  | 是否自动获取焦点                                                              | true/false | false            |
-| onChange    | function | 编辑器值更新时触发，回调参数为 newValue 和 oldValue，同时 this 指向编辑器实例 | -          | -                |
-
-> renderRules 函数的回调参数为 element，表示当前渲染的 AlexElement 实例，你可以针对该实例的进行你想要的操作（实例的 key、parent 和\_elm 不能进行操作，key 是禁止操作的，parent 和\_elm 操作了也没用处），但是最后需要返回一个 AlexElement 实例
+| 属性            | 类型     | 说明                                                                                                                                                                                      | 可取值     | 默认值           |
+| --------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
+| value           | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                                                                                                                            | -          | "\<p>\<br>\</p>" |
+| disabled        | boolean  | 是否禁用编辑器                                                                                                                                                                            | true/false | false            |
+| renderRules     | function | 自定义编辑器渲染规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
+| autofocus       | boolean  | 是否自动获取焦点                                                                                                                                                                          | true/false | false            |
+| onChange        | function | 编辑器值更新时触发，回调参数为 newValue 和 oldValue，同时 this 指向编辑器实例                                                                                                             | -          | -                |
+| htmlPaste       | boolean  | 粘贴时是否携带样式                                                                                                                                                                        | true/false | false            |
+| handlePasteFile | function | 自定义文件粘贴的处理函数，回调参数为文件数组 files，如果不设置，编辑器只会以把 base64 字符串形式加载图片和视频，其他文件直接忽略                                                          | -          | -                |
 
 ### 编辑器内部元素渲染规范
 
-#### 默认的强制性的不可变更的规则（执行 editor.formatElements 方法）：
+> 即 editor.formatElements 函数执行效果
 
 -   子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
@@ -75,20 +77,20 @@ editor.render()
 -   执行格式化时会把空元素移除（text 元素内容为空视为空元素、block 和 inline 没有子元素视为空元素）
 -   AlexPoint 对象的 element 属性只会是 closed 和 text 元素
 -   删除操作中，如果 block 元素的 children 为空了，则添加一个换行符 \<br>，在删除换行符后才会清除此元素
--   清除一个元素的方法：如果是在遍历 editor.stack 数组则可以将遍历到的元素置为 null ；如果只是在访问具体元素时，不能直接置为 null ，可以把 text 元素的 textContent 设为空，或者 block 元素 / inline 元素的 children 设为空，或者把 closed 元素从父元素中删除掉
 -   如果 AlexPoint 对象的 element 是 closed 元素，那么 offset 要么是 0 要么是 1
-    操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入
+-   操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入
 
-#### 可变更的规则（可以通过 renderRules 来变更）：
-
--   在执行 parseHtml 和 parseNode 时， br 和 img 元素会生成 closed 元素，span 元素会生成 inline 元素，其余都会生成 block 元素。如果需要修改此规则，可通过 renderRules 进行修改和覆盖
+> 以上的规则是编辑器内部渲染的一个固定的逻辑，无法去改变。但是我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作
 
 ```javascript
 const editor = new AlexEditor(el, {
 	renderRules: function (element) {
-		//将video元素设定为closed元素
-		if (element.parsedom == 'video') {
-			element.type = 'closed'
+		//将span设置为block
+		if (element.parsedom == 'span') {
+			element.type = 'block'
+			element.styles = {
+				display: 'block'
+			}
 		}
 		return element
 	}
@@ -100,14 +102,11 @@ const editor = new AlexEditor(el, {
 作为该编辑器组件的最顶级的核心类，其功能强大，提供了丰富的语法：
 
 -   `editor.$el` ：编辑器所在的 dom 元素
--   `editor.autofocus` ：即等于 options.autofocus，在组件渲染后，该属性无效，仅表示是否设置了自动获取焦点
--   `editor.disabled` ：当前编辑器是否禁用（请勿通过修改此值来禁用或者启用编辑器，请使用语法 setDisabled 或者 setEnabled）
 -   `editor.value` ：当前编辑器的内容
--   `editor.renderRules` ：当前编辑器转换 AlexElement 元素时的渲染规则，等于 options.renderRules，如果对此进行修改，在后续使用 parseNode 和 parseHtml 时会生效，一般建议初始化时在 options 中定义好就可以，不应该经常变更
--   `editor.onChange` ：当前编辑器值变更时触发，等于 options.onChange，如果对此进行修改，在后续更新值时会触发
--   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。此属性不能修改
+-   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性修改
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录
+-   `editor.setRecentlyPoint(point)` : 将指定焦点的元素设置为前后最近的 closed 或者 text 元素
 -   `editor.getPreviousElement(ele)` ：获取 ele 元素前一个兄弟元素，如果没有则返回 null
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
 -   `editor.addElementTo(childEle, parentEle, index)` ：将指定元素添加到父元素的子元素数组中
@@ -119,7 +118,7 @@ const editor = new AlexEditor(el, {
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange()` ：获取 anchor 和 focus 两个焦点之间的元素
+-   `editor.getElementsByRange()` ：获取 anchor 和 focus 两个焦点之间的元素（如果焦点在文本中间，还会分割文本元素）
 -   `editor.formatElements()` ：对 editor.stack 进行内部的格式化规范校验处理
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不建议设置此参数
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
@@ -127,10 +126,10 @@ const editor = new AlexEditor(el, {
 -   `editor.delete()` ：根据光标执行删除操作
 -   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在光标处换行
--   `editor.collapseToEnd(element)` ：将光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
--   `editor.collapseToStart(element)` ：将光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
--   `editor.setStyle(styleObject)` ：根据光标设定指定的样式，参数是一个对象，key 表示 css 样式名称，value 表示值
 -   `editor.insertElement(ele)` ：根据光标位置插入指定的 ele，可用于在生成元素后向编辑器内插入
+-   `editor.collapseToStart(element)` ：将光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
+-   `editor.collapseToEnd(element)` ：将光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
+-   `editor.setStyle(styleObject)` ：根据光标设定指定的样式，参数是一个对象，key 表示 css 样式名称，value 表示值
 
 ### AlexElement：元素
 
@@ -169,7 +168,8 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.hasStyles()` ：el 是否含有样式
 -   `el.hasChildren()` ：el 是否有子元素
 -   `el.clone(deep)` ：将 el 元素进行克隆，返回一个新的元素，deep 为 true 表示深度克隆，即克隆子孙元素，默认为 true
--   `el.convertToBlock()` ：将元素转为 block 元素
+-   `el.convertToBlock()` ：将非 block 类型的元素转为 block 元素
+-   `el.setEmpty()` ：将一个非空元素设置为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
 -   `AlexElement.paragraph` ：定义段落元素，默认是"p"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
