@@ -439,8 +439,9 @@ class AlexEditor {
 	}
 	//监听beforeinput
 	_handleBeforeInput(e) {
-		//粘贴和剪切使用系统的默认行为
-		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut') {
+		console.log(e.inputType)
+		//以下输入类型使用系统的默认行为
+		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop') {
 			return
 		}
 		e.preventDefault()
