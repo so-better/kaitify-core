@@ -150,6 +150,21 @@ class AlexElement {
 		this.children = [element]
 		element.parent = this
 	}
+	//设置为空元素
+	setEmpty() {
+		if (this.isEmpty()) {
+			return
+		}
+		if (this.isText()) {
+			this.textContent = ''
+		} else if (this.isClosed()) {
+			this.type = 'inline'
+			this.parsedom = 'span'
+			this.children = null
+		} else if (this.isBlock() || this.isInline()) {
+			this.children = null
+		}
+	}
 	//渲染成真实dom
 	_renderElement() {
 		let el = null
@@ -211,23 +226,6 @@ class AlexElement {
 			return result
 		}
 		return flat(elements)
-	}
-	//内部定义的转换规则，可以被renderRules属性覆盖
-	static _renderRules(element) {
-		switch (element.parsedom) {
-			case 'br':
-				element.type = 'closed'
-				element.children = null
-				break
-			case 'span':
-				element.type = 'inline'
-				break
-			case 'img':
-				element.type = 'closed'
-				element.children = null
-				break
-		}
-		return element
 	}
 }
 
