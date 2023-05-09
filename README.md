@@ -55,6 +55,9 @@ editor.domRender()
 editor.range.setCursor()
 ```
 
+> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus。
+> 自定义操作中，最后都需要使用 editor.formatElements、editor.domRender 和 editor.range.setCursor()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
+
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
 | 属性            | 类型     | 说明                                                                                                                                                                                        | 可取值     | 默认值           |
