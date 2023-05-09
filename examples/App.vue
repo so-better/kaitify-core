@@ -13,13 +13,7 @@ onMounted(() => {
 		value: value.value,
 		htmlPaste: true,
 		renderRules: function (element) {
-			//将span设置为block
-			if (element.parsedom == 'span') {
-				element.type = 'block'
-				element.styles = {
-					display: 'block'
-				}
-			}
+			//这里可以自定义格式化规则
 			return element
 		},
 		onChange: function (val) {
@@ -33,13 +27,13 @@ onMounted(() => {
 })
 
 const undo = function () {
-	// const els = editor.parseHtml('<i>33333</i>')
-	// els.forEach(el => {
-	// 	editor.insertElement(el)
-	// })
-	editor.setStyle({
-		'background-color': '#708af3'
+	const els = editor.parseHtml('<i>33333</i>')
+	els.forEach(el => {
+		editor.insertElement(el)
 	})
+	// editor.setStyle({
+	// 	'background-color': '#708af3'
+	// })
 	editor.formatElements()
 	editor.domRender()
 	editor.range.setCursor()

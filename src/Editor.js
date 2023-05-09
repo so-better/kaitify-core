@@ -22,7 +22,7 @@ class AlexEditor {
 		this.disabled = options.disabled
 		//编辑器的值
 		this.value = options.value
-		//自定义编辑器内容渲染规则
+		//自定义编辑器元素的格式化规则
 		this.renderRules = options.renderRules
 		//内容变更触发的事件
 		this.onChange = options.onChange
@@ -79,7 +79,7 @@ class AlexEditor {
 
 	//校验函数数组，用于格式化
 	_formatUnchangeableRules = [
-		//修改元素的属性和自定义渲染
+		//修改元素的属性和自定义格式化规则
 		element => {
 			//如果parsedom不存在，且存在文字
 			if (!element.parsedom && element.textContent && element.type != 'text') {
