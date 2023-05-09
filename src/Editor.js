@@ -41,7 +41,7 @@ class AlexEditor {
 		//创建历史记录
 		this.history = new AlexHistory()
 		//格式化元素数组
-		this.formatElements()
+		this.formatElementStack()
 		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化一个段落
 		if (this.stack.length == 0) {
 			const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
@@ -447,7 +447,7 @@ class AlexEditor {
 		//插入文本
 		if (e.inputType == 'insertText') {
 			this.insertText(e.data)
-			this.formatElements()
+			this.formatElementStack()
 			this.domRender()
 			this.range.setCursor()
 			return
@@ -455,7 +455,7 @@ class AlexEditor {
 		//插入段落
 		if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
 			this.insertParagraph()
-			this.formatElements()
+			this.formatElementStack()
 			this.domRender()
 			this.range.setCursor()
 			return
@@ -463,7 +463,7 @@ class AlexEditor {
 		//删除内容
 		if (e.inputType == 'deleteContentBackward') {
 			this.delete()
-			this.formatElements()
+			this.formatElementStack()
 			this.domRender()
 			this.range.setCursor()
 			return
@@ -480,7 +480,7 @@ class AlexEditor {
 			this._isInputChinese = false
 			//在中文输入结束后插入数据
 			this.insertText(e.data)
-			this.formatElements()
+			this.formatElementStack()
 			this.domRender()
 			this.range.setCursor()
 		}
@@ -494,7 +494,7 @@ class AlexEditor {
 			if (historyRecord) {
 				this.stack = historyRecord.stack
 				this.range = historyRecord.range
-				this.formatElements()
+				this.formatElementStack()
 				this.domRender(true)
 				this.range.setCursor()
 			}
@@ -506,7 +506,7 @@ class AlexEditor {
 			if (historyRecord) {
 				this.stack = historyRecord.stack
 				this.range = historyRecord.range
-				this.formatElements()
+				this.formatElementStack()
 				this.domRender(true)
 				this.range.setCursor()
 			}
@@ -557,7 +557,7 @@ class AlexEditor {
 							el = new AlexElement('closed', 'img', marks, styles, null)
 						}
 						this.insertElement(el)
-						this.formatElements()
+						this.formatElementStack()
 						this.domRender(index < urls.length - 1)
 						this.range.setCursor()
 					})
@@ -570,7 +570,7 @@ class AlexEditor {
 			const data = e.clipboardData.getData('text/plain')
 			if (data) {
 				this.insertText(data)
-				this.formatElements()
+				this.formatElementStack()
 				this.domRender()
 				this.range.setCursor()
 			}
@@ -599,7 +599,7 @@ class AlexEditor {
 					rIndex = flatElements.length - 1 - rIndex
 				}
 				this.stack = this.parseHtml(this.$el.innerHTML)
-				this.formatElements()
+				this.formatElementStack()
 				const newElements = AlexElement.flatElements(this.stack)
 				if (rIndex >= 0) {
 					this.range.anchor.moveToStart(newElements[newElements.length - 1 - rIndex])
@@ -623,7 +623,7 @@ class AlexEditor {
 		//加上setTimeout是为了在剪切事件后进行处理，起到延时作用
 		setTimeout(() => {
 			this.delete()
-			this.formatElements()
+			this.formatElementStack()
 			this.domRender()
 			this.range.setCursor()
 		}, 0)
@@ -852,7 +852,7 @@ class AlexEditor {
 		}
 		//文本节点
 		if (node.nodeType == 3) {
-			return new AlexElement('text', null, null, null, node.nodeValue)
+			return this.formatElement(new AlexElement('text', null, null, null, node.nodeValue))
 		}
 		//元素节点
 		else {
@@ -871,7 +871,7 @@ class AlexEditor {
 					}
 				}
 			})
-			return element
+			return this.formatElement(element)
 		}
 	}
 	//将html转为元素
@@ -1014,44 +1014,52 @@ class AlexEditor {
 		}
 		return elements
 	}
-	//规范stack和修正range
-	formatElements() {
+	//格式化单个元素
+	formatElement(ele) {
+		if (!AlexElement.isElement(ele)) {
+			throw new Error('The argument must be an AlexElement instance')
+		}
 		//格式化
-		const format = ele => {
+		const format = element => {
 			//从子孙元素开始格式化
-			if (ele.hasChildren()) {
-				ele.children = ele.children.map(format)
+			if (element.hasChildren()) {
+				element.children = element.children.map(format)
 			}
 			//格式化自身
 			this._formatUnchangeableRules.forEach(fn => {
-				ele = fn(ele)
+				element = fn(element)
 			})
-			return ele
+			return element
 		}
 		//移除子孙元素中的空元素
-		const removeEmptyElement = ele => {
-			if (ele.hasChildren()) {
-				ele.children.forEach(item => {
+		const removeEmptyElement = element => {
+			if (element.hasChildren()) {
+				element.children.forEach(item => {
 					if (!item.isEmpty()) {
 						item = removeEmptyElement(item)
 					}
 				})
-				ele.children = ele.children.filter(item => {
+				element.children = element.children.filter(item => {
 					return !item.isEmpty()
 				})
 			}
-			return ele
+			return element
 		}
+		//格式化
+		ele = format(ele)
+		//移除所有的空元素
+		ele = removeEmptyElement(ele)
+		return ele
+	}
+	//格式化stack
+	formatElementStack() {
 		this.stack = this.stack
 			.map(ele => {
 				//转为块元素
 				if (!ele.isBlock()) {
 					ele.convertToBlock()
 				}
-				//格式化
-				ele = format(ele)
-				//移除所有的空元素
-				ele = removeEmptyElement(ele)
+				ele = this.formatElement(ele)
 				return ele
 			})
 			.filter(ele => {

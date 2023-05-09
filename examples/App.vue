@@ -34,7 +34,7 @@ const undo = function () {
 	// editor.setStyle({
 	// 	'background-color': '#708af3'
 	// })
-	editor.formatElements()
+	editor.formatElementStack()
 	editor.domRender()
 	editor.range.setCursor()
 }

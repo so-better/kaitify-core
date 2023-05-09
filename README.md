@@ -50,13 +50,12 @@ editor.addElementAfter(ele, editor.range.focus.element)
 editor.range.anchor.moveToEnd(ele)
 editor.range.focus.moveToEnd(ele)
 //渲染
-editor.formatElements()
+editor.formatElementStack()
 editor.domRender()
 editor.range.setCursor()
 ```
 
-> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus。
-> 自定义操作中，最后都需要使用 editor.formatElements、editor.domRender 和 editor.range.setCursor()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
+> 自定义操作中，最后都需要使用 editor.formatElementStack、editor.domRender 和 editor.range.setCursor()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
@@ -72,7 +71,7 @@ editor.range.setCursor()
 
 ### 编辑器内部元素规范
 
-> 即 editor.formatElements 函数执行效果
+> 即 editor.formatElementStack 函数执行效果
 
 -   子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
@@ -122,7 +121,8 @@ const editor = new AlexEditor(el, {
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
 -   `editor.getElementsByRange()` ：获取 anchor 和 focus 两个焦点之间的元素（如果焦点在文本中间，还会分割文本元素）
--   `editor.formatElements()` ：对 editor.stack 进行内部的格式化规范校验处理
+-   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化，返回格式化后的元素
+-   `editor.formatElementStack()` ：对 editor.stack 进行内部的格式化规范校验处理
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不建议设置此参数
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
 -   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
@@ -179,6 +179,8 @@ AlexElement 提供以下几种语法来方便我们的操作：
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
 
+> 自行创建的 AlexElement 实例可能不符合编辑器内部的规范，在插入编辑器并渲染后可能和我们预想的效果不太一样，甚至会出现 bug。因此在创建元素后，必须使用 editor.formatElement(element)方法来进行格式化，该方法会返回格式化后的元素
+
 ### AlexPoint：焦点对象
 
 AlexPoint 表示当前操作的光标焦点，由编辑器内部创建其实例，包含 element 和 offset 两个属性
@@ -207,6 +209,8 @@ AlexPoint 是基于浏览器原生的 Selection 和 Range 对象进行封装，�
 AlexRange 提供下面的方法来方便我们的操作：
 
 -   `range.setCursor()` ：根据 anchor 和 focus 来设置编辑器真实光标位置
+
+> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus。
 
 ### AlexHistory：历史记录对象
 
