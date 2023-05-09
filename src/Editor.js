@@ -1215,8 +1215,8 @@ class AlexEditor {
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 			//焦点在当前块的起点位置
 			if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
-				//在该块之前插入一个新的段落
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, null, null)
+				//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
+				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
 				const breakEle = new AlexElement('closed', 'br', null, null, null)
 				this.addElementTo(breakEle, paragraph, 0)
 				this.addElementBefore(paragraph, anchorBlock)
@@ -1225,8 +1225,8 @@ class AlexEditor {
 			}
 			//焦点在当前块的终点位置
 			else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
-				//在该块之后插入一个新的段落
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, null, null)
+				//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
+				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
 				const breakEle = new AlexElement('closed', 'br', null, null, null)
 				this.addElementTo(breakEle, paragraph, 0)
 				this.addElementAfter(paragraph, anchorBlock)
@@ -1369,17 +1369,37 @@ class AlexEditor {
 		const elements = this.getElementsByRange()
 		elements.forEach(el => {
 			if (el.isText()) {
-				let cloneEl = el.clone()
-				el.type = 'inline'
-				el.parsedom = 'span'
-				el.textContent = null
+				const children = el.parent.children.filter(item => {
+					return !item.isEmpty()
+				})
+				//如果父元素只有该文本一个子元素
+				if (children.length == 1) {
+					for (let key in styleObject) {
+						if (!el.parent.hasStyles()) {
+							el.parent.styles = {}
+						}
+						el.parent.styles[key] = styleObject[key]
+					}
+				} else {
+					let cloneEl = el.clone()
+					el.type = 'inline'
+					el.parsedom = 'span'
+					el.textContent = null
+					for (let key in styleObject) {
+						if (!el.hasStyles()) {
+							el.styles = {}
+						}
+						el.styles[key] = styleObject[key]
+					}
+					this.addElementTo(cloneEl, el, 0)
+				}
+			} else if (el.isClosed()) {
 				for (let key in styleObject) {
 					if (!el.hasStyles()) {
 						el.styles = {}
 					}
 					el.styles[key] = styleObject[key]
 				}
-				this.addElementTo(cloneEl, el, 0)
 			}
 		})
 		this.range.anchor.moveToStart(elements[0])
