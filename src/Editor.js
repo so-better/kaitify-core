@@ -86,7 +86,7 @@ class AlexEditor {
 					element.children = null
 				} else if (['span', 'a', 'label', 'code'].includes(element.parsedom)) {
 					element.type = 'inline'
-				} else if (['input', 'textarea', 'select'].includes(element.parsedom)) {
+				} else if (['input', 'textarea', 'select', 'script', 'style', 'html', 'body', 'meta', 'link', 'head', 'title'].includes(element.parsedom)) {
 					element.type = 'closed'
 					element.parsedom = 'br'
 					element.children = null

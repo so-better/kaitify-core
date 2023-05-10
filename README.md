@@ -81,7 +81,7 @@ editor.range.setCursor()
 
 -   br 标签、img 标签、video 标签渲染为 closed 元素
 -   span 标签、a 标签、label 标签、code 标签渲染为 inline 元素
--   input 标签、textarea 标签、select 标签会渲染为 br 标签（编辑器内不应当存在这类元素）
+-   input 标签、textarea 标签、select 标签、script 标签、sstyle 标签、html 标签、body 标签、meta 标签、 link 标签、 head 标签、 title 标签会渲染为 br 标签（编辑器内不应当存在这类元素）
 -   b 标签和 strong 标签渲染为加粗的 span
 -   sup 标签渲染为带`'vertical-align': 'super'`样式的 span
 -   sub 标签渲染为带`'vertical-align': 'sub'`样式的 span
