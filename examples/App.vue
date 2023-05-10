@@ -11,13 +11,7 @@ onMounted(() => {
 	const $table = document.createElement('table')
 	$table.innerHTML = table.value.innerHTML
 	editor = new AlexEditor(el.value, {
-		value: `${$table.outerHTML}<p><br></p>`,
-		htmlPaste: true,
-		disabled: false,
-		renderRules: function (element) {
-			//这里可以自定义格式化规则
-			return element
-		}
+		value: `${$table.outerHTML}<p><br></p>`
 	})
 	editor.on('change', (newVal, oldVal) => {
 		console.log(newVal, oldVal)

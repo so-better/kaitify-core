@@ -59,8 +59,8 @@ editor.range.setCursor()
 
 | 属性        | 类型     | 说明                                                                                                                                                                                        | 可取值     | 默认值           |
 | ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
-| value       | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                                                                                                                              | -          | "\<p>\<br>\</p>" |
-| disabled    | boolean  | 是否禁用编辑器                                                                                                                                                                              | true/false | false            |
+| value       | string   | 初始化时设置的编辑器内容                                                                                                                                                                    | -          | "\<p>\<br>\</p>" |
+| disabled    | boolean  | 初始化时是否禁用编辑器                                                                                                                                                                      | true/false | false            |
 | renderRules | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
 | htmlPaste   | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
 
@@ -112,11 +112,11 @@ const editor = new AlexEditor(el, {
 
 作为该编辑器组件的最顶级的核心类，其功能强大，提供了丰富的语法：
 
--   `editor.$el` ：编辑器所在的 dom 元素
--   `editor.value` ：当前编辑器的内容
+-   `editor.$el` ：编辑器所在的 dom 元素，请勿修改此属性修改
+-   `editor.value` ：当前编辑器的内容，请勿修改此属性修改
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性修改
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
--   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录
+-   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性修改
 -   `editor.setRecentlyPoint(point)` : 将指定焦点的元素设置为前后最近的 closed 或者 text 元素
 -   `editor.getPreviousElement(ele)` ：获取 ele 元素前一个兄弟元素，如果没有则返回 null
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
