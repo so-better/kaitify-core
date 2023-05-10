@@ -16,7 +16,6 @@
 import AlexEditor from 'alex-editor'
 const el = document.body.querySlector('#editor')
 const editor = new AlexEditor(el, {
-	autofocus: true,
 	value: '<p>hello,我是一个编辑器</p>'
 })
 ```
@@ -30,7 +29,6 @@ const editor = new AlexEditor(el, {
 import { AlexEditor, AlexElement } from 'alex-editor'
 const el = document.body.querySlector('#editor')
 const editor = new AlexEditor(el, {
-	autofocus: true,
 	value: '<p>hello,我是一个编辑器</p>'
 })
 //获取AlexRange实例
@@ -59,15 +57,12 @@ editor.range.setCursor()
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
-| 属性            | 类型     | 说明                                                                                                                                                                                        | 可取值     | 默认值           |
-| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
-| value           | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                                                                                                                              | -          | "\<p>\<br>\</p>" |
-| disabled        | boolean  | 是否禁用编辑器                                                                                                                                                                              | true/false | false            |
-| renderRules     | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
-| autofocus       | boolean  | 是否自动获取焦点                                                                                                                                                                            | true/false | false            |
-| onChange        | function | 编辑器值更新时触发，回调参数为 newValue 和 oldValue，同时 this 指向编辑器实例                                                                                                               | -          | -                |
-| htmlPaste       | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
-| handlePasteFile | function | 自定义文件粘贴的处理函数，回调参数为文件数组 files，如果不设置，编辑器只会以把 base64 字符串形式加载图片和视频，其他文件直接忽略                                                            | -          | -                |
+| 属性        | 类型     | 说明                                                                                                                                                                                        | 可取值     | 默认值           |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
+| value       | string   | 编辑器的 html 内容，可以实时获取到编辑器的内容                                                                                                                                              | -          | "\<p>\<br>\</p>" |
+| disabled    | boolean  | 是否禁用编辑器                                                                                                                                                                              | true/false | false            |
+| renderRules | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
+| htmlPaste   | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
 
 ### 编辑器内部元素规范
 
@@ -134,6 +129,17 @@ const editor = new AlexEditor(el, {
 -   `editor.collapseToEnd(element)` ：将光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setStyle(styleObject)` ：根据光标设定指定的样式，参数是一个对象，key 表示 css 样式名称，value 表示值
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
+-   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
+-   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
+
+> 下面是 editor 内部定义的事件：
+
+| 事件名称  | 事件说明                                                             |
+| --------- | -------------------------------------------------------------------- |
+| change    | 编辑的内容发生变化就会触发此事件，回调参数为编辑器当前值和编辑器旧值 |
+| blur      | 编辑器失去焦点时触发，回调参数为编辑器当前的值                       |
+| focus     | 编辑器获取焦点时触发，回调参数为编辑器当前的值                       |
+| pasteFile | 在编辑器里粘贴文件时触发，回调参数为文件数组                         |
 
 ### AlexElement：元素
 
