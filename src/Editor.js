@@ -12,26 +12,28 @@ class AlexEditor {
 		if (!Dap.element.isElement(el)) {
 			throw new Error('You must specify a dom container to initialize the editor')
 		}
+		//校验是否已经初始化过
+		if (Dap.data.get(el, 'data-alex-editor-init')) {
+			throw new Error('The element node has been initialized to the editor')
+		}
+		//设置初始化后的标记
+		Dap.data.set(el, 'data-alex-editor-init', true)
 		//格式化options参数
 		options = this._formatOptions(options)
 		//编辑器容器
 		this.$el = el
-		//是否自动获取焦点
-		this.autofocus = options.autofocus
 		//是否禁用
 		this.disabled = options.disabled
 		//编辑器的值
 		this.value = options.value
 		//自定义编辑器元素的格式化规则
 		this.renderRules = options.renderRules
-		//内容变更触发的事件
-		this.onChange = options.onChange
 		//粘贴时是否粘贴html
 		this.htmlPaste = options.htmlPaste
-		//文件粘贴处理函数
-		this.handlePasteFile = options.handlePasteFile
 		//编辑的range
 		this.range = null
+		//事件集合
+		this._events = {}
 		//是否正在输入中文
 		this._isInputChinese = false
 		//旧的文本内容
@@ -42,27 +44,14 @@ class AlexEditor {
 		this.history = new AlexHistory()
 		//格式化元素数组
 		this.formatElementStack()
-		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化一个段落
-		if (this.stack.length == 0) {
-			const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
-			const breakEle = new AlexElement('closed', 'br', null, null, null)
-			this.addElementTo(breakEle, ele, 0)
-			this.stack = [ele]
-		}
+		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化stack
+		this.stack.length == 0 ? this._initStack() : null
 		//初始设置range
 		this._initRange()
 		//渲染dom
 		this.domRender()
 		//编辑器禁用和启用设置
-		if (this.disabled) {
-			this.setDisabled()
-		} else {
-			this.setEnabled()
-			//自动获取焦点
-			if (this.autofocus) {
-				this.collapseToEnd()
-			}
-		}
+		this.disabled ? this.setDisabled() : this.setEnabled()
 		//设置selection的监听更新range
 		Dap.event.on(document, 'selectionchange.alex_editor', this._handleSelectionChange.bind(this))
 		//监听内容输入
@@ -77,129 +66,105 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'paste.alex_editor', this._handlePaste.bind(this))
 		//监听编辑器拖放
 		Dap.event.on(this.$el, 'drop.alex_editor', this._handleNodesChange.bind(this))
+		//监听编辑器获取焦点
+		Dap.event.on(this.$el, 'focus.alex_editor', () => {
+			this.emit('focus', this.value)
+		})
+		//监听编辑器失去焦点
+		Dap.event.on(this.$el, 'blur.alex_editor', () => {
+			this.emit('blur', this.value)
+		})
 	}
 
 	//校验函数数组，用于格式化
 	_formatUnchangeableRules = [
 		//修改元素的属性和自定义格式化规则
 		element => {
-			//如果parsedom不存在，且存在文字
-			if (!element.parsedom && element.textContent && element.type != 'text') {
+			if (element.parsedom) {
+				if (['br', 'img', 'video'].includes(element.parsedom)) {
+					element.type = 'closed'
+					element.children = null
+				} else if (['span', 'a', 'label', 'code'].includes(element.parsedom)) {
+					element.type = 'inline'
+				} else if (['input', 'textarea', 'select'].includes(element.parsedom)) {
+					element.type = 'closed'
+					element.parsedom = 'br'
+					element.children = null
+				} else if (['b', 'strong'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'font-weight': 'bold'
+						})
+					} else {
+						element.styles = {
+							'font-weight': 'bold'
+						}
+					}
+				} else if (['sup'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'vertical-align': 'super'
+						})
+					} else {
+						element.styles = {
+							'vertical-align': 'super'
+						}
+					}
+				} else if (['sub'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'vertical-align': 'sub'
+						})
+					} else {
+						element.styles = {
+							'vertical-align': 'sub'
+						}
+					}
+				} else if (['i'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'font-style': 'italic'
+						})
+					} else {
+						element.styles = {
+							'font-style': 'italic'
+						}
+					}
+				} else if (['u'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'text-decoration-line': 'underline'
+						})
+					} else {
+						element.styles = {
+							'text-decoration-line': 'underline'
+						}
+					}
+				} else if (['del'].includes(element.parsedom)) {
+					element.type = 'inline'
+					element.parsedom = 'span'
+					if (Dap.common.isObject()) {
+						Object.assign(element.styles, {
+							'text-decoration-line': 'line-through'
+						})
+					} else {
+						element.styles = {
+							'text-decoration-line': 'line-through'
+						}
+					}
+				}
+			} else {
 				element.type = 'text'
-				return element
-			}
-			switch (element.parsedom) {
-				case 'br':
-					element.type = 'closed'
-					element.children = null
-					break
-				case 'span':
-					element.type = 'inline'
-					break
-				case 'img':
-					element.type = 'closed'
-					element.children = null
-					break
-				case 'video':
-					element.type = 'closed'
-					element.children = null
-					break
-				case 'a':
-					element.type = 'inline'
-					break
-				case 'input':
-					element.type = 'br'
-					element.children = null
-					break
-				case 'textarea':
-					element.type = 'br'
-					element.children = null
-					break
-				case 'select':
-					element.type = 'br'
-					element.children = null
-					break
-				case 'label':
-					element.type = 'inline'
-					break
-				case 'b':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'font-weight': 'bold'
-						})
-					} else {
-						element.styles = {
-							'font-weight': 'bold'
-						}
-					}
-					break
-				case 'strong':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'font-weight': 'bold'
-						})
-					} else {
-						element.styles = {
-							'font-weight': 'bold'
-						}
-					}
-					break
-				case 'sup':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'vertical-align': 'super'
-						})
-					} else {
-						element.styles = {
-							'vertical-align': 'super'
-						}
-					}
-					break
-				case 'sub':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'vertical-align': 'sub'
-						})
-					} else {
-						element.styles = {
-							'vertical-align': 'sub'
-						}
-					}
-					break
-				case 'i':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'font-style': 'italic'
-						})
-					} else {
-						element.styles = {
-							'font-style': 'italic'
-						}
-					}
-					break
-				case 'u':
-					element.type = 'inline'
-					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
-						Object.assign(element.styles, {
-							'text-decoration-line': 'underline'
-						})
-					} else {
-						element.styles = {
-							'text-decoration-line': 'underline'
-						}
-					}
-					break
 			}
 			if (typeof this.renderRules == 'function') {
 				element = this.renderRules.apply(this, [element])
@@ -274,17 +239,11 @@ class AlexEditor {
 	_formatOptions(options) {
 		let opts = {
 			disabled: false,
-			autofocus: false,
 			renderRules: null,
 			htmlPaste: false,
-			handlePasteFile: null,
-			value: '<p><br></p>',
-			onChange: null
+			value: '<p><br></p>'
 		}
 		if (Dap.common.isObject(options)) {
-			if (typeof options.autofocus == 'boolean') {
-				opts.autofocus = options.autofocus
-			}
 			if (typeof options.disabled == 'boolean') {
 				opts.disabled = options.disabled
 			}
@@ -294,17 +253,18 @@ class AlexEditor {
 			if (typeof options.value == 'string' && options.value) {
 				opts.value = options.value
 			}
-			if (typeof options.onChange == 'function') {
-				opts.onChange = options.onChange
-			}
 			if (typeof options.htmlPaste == 'boolean') {
 				opts.htmlPaste = options.htmlPaste
 			}
-			if (typeof options.handlePasteFile == 'function') {
-				opts.handlePasteFile = options.handlePasteFile
-			}
 		}
 		return opts
+	}
+	//初始化stack
+	_initStack() {
+		const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
+		const breakEle = new AlexElement('closed', 'br', null, null, null)
+		this.addElementTo(breakEle, ele, 0)
+		this.stack = [ele]
 	}
 	//初始设置range
 	_initRange() {
@@ -532,9 +492,7 @@ class AlexEditor {
 		//粘贴文件
 		if (files.length) {
 			e.preventDefault()
-			if (typeof this.handlePasteFile == 'function') {
-				this.handlePasteFile.apply(this, [files])
-			} else {
+			if (!this.emit('pasteFile', files)) {
 				let parseImageFn = []
 				Array.from(files).forEach(file => {
 					//将图片文件和视频转为base64
@@ -636,6 +594,355 @@ class AlexEditor {
 				this.range.setCursor()
 			}
 		}, 0)
+	}
+	//禁用编辑器
+	setDisabled() {
+		this.disabled = true
+		this.$el.removeAttribute('contenteditable')
+	}
+	//启用编辑器
+	setEnabled() {
+		this.disabled = false
+		this.$el.setAttribute('contenteditable', true)
+	}
+	//格式化单个元素
+	formatElement(ele) {
+		if (!AlexElement.isElement(ele)) {
+			throw new Error('The argument must be an AlexElement instance')
+		}
+		//格式化
+		const format = element => {
+			//从子孙元素开始格式化
+			if (element.hasChildren()) {
+				element.children = element.children.map(format)
+			}
+			//格式化自身
+			this._formatUnchangeableRules.forEach(fn => {
+				element = fn(element)
+			})
+			return element
+		}
+		//移除子孙元素中的空元素
+		const removeEmptyElement = element => {
+			if (element.hasChildren()) {
+				element.children.forEach(item => {
+					if (!item.isEmpty()) {
+						item = removeEmptyElement(item)
+					}
+				})
+				element.children = element.children.filter(item => {
+					return !item.isEmpty()
+				})
+			}
+			return element
+		}
+		//格式化
+		ele = format(ele)
+		//移除所有的空元素
+		ele = removeEmptyElement(ele)
+		return ele
+	}
+	//格式化stack
+	formatElementStack() {
+		this.stack = this.stack
+			.map(ele => {
+				//转为块元素
+				if (!ele.isBlock()) {
+					ele.convertToBlock()
+				}
+				ele = this.formatElement(ele)
+				return ele
+			})
+			.filter(ele => {
+				//移除根部的空元素
+				return !ele.isEmpty()
+			})
+	}
+	//渲染编辑器dom内容
+	domRender(unPushHistory = false) {
+		this.$el.innerHTML = ''
+		this.stack.forEach(element => {
+			let elm = element._renderElement()
+			this.$el.appendChild(elm)
+		})
+		this._oldValue = this.value
+		this.value = this.$el.innerHTML
+		//值有变化
+		if (this._oldValue != this.value) {
+			//触发change事件
+			this.emit('change', this.value, this._oldValue)
+			//unPushHistory如果是true则表示不加入历史记录中
+			if (!unPushHistory) {
+				//将本次的stack和range推入历史栈中
+				this.history.push(this.stack, this.range)
+			}
+		}
+	}
+	//根据光标位置删除编辑器内容
+	delete() {
+		//单个删除
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//前一个可以获取焦点的元素
+			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+			//当前焦点所在的块元素
+			const anchorBlock = this.range.anchor.getBlock()
+			//光标在焦点元素的开始处
+			if (this.range.anchor.offset == 0) {
+				//如果前一个可获取焦点的元素存在
+				if (previousElement) {
+					//和当前焦点元素在同一个块内
+					if (anchorBlock.isContains(previousElement)) {
+						this.range.anchor.moveToEnd(previousElement)
+						this.range.focus.moveToEnd(previousElement)
+						this._deleteInSameElement()
+					}
+					//和当前焦点元素不在同一个块内
+					else {
+						//当前焦点所在块元素和前一个块元素进行合并
+						this.mergeBlockElement(anchorBlock)
+						this.range.anchor.moveToEnd(previousElement)
+						this.range.focus.moveToEnd(previousElement)
+					}
+				}
+			}
+			//正常删除
+			else {
+				this._deleteInSameElement()
+			}
+		}
+		//批量删除
+		else {
+			//选区在一个元素内
+			if (this.range.anchor.element.isEqual(this.range.focus.element)) {
+				this._deleteInSameElement()
+			} else {
+				const flatElements = AlexElement.flatElements(this.stack)
+				const anchorIndex = flatElements.findIndex(item => {
+					return this.range.anchor.element.isEqual(item)
+				})
+				const focusIndex = flatElements.findIndex(item => {
+					return this.range.focus.element.isEqual(item)
+				})
+				//获取选区之间的
+				let rangeElements = []
+				for (let i = anchorIndex + 1; i < focusIndex; i++) {
+					if (!flatElements[i].hasContains(this.range.anchor.element) && !flatElements[i].hasContains(this.range.focus.element)) {
+						rangeElements.push(flatElements[i])
+					}
+				}
+				//清空选区内容
+				rangeElements.forEach(el => {
+					if (el.isText()) {
+						el.textContent = ''
+					} else if (el.isClosed()) {
+						const index = el.parent.children.findIndex(item => {
+							return el.isEqual(item)
+						})
+						el.parent.children.splice(index, 1)
+					}
+					if (el.hasChildren()) {
+						el.children = []
+					}
+				})
+				//获取终点所在的块元素
+				const focusBlock = this.range.focus.getBlock()
+				//不在一个块内则需要merge
+				let hasMerge = !focusBlock.hasContains(this.range.anchor.element)
+
+				//执行终点处的删除逻辑
+				if (this.range.focus.offset > 0) {
+					//记录删除操作之前的值
+					let anchorElement = this.range.anchor.element
+					let anchorOffset = this.range.anchor.offset
+					this.range.anchor.element = this.range.focus.element
+					this.range.anchor.offset = 0 //如果是文本，起点从文本起点0开始；如果是自闭合元素，起点从0开始
+					this._deleteInSameElement()
+					//恢复起点光标位置
+					this.range.anchor.element = anchorElement
+					this.range.anchor.offset = anchorOffset
+				}
+				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+				//执行起点处的删除逻辑
+				if (this.range.anchor.offset < endOffset) {
+					this.range.focus.element = this.range.anchor.element
+					//如果是文本从文本终点开始，如果是自闭合元素从自闭合元素终点开始
+					this.range.focus.offset = endOffset
+					this._deleteInSameElement()
+				}
+				if (hasMerge) {
+					this.mergeBlockElement(focusBlock)
+				}
+			}
+		}
+	}
+	//根据光标位置向编辑器内插入文本
+	insertText(data) {
+		if (!data || typeof data != 'string') {
+			throw new Error('The argument must be a string')
+		}
+		//起点和终点在一个位置
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//对空格进行处理
+			data = data.replace(/\s+/g, () => {
+				const span = document.createElement('span')
+				span.innerHTML = '&nbsp;'
+				return span.innerText
+			})
+			//如果是文本
+			if (this.range.anchor.element.isText()) {
+				let val = this.range.anchor.element.textContent
+				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + data + val.substring(this.range.anchor.offset)
+				this.range.anchor.offset = this.range.anchor.offset + data.length
+				this.range.focus.offset = this.range.anchor.offset
+			}
+			//如果是自闭合元素
+			else {
+				const textEl = new AlexElement('text', null, null, null, data)
+				if (this.range.anchor.offset == 0) {
+					this.addElementBefore(textEl, this.range.anchor.element)
+				} else {
+					this.addElementAfter(textEl, this.range.anchor.element)
+				}
+				this.range.anchor.moveToEnd(textEl)
+				this.range.focus.moveToEnd(textEl)
+			}
+		}
+		//起点和终点不在一个位置，即存在选区
+		else {
+			this.delete()
+			this.insertText(data)
+		}
+	}
+	//在光标处换行
+	insertParagraph() {
+		//起点和终点在一个位置
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//前一个可以获取焦点的元素
+			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+			//后一个可以获取焦点的元素
+			const nextElement = this.getNextElementOfPoint(this.range.anchor)
+			//当前焦点所在的块元素
+			const anchorBlock = this.range.anchor.getBlock()
+			//终点位置
+			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			//焦点在当前块的起点位置
+			if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+				//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
+				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
+				const breakEle = new AlexElement('closed', 'br', null, null, null)
+				this.addElementTo(breakEle, paragraph, 0)
+				this.addElementBefore(paragraph, anchorBlock)
+				this.range.anchor.moveToStart(anchorBlock)
+				this.range.focus.moveToStart(anchorBlock)
+			}
+			//焦点在当前块的终点位置
+			else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+				//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
+				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
+				const breakEle = new AlexElement('closed', 'br', null, null, null)
+				this.addElementTo(breakEle, paragraph, 0)
+				this.addElementAfter(paragraph, anchorBlock)
+				this.range.anchor.moveToStart(paragraph)
+				this.range.focus.moveToStart(paragraph)
+			}
+			//焦点在当前块的中间部分则需要切割
+			else {
+				//获取所在块元素
+				const block = this.range.anchor.getBlock()
+				const newBlock = block.clone(true)
+				this.addElementAfter(newBlock, block)
+				//将终点移动到块元素末尾
+				this.range.focus.moveToEnd(block)
+				this.delete()
+				//将终点移动到新的块元素
+				const elements = AlexElement.flatElements(block.children)
+				const index = elements.findIndex(item => {
+					return this.range.anchor.element.isEqual(item)
+				})
+				const newElements = AlexElement.flatElements(newBlock.children)
+				this.range.focus.element = newElements[index]
+				this.range.focus.offset = this.range.anchor.offset
+				this.range.anchor.moveToStart(newBlock)
+				this.delete()
+			}
+		} else {
+			this.delete()
+			this.insertParagraph()
+		}
+	}
+	//根据光标插入元素
+	insertElement(ele) {
+		if (!AlexElement.isElement(ele)) {
+			throw new Error('The argument must be an AlexElement instance')
+		}
+		//起点和终点在一个位置
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			if (ele.isBlock()) {
+				//前一个可以获取焦点的元素
+				const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+				//后一个可以获取焦点的元素
+				const nextElement = this.getNextElementOfPoint(this.range.anchor)
+				//当前焦点所在的块元素
+				const anchorBlock = this.range.anchor.getBlock()
+				//终点位置
+				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+				//焦点在当前块的起点位置
+				if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+					//在该块之前插入
+					this.addElementBefore(ele, anchorBlock)
+				}
+				//焦点在当前块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+					//在该块之后插入
+					this.addElementAfter(ele, anchorBlock)
+				}
+				//焦点在当前块的中间部分则需要切割
+				else {
+					//获取所在块元素
+					const block = this.range.anchor.getBlock()
+					const newBlock = block.clone(true)
+					this.addElementAfter(newBlock, block)
+					//将终点移动到块元素末尾
+					this.range.focus.moveToEnd(block)
+					this.delete()
+					//将终点移动到新的块元素
+					const elements = AlexElement.flatElements(block.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newBlock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newBlock)
+					this.delete()
+
+					//在新的块之前插入
+					this.addElementBefore(ele, newBlock)
+				}
+			} else {
+				//是文本
+				if (this.range.anchor.element.isText()) {
+					let val = this.range.anchor.element.textContent
+					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+					let newText = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset))
+					this.addElementAfter(newText, this.range.anchor.element)
+					this.addElementBefore(ele, newText)
+				}
+				//自闭合元素
+				else {
+					if (this.range.anchor.offset == 0) {
+						this.addElementBefore(ele, this.range.anchor.element)
+					} else {
+						this.addElementAfter(ele, this.range.anchor.element)
+					}
+				}
+			}
+			this.range.anchor.moveToEnd(ele)
+			this.range.focus.moveToEnd(ele)
+		} else {
+			this.delete()
+			this.insertElement(ele)
+		}
 	}
 	//更新焦点的元素为最近的可设置光标的元素
 	setRecentlyPoint(point) {
@@ -1023,356 +1330,6 @@ class AlexEditor {
 		}
 		return elements
 	}
-	//格式化单个元素
-	formatElement(ele) {
-		if (!AlexElement.isElement(ele)) {
-			throw new Error('The argument must be an AlexElement instance')
-		}
-		//格式化
-		const format = element => {
-			//从子孙元素开始格式化
-			if (element.hasChildren()) {
-				element.children = element.children.map(format)
-			}
-			//格式化自身
-			this._formatUnchangeableRules.forEach(fn => {
-				element = fn(element)
-			})
-			return element
-		}
-		//移除子孙元素中的空元素
-		const removeEmptyElement = element => {
-			if (element.hasChildren()) {
-				element.children.forEach(item => {
-					if (!item.isEmpty()) {
-						item = removeEmptyElement(item)
-					}
-				})
-				element.children = element.children.filter(item => {
-					return !item.isEmpty()
-				})
-			}
-			return element
-		}
-		//格式化
-		ele = format(ele)
-		//移除所有的空元素
-		ele = removeEmptyElement(ele)
-		return ele
-	}
-	//格式化stack
-	formatElementStack() {
-		this.stack = this.stack
-			.map(ele => {
-				//转为块元素
-				if (!ele.isBlock()) {
-					ele.convertToBlock()
-				}
-				ele = this.formatElement(ele)
-				return ele
-			})
-			.filter(ele => {
-				//移除根部的空元素
-				return !ele.isEmpty()
-			})
-	}
-	//渲染编辑器dom内容
-	domRender(unPushHistory = false) {
-		this.$el.innerHTML = ''
-		this.stack.forEach(element => {
-			let elm = element._renderElement()
-			this.$el.appendChild(elm)
-		})
-		this._oldValue = this.value
-		this.value = this.$el.innerHTML
-		//值有变化
-		if (this._oldValue != this.value) {
-			if (typeof this.onChange == 'function') {
-				this.onChange.apply(this, [this.value, this._oldValue])
-			}
-			//unPushHistory如果是true则表示不加入历史记录中
-			if (!unPushHistory) {
-				//将本次的stack和range推入历史栈中
-				this.history.push(this.stack, this.range)
-			}
-		}
-	}
-	//禁用编辑器
-	setDisabled() {
-		this.disabled = true
-		this.$el.removeAttribute('contenteditable')
-	}
-	//启用编辑器
-	setEnabled() {
-		this.disabled = false
-		this.$el.setAttribute('contenteditable', true)
-	}
-	//根据光标位置删除编辑器内容
-	delete() {
-		//单个删除
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			//前一个可以获取焦点的元素
-			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
-			//当前焦点所在的块元素
-			const anchorBlock = this.range.anchor.getBlock()
-			//光标在焦点元素的开始处
-			if (this.range.anchor.offset == 0) {
-				//如果前一个可获取焦点的元素存在
-				if (previousElement) {
-					//和当前焦点元素在同一个块内
-					if (anchorBlock.isContains(previousElement)) {
-						this.range.anchor.moveToEnd(previousElement)
-						this.range.focus.moveToEnd(previousElement)
-						this._deleteInSameElement()
-					}
-					//和当前焦点元素不在同一个块内
-					else {
-						//当前焦点所在块元素和前一个块元素进行合并
-						this.mergeBlockElement(anchorBlock)
-						this.range.anchor.moveToEnd(previousElement)
-						this.range.focus.moveToEnd(previousElement)
-					}
-				}
-			}
-			//正常删除
-			else {
-				this._deleteInSameElement()
-			}
-		}
-		//批量删除
-		else {
-			//选区在一个元素内
-			if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-				this._deleteInSameElement()
-			} else {
-				const flatElements = AlexElement.flatElements(this.stack)
-				const anchorIndex = flatElements.findIndex(item => {
-					return this.range.anchor.element.isEqual(item)
-				})
-				const focusIndex = flatElements.findIndex(item => {
-					return this.range.focus.element.isEqual(item)
-				})
-				//获取选区之间的
-				let rangeElements = []
-				for (let i = anchorIndex + 1; i < focusIndex; i++) {
-					if (!flatElements[i].hasContains(this.range.anchor.element) && !flatElements[i].hasContains(this.range.focus.element)) {
-						rangeElements.push(flatElements[i])
-					}
-				}
-				//清空选区内容
-				rangeElements.forEach(el => {
-					if (el.isText()) {
-						el.textContent = ''
-					} else if (el.isClosed()) {
-						const index = el.parent.children.findIndex(item => {
-							return el.isEqual(item)
-						})
-						el.parent.children.splice(index, 1)
-					}
-					if (el.hasChildren()) {
-						el.children = []
-					}
-				})
-				//获取终点所在的块元素
-				const focusBlock = this.range.focus.getBlock()
-				//不在一个块内则需要merge
-				let hasMerge = !focusBlock.hasContains(this.range.anchor.element)
-
-				//执行终点处的删除逻辑
-				if (this.range.focus.offset > 0) {
-					//记录删除操作之前的值
-					let anchorElement = this.range.anchor.element
-					let anchorOffset = this.range.anchor.offset
-					this.range.anchor.element = this.range.focus.element
-					this.range.anchor.offset = 0 //如果是文本，起点从文本起点0开始；如果是自闭合元素，起点从0开始
-					this._deleteInSameElement()
-					//恢复起点光标位置
-					this.range.anchor.element = anchorElement
-					this.range.anchor.offset = anchorOffset
-				}
-				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-				//执行起点处的删除逻辑
-				if (this.range.anchor.offset < endOffset) {
-					this.range.focus.element = this.range.anchor.element
-					//如果是文本从文本终点开始，如果是自闭合元素从自闭合元素终点开始
-					this.range.focus.offset = endOffset
-					this._deleteInSameElement()
-				}
-				if (hasMerge) {
-					this.mergeBlockElement(focusBlock)
-				}
-			}
-		}
-	}
-	//根据光标位置向编辑器内插入文本
-	insertText(data) {
-		if (!data || typeof data != 'string') {
-			throw new Error('The argument must be a string')
-		}
-		//对空格进行处理
-		data = data.replace(/\s+/g, () => {
-			const span = document.createElement('span')
-			span.innerHTML = '&nbsp;'
-			return span.innerText
-		})
-		//起点和终点在一个位置
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			//如果是文本
-			if (this.range.anchor.element.isText()) {
-				let val = this.range.anchor.element.textContent
-				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + data + val.substring(this.range.anchor.offset)
-				this.range.anchor.offset = this.range.anchor.offset + data.length
-				this.range.focus.offset = this.range.anchor.offset
-			}
-			//如果是自闭合元素
-			else {
-				const textEl = new AlexElement('text', null, null, null, data)
-				if (this.range.anchor.offset == 0) {
-					this.addElementBefore(textEl, this.range.anchor.element)
-				} else {
-					this.addElementAfter(textEl, this.range.anchor.element)
-				}
-				this.range.anchor.moveToEnd(textEl)
-				this.range.focus.moveToEnd(textEl)
-			}
-		}
-		//起点和终点不在一个位置，即存在选区
-		else {
-			this.delete()
-			this.insertText(data)
-		}
-	}
-	//在光标处换行
-	insertParagraph() {
-		//起点和终点在一个位置
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			//前一个可以获取焦点的元素
-			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
-			//后一个可以获取焦点的元素
-			const nextElement = this.getNextElementOfPoint(this.range.anchor)
-			//当前焦点所在的块元素
-			const anchorBlock = this.range.anchor.getBlock()
-			//终点位置
-			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-			//焦点在当前块的起点位置
-			if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
-				//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
-				const breakEle = new AlexElement('closed', 'br', null, null, null)
-				this.addElementTo(breakEle, paragraph, 0)
-				this.addElementBefore(paragraph, anchorBlock)
-				this.range.anchor.moveToStart(anchorBlock)
-				this.range.focus.moveToStart(anchorBlock)
-			}
-			//焦点在当前块的终点位置
-			else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
-				//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
-				const breakEle = new AlexElement('closed', 'br', null, null, null)
-				this.addElementTo(breakEle, paragraph, 0)
-				this.addElementAfter(paragraph, anchorBlock)
-				this.range.anchor.moveToStart(paragraph)
-				this.range.focus.moveToStart(paragraph)
-			}
-			//焦点在当前块的中间部分则需要切割
-			else {
-				//获取所在块元素
-				const block = this.range.anchor.getBlock()
-				const newBlock = block.clone(true)
-				this.addElementAfter(newBlock, block)
-				//将终点移动到块元素末尾
-				this.range.focus.moveToEnd(block)
-				this.delete()
-				//将终点移动到新的块元素
-				const elements = AlexElement.flatElements(block.children)
-				const index = elements.findIndex(item => {
-					return this.range.anchor.element.isEqual(item)
-				})
-				const newElements = AlexElement.flatElements(newBlock.children)
-				this.range.focus.element = newElements[index]
-				this.range.focus.offset = this.range.anchor.offset
-				this.range.anchor.moveToStart(newBlock)
-				this.delete()
-			}
-		} else {
-			this.delete()
-			this.insertParagraph()
-		}
-	}
-	//根据光标插入元素
-	insertElement(ele) {
-		if (!AlexElement.isElement(ele)) {
-			throw new Error('The argument must be an AlexElement instance')
-		}
-		//起点和终点在一个位置
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			if (ele.isBlock()) {
-				//前一个可以获取焦点的元素
-				const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
-				//后一个可以获取焦点的元素
-				const nextElement = this.getNextElementOfPoint(this.range.anchor)
-				//当前焦点所在的块元素
-				const anchorBlock = this.range.anchor.getBlock()
-				//终点位置
-				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-				//焦点在当前块的起点位置
-				if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
-					//在该块之前插入
-					this.addElementBefore(ele, anchorBlock)
-				}
-				//焦点在当前块的终点位置
-				else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
-					//在该块之后插入
-					this.addElementAfter(ele, anchorBlock)
-				}
-				//焦点在当前块的中间部分则需要切割
-				else {
-					//获取所在块元素
-					const block = this.range.anchor.getBlock()
-					const newBlock = block.clone(true)
-					this.addElementAfter(newBlock, block)
-					//将终点移动到块元素末尾
-					this.range.focus.moveToEnd(block)
-					this.delete()
-					//将终点移动到新的块元素
-					const elements = AlexElement.flatElements(block.children)
-					const index = elements.findIndex(item => {
-						return this.range.anchor.element.isEqual(item)
-					})
-					const newElements = AlexElement.flatElements(newBlock.children)
-					this.range.focus.element = newElements[index]
-					this.range.focus.offset = this.range.anchor.offset
-					this.range.anchor.moveToStart(newBlock)
-					this.delete()
-
-					//在新的块之前插入
-					this.addElementBefore(ele, newBlock)
-				}
-			} else {
-				//是文本
-				if (this.range.anchor.element.isText()) {
-					let val = this.range.anchor.element.textContent
-					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
-					let newText = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset))
-					this.addElementAfter(newText, this.range.anchor.element)
-					this.addElementBefore(ele, newText)
-				}
-				//自闭合元素
-				else {
-					if (this.range.anchor.offset == 0) {
-						this.addElementBefore(ele, this.range.anchor.element)
-					} else {
-						this.addElementAfter(ele, this.range.anchor.element)
-					}
-				}
-			}
-			this.range.anchor.moveToEnd(ele)
-			this.range.focus.moveToEnd(ele)
-		} else {
-			this.delete()
-			this.insertElement(ele)
-		}
-	}
 	//将真实的光标设置到指定元素开始
 	collapseToStart(element) {
 		if (this.disabled) {
@@ -1461,7 +1418,19 @@ class AlexEditor {
 		this.setDisabled()
 		//移除相关监听事件
 		Dap.event.off(document, 'selectionchange.alex_editor')
-		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor drop.alex_editor')
+		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
+	}
+	//触发自定义事件
+	emit(eventName, ...value) {
+		if (typeof this._events[eventName] == 'function') {
+			this._events[eventName].apply(this, [...value])
+			return true
+		}
+		return false
+	}
+	//监听自定义事件
+	on(eventName, eventHandle) {
+		this._events[eventName] = eventHandle
 	}
 }
 
