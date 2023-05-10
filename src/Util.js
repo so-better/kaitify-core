@@ -5,7 +5,7 @@ export default {
 		let o = {}
 		for (let attribute of el.attributes) {
 			//匹配事件、样式外的属性
-			if (!/^on/g.test(attribute.nodeName) && attribute.nodeName != 'style') {
+			if (!/(^on)|(^style$)|(^class$)/g.test(attribute.nodeName)) {
 				o[attribute.nodeName] = attribute.nodeValue
 			}
 		}

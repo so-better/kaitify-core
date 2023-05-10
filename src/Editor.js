@@ -162,6 +162,8 @@ class AlexEditor {
 							'text-decoration-line': 'line-through'
 						}
 					}
+				} else if (['pre'].includes(element.parsedom)) {
+					element.type = 'block'
 				}
 			} else {
 				element.type = 'text'
@@ -782,12 +784,14 @@ class AlexEditor {
 		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			//对空格进行处理
-			data = data.replace(/\s+/g, () => {
-				const span = document.createElement('span')
-				span.innerHTML = '&nbsp;'
-				return span.innerText
-			})
+			//不是代码块内则对空格进行处理
+			if (!this.range.anchor.getBlock().parsedom == 'pre') {
+				data = data.replace(/\s+/g, () => {
+					const span = document.createElement('span')
+					span.innerHTML = '&nbsp;'
+					return span.innerText
+				})
+			}
 			//如果是文本
 			if (this.range.anchor.element.isText()) {
 				let val = this.range.anchor.element.textContent
@@ -825,45 +829,59 @@ class AlexEditor {
 			const anchorBlock = this.range.anchor.getBlock()
 			//终点位置
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-			//焦点在当前块的起点位置
-			if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
-				//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
-				const breakEle = new AlexElement('closed', 'br', null, null, null)
-				this.addElementTo(breakEle, paragraph, 0)
-				this.addElementBefore(paragraph, anchorBlock)
-				this.range.anchor.moveToStart(anchorBlock)
-				this.range.focus.moveToStart(anchorBlock)
+			//在源代码标签中
+			if (anchorBlock.parsedom == 'pre') {
+				//焦点在代码块的终点位置
+				if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+					this.insertText('\n\n')
+					this.range.anchor.offset -= 1
+					this.range.focus.offset -= 1
+				} else {
+					this.insertText('\n')
+				}
 			}
-			//焦点在当前块的终点位置
-			else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
-				//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
-				const paragraph = new AlexElement('block', anchorBlock.parsedom, null, { ...anchorBlock.styles }, null)
-				const breakEle = new AlexElement('closed', 'br', null, null, null)
-				this.addElementTo(breakEle, paragraph, 0)
-				this.addElementAfter(paragraph, anchorBlock)
-				this.range.anchor.moveToStart(paragraph)
-				this.range.focus.moveToStart(paragraph)
-			}
-			//焦点在当前块的中间部分则需要切割
+			//在其他标签中
 			else {
-				//获取所在块元素
-				const block = this.range.anchor.getBlock()
-				const newBlock = block.clone(true)
-				this.addElementAfter(newBlock, block)
-				//将终点移动到块元素末尾
-				this.range.focus.moveToEnd(block)
-				this.delete()
-				//将终点移动到新的块元素
-				const elements = AlexElement.flatElements(block.children)
-				const index = elements.findIndex(item => {
-					return this.range.anchor.element.isEqual(item)
-				})
-				const newElements = AlexElement.flatElements(newBlock.children)
-				this.range.focus.element = newElements[index]
-				this.range.focus.offset = this.range.anchor.offset
-				this.range.anchor.moveToStart(newBlock)
-				this.delete()
+				//焦点在当前块的起点位置
+				if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+					//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
+					const paragraph = new AlexElement('block', anchorBlock.parsedom, { ...anchorBlock.marks }, { ...anchorBlock.styles }, null)
+					const breakEle = new AlexElement('closed', 'br', null, null, null)
+					this.addElementTo(breakEle, paragraph, 0)
+					this.addElementBefore(paragraph, anchorBlock)
+					this.range.anchor.moveToStart(anchorBlock)
+					this.range.focus.moveToStart(anchorBlock)
+				}
+				//焦点在当前块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+					//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
+					const paragraph = new AlexElement('block', anchorBlock.parsedom, { ...anchorBlock.marks }, { ...anchorBlock.styles }, null)
+					const breakEle = new AlexElement('closed', 'br', null, null, null)
+					this.addElementTo(breakEle, paragraph, 0)
+					this.addElementAfter(paragraph, anchorBlock)
+					this.range.anchor.moveToStart(paragraph)
+					this.range.focus.moveToStart(paragraph)
+				}
+				//焦点在当前块的中间部分则需要切割
+				else {
+					//获取所在块元素
+					const block = this.range.anchor.getBlock()
+					const newBlock = block.clone(true)
+					this.addElementAfter(newBlock, block)
+					//将终点移动到块元素末尾
+					this.range.focus.moveToEnd(block)
+					this.delete()
+					//将终点移动到新的块元素
+					const elements = AlexElement.flatElements(block.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newBlock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newBlock)
+					this.delete()
+				}
 			}
 		} else {
 			this.delete()

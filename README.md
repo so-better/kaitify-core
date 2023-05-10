@@ -64,9 +64,9 @@ editor.range.setCursor()
 | renderRules | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
 | htmlPaste   | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
 
-### 编辑器内部元素规范
+### 编辑器规范
 
-> 即 editor.formatElementStack 函数执行效果
+> 无法改变的固定规范：
 
 -   子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
@@ -77,7 +77,21 @@ editor.range.setCursor()
 -   如果 AlexPoint 对象的 element 是 closed 元素，那么 offset 要么是 0 要么是 1
 -   操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入
 
-> 以上的规则是编辑器内部渲染的一个固定的逻辑，无法去改变。但是我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作
+> 可以改变的规范：
+
+-   br 标签、img 标签、video 标签渲染为 closed 元素
+-   span 标签、a 标签、label 标签、code 标签渲染为 inline 元素
+-   input 标签、textarea 标签、select 标签会渲染为 br 标签（编辑器内不应当存在这类元素）
+-   b 标签和 strong 标签渲染为加粗的 span
+-   sup 标签渲染为带`'vertical-align': 'super'`样式的 span
+-   sub 标签渲染为带`'vertical-align': 'sub'`样式的 span
+-   i 标签渲染为带`'font-style': 'italic'`样式的 span
+-   u 标签渲染为带`'text-decoration-line': 'underline'`样式的 span
+-   del 标签渲染为带`text-decoration-line': 'line-through'`样式的 span
+-   pre 标签渲染为 block 元素
+-   其余元素在内部创建时会默认是 block 元素
+
+> 我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作，可以覆盖上面的规范
 
 ```javascript
 const editor = new AlexEditor(el, {
@@ -111,8 +125,8 @@ const editor = new AlexEditor(el, {
 -   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
 -   `editor.mergeBlockElement(ele)` ：将指定的块元素与其前一个块元素进行合并
 -   `editor.getElementByKey(key)` ：根据 key 查询元素
--   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素
--   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组
+-   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性和 class 属性）
+-   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性和 class 属性）
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
 -   `editor.getElementsByRange()` ：获取 anchor 和 focus 两个焦点之间的元素（如果焦点在文本中间，还会分割文本元素）
