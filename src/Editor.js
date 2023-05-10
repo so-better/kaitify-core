@@ -64,17 +64,19 @@ class AlexEditor {
 			}
 		}
 		//设置selection的监听更新range
-		Dap.event.on(document, 'selectionchange', this._handleSelectionChange.bind(this))
+		Dap.event.on(document, 'selectionchange.alex_editor', this._handleSelectionChange.bind(this))
 		//监听内容输入
-		Dap.event.on(this.$el, 'beforeinput', this._handleBeforeInput.bind(this))
+		Dap.event.on(this.$el, 'beforeinput.alex_editor', this._handleBeforeInput.bind(this))
 		//监听中文输入
-		Dap.event.on(this.$el, 'compositionstart compositionupdate compositionend', this._handleChineseInput.bind(this))
+		Dap.event.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', this._handleChineseInput.bind(this))
 		//监听键盘按下
-		Dap.event.on(this.$el, 'keydown', this._handleKeydown.bind(this))
+		Dap.event.on(this.$el, 'keydown.alex_editor', this._handleKeydown.bind(this))
 		//监听编辑器剪切
-		Dap.event.on(this.$el, 'cut', this._handleCut.bind(this))
+		Dap.event.on(this.$el, 'cut.alex_editor', this._handleCut.bind(this))
 		//监听编辑器粘贴
-		Dap.event.on(this.$el, 'paste', this._handlePaste.bind(this))
+		Dap.event.on(this.$el, 'paste.alex_editor', this._handlePaste.bind(this))
+		//监听编辑器拖放
+		Dap.event.on(this.$el, 'drop.alex_editor', this._handleNodesChange.bind(this))
 	}
 
 	//校验函数数组，用于格式化
@@ -439,7 +441,9 @@ class AlexEditor {
 	}
 	//监听beforeinput
 	_handleBeforeInput(e) {
-		console.log(e.inputType)
+		if (this.disabled) {
+			return
+		}
 		//以下输入类型使用系统的默认行为
 		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop') {
 			return
@@ -473,6 +477,9 @@ class AlexEditor {
 	}
 	//监听中文输入
 	_handleChineseInput(e) {
+		if (this.disabled) {
+			return
+		}
 		e.preventDefault()
 		if (e.type == 'compositionstart') {
 			this._isInputChinese = true
@@ -488,6 +495,9 @@ class AlexEditor {
 	}
 	//监听键盘按下
 	_handleKeydown(e) {
+		if (this.disabled) {
+			return
+		}
 		//撤销
 		if (Keyboard.Undo(e)) {
 			e.preventDefault()
@@ -515,6 +525,9 @@ class AlexEditor {
 	}
 	//监听粘贴事件
 	_handlePaste(e) {
+		if (this.disabled) {
+			return
+		}
 		const files = e.clipboardData.files
 		//粘贴文件
 		if (files.length) {
@@ -578,49 +591,14 @@ class AlexEditor {
 		}
 		//粘贴html：以下是针对浏览器原本的粘贴功能，进行节点和光标的更新
 		else {
-			//加上setTimeout是为了在粘贴事件后进行处理，起到延时作用
-			setTimeout(() => {
-				if (!this.range.anchor.isEqual(this.range.focus)) {
-					this.delete()
-				}
-				const flatElements = AlexElement.flatElements(this.stack)
-				const nextElement = this.getNextElementOfPoint(this.range.focus)
-				let rIndex = -1
-				//如果是文本并且offset不是在最后一个
-				if (this.range.focus.element.isText() && this.range.focus.offset < this.range.focus.element.textContent.length) {
-					rIndex = flatElements.findIndex(item => {
-						return this.range.focus.element.isEqual(item)
-					})
-					rIndex = flatElements.length - 1 - rIndex
-				} else if (nextElement) {
-					//获取后一个焦点元素的距离终点的序列
-					rIndex = flatElements.findIndex(item => {
-						return nextElement.isEqual(item)
-					})
-					rIndex = flatElements.length - 1 - rIndex
-				}
-				this.stack = this.parseHtml(this.$el.innerHTML)
-				this.formatElementStack()
-				const newElements = AlexElement.flatElements(this.stack)
-				if (rIndex >= 0) {
-					this.range.anchor.moveToStart(newElements[newElements.length - 1 - rIndex])
-					this.range.focus.moveToStart(newElements[newElements.length - 1 - rIndex])
-					const previousElement = this.getPreviousElementOfPoint(this.range.focus)
-					if (previousElement) {
-						this.range.anchor.moveToEnd(previousElement)
-						this.range.focus.moveToEnd(previousElement)
-					}
-				} else {
-					this.range.anchor.moveToEnd(newElements[newElements.length - 1])
-					this.range.focus.moveToEnd(newElements[newElements.length - 1])
-				}
-				this.domRender()
-				this.range.setCursor()
-			}, 0)
+			this._handleNodesChange()
 		}
 	}
 	//监听剪切事件
 	_handleCut(e) {
+		if (this.disabled) {
+			return
+		}
 		//加上setTimeout是为了在剪切事件后进行处理，起到延时作用
 		setTimeout(() => {
 			this.delete()
@@ -629,7 +607,37 @@ class AlexEditor {
 			this.range.setCursor()
 		}, 0)
 	}
-	//获取最近的可设置光标的元素
+	//解决编辑器内元素节点与stack数据不符的情况，进行数据纠正
+	_handleNodesChange() {
+		//加上setTimeout是为了保证this.$el.innerHTML获取的是最新的
+		setTimeout(() => {
+			const selection = window.getSelection()
+			let focusNode = null
+			let focusOffset = null
+			if (selection.rangeCount) {
+				let range = selection.getRangeAt(0)
+				focusNode = range.endContainer
+				focusOffset = range.endOffset
+				const flatNodes = Util.flatNodes(Array.from(this.$el.childNodes))
+				const index = flatNodes.findIndex(item => {
+					return focusNode.isEqualNode(item)
+				})
+				this.stack = this.parseHtml(this.$el.innerHTML)
+				this.formatElementStack()
+				const flatElements = AlexElement.flatElements(this.stack)
+				this.range.anchor.moveToStart(flatElements[0])
+				this.range.focus.moveToStart(flatElements[0])
+				this.domRender()
+				const nodes = Util.flatNodes(Array.from(this.$el.childNodes))
+				const focusKey = Dap.data.get(nodes[index], 'data-alex-editor-key')
+				const focusEle = this.getElementByKey(focusKey)
+				const focus = new AlexPoint(focusEle, focusOffset)
+				this.range = new AlexRange(focus, focus)
+				this.range.setCursor()
+			}
+		}, 0)
+	}
+	//更新焦点的元素为最近的可设置光标的元素
 	setRecentlyPoint(point) {
 		const previousElement = this.getPreviousElementOfPoint(point)
 		const nextElement = this.getNextElementOfPoint(point)
@@ -1367,6 +1375,9 @@ class AlexEditor {
 	}
 	//将真实的光标设置到指定元素开始
 	collapseToStart(element) {
+		if (this.disabled) {
+			return
+		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToStart(element)
@@ -1381,6 +1392,9 @@ class AlexEditor {
 	}
 	//将真实的光标设置到指定元素最后
 	collapseToEnd(element) {
+		if (this.disabled) {
+			return
+		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToEnd(element)
@@ -1400,6 +1414,9 @@ class AlexEditor {
 			throw new Error('The argument must be an object')
 		}
 		const elements = this.getElementsByRange()
+		if (elements.length == 0) {
+			return
+		}
 		elements.forEach(el => {
 			if (el.isText()) {
 				const children = el.parent.children.filter(item => {
@@ -1437,6 +1454,14 @@ class AlexEditor {
 		})
 		this.range.anchor.moveToStart(elements[0])
 		this.range.focus.moveToEnd(elements[elements.length - 1])
+	}
+	//销毁编辑器的方法
+	destroy() {
+		//去除可编辑效果
+		this.setDisabled()
+		//移除相关监听事件
+		Dap.event.off(document, 'selectionchange.alex_editor')
+		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor drop.alex_editor')
 	}
 }
 

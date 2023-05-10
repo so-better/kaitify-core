@@ -38,5 +38,22 @@ export default {
 		key++
 		Dap.data.set(window, 'data-alex-editor-key', key)
 		return key
+	},
+	flatNodes(nodes) {
+		const flat = arr => {
+			let result = []
+			arr.forEach(node => {
+				if (Dap.element.isElement(node, true)) {
+					result.push(node)
+					const childNodes = Array.from(node.childNodes)
+					if (childNodes.length) {
+						let arr = flat(childNodes)
+						result = [...result, ...arr]
+					}
+				}
+			})
+			return result
+		}
+		return flat(nodes)
 	}
 }

@@ -12,6 +12,7 @@ onMounted(() => {
 		autofocus: true,
 		value: value.value,
 		htmlPaste: true,
+		disabled: true,
 		renderRules: function (element) {
 			//这里可以自定义格式化规则
 			return element
@@ -27,16 +28,8 @@ onMounted(() => {
 })
 
 const undo = function () {
-	const els = editor.parseHtml('<i>33333</i>')
-	els.forEach(el => {
-		editor.insertElement(el)
-	})
-	// editor.setStyle({
-	// 	'background-color': '#708af3'
-	// })
-	editor.formatElementStack()
-	editor.domRender()
 	editor.range.setCursor()
+	//editor.destroy()
 }
 </script>
 <template>
