@@ -1414,35 +1414,14 @@ class AlexEditor {
 			let offset = null
 			//如果是自闭合元素
 			if (point.element.isClosed()) {
-				//在自闭合元素之前
-				if (point.offset == 0) {
-					const previousElement = this.getPreviousElementOfPoint(point)
-					const block = point.getBlock()
-					//同块内前面存在可获取焦点的元素
-					if (previousElement && block.isContains(previousElement)) {
-						point.moveToEnd(previousElement)
-						const res = handler(point)
-						node = res.node
-						offset = res.offset
-					}
-					//同块内前面不存在可获取焦点的元素
-					else {
-						node = point.element.parent._elm
-						offset = 0
-					}
-				}
-				//在自闭合元素之后
-				else if (point.offset == 1) {
-					node = point.element.parent._elm
-					const index = point.element.parent.children.findIndex(item => {
-						return point.element.isEqual(item)
-					})
-					//处理自闭合元素是换行符的情况换行符之后不能输入，只能将光标设在换行符之前
-					if (point.element.isBreak()) {
-						offset = index
-					} else {
-						offset = index + 1
-					}
+				node = point.element.parent._elm
+				const index = point.element.parent.children.findIndex(item => {
+					return point.element.isEqual(item)
+				})
+				if (point.offset == 0 || point.element.isBreak()) {
+					offset = index
+				} else {
+					offset = index + 1
 				}
 			}
 			//文本元素

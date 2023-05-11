@@ -24,7 +24,7 @@ onMounted(() => {
 	// editor.on('pasteFile', files => {
 	// 	console.log(files)
 	// })
-	editor.collapseToStart()
+	editor.collapseToEnd()
 })
 
 const insert = function () {
