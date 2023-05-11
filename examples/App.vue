@@ -11,15 +11,16 @@ onMounted(() => {
 	editor = new AlexEditor(el.value, {
 		value: `<p><br></p>`
 	})
-	editor.on('change', (newVal, oldVal) => {
-		console.log(newVal, oldVal)
-	})
-	editor.on('focus', newVal => {
-		//console.log(newVal)
-	})
-	editor.on('blur', newVal => {
-		//console.log(newVal)
-	})
+
+	// editor.on('change', (newVal, oldVal) => {
+	// 	console.log(newVal, oldVal)
+	// })
+	// editor.on('focus', newVal => {
+	// 	//console.log(newVal)
+	// })
+	// editor.on('blur', newVal => {
+	// 	//console.log(newVal)
+	// })
 	// editor.on('pasteFile', files => {
 	// 	console.log(files)
 	// })
@@ -53,6 +54,7 @@ const insert = function () {
 </script>
 <template>
 	<div>
+		<div contenteditable="true" class="editor"></div>
 		<button @click="insert">插入引用</button>
 		<div ref="el" class="editor"></div>
 	</div>

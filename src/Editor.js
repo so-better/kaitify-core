@@ -418,7 +418,7 @@ class AlexEditor {
 			return
 		}
 		//以下输入类型使用系统的默认行为
-		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop') {
+		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop' || e.inputType == 'insertCompositionText') {
 			return
 		}
 		e.preventDefault()
