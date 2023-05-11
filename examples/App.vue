@@ -11,7 +11,8 @@ onMounted(() => {
 	const $table = document.createElement('table')
 	$table.innerHTML = table.value.innerHTML
 	editor = new AlexEditor(el.value, {
-		value: `${$table.outerHTML}<p><br></p>`
+		value: `${$table.outerHTML}<p><br></p>`,
+		disabled: true
 	})
 	editor.on('change', (newVal, oldVal) => {
 		console.log(newVal, oldVal)
@@ -28,9 +29,29 @@ onMounted(() => {
 	editor.collapseToEnd()
 })
 
-const undo = function () {
+const insert = function () {
+	const quote = new AlexElement(
+		'block',
+		'blockquote',
+		{
+			class: 'a'
+		},
+		{
+			'background-color': '#f5f6f7',
+			color: '#666',
+			'font-size': '16px',
+			margin: '0 0 15px 0',
+			padding: '10px 10px 10px 20px',
+			'border-left': '10px solid #eee'
+		},
+		null
+	)
+	const breakEl = new AlexElement('closed', 'br', null, null, null)
+	editor.addElementTo(breakEl, quote)
+	editor.insertElement(quote)
+	editor.formatElementStack()
+	editor.domRender()
 	editor.range.setCursor()
-	//editor.destroy()
 }
 </script>
 <template>
@@ -67,6 +88,7 @@ const undo = function () {
 				</tr>
 			</tbody>
 		</table>
+		<button @click="insert">插入引用</button>
 		<div ref="el" class="editor"></div>
 	</div>
 </template>

@@ -93,7 +93,7 @@ class AlexEditor {
 				} else if (['b', 'strong'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'font-weight': 'bold'
 						})
@@ -105,7 +105,7 @@ class AlexEditor {
 				} else if (['sup'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'vertical-align': 'super'
 						})
@@ -117,7 +117,7 @@ class AlexEditor {
 				} else if (['sub'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'vertical-align': 'sub'
 						})
@@ -129,7 +129,7 @@ class AlexEditor {
 				} else if (['i'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'font-style': 'italic'
 						})
@@ -141,7 +141,7 @@ class AlexEditor {
 				} else if (['u'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'text-decoration-line': 'underline'
 						})
@@ -153,7 +153,7 @@ class AlexEditor {
 				} else if (['del'].includes(element.parsedom)) {
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (Dap.common.isObject()) {
+					if (Dap.common.isObject(element.styles)) {
 						Object.assign(element.styles, {
 							'text-decoration-line': 'line-through'
 						})
@@ -164,6 +164,17 @@ class AlexEditor {
 					}
 				} else if (['pre'].includes(element.parsedom)) {
 					element.type = 'block'
+				} else if (['blockquote'].includes(element.parsedom)) {
+					element.type = 'block'
+					if (Dap.common.isObject(element.styles)) {
+						Object.assign(element.styles, {
+							'white-space': 'pre-wrap'
+						})
+					} else {
+						element.styles = {
+							'white-space': 'pre-wrap'
+						}
+					}
 				}
 			} else {
 				element.type = 'text'
@@ -785,7 +796,7 @@ class AlexEditor {
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//不是代码块内则对空格进行处理
-			if (!this.range.anchor.getBlock().parsedom == 'pre') {
+			if (!this.range.anchor.getBlock().isPreStyle()) {
 				data = data.replace(/\s+/g, () => {
 					const span = document.createElement('span')
 					span.innerHTML = '&nbsp;'
@@ -830,7 +841,7 @@ class AlexEditor {
 			//终点位置
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 			//在源代码标签中
-			if (anchorBlock.parsedom == 'pre') {
+			if (anchorBlock.isPreStyle()) {
 				//焦点在代码块的终点位置
 				if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
 					this.insertText('\n\n')
@@ -1036,7 +1047,7 @@ class AlexEditor {
 		}
 	}
 	//将指定元素添加到父元素的子元素数组中
-	addElementTo(childEle, parentEle, index) {
+	addElementTo(childEle, parentEle, index = 0) {
 		if (!AlexElement.isElement(childEle)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}

@@ -89,6 +89,7 @@ editor.range.setCursor()
 -   u 标签渲染为带`'text-decoration-line': 'underline'`样式的 span
 -   del 标签渲染为带`text-decoration-line': 'line-through'`样式的 span
 -   pre 标签渲染为 block 元素
+-   blockquote 标签渲染为 block 元素，并且设置 white-space:pre-wrap 样式
 -   其余元素在内部创建时会默认是 block 元素
 
 > 我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作，可以覆盖上面的规范
@@ -182,11 +183,12 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isBlock()` ：el 是否块元素
 -   `el.isInline()` ：el 是否行内元素
 -   `el.isClosed()` ：el 是否自闭合元素
--   `el.isBreak()` ：el 是否是换行符
+-   `el.isBreak()` ：el 是否是换行符`<br>`
 -   `el.isEmpty()` ：el 是否是空元素。文本没有值，行内和块元素没有子元素或者子元素都是 null 的话，都是空元素
 -   `el.isRoot()` ：el 是否是根元素，即 AlexElement.elementStack 数组中的元素
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
+-   `el.isPreStyle()` ：el 是否代码块样式的元素，如果 el 是块元素且其 parsedom 属性值是“pre”或者其 styles 属性拥有 white-space 属性，且值为“pre”或者“pre-wrap”，则返回 true，其他情况返回 false
 -   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
 -   `el.hasMarks()` ：el 是否含有标记
 -   `el.hasStyles()` ：el 是否含有样式
@@ -201,6 +203,22 @@ AlexElement 提供以下几种语法来方便我们的操作：
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
 
 > 自行创建的 AlexElement 实例可能不符合编辑器内部的规范，在插入编辑器并渲染后可能和我们预想的效果不太一样，甚至会出现 bug。因此在创建元素后，必须使用 editor.formatElement(element)方法来进行格式化，该方法会返回格式化后的元素（通过 parseNode 和 parseHtml 生成的 AlexElement 元素是已经格式化后的了，无需再格式化）
+
+简单介绍下代码块样式
+
+```javascript
+const el = new AlexElement(
+	'block',
+	'blockquote',
+	null,
+	{
+		'white-space': 'pre-wrap'
+	},
+	null
+)
+//上面创建的元素就是一个拥有代码块样式的元素，因为pre标签默认携带white-space:pre的样式，所以也被认定为代码块样式。代码块样式必须是block元素
+//代码块样式的元素内部进行换行时，不会插入新的段落，而是使用换行符\n进行换行
+```
 
 ### AlexPoint：焦点对象
 

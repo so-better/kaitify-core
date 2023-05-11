@@ -81,6 +81,19 @@ class AlexElement {
 		}
 		return this.isContains(element.parent)
 	}
+	//判断是否保留空白和换行符
+	isPreStyle() {
+		if (!this.isBlock()) {
+			return false
+		}
+		if (this.parsedom == 'pre') {
+			return true
+		}
+		if (this.hasStyles()) {
+			return ['pre-wrap', 'pre'].includes(this.styles['white-space'])
+		}
+		return false
+	}
 	//判断两个元素是否有包含关系
 	hasContains(element) {
 		if (!AlexElement.isElement(element)) {
@@ -178,10 +191,7 @@ class AlexElement {
 			//设置属性
 			if (this.hasMarks()) {
 				for (let key in this.marks) {
-					//过滤掉事件、样式
-					if (!/^on/g.test(key) && key != 'style') {
-						el.setAttribute(key, this.marks[key])
-					}
+					el.setAttribute(key, this.marks[key])
 				}
 			}
 			//设置样式
