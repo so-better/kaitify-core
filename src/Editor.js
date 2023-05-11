@@ -424,10 +424,12 @@ class AlexEditor {
 		e.preventDefault()
 		//插入文本
 		if (e.inputType == 'insertText') {
-			this.insertText(e.data)
-			this.formatElementStack()
-			this.domRender()
-			this.range.setCursor()
+			if (e.data) {
+				this.insertText(e.data)
+				this.formatElementStack()
+				this.domRender()
+				this.range.setCursor()
+			}
 			return
 		}
 		//插入段落
@@ -460,10 +462,12 @@ class AlexEditor {
 		if (e.type == 'compositionend') {
 			this._isInputChinese = false
 			//在中文输入结束后插入数据
-			this.insertText(e.data)
-			this.formatElementStack()
-			this.domRender()
-			this.range.setCursor()
+			if (e.data) {
+				this.insertText(e.data)
+				this.formatElementStack()
+				this.domRender()
+				this.range.setCursor()
+			}
 		}
 	}
 	//监听键盘按下

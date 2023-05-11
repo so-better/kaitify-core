@@ -15,10 +15,10 @@ onMounted(() => {
 		console.log(newVal, oldVal)
 	})
 	editor.on('focus', newVal => {
-		console.log(newVal)
+		//console.log(newVal)
 	})
 	editor.on('blur', newVal => {
-		console.log(newVal)
+		//console.log(newVal)
 	})
 	// editor.on('pasteFile', files => {
 	// 	console.log(files)
