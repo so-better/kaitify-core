@@ -24,7 +24,7 @@ onMounted(() => {
 	// editor.on('pasteFile', files => {
 	// 	console.log(files)
 	// })
-	editor.collapseToEnd()
+	editor.collapseToStart()
 })
 
 const insert = function () {
@@ -49,7 +49,7 @@ const insert = function () {
 	editor.insertElement(quote)
 	editor.formatElementStack()
 	editor.domRender()
-	editor.range.setCursor()
+	editor.setCursor()
 }
 </script>
 <template>

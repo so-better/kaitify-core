@@ -428,7 +428,7 @@ class AlexEditor {
 				this.insertText(e.data)
 				this.formatElementStack()
 				this.domRender()
-				this.range.setCursor()
+				this.setCursor()
 			}
 			return
 		}
@@ -437,7 +437,7 @@ class AlexEditor {
 			this.insertParagraph()
 			this.formatElementStack()
 			this.domRender()
-			this.range.setCursor()
+			this.setCursor()
 			return
 		}
 		//删除内容
@@ -445,7 +445,7 @@ class AlexEditor {
 			this.delete()
 			this.formatElementStack()
 			this.domRender()
-			this.range.setCursor()
+			this.setCursor()
 			return
 		}
 		console.log('beforeInput没有监听到的inputType', e.inputType, e)
@@ -466,7 +466,7 @@ class AlexEditor {
 				this.insertText(e.data)
 				this.formatElementStack()
 				this.domRender()
-				this.range.setCursor()
+				this.setCursor()
 			}
 		}
 	}
@@ -484,7 +484,7 @@ class AlexEditor {
 				this.range = historyRecord.range
 				this.formatElementStack()
 				this.domRender(true)
-				this.range.setCursor()
+				this.setCursor()
 			}
 		}
 		//重做
@@ -496,7 +496,7 @@ class AlexEditor {
 				this.range = historyRecord.range
 				this.formatElementStack()
 				this.domRender(true)
-				this.range.setCursor()
+				this.setCursor()
 			}
 		}
 	}
@@ -548,7 +548,7 @@ class AlexEditor {
 						this.insertElement(el)
 						this.formatElementStack()
 						this.domRender(index < urls.length - 1)
-						this.range.setCursor()
+						this.setCursor()
 					})
 				})
 			}
@@ -561,7 +561,7 @@ class AlexEditor {
 				this.insertText(data)
 				this.formatElementStack()
 				this.domRender()
-				this.range.setCursor()
+				this.setCursor()
 			}
 		}
 		//粘贴html：以下是针对浏览器原本的粘贴功能，进行节点和光标的更新
@@ -579,7 +579,7 @@ class AlexEditor {
 			this.delete()
 			this.formatElementStack()
 			this.domRender()
-			this.range.setCursor()
+			this.setCursor()
 		}, 0)
 	}
 	//解决编辑器内元素节点与stack数据不符的情况，进行数据纠正
@@ -608,7 +608,7 @@ class AlexEditor {
 				const focusEle = this.getElementByKey(focusKey)
 				const focus = new AlexPoint(focusEle, focusOffset)
 				this.range = new AlexRange(focus, focus)
-				this.range.setCursor()
+				this.setCursor()
 			}
 		}, 0)
 	}
@@ -1380,7 +1380,7 @@ class AlexEditor {
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToStart(element)
 			this.range.focus.moveToStart(element)
-			this.range.setCursor()
+			this.setCursor()
 		}
 		//文档最后面
 		else {
@@ -1397,7 +1397,7 @@ class AlexEditor {
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToEnd(element)
 			this.range.focus.moveToEnd(element)
-			this.range.setCursor()
+			this.setCursor()
 		}
 		//文档最后面
 		else {
@@ -1405,6 +1405,62 @@ class AlexEditor {
 			const length = flatElements.length
 			this.collapseToEnd(flatElements[length - 1])
 		}
+	}
+	//根据anchor和focus来设置真实的光标
+	setCursor() {
+		//将虚拟光标位置转为真实光标位置
+		const handler = point => {
+			let node = null
+			let offset = null
+			//如果是自闭合元素
+			if (point.element.isClosed()) {
+				//在自闭合元素之前
+				if (point.offset == 0) {
+					const previousElement = this.getPreviousElementOfPoint(point)
+					const block = point.getBlock()
+					//同块内前面存在可获取焦点的元素
+					if (previousElement && block.isContains(previousElement)) {
+						point.moveToEnd(previousElement)
+						const res = handler(point)
+						node = res.node
+						offset = res.offset
+					}
+					//同块内前面不存在可获取焦点的元素
+					else {
+						node = point.element.parent._elm
+						offset = 0
+					}
+				}
+				//在自闭合元素之后
+				else if (point.offset == 1) {
+					node = point.element.parent._elm
+					const index = point.element.parent.children.findIndex(item => {
+						return point.element.isEqual(item)
+					})
+					//处理自闭合元素是换行符的情况换行符之后不能输入，只能将光标设在换行符之前
+					if (point.element.isBreak()) {
+						offset = index
+					} else {
+						offset = index + 1
+					}
+				}
+			}
+			//文本元素
+			else {
+				node = point.element._elm
+				offset = point.offset
+			}
+			return { node, offset }
+		}
+		const anchorResult = handler(this.range.anchor)
+		const focusResult = handler(this.range.focus)
+		//设置光标
+		const selection = window.getSelection()
+		selection.removeAllRanges()
+		const range = document.createRange()
+		range.setStart(anchorResult.node, anchorResult.offset)
+		range.setEnd(focusResult.node, focusResult.offset)
+		selection.addRange(range)
 	}
 	//根据光标设置css样式
 	setStyle(styleObject) {

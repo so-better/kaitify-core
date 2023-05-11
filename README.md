@@ -50,7 +50,7 @@ editor.range.focus.moveToEnd(ele)
 //渲染
 editor.formatElementStack()
 editor.domRender()
-editor.range.setCursor()
+editor.setCursor()
 ```
 
 > 自定义操作中，最后都需要使用 editor.formatElementStack、editor.domRender 和 editor.range.setCursor()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
@@ -140,9 +140,10 @@ const editor = new AlexEditor(el, {
 -   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在光标处换行
 -   `editor.insertElement(ele)` ：根据光标位置插入指定的元素，可用于在生成元素后向编辑器内插入。如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素
--   `editor.collapseToStart(element)` ：将光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
--   `editor.collapseToEnd(element)` ：将光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
--   `editor.setStyle(styleObject)` ：根据光标设定指定的样式，参数是一个对象，key 表示 css 样式名称，value 表示值
+-   `editor.setCursor()` ：根据虚拟光标来设置真实的光标
+-   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部并设置真实光标于此，如果 element 指定了元素，则移动到该元素头部
+-   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部并设置真实光标于此，如果 element 指定了元素，则移动到该元素尾部
+-   `editor.setStyle(styleObject)` ：根据虚拟光标所在位置设置样式，参数是一个对象，key 表示 css 样式名称，value 表示值
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
@@ -221,36 +222,34 @@ const el = new AlexElement(
 //代码块样式的元素内部进行换行时，不会插入新的段落，而是使用换行符\n进行换行
 ```
 
-### AlexPoint：焦点对象
+### AlexPoint：虚拟光标的点对象
 
-AlexPoint 表示当前操作的光标焦点，由编辑器内部创建其实例，包含 element 和 offset 两个属性
+AlexPoint 表示虚拟光标的点，由编辑器内部创建实例，包含 element 和 offset 两个属性
 
--   elemet: 即 AlexElement 实例，即该焦点所在的元素，只能是自闭合元素或者文本元素
--   offset：即焦点在元素上的偏移值，如果是自闭合元素，只能是 0 和 1
+-   elemet: 即 AlexElement 实例，即该点所在的元素，只能是 closed 元素或者 text 元素
+-   offset：即点在元素上的偏移值，如果是 closed 元素，只能是 0 和 1
 
 AlexPoint 提供以下几种语法来方便我们的操作：
 
--   `point.isEqual(target)` ：point 是否和 target 相等，即两个焦点是否同一个
--   `point.moveToEnd(element)` ：将焦点移动到 element 之后，如果 element 不是自闭合元素和文本元素，会查找其最后一个子元素，以此类推，直至获取到自闭合元素或者文本元素
--   `point.moveToStart(element)` ：将焦点移动到 element 之前，如果 element 不是自闭合元素和文本元素，会查找其第一个子元素，以此类推，直至获取到自闭合元素或者文本元素
--   `point.getBlock()` ：获取该焦点所在的块元素
--   `point.getInline()` ：获取该焦点所在的行内元素
+-   `point.isEqual(target)` ：point 是否和 target 相等，即两个点是否同一个
+-   `point.moveToEnd(element)` ：将点移动到 element 之后，如果 element 不是 closed 元素和 text 元素，会查找其最后一个子元素，以此类推，直至获取到 closed 元素或 text 元素
+-   `point.moveToStart(element)` ：将点移动到 element 之前，如果 element 不是 closed 元素和 text 元素，会查找其第一个子元素，以此类推，直至获取到 closed 元素或 text 元素
+-   `point.getBlock()` ：获取该点所在的块元素
+-   `point.getInline()` ：获取该点所在的行内元素
 -   `AlexPoint.isPoint(val)` ：判断 val 是否 AlexPoint 对象
 
-### AlexRange：光标范围对象
+### AlexRange：虚拟光标的范围对象
 
-AlexPoint 是基于浏览器原生的 Selection 和 Range 对象进行封装，表示光标的相关操作，由编辑器内部创建其实例并不断更新，包含 anchor 和 focus 两个属性：
+AlexRange 实例由编辑器内部创建并挂在在 `editor.range` 上，它包含 anchor 和 focus 两个属性：
 
 -   anchor：起点，是一个 AlexPoint 实例
 -   focus：终点，是一个 AlexPoint 实例
 
-> 如果 anchor 和 focus 相等，则表示光标在某一处，没有选择区域；如果 anchor.element 和 foucs.element 相等，则表示光标在一个元素上
+> 如果 anchor 和 focus 相等，则表示虚拟光标在某一点上，没有选择区域；如果 anchor.element 和 foucs.element 相等，则表示虚拟光标在一个元素上
 
-AlexRange 提供下面的方法来方便我们的操作：
+> anchor 和 focus 只要不相等，表示虚拟光标的起点和终点不在一起，即用户操作选区
 
--   `range.setCursor()` ：根据 anchor 和 focus 来设置编辑器真实光标位置
-
-> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus，主要是设置新的 element 和 offset 属性。
+> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会自动更新虚拟光标位置。如果你是自行操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus，主要是设置新的点位
 
 ### AlexHistory：历史记录对象
 
@@ -266,4 +265,4 @@ AlexHistory 通过以下方法来读取和操作历史记录：
 
 > editor 在每次执行 domRender 时，当 unPushHistory 参数为 false 时，都会自动把当前编辑器的 stack 和 range 保存到 history 中去
 
-> 自定义撤销和重做功能时，你需要通过 get 方法读取 stack 和 range，然后赋值给编辑器的 stack 和 range，然后执行 editor.domRender(true)并通过 range.setCursor()设置光标
+> 自定义撤销和重做功能时，你需要通过 get 方法读取 stack 和 range，然后赋值给编辑器的 stack 和 range，然后执行 editor.domRender(true)并通过 editor.setCursor()设置真实光标
