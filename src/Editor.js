@@ -236,11 +236,11 @@ class AlexEditor {
 		//光标所在元素为空元素的情况下重新设置光标
 		element => {
 			if (element.isEmpty()) {
-				//移除空节点时判断该节点是否是起点元素，如果是则更新起点元素
+				//移除空元素时判断该元素是否是起点元素，如果是则更新起点元素
 				if (this.range && this.range.anchor.element.isEqual(element)) {
 					this.setRecentlyPoint(this.range.anchor)
 				}
-				//移除空节点时判断该节点是否是终点元素，如果是则更新终点元素
+				//移除空元素时判断该元素是否是终点元素，如果是则更新终点元素
 				if (this.range && this.range.focus.element.isEqual(element)) {
 					this.setRecentlyPoint(this.range.focus)
 				}
@@ -624,16 +624,15 @@ class AlexEditor {
 			throw new Error('The argument must be an AlexElement instance')
 		}
 		//格式化
-		const format = element => {
+		const format = (element, fn) => {
 			//从子孙元素开始格式化
 			if (element.hasChildren()) {
-				element.children = element.children.map(format)
+				element.children = element.children.map(item => {
+					return format(item, fn)
+				})
 			}
-			//格式化自身
-			this._formatUnchangeableRules.forEach(fn => {
-				element = fn(element)
-			})
-			return element
+			//格式化自身后返回
+			return fn(element)
 		}
 		//移除子孙元素中的空元素
 		const removeEmptyElement = element => {
@@ -650,7 +649,9 @@ class AlexEditor {
 			return element
 		}
 		//格式化
-		ele = format(ele)
+		this._formatUnchangeableRules.forEach(fn => {
+			ele = format(ele, fn)
+		})
 		//移除所有的空元素
 		ele = removeEmptyElement(ele)
 		return ele
@@ -915,8 +916,15 @@ class AlexEditor {
 				const anchorBlock = this.range.anchor.getBlock()
 				//终点位置
 				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+				//当前块是一个只有换行符的块，则该块需要被覆盖
+				if (anchorBlock.isOnlyHasBreak()) {
+					//在该块之前插入
+					this.addElementBefore(ele, anchorBlock)
+					//然后把当前块与前一个进行合并
+					this.mergeBlockElement(anchorBlock)
+				}
 				//焦点在当前块的起点位置
-				if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
+				else if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
 					//在该块之前插入
 					this.addElementBefore(ele, anchorBlock)
 				}

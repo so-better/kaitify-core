@@ -8,11 +8,8 @@ const el = ref(null)
 const table = ref(null)
 let editor = null
 onMounted(() => {
-	const $table = document.createElement('table')
-	$table.innerHTML = table.value.innerHTML
 	editor = new AlexEditor(el.value, {
-		value: `${$table.outerHTML}<p><br></p>`,
-		disabled: true
+		value: `<p><br></p>`
 	})
 	editor.on('change', (newVal, oldVal) => {
 		console.log(newVal, oldVal)
@@ -56,38 +53,6 @@ const insert = function () {
 </script>
 <template>
 	<div>
-		<table style="display: none" ref="table">
-			<tbody>
-				<tr>
-					<th><br /></th>
-					<th><br /></th>
-					<th><br /></th>
-					<th><br /></th>
-					<th><br /></th>
-				</tr>
-				<tr>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-				</tr>
-				<tr>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-				</tr>
-				<tr>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-					<td><br /></td>
-				</tr>
-			</tbody>
-		</table>
 		<button @click="insert">插入引用</button>
 		<div ref="el" class="editor"></div>
 	</div>

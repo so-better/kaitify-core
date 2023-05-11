@@ -139,7 +139,7 @@ const editor = new AlexEditor(el, {
 -   `editor.delete()` ：根据光标执行删除操作
 -   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在光标处换行
--   `editor.insertElement(ele)` ：根据光标位置插入指定的 ele，可用于在生成元素后向编辑器内插入
+-   `editor.insertElement(ele)` ：根据光标位置插入指定的元素，可用于在生成元素后向编辑器内插入。如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素
 -   `editor.collapseToStart(element)` ：将光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
 -   `editor.collapseToEnd(element)` ：将光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setStyle(styleObject)` ：根据光标设定指定的样式，参数是一个对象，key 表示 css 样式名称，value 表示值
@@ -189,6 +189,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
 -   `el.isPreStyle()` ：el 是否代码块样式的元素，如果 el 是块元素且其 parsedom 属性值是“pre”或者其 styles 属性拥有 white-space 属性，且值为“pre”或者“pre-wrap”，则返回 true，其他情况返回 false
+-   `el.isOnlyHasBreak()` ：el 的子元素是否只含有换行符`<br>`
 -   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
 -   `el.hasMarks()` ：el 是否含有标记
 -   `el.hasStyles()` ：el 是否含有样式
@@ -249,7 +250,7 @@ AlexRange 提供下面的方法来方便我们的操作：
 
 -   `range.setCursor()` ：根据 anchor 和 focus 来设置编辑器真实光标位置
 
-> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus。
+> 自定义操作中如果使用的是 editor 提供的语法，如 insertText，insertElement，delete 等等，会更新 range 的光标焦点位置。如果你是自己操作，不依赖于这些语法，你需要手动去更新 range 的 anchor 和 focus，主要是设置新的 element 和 offset 属性。
 
 ### AlexHistory：历史记录对象
 

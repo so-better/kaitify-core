@@ -94,6 +94,15 @@ class AlexElement {
 		}
 		return false
 	}
+	//判断是否只包含换行符
+	isOnlyHasBreak() {
+		if (this.hasChildren()) {
+			return this.children.every(item => {
+				return item.isBreak() || item.isEmpty()
+			})
+		}
+		return false
+	}
 	//判断两个元素是否有包含关系
 	hasContains(element) {
 		if (!AlexElement.isElement(element)) {
