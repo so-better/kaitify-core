@@ -276,7 +276,7 @@ class AlexEditor {
 	_initStack() {
 		const ele = new AlexElement('block', AlexElement.paragraph, null, null, null)
 		const breakEle = new AlexElement('closed', 'br', null, null, null)
-		this.addElementTo(breakEle, ele, 0)
+		this.addElementTo(breakEle, ele)
 		this.stack = [ele]
 	}
 	//初始设置range
@@ -322,7 +322,7 @@ class AlexEditor {
 				//如果所在块元素为空
 				if (anchorBlock.isEmpty()) {
 					const breakEl = new AlexElement('closed', 'br', null, null, null)
-					this.addElementTo(breakEl, anchorBlock, 0)
+					this.addElementTo(breakEl, anchorBlock)
 					this.range.anchor.moveToEnd(breakEl)
 					this.range.focus.moveToEnd(breakEl)
 				}
@@ -359,7 +359,7 @@ class AlexEditor {
 				//否则创建换行符
 				else {
 					const breakEl = new AlexElement('closed', 'br', null, null, null)
-					this.addElementTo(breakEl, anchorBlock, 0)
+					this.addElementTo(breakEl, anchorBlock)
 					this.range.anchor.moveToEnd(breakEl)
 					this.range.focus.moveToEnd(breakEl)
 				}
@@ -863,7 +863,7 @@ class AlexEditor {
 					//在该块之前插入一个新的段落，标签名称和样式与上一个段落一致
 					const paragraph = new AlexElement('block', anchorBlock.parsedom, { ...anchorBlock.marks }, { ...anchorBlock.styles }, null)
 					const breakEle = new AlexElement('closed', 'br', null, null, null)
-					this.addElementTo(breakEle, paragraph, 0)
+					this.addElementTo(breakEle, paragraph)
 					this.addElementBefore(paragraph, anchorBlock)
 					this.range.anchor.moveToStart(anchorBlock)
 					this.range.focus.moveToStart(anchorBlock)
@@ -873,7 +873,7 @@ class AlexEditor {
 					//在该块之后插入一个新的段落，标签名称和样式与上一个段落一致
 					const paragraph = new AlexElement('block', anchorBlock.parsedom, { ...anchorBlock.marks }, { ...anchorBlock.styles }, null)
 					const breakEle = new AlexElement('closed', 'br', null, null, null)
-					this.addElementTo(breakEle, paragraph, 0)
+					this.addElementTo(breakEle, paragraph)
 					this.addElementAfter(paragraph, anchorBlock)
 					this.range.anchor.moveToStart(paragraph)
 					this.range.focus.moveToStart(paragraph)
@@ -1474,7 +1474,7 @@ class AlexEditor {
 						}
 						el.styles[key] = styleObject[key]
 					}
-					this.addElementTo(cloneEl, el, 0)
+					this.addElementTo(cloneEl, el)
 				}
 			} else if (el.isClosed()) {
 				for (let key in styleObject) {
