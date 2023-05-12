@@ -246,6 +246,14 @@ class AlexElement {
 		}
 		return flat(elements)
 	}
+	//获取一个空白字符，用来占位防止行内元素没有内容被删除
+	static getSpaceElement() {
+		let span = document.createElement('span')
+		span.innerHTML = '&#xFEFF;'
+		let el = new AlexElement('text', null, null, null, span.innerText)
+		span = null
+		return el
+	}
 }
 
 export default AlexElement

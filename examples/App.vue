@@ -9,7 +9,7 @@ const table = ref(null)
 let editor = null
 onMounted(() => {
 	editor = new AlexEditor(el.value, {
-		value: `<p>3333<span><br></span></p>`
+		value: `<p>3333344444</p>`
 	})
 
 	// editor.on('change', (newVal, oldVal) => {
@@ -28,25 +28,28 @@ onMounted(() => {
 })
 
 const insert = function () {
-	const quote = new AlexElement(
-		'block',
-		'blockquote',
-		{
-			class: 'a'
-		},
-		{
-			'background-color': '#f5f6f7',
-			color: '#666',
-			'font-size': '16px',
-			margin: '0 0 15px 0',
-			padding: '10px 10px 10px 20px',
-			'border-left': '10px solid #eee'
-		},
-		null
-	)
-	const breakEl = new AlexElement('closed', 'br', null, null, null)
-	editor.addElementTo(breakEl, quote)
-	editor.insertElement(quote)
+	editor.setStyle({
+		color: '#f30'
+	})
+	// const quote = new AlexElement(
+	// 	'block',
+	// 	'blockquote',
+	// 	{
+	// 		class: 'a'
+	// 	},
+	// 	{
+	// 		'background-color': '#f5f6f7',
+	// 		color: '#666',
+	// 		'font-size': '16px',
+	// 		margin: '0 0 15px 0',
+	// 		padding: '10px 10px 10px 20px',
+	// 		'border-left': '10px solid #eee'
+	// 	},
+	// 	null
+	// )
+	// const breakEl = new AlexElement('closed', 'br', null, null, null)
+	// editor.addElementTo(breakEl, quote)
+	// editor.insertElement(quote)
 	editor.formatElementStack()
 	editor.domRender()
 	editor.setCursor()
