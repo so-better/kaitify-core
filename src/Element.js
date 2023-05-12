@@ -178,7 +178,7 @@ class AlexElement {
 			return
 		}
 		if (this.isText()) {
-			this.textContent = ''
+			this.textContent = null
 		} else if (this.isClosed()) {
 			this.type = 'inline'
 			this.parsedom = 'span'

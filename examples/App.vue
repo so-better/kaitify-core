@@ -9,7 +9,7 @@ const table = ref(null)
 let editor = null
 onMounted(() => {
 	editor = new AlexEditor(el.value, {
-		value: `<p><br></p>`
+		value: `<p>3333<span><br></span></p>`
 	})
 
 	// editor.on('change', (newVal, oldVal) => {

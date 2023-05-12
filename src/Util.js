@@ -39,6 +39,7 @@ export default {
 		Dap.data.set(window, 'data-alex-editor-key', key)
 		return key
 	},
+	//扁平化处理节点
 	flatNodes(nodes) {
 		const flat = arr => {
 			let result = []
