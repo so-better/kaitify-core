@@ -8,6 +8,9 @@ import Dap from 'dap-util'
 
 class AlexEditor {
 	constructor(el, options) {
+		if (typeof el == 'string' && el) {
+			el = document.body.querySelector(el)
+		}
 		//校验el是否元素
 		if (!Dap.element.isElement(el)) {
 			throw new Error('You must specify a dom container to initialize the editor')
@@ -881,7 +884,7 @@ class AlexEditor {
 			const anchorBlock = this.range.anchor.getBlock()
 			//终点位置
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-			//在源代码标签中
+			//在代码块中
 			if (anchorBlock.isPreStyle()) {
 				//焦点在代码块的终点位置
 				if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
