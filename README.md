@@ -68,16 +68,17 @@ editor.setCursor()
 
 > 无法改变的固定规范：
 
--   子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
+-   相邻的行内元素如果 parsedom、marks 和 styles 完全相同，则会进行合并；相邻的文本元素会进行合并；相邻的换行符会进行合并
+-   块元素的子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
+-   行内元素的子元素中如果存在换行符\<br>，会被设置为空元素，即行内元素的子元素不会有换行符的存在
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
 -   同级元素中 block 元素和其他元素不能同时存在，否则会把其他元素强转为 block 元素
 -   执行格式化时会把空元素移除（text 元素内容为空视为空元素、block 和 inline 没有子元素视为空元素）
--   AlexPoint 对象的 element 属性只会是 closed 和 text 元素
+-   AlexPoint 实例的 element 属性只会是 closed 和 text 元素，且如果 element 是 closed 元素，那么 offset 要么是 0 要么是 1
 -   删除操作中，如果 block 元素的 children 为空了，则添加一个换行符 \<br>，在删除换行符后才会清除此元素
--   如果 AlexPoint 对象的 element 是 closed 元素，那么 offset 要么是 0 要么是 1
--   操作编辑器只能通过 AlexElement 对象和 AlexEditor 对象，不支持 node 和 html 直接插入
+-   在代码块样式的块元素中进行换行操作，会使用\n，并非新建一个块元素
 
-> 可以改变的规范：
+> 可以覆盖的规范：
 
 -   br 标签、img 标签、video 标签渲染为 closed 元素
 -   span 标签、a 标签、label 标签、code 标签渲染为 inline 元素
@@ -89,7 +90,7 @@ editor.setCursor()
 -   u 标签渲染为带`'text-decoration-line': 'underline'`样式的 span
 -   del 标签渲染为带`text-decoration-line': 'line-through'`样式的 span
 -   pre 标签渲染为 block 元素
--   blockquote 标签渲染为 block 元素，并且设置 white-space:pre-wrap 样式
+-   blockquote 标签渲染为 block 元素，并且设置 white-space\:pre-wrap 样式
 -   其余元素在内部创建时会默认是 block 元素
 
 > 我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作，可以覆盖上面的规范
@@ -198,9 +199,12 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.clone(deep)` ：将 el 元素进行克隆，返回一个新的元素，deep 为 true 表示深度克隆，即克隆子孙元素，默认为 true
 -   `el.convertToBlock()` ：将非 block 类型的元素转为 block 元素
 -   `el.setEmpty()` ：将一个非空元素设置为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
+-   `el.getBlock()` ：获取该元素所在的块元素，如果本身是块元素则返回自身
+-   `el.getInline()` ：获取该元素所在的行内元素，如果该元素不在行内元素中则返回 null
 -   `AlexElement.paragraph` ：定义段落元素，默认是"p"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
+-   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素。主要是用来占位防止行内元素没有内容被删除
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
 
@@ -234,8 +238,6 @@ AlexPoint 提供以下几种语法来方便我们的操作：
 -   `point.isEqual(target)` ：point 是否和 target 相等，即两个点是否同一个
 -   `point.moveToEnd(element)` ：将点移动到 element 之后，如果 element 不是 closed 元素和 text 元素，会查找其最后一个子元素，以此类推，直至获取到 closed 元素或 text 元素
 -   `point.moveToStart(element)` ：将点移动到 element 之前，如果 element 不是 closed 元素和 text 元素，会查找其第一个子元素，以此类推，直至获取到 closed 元素或 text 元素
--   `point.getBlock()` ：获取该点所在的块元素
--   `point.getInline()` ：获取该点所在的行内元素
 -   `AlexPoint.isPoint(val)` ：判断 val 是否 AlexPoint 对象
 
 ### AlexRange：虚拟光标的范围对象
