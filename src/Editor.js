@@ -187,9 +187,94 @@ class AlexEditor {
 			}
 			return element
 		},
-		//合并相似子元素
+		//合并相似子元素（如果光标在子元素中可能会重新设置）
 		element => {
-			element._mergeChildren()
+			//存在子元素并且子元素数量大于1
+			if (element.hasChildren() && element.children.length > 1) {
+				//判断两个元素是否可以合并
+				const canMerge = (pel, nel) => {
+					if (pel.isBreak() && nel.isBreak()) {
+						return true
+					}
+					if (pel.isText() && nel.isText()) {
+						return true
+					}
+					if (pel.isInline() && nel.isInline()) {
+						let sameStyles = false
+						if (pel.hasStyles() && nel.hasStyles() && Dap.common.equal(pel.styles, nel.styles)) {
+							sameStyles = true
+						} else if (!pel.hasStyles() && !nel.hasStyles()) {
+							sameStyles = true
+						}
+						let sameMarks = false
+						if (pel.hasMarks() && nel.hasMarks() && Dap.common.equal(pel.marks, nel.marks)) {
+							sameMarks = true
+						} else if (!pel.hasMarks() && !nel.hasMarks()) {
+							sameMarks = true
+						}
+						return pel.parsedom == nel.parsedom && sameMarks && sameStyles
+					}
+					return false
+				}
+				//两个元素的合并方法
+				const merge = (pel, nel) => {
+					//如果可以合并
+					if (canMerge(pel, nel)) {
+						//文本元素合并
+						if (pel.isText()) {
+							//起点在后一个元素上，则将起点设置到前一个元素上
+							if (this.range.anchor.element.isEqual(nel)) {
+								this.range.anchor.element = pel
+								this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
+							}
+							//终点在后一个元素上，则将终点设置到前一个元素上
+							if (this.range.focus.element.isEqual(nel)) {
+								this.range.focus.element = pel
+								this.range.focus.offset = pel.textContent.length + this.range.focus.offset
+							}
+							//将后一个元素的内容给前一个元素
+							pel.textContent += nel.textContent
+						}
+						//换行符合并
+						else if (pel.isBreak()) {
+							//起点在后一个换行符上，则直接将起点设置到前一个换行符上
+							if (this.range.anchor.element.isEqual(nel)) {
+								this.range.anchor.element = pel
+							}
+							//终点在后一个换行符上，则直接将终点设置到前一个换行符上
+							if (this.range.focus.element.isEqual(nel)) {
+								this.range.focus.element = pel
+							}
+						}
+						//行内元素合并
+						else if (pel.isInline()) {
+							if (!pel.hasChildren()) {
+								pel.children = []
+							}
+							if (!nel.hasChildren()) {
+								nel.children = []
+							}
+							pel.children.push(...nel.children)
+							pel.children.forEach(item => {
+								item.parent = pel
+							})
+						}
+						//删除被合并的元素
+						const index = nel.parent.children.findIndex(item => {
+							return nel.isEqual(item)
+						})
+						nel.parent.children.splice(index, 1)
+					}
+				}
+				let index = 0
+				while (index <= element.children.length - 2) {
+					if (canMerge(element.children[index], element.children[index + 1])) {
+						merge(element.children[index], element.children[index + 1])
+					} else {
+						index++
+					}
+				}
+			}
 			return element
 		},
 		//换行符清除规则
@@ -1332,15 +1417,40 @@ class AlexEditor {
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
 			//文本
 			if (this.range.anchor.element.isText()) {
-				let val = this.range.anchor.element.textContent
-				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
-				let newEl = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset, this.range.focus.offset))
-				this.addElementAfter(newEl, this.range.anchor.element)
-				let newFocus = new AlexElement('text', null, null, null, val.substring(this.range.focus.offset))
-				this.addElementAfter(newFocus, newEl)
-				this.range.anchor.moveToStart(newEl)
-				this.range.focus.moveToEnd(newEl)
-				elements = [newEl]
+				//起点在文本开始处并且终点在文本结尾处
+				if (this.range.anchor.offset == 0 && this.range.focus.offset == this.range.anchor.element.textContent.length) {
+					elements = [this.range.anchor.element]
+				}
+				//起点在文本开始处且终点不在文本结尾处
+				else if (this.range.anchor.offset == 0) {
+					let val = this.range.anchor.element.textContent
+					this.range.anchor.element.textContent = val.substring(0, this.range.focus.offset)
+					let newFocus = new AlexElement('text', null, null, null, val.substring(this.range.focus.offset))
+					this.addElementAfter(newFocus, this.range.anchor.element)
+					elements = [this.range.anchor.element]
+				}
+				//起点不在文本开始处，但是终点在文本结尾处
+				else if (this.range.focus.offset == this.range.anchor.element.textContent.length) {
+					let val = this.range.anchor.element.textContent
+					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+					let newFocus = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset))
+					this.addElementAfter(newFocus, this.range.anchor.element)
+					elements = [newFocus]
+					this.range.anchor.moveToStart(newFocus)
+					this.range.focus.moveToEnd(newFocus)
+				}
+				//起点不在文本开始处且终点不在文本结尾处
+				else {
+					let val = this.range.anchor.element.textContent
+					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+					let newEl = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset, this.range.focus.offset))
+					this.addElementAfter(newEl, this.range.anchor.element)
+					let newFocus = new AlexElement('text', null, null, null, val.substring(this.range.focus.offset))
+					this.addElementAfter(newFocus, newEl)
+					this.range.anchor.moveToStart(newEl)
+					this.range.focus.moveToEnd(newEl)
+					elements = [newEl]
+				}
 			}
 			//自闭合元素
 			else {
@@ -1482,46 +1592,63 @@ class AlexEditor {
 		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			let spanEl = new AlexElement('inline', 'span', null, { ...styleObject }, null)
-			let spaceEl = AlexElement.getSpaceElement()
-			this.addElementTo(spaceEl, spanEl)
 			//在文本元素上
 			if (this.range.anchor.element.isText()) {
-				let val = this.range.anchor.element.textContent
-				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
-				let newEl = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset))
-				this.addElementAfter(newEl, this.range.anchor.element)
-				this.addElementBefore(spanEl, newEl)
+				//如果文本元素是空白字符的元素，并且其父元素只有他一个子元素，则直接修改其父元素样式
+				if (AlexElement.getSpaceElement().textContent == this.range.anchor.element.textContent && this.range.anchor.element.parent.children.length == 1) {
+					if (this.range.anchor.element.parent.hasStyles()) {
+						Object.assign(this.range.anchor.element.parent.styles, styleObject)
+					} else {
+						this.range.anchor.element.parent.styles = { ...styleObject }
+					}
+				}
+				//其他情况需要新建一个span并设置空白字符内容
+				else {
+					let spanEl = new AlexElement('inline', 'span', null, { ...styleObject }, null)
+					let spaceEl = AlexElement.getSpaceElement()
+					this.addElementTo(spaceEl, spanEl)
+					let val = this.range.anchor.element.textContent
+					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+					let newEl = new AlexElement('text', null, null, null, val.substring(this.range.anchor.offset))
+					this.addElementAfter(newEl, this.range.anchor.element)
+					this.addElementBefore(spanEl, newEl)
+					this.range.anchor.moveToEnd(spanEl)
+					this.range.focus.moveToEnd(spanEl)
+				}
 			}
 			//在自闭合元素上
 			else {
+				let spanEl = new AlexElement('inline', 'span', null, { ...styleObject }, null)
+				let spaceEl = AlexElement.getSpaceElement()
+				this.addElementTo(spaceEl, spanEl)
 				if (this.range.anchor.offset == 0) {
 					this.addElementBefore(spanEl, this.range.anchor.element)
 				} else {
 					this.addElementAfter(spanEl, this.range.anchor.element)
 				}
+				this.range.anchor.moveToEnd(spanEl)
+				this.range.focus.moveToEnd(spanEl)
 			}
-			this.range.anchor.moveToEnd(spanEl)
-			this.range.focus.moveToEnd(spanEl)
-		} else {
+		}
+		//起点和终点不在一个位置
+		else {
 			const elements = this.getElementsByRange()
-			if (elements.length == 0) {
-				return
-			}
 			elements.forEach(el => {
+				//文本元素
 				if (el.isText()) {
 					const children = el.parent.children.filter(item => {
 						return !item.isEmpty()
 					})
-					//如果父元素只有该文本一个子元素
-					if (children.length == 1) {
-						for (let key in styleObject) {
-							if (!el.parent.hasStyles()) {
-								el.parent.styles = {}
-							}
-							el.parent.styles[key] = styleObject[key]
+					//如果父元素是行内元素且只有该文本一个子元素，则直接修改父元素样式
+					if (children.length == 1 && el.parent.isInline()) {
+						if (el.parent.hasStyles()) {
+							Object.assign(el.parent.styles, styleObject)
+						} else {
+							el.parent.styles = { ...styleObject }
 						}
-					} else {
+					}
+					//其他情况需要新建一个span并设置空白字符内容
+					else {
 						let cloneEl = el.clone()
 						el.type = 'inline'
 						el.parsedom = 'span'
@@ -1534,7 +1661,9 @@ class AlexEditor {
 						}
 						this.addElementTo(cloneEl, el)
 					}
-				} else if (el.isClosed()) {
+				}
+				//自闭合元素
+				else if (el.isClosed()) {
 					for (let key in styleObject) {
 						if (!el.hasStyles()) {
 							el.styles = {}
