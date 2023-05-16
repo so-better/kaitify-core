@@ -3,7 +3,7 @@
 		<div class="editor-menus">
 			<div @click="setEditor(item)" class="editor-menu" v-for="item in menus">{{ item }}</div>
 		</div>
-		<div class="editor-content"></div>
+		<div class="editor-content" @click="queryStyle"></div>
 	</div>
 </template>
 <script>
@@ -163,6 +163,12 @@ export default {
 			this.editor.formatElementStack()
 			this.editor.domRender()
 			this.editor.setCursor()
+		},
+		queryStyle() {
+			const inline = this.editor.range.anchor.element.getInline()
+			if (inline && inline.hasStyles()) {
+				console.log(Object.assign({}, inline.styles))
+			}
 		}
 	}
 }
