@@ -660,7 +660,49 @@ class AlexEditor {
 		}
 		//粘贴html：以下是针对浏览器原本的粘贴功能，进行节点和光标的更新
 		else {
-			this._handleNodesChange()
+			let element = null
+			const end = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			//在元素结尾处
+			if (this.range.focus.offset == end) {
+				const nextElement = this.getNextElementOfPoint(this.range.focus)
+				if (nextElement) {
+					element = nextElement
+				}
+			} else {
+				element = this.range.focus.element
+			}
+			const elements = AlexElement.flatElements(this.stack)
+			const index = elements.findIndex(item => {
+				return element && item.isEqual(element)
+			})
+			//获取焦点元素距离扁平化数组结尾的距离
+			const lastLength = elements.length - 1 - index
+			setTimeout(() => {
+				//重新渲染
+				this.stack = this.parseHtml(this.$el.innerHTML)
+				this.formatElementStack()
+				const flatElements = AlexElement.flatElements(this.stack)
+				//index>-1说明不是在编辑器的尾部进行的粘贴
+				if (index > -1) {
+					//根据之前计算的lastLength获取焦点元素的位置
+					const newIndex = flatElements.length - 1 - lastLength
+					this.range.anchor.moveToStart(flatElements[newIndex])
+					this.range.focus.moveToStart(flatElements[newIndex])
+					//将焦点移动到前一个可获取焦点的元素，即粘贴内容的最后
+					const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+					if (previousElement) {
+						this.range.anchor.moveToEnd(previousElement)
+						this.range.focus.moveToEnd(previousElement)
+					}
+				}
+				//在编辑器尾部粘贴
+				else {
+					this.range.anchor.moveToEnd(flatElements[flatElements.length - 1])
+					this.range.focus.moveToEnd(flatElements[flatElements.length - 1])
+				}
+				this.domRender()
+				this.setCursor()
+			}, 0)
 		}
 	}
 	//监听剪切事件

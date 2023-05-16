@@ -24,7 +24,8 @@ export default {
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
-			value: this.modelValue
+			value: this.modelValue,
+			htmlPaste: true
 		})
 		this.editor.on('change', val => {
 			this.$emit('update:modelValue', val)
