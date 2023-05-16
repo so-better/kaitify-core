@@ -187,6 +187,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isClosed()` ：el 是否自闭合元素
 -   `el.isBreak()` ：el 是否是换行符`<br>`
 -   `el.isEmpty()` ：el 是否是空元素。文本没有值，行内和块元素没有子元素或者子元素都是 null 的话，都是空元素
+-   `el.isSpaceText()` ：el 是否只含有空白字符的 text 元素
 -   `el.isRoot()` ：el 是否是根元素，即 AlexElement.elementStack 数组中的元素
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
