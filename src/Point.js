@@ -89,31 +89,6 @@ class AlexPoint {
 			this.moveToStart(flatElements[0])
 		}
 	}
-
-	//获取该点所在的块元素
-	getBlock() {
-		const fn = element => {
-			if (element.isBlock()) {
-				return element
-			}
-			return fn(element.parent)
-		}
-		return fn(this.element)
-	}
-
-	//获取该点所在的行内元素
-	getInline() {
-		const fn = element => {
-			if (element.isInline()) {
-				return element
-			}
-			if (element.isRoot()) {
-				return null
-			}
-			return fn(element.parent)
-		}
-		return fn(this.element)
-	}
 }
 
 export default AlexPoint

@@ -187,6 +187,11 @@ class AlexEditor {
 			}
 			return element
 		},
+		//合并相似子元素
+		element => {
+			element._mergeChildren()
+			return element
+		},
 		//换行符清除规则
 		element => {
 			if (element.hasChildren()) {
@@ -204,16 +209,6 @@ class AlexEditor {
 					if (hasBreak && hasOther) {
 						element.children = element.children.map(el => {
 							if (el.isBreak()) {
-								el.setEmpty()
-							}
-							return el
-						})
-					}
-					//只有换行符并且存在多个换行符
-					else if (hasBreak && element.children.length > 1) {
-						//把除了第一个换行符外的其他换行符都置为空元素
-						element.children = element.children.map((el, index) => {
-							if (el.isBreak() && index > 0) {
 								el.setEmpty()
 							}
 							return el
@@ -315,9 +310,9 @@ class AlexEditor {
 		//后一个可以获取焦点的元素
 		const nextElement = this.getNextElementOfPoint(this.range.anchor)
 		//当前焦点所在的块元素
-		const anchorBlock = this.range.anchor.getBlock()
+		const anchorBlock = this.range.anchor.element.getBlock()
 		//当前焦点所在的行内元素
-		const anchorInline = this.range.anchor.getInline()
+		const anchorInline = this.range.anchor.element.getInline()
 		//起点和终点都在文本内
 		if (this.range.anchor.element.isText()) {
 			const val = this.range.anchor.element.textContent
@@ -742,7 +737,7 @@ class AlexEditor {
 			//前一个可以获取焦点的元素
 			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
 			//当前焦点所在的块元素
-			const anchorBlock = this.range.anchor.getBlock()
+			const anchorBlock = this.range.anchor.element.getBlock()
 			//光标在焦点元素的开始处
 			if (this.range.anchor.offset == 0) {
 				//如果前一个可获取焦点的元素存在
@@ -802,7 +797,7 @@ class AlexEditor {
 					}
 				})
 				//获取终点所在的块元素
-				const focusBlock = this.range.focus.getBlock()
+				const focusBlock = this.range.focus.element.getBlock()
 				//不在一个块内则需要merge
 				let hasMerge = !focusBlock.hasContains(this.range.anchor.element)
 
@@ -840,7 +835,7 @@ class AlexEditor {
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//不是代码块内则对空格进行处理
-			if (!this.range.anchor.getBlock().isPreStyle()) {
+			if (!this.range.anchor.element.getBlock().isPreStyle()) {
 				data = data.replace(/\s+/g, () => {
 					const span = document.createElement('span')
 					span.innerHTML = '&nbsp;'
@@ -881,7 +876,7 @@ class AlexEditor {
 			//后一个可以获取焦点的元素
 			const nextElement = this.getNextElementOfPoint(this.range.anchor)
 			//当前焦点所在的块元素
-			const anchorBlock = this.range.anchor.getBlock()
+			const anchorBlock = this.range.anchor.element.getBlock()
 			//终点位置
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 			//在代码块中
@@ -920,7 +915,7 @@ class AlexEditor {
 				//焦点在当前块的中间部分则需要切割
 				else {
 					//获取所在块元素
-					const block = this.range.anchor.getBlock()
+					const block = this.range.anchor.element.getBlock()
 					const newBlock = block.clone(true)
 					this.addElementAfter(newBlock, block)
 					//将终点移动到块元素末尾
@@ -956,7 +951,7 @@ class AlexEditor {
 				//后一个可以获取焦点的元素
 				const nextElement = this.getNextElementOfPoint(this.range.anchor)
 				//当前焦点所在的块元素
-				const anchorBlock = this.range.anchor.getBlock()
+				const anchorBlock = this.range.anchor.element.getBlock()
 				//终点位置
 				const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 				//当前块是一个只有换行符的块，则该块需要被覆盖
@@ -979,7 +974,7 @@ class AlexEditor {
 				//焦点在当前块的中间部分则需要切割
 				else {
 					//获取所在块元素
-					const block = this.range.anchor.getBlock()
+					const block = this.range.anchor.element.getBlock()
 					const newBlock = block.clone(true)
 					this.addElementAfter(newBlock, block)
 					//将终点移动到块元素末尾
@@ -1028,7 +1023,7 @@ class AlexEditor {
 	setRecentlyPoint(point) {
 		const previousElement = this.getPreviousElementOfPoint(point)
 		const nextElement = this.getNextElementOfPoint(point)
-		const block = point.getBlock()
+		const block = point.element.getBlock()
 		if (previousElement && block.isContains(previousElement)) {
 			point.moveToEnd(previousElement)
 		} else if (nextElement && block.isContains(nextElement)) {

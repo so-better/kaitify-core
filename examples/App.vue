@@ -12,7 +12,7 @@ export default {
 	},
 	data() {
 		return {
-			value: 'alex-editor基于原生JS开发，不依赖于其他框架，脱离了浏览器的document.execCommand语法，是一款非常强大的轻量型底层富文本编辑器'
+			value: '<p>33</p><div style="color:#f30;"><ul><li>333</li><li>444</li></ul></div>'
 		}
 	}
 }
