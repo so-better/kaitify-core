@@ -60,6 +60,10 @@ class AlexElement {
 		}
 		return false
 	}
+	//是否空白占位元素
+	isSpaceText() {
+		return this.isText() && !this.isEmpty() && /^\s+$/g.test(this.textContent)
+	}
 	//是否根元素
 	isRoot() {
 		return !this.parent

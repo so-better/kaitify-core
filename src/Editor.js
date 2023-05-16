@@ -434,31 +434,6 @@ class AlexEditor {
 					}
 				}
 			}
-			//文本元素里还存在空白字符，不占位置也不是空格
-			else if (/^\s+$/g.test(this.range.anchor.element.textContent)) {
-				//该元素设为空
-				this.range.anchor.element.setEmpty()
-				//如果所在块元素为空
-				if (anchorBlock.isEmpty()) {
-					const breakEl = new AlexElement('closed', 'br', null, null, null)
-					this.addElementTo(breakEl, anchorBlock)
-					this.range.anchor.moveToEnd(breakEl)
-					this.range.focus.moveToEnd(breakEl)
-				}
-				//所在块元素不是空
-				else {
-					//同块内前面存在可以获取焦点的元素
-					if (previousElement && anchorBlock.isContains(previousElement)) {
-						this.range.anchor.moveToEnd(previousElement)
-						this.range.focus.moveToEnd(previousElement)
-					}
-					//同块内后面存在可以获取焦点的元素
-					else if (nextElement && anchorBlock.isContains(nextElement)) {
-						this.range.anchor.moveToStart(nextElement)
-						this.range.focus.moveToStart(nextElement)
-					}
-				}
-			}
 		}
 		//起点和终点在自闭合元素内
 		else {
@@ -1594,8 +1569,12 @@ class AlexEditor {
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//在文本元素上
 			if (this.range.anchor.element.isText()) {
-				//如果文本元素是空白字符的元素，并且其父元素只有他一个子元素，则直接修改其父元素样式
-				if (AlexElement.getSpaceElement().textContent == this.range.anchor.element.textContent && this.range.anchor.element.parent.children.length == 1) {
+				//过滤掉空元素
+				const children = this.range.anchor.element.parent.children.filter(item => {
+					return !item.isEmpty()
+				})
+				//如果文本元素是空白字符的元素，并且其父元素是行内元素且只有他一个子元素，则直接修改其父元素样式
+				if (this.range.anchor.element.isSpaceText() && this.range.anchor.element.parent.isInline() && children.length == 1) {
 					if (this.range.anchor.element.parent.hasStyles()) {
 						Object.assign(this.range.anchor.element.parent.styles, styleObject)
 					} else {
@@ -1636,8 +1615,9 @@ class AlexEditor {
 			elements.forEach(el => {
 				//文本元素
 				if (el.isText()) {
+					//过滤掉空元素和空白元素
 					const children = el.parent.children.filter(item => {
-						return !item.isEmpty()
+						return !item.isEmpty() && !item.isSpaceText()
 					})
 					//如果父元素是行内元素且只有该文本一个子元素，则直接修改父元素样式
 					if (children.length == 1 && el.parent.isInline()) {
@@ -1647,7 +1627,7 @@ class AlexEditor {
 							el.parent.styles = { ...styleObject }
 						}
 					}
-					//其他情况需要新建一个span并设置空白字符内容
+					//其他情况需要新建一个span
 					else {
 						let cloneEl = el.clone()
 						el.type = 'inline'
