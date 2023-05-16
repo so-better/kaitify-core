@@ -223,12 +223,12 @@ class AlexEditor {
 						//文本元素合并
 						if (pel.isText()) {
 							//起点在后一个元素上，则将起点设置到前一个元素上
-							if (this.range.anchor.element.isEqual(nel)) {
+							if (this.range && this.range.anchor.element.isEqual(nel)) {
 								this.range.anchor.element = pel
 								this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
 							}
 							//终点在后一个元素上，则将终点设置到前一个元素上
-							if (this.range.focus.element.isEqual(nel)) {
+							if (this.range && this.range.focus.element.isEqual(nel)) {
 								this.range.focus.element = pel
 								this.range.focus.offset = pel.textContent.length + this.range.focus.offset
 							}
@@ -238,11 +238,11 @@ class AlexEditor {
 						//换行符合并
 						else if (pel.isBreak()) {
 							//起点在后一个换行符上，则直接将起点设置到前一个换行符上
-							if (this.range.anchor.element.isEqual(nel)) {
+							if (this.range && this.range.anchor.element.isEqual(nel)) {
 								this.range.anchor.element = pel
 							}
 							//终点在后一个换行符上，则直接将终点设置到前一个换行符上
-							if (this.range.focus.element.isEqual(nel)) {
+							if (this.range && this.range.focus.element.isEqual(nel)) {
 								this.range.focus.element = pel
 							}
 						}
@@ -680,30 +680,13 @@ class AlexEditor {
 	_handleNodesChange() {
 		//加上setTimeout是为了保证this.$el.innerHTML获取的是最新的
 		setTimeout(() => {
-			const selection = window.getSelection()
-			let focusNode = null
-			let focusOffset = null
-			if (selection.rangeCount) {
-				let range = selection.getRangeAt(0)
-				focusNode = range.endContainer
-				focusOffset = range.endOffset
-				const flatNodes = Util.flatNodes(Array.from(this.$el.childNodes))
-				const index = flatNodes.findIndex(item => {
-					return focusNode.isEqualNode(item)
-				})
-				this.stack = this.parseHtml(this.$el.innerHTML)
-				this.formatElementStack()
-				const flatElements = AlexElement.flatElements(this.stack)
-				this.range.anchor.moveToStart(flatElements[0])
-				this.range.focus.moveToStart(flatElements[0])
-				this.domRender()
-				const nodes = Util.flatNodes(Array.from(this.$el.childNodes))
-				const focusKey = Dap.data.get(nodes[index], 'data-alex-editor-key')
-				const focusEle = this.getElementByKey(focusKey)
-				const focus = new AlexPoint(focusEle, focusOffset)
-				this.range = new AlexRange(focus, focus)
-				this.setCursor()
-			}
+			this.stack = this.parseHtml(this.$el.innerHTML)
+			this.formatElementStack()
+			const flatElements = AlexElement.flatElements(this.stack)
+			this.range.anchor.moveToEnd(flatElements[flatElements.length - 1])
+			this.range.focus.moveToEnd(flatElements[flatElements.length - 1])
+			this.domRender()
+			this.setCursor()
 		}, 0)
 	}
 	//禁用编辑器
