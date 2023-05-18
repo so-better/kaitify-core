@@ -282,18 +282,32 @@ class AlexEditor {
 			if (element.hasChildren()) {
 				//块元素中的换行符
 				if (element.isBlock()) {
+					//过滤掉空元素
+					const children = element.children.filter(el => {
+						return !el.isEmpty()
+					})
 					//是否有换行符
-					let hasBreak = element.children.some(el => {
+					let hasBreak = children.some(el => {
 						return el.isBreak()
 					})
 					//是否有其他元素
-					let hasOther = element.children.some(el => {
-						return !el.isEmpty() && !el.isBreak()
+					let hasOther = children.some(el => {
+						return !el.isBreak()
 					})
 					//既有换行符也有其他元素则把换行符元素都置为空元素
 					if (hasBreak && hasOther) {
 						element.children = element.children.map(el => {
 							if (el.isBreak()) {
+								el.setEmpty()
+							}
+							return el
+						})
+					}
+					//只有换行符并且存在多个换行符
+					else if (hasBreak && children.length > 1) {
+						//把除了第一个换行符外的其他换行符都置为空元素
+						element.children = element.children.map((el, index) => {
+							if (el.isBreak() && index > 0) {
 								el.setEmpty()
 							}
 							return el
