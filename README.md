@@ -68,7 +68,8 @@ editor.setCursor()
 
 > 无法改变的固定规范：
 
--   相邻的行内元素如果 parsedom、marks 和 styles 完全相同，则会进行合并；相邻的文本元素会进行合并；相邻的换行符会进行合并
+-   兄弟元素合并策略：相邻的行内元素如果 parsedom、marks 和 styles 完全相同，则会进行合并；相邻的文本元素会进行合并；相邻的换行符会进行合并
+-   父子元素合并策略：如果父元素只有一个子元素并且与子元素的 parsedom 相同，则当二者的 marks 和 styls 都相同时会将子元素与父元素进行合并（如果父元素或者子元素的 marks 相同，但是其中一个没有 styles，也会进行合并；同理 styles 相同但是其中一个没有 marks，也会进行合并）
 -   块元素的子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
 -   行内元素的子元素中如果存在换行符\<br>，会被设置为空元素，即行内元素的子元素不会有换行符的存在
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
@@ -202,6 +203,8 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.setEmpty()` ：将一个非空元素设置为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
 -   `el.getBlock()` ：获取该元素所在的块元素，如果本身是块元素则返回自身
 -   `el.getInline()` ：获取该元素所在的行内元素，如果该元素不在行内元素中则返回 null
+-   `el.isEqualStyles(element)` ：判断 el 与 element 的 styles 是否相同，如果二者都没有 styles 也会返回 true
+-   `el.isEqualMarks(element)` ：判断 el 与 element 的 marks 是否相同，如果二者都没有 marks 也会返回 true
 -   `AlexElement.paragraph` ：定义段落元素，默认是"p"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
