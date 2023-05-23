@@ -269,49 +269,22 @@ class AlexEditor {
 			}
 			return mergeSimilarElement(element)
 		},
-		//子元素和父元素合并策略
+		//子元素和父元素合并策略（仅会针对行内元素和块元素）
 		element => {
 			//判断两个元素是否可以合并
 			const canMerge = (parent, child) => {
 				if ((parent.isInline() && child.isInline()) || (parent.isBlock() && child.isBlock())) {
 					//styles是否相同
-					let sameStyles = parent.isEqualStyles(child)
+					let sameStyles = child.isEqualStyles(parent) || child.isStyleNameContains(parent)
 					//marks是否相同
-					let sameMarks = parent.isEqualMarks(child)
-					//styles相同marks不同
-					if (sameStyles && !sameMarks) {
-						//如果父元素没有marks子元素有marks
-						if (!parent.hasMarks() && child.hasMarks()) {
-							sameMarks = true
-						}
-						//如果子元素没有marks父元素有marks
-						if (parent.hasMarks() && !child.hasMarks()) {
-							sameMarks = true
-						}
+					let sameMarks = child.isEqualMarks(parent) || child.isMarkNameContains(parent)
+					//父子元素的marks不同且父子元素只有一个有marks
+					if (!sameMarks && (!child.hasMarks() || !parent.hasMarks())) {
+						sameMarks = true
 					}
-					//marks相同styles不同
-					else if (sameMarks && !sameStyles) {
-						//如果父元素没有styles子元素有styles
-						if (!parent.hasStyles() && child.hasStyles()) {
-							sameStyles = true
-						}
-						//如果子元素没有styles父元素有styles
-						if (parent.hasStyles() && !child.hasStyles()) {
-							sameStyles = true
-						}
-					}
-					//父子元素styles和marks都不相同
-					else if (!sameMarks && !sameStyles) {
-						//父元素没有marks和styles，而子元素有
-						if (!parent.hasStyles() && !parent.hasMarks() && child.hasMarks() && child.hasStyles()) {
-							sameMarks = true
-							sameStyles = true
-						}
-						//父元素有marks和styles，而子元素没有
-						else if (parent.hasMarks() && parent.hasStyles() && !child.hasMarks() && !child.hasStyles()) {
-							sameMarks = true
-							sameStyles = true
-						}
+					//父子元素的styles不同且父子元素只有一个有styles
+					if (!sameStyles && (!child.hasStyles() || !parent.hasStyles())) {
+						sameStyles = true
 					}
 					return parent.parsedom == child.parsedom && sameMarks && sameStyles
 				}
@@ -323,13 +296,21 @@ class AlexEditor {
 				if (canMerge(parent, child)) {
 					//行内元素或者块元素合并
 					if (parent.isInline() || parent.isBlock()) {
-						//如果子元素有styles而父元素没有
-						if (child.hasStyles() && !parent.hasStyles()) {
-							parent.styles = { ...child.styles }
+						//如果子元素有styles
+						if (child.hasStyles()) {
+							if (parent.hasStyles()) {
+								Object.assign(parent.styles, child.styles)
+							} else {
+								parent.styles = { ...child.styles }
+							}
 						}
-						//如果子元素有marks而父元素没有
-						if (child.hasMarks() && !parent.hasMarks()) {
-							parent.marks = { ...child.marks }
+						//如果子元素有marks
+						if (child.hasMarks()) {
+							if (parent.hasMarks()) {
+								Object.assign(parent.marks, child.marks)
+							} else {
+								parent.marks = { ...child.marks }
+							}
 						}
 						parent.children.push(...child.children)
 						parent.children.forEach(item => {

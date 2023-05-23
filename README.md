@@ -115,11 +115,11 @@ const editor = new AlexEditor(el, {
 
 作为该编辑器组件的最顶级的核心类，其功能强大，提供了丰富的语法：
 
--   `editor.$el` ：编辑器所在的 dom 元素，请勿修改此属性修改
--   `editor.value` ：当前编辑器的内容，请勿修改此属性修改
--   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性修改
+-   `editor.$el` ：编辑器所在的 dom 元素，请勿修改此属性
+-   `editor.value` ：当前编辑器的内容，请勿修改此属性
+-   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
--   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性修改
+-   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
 -   `editor.setRecentlyPoint(point)` : 将指定焦点的元素设置为前后最近的 closed 或者 text 元素
 -   `editor.getPreviousElement(ele)` ：获取 ele 元素前一个兄弟元素，如果没有则返回 null
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
@@ -133,9 +133,9 @@ const editor = new AlexEditor(el, {
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
 -   `editor.getElementsByRange(includes)` ：获取 anchor 和 focus 两个焦点之间的元素，如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素
--   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化，返回格式化后的元素
--   `editor.formatElementStack()` ：对 editor.stack 进行内部的格式化规范校验处理
--   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不建议设置此参数
+-   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化规范处理，返回格式化后的元素
+-   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
+-   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
 -   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
 -   `editor.delete()` ：根据光标执行删除操作
@@ -190,8 +190,8 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isEmpty()` ：el 是否是空元素。文本没有值，行内和块元素没有子元素或者子元素都是 null 的话，都是空元素
 -   `el.isSpaceText()` ：el 是否只含有空白字符的 text 元素
 -   `el.isRoot()` ：el 是否是根元素，即 AlexElement.elementStack 数组中的元素
--   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
+-   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isPreStyle()` ：el 是否代码块样式的元素，如果 el 是块元素且其 parsedom 属性值是“pre”或者其 styles 属性拥有 white-space 属性，且值为“pre”或者“pre-wrap”，则返回 true，其他情况返回 false
 -   `el.isOnlyHasBreak()` ：el 的子元素是否只含有换行符`<br>`
 -   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
@@ -205,6 +205,8 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.getInline()` ：获取该元素所在的行内元素，如果该元素不在行内元素中则返回 null
 -   `el.isEqualStyles(element)` ：判断 el 与 element 的 styles 是否相同，如果二者都没有 styles 也会返回 true
 -   `el.isEqualMarks(element)` ：判断 el 与 element 的 marks 是否相同，如果二者都没有 marks 也会返回 true
+-   `el.isStyleNameContains(element)` ：判断 element 的样式名称是否都存在于 el 的样式名称中
+-   `el.isMarkNameContains(element)` ：判断 element 的标记名称是否都存在于 el 的标记名称中
 -   `AlexElement.paragraph` ：定义段落元素，默认是"p"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
