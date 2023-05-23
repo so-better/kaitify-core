@@ -1693,55 +1693,6 @@ class AlexEditor {
 			this.range.focus.moveToEnd(elements[elements.length - 1])
 		}
 	}
-	//移除样式
-	removeStyle() {
-		//起点和终点在一个位置
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			//过滤掉空元素
-			const children = this.range.anchor.element.parent.children.filter(item => {
-				return !item.isEmpty()
-			})
-			//如果在空白字符的文本元素上，并且其父元素是行内元素且只有他一个子元素，则直接清空父元素的样式
-			if (this.range.anchor.element.isSpaceText() && this.range.anchor.element.parent.isInline() && children.length == 1) {
-				this.range.anchor.element.parent.styles = null
-			}
-			//其他情况
-			else {
-				//获取所在块元素
-				const block = this.range.anchor.element.getBlock()
-				const newBlock = block.clone(true)
-				this.addElementAfter(newBlock, block)
-				//记录起点所在元素在整个块元素中的序列
-				const elements = AlexElement.flatElements(block.children)
-				const index = elements.findIndex(item => {
-					return this.range.anchor.element.isEqual(item)
-				})
-				//将终点移动到块元素末尾
-				this.range.focus.moveToEnd(block)
-				this.delete()
-				//将终点移动到新的块元素
-				const newElements = AlexElement.flatElements(newBlock.children)
-				this.range.focus.element = newElements[index]
-				this.range.focus.offset = this.range.anchor.offset
-				this.range.anchor.moveToStart(newBlock)
-				this.delete()
-
-				//创建新的span添加到新的块元素之前
-				let spanEl = new AlexElement('inline', 'span', null, null, null)
-				let spaceEl = AlexElement.getSpaceElement()
-				this.addElementTo(spaceEl, spanEl)
-				this.addElementTo(spanEl, newBlock)
-				//合并两个块元素
-				this.mergeBlockElement(newBlock)
-				//重新设置虚拟光标位置
-				this.range.anchor.moveToEnd(spanEl)
-				this.range.focus.moveToEnd(spanEl)
-			}
-		}
-		//起点和终点不在一个位置
-		else {
-		}
-	}
 	//销毁编辑器的方法
 	destroy() {
 		//去除可编辑效果
