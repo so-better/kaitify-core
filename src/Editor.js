@@ -189,7 +189,7 @@ class AlexEditor {
 		},
 		//兄弟元素合并策略（如果光标在子元素中可能会重新设置）
 		element => {
-			const mergeSimilarElement = ele => {
+			const mergeElement = ele => {
 				//判断两个元素是否可以合并
 				const canMerge = (pel, nel) => {
 					if (pel.isBreak() && nel.isBreak()) {
@@ -205,54 +205,51 @@ class AlexEditor {
 				}
 				//两个元素的合并方法
 				const merge = (pel, nel) => {
-					//如果可以合并
-					if (canMerge(pel, nel)) {
-						//文本元素合并
-						if (pel.isText()) {
-							//起点在后一个元素上，则将起点设置到前一个元素上
-							if (this.range && this.range.anchor.element.isEqual(nel)) {
-								this.range.anchor.element = pel
-								this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
-							}
-							//终点在后一个元素上，则将终点设置到前一个元素上
-							if (this.range && this.range.focus.element.isEqual(nel)) {
-								this.range.focus.element = pel
-								this.range.focus.offset = pel.textContent.length + this.range.focus.offset
-							}
-							//将后一个元素的内容给前一个元素
-							pel.textContent += nel.textContent
+					//文本元素合并
+					if (pel.isText()) {
+						//起点在后一个元素上，则将起点设置到前一个元素上
+						if (this.range && this.range.anchor.element.isEqual(nel)) {
+							this.range.anchor.element = pel
+							this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
 						}
-						//换行符合并
-						else if (pel.isBreak()) {
-							//起点在后一个换行符上，则直接将起点设置到前一个换行符上
-							if (this.range && this.range.anchor.element.isEqual(nel)) {
-								this.range.anchor.element = pel
-							}
-							//终点在后一个换行符上，则直接将终点设置到前一个换行符上
-							if (this.range && this.range.focus.element.isEqual(nel)) {
-								this.range.focus.element = pel
-							}
+						//终点在后一个元素上，则将终点设置到前一个元素上
+						if (this.range && this.range.focus.element.isEqual(nel)) {
+							this.range.focus.element = pel
+							this.range.focus.offset = pel.textContent.length + this.range.focus.offset
 						}
-						//行内元素合并
-						else if (pel.isInline()) {
-							if (!pel.hasChildren()) {
-								pel.children = []
-							}
-							if (!nel.hasChildren()) {
-								nel.children = []
-							}
-							pel.children.push(...nel.children)
-							pel.children.forEach(item => {
-								item.parent = pel
-							})
-							pel = mergeSimilarElement(pel)
-						}
-						//删除被合并的元素
-						const index = nel.parent.children.findIndex(item => {
-							return nel.isEqual(item)
-						})
-						nel.parent.children.splice(index, 1)
+						//将后一个元素的内容给前一个元素
+						pel.textContent += nel.textContent
 					}
+					//换行符合并
+					else if (pel.isBreak()) {
+						//起点在后一个换行符上，则直接将起点设置到前一个换行符上
+						if (this.range && this.range.anchor.element.isEqual(nel)) {
+							this.range.anchor.element = pel
+						}
+						//终点在后一个换行符上，则直接将终点设置到前一个换行符上
+						if (this.range && this.range.focus.element.isEqual(nel)) {
+							this.range.focus.element = pel
+						}
+					}
+					//行内元素合并
+					else if (pel.isInline()) {
+						if (!pel.hasChildren()) {
+							pel.children = []
+						}
+						if (!nel.hasChildren()) {
+							nel.children = []
+						}
+						pel.children.push(...nel.children)
+						pel.children.forEach(item => {
+							item.parent = pel
+						})
+						pel = mergeElement(pel)
+					}
+					//删除被合并的元素
+					const index = nel.parent.children.findIndex(item => {
+						return nel.isEqual(item)
+					})
+					nel.parent.children.splice(index, 1)
 				}
 				//存在子元素并且子元素数量大于1
 				if (ele.hasChildren() && ele.children.length > 1) {
@@ -267,65 +264,47 @@ class AlexEditor {
 				}
 				return ele
 			}
-			return mergeSimilarElement(element)
+			return mergeElement(element)
 		},
 		//子元素和父元素合并策略（仅会针对行内元素和块元素）
 		element => {
 			//判断两个元素是否可以合并
 			const canMerge = (parent, child) => {
 				if ((parent.isInline() && child.isInline()) || (parent.isBlock() && child.isBlock())) {
-					//styles是否相同
-					let sameStyles = child.isEqualStyles(parent) || child.isStyleNameContains(parent)
-					//marks是否相同
-					let sameMarks = child.isEqualMarks(parent) || child.isMarkNameContains(parent)
-					//父子元素的marks不同且父子元素只有一个有marks
-					if (!sameMarks && (!child.hasMarks() || !parent.hasMarks())) {
-						sameMarks = true
-					}
-					//父子元素的styles不同且父子元素只有一个有styles
-					if (!sameStyles && (!child.hasStyles() || !parent.hasStyles())) {
-						sameStyles = true
-					}
-					return parent.parsedom == child.parsedom && sameMarks && sameStyles
+					return parent.parsedom == child.parsedom
 				}
 				return false
 			}
 			//两个元素的合并方法
 			const merge = (parent, child) => {
-				//如果可以合并
-				if (canMerge(parent, child)) {
-					//行内元素或者块元素合并
-					if (parent.isInline() || parent.isBlock()) {
-						//如果子元素有styles
-						if (child.hasStyles()) {
-							if (parent.hasStyles()) {
-								Object.assign(parent.styles, child.styles)
-							} else {
-								parent.styles = { ...child.styles }
-							}
-						}
-						//如果子元素有marks
-						if (child.hasMarks()) {
-							if (parent.hasMarks()) {
-								Object.assign(parent.marks, child.marks)
-							} else {
-								parent.marks = { ...child.marks }
-							}
-						}
-						parent.children.push(...child.children)
-						parent.children.forEach(item => {
-							item.parent = parent
-						})
+				//如果子元素有styles
+				if (child.hasStyles()) {
+					if (parent.hasStyles()) {
+						Object.assign(parent.styles, child.styles)
+					} else {
+						parent.styles = { ...child.styles }
 					}
-					//删除被合并的元素
-					const index = parent.children.findIndex(item => {
-						return child.isEqual(item)
-					})
-					parent.children.splice(index, 1)
 				}
+				//如果子元素有marks
+				if (child.hasMarks()) {
+					if (parent.hasMarks()) {
+						Object.assign(parent.marks, child.marks)
+					} else {
+						parent.marks = { ...child.marks }
+					}
+				}
+				parent.children.push(...child.children)
+				parent.children.forEach(item => {
+					item.parent = parent
+				})
+				//删除被合并的元素
+				const index = parent.children.findIndex(item => {
+					return child.isEqual(item)
+				})
+				parent.children.splice(index, 1)
 			}
-			//存在子元素并且子元素数量大于1
-			if (element.hasChildren() && element.children.length == 1) {
+			//存在子元素并且子元素只有一个且父子元素可以合并
+			if (element.hasChildren() && element.children.length == 1 && canMerge(element, element.children[0])) {
 				merge(element, element.children[0])
 			}
 			return element

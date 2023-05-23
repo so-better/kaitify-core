@@ -228,30 +228,6 @@ class AlexElement {
 		}
 		return false
 	}
-	//指定元素的样式名称是否都存在于该元素中
-	isStyleNameContains(element) {
-		if (!this.hasStyles()) {
-			return false
-		}
-		if (!element.hasStyles()) {
-			return false
-		}
-		return Object.keys(element.styles).every(styleName => {
-			return Object.keys(this.styles).includes(styleName)
-		})
-	}
-	//指定元素的标记名称是否都存在于该元素中
-	isMarkNameContains(element) {
-		if (!this.hasMarks()) {
-			return false
-		}
-		if (!element.hasMarks()) {
-			return false
-		}
-		return Object.keys(element.marks).every(markName => {
-			return Object.keys(this.marks).includes(markName)
-		})
-	}
 	//渲染成真实dom
 	_renderElement() {
 		let el = null
