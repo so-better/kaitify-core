@@ -189,8 +189,7 @@ class AlexEditor {
 		},
 		//合并相似子元素（如果光标在子元素中可能会重新设置）
 		element => {
-			//存在子元素并且子元素数量大于1
-			if (element.hasChildren() && element.children.length > 1) {
+			const mergeSimilarElement = ele => {
 				//判断两个元素是否可以合并
 				const canMerge = (pel, nel) => {
 					if (pel.isBreak() && nel.isBreak()) {
@@ -258,6 +257,7 @@ class AlexEditor {
 							pel.children.forEach(item => {
 								item.parent = pel
 							})
+							pel = mergeSimilarElement(pel)
 						}
 						//删除被合并的元素
 						const index = nel.parent.children.findIndex(item => {
@@ -266,16 +266,20 @@ class AlexEditor {
 						nel.parent.children.splice(index, 1)
 					}
 				}
-				let index = 0
-				while (index <= element.children.length - 2) {
-					if (canMerge(element.children[index], element.children[index + 1])) {
-						merge(element.children[index], element.children[index + 1])
-					} else {
-						index++
+				//存在子元素并且子元素数量大于1
+				if (ele.hasChildren() && ele.children.length > 1) {
+					let index = 0
+					while (index <= ele.children.length - 2) {
+						if (canMerge(ele.children[index], ele.children[index + 1])) {
+							merge(ele.children[index], ele.children[index + 1])
+						} else {
+							index++
+						}
 					}
 				}
+				return ele
 			}
-			return element
+			return mergeSimilarElement(element)
 		},
 		//换行符清除规则
 		element => {
