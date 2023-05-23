@@ -187,7 +187,7 @@ class AlexEditor {
 			}
 			return element
 		},
-		//合并相似子元素（如果光标在子元素中可能会重新设置）
+		//兄弟元素合并策略（如果光标在子元素中可能会重新设置）
 		element => {
 			const mergeSimilarElement = ele => {
 				//判断两个元素是否可以合并
@@ -199,19 +199,7 @@ class AlexEditor {
 						return true
 					}
 					if (pel.isInline() && nel.isInline()) {
-						let sameStyles = false
-						if (pel.hasStyles() && nel.hasStyles() && Dap.common.equal(pel.styles, nel.styles)) {
-							sameStyles = true
-						} else if (!pel.hasStyles() && !nel.hasStyles()) {
-							sameStyles = true
-						}
-						let sameMarks = false
-						if (pel.hasMarks() && nel.hasMarks() && Dap.common.equal(pel.marks, nel.marks)) {
-							sameMarks = true
-						} else if (!pel.hasMarks() && !nel.hasMarks()) {
-							sameMarks = true
-						}
-						return pel.parsedom == nel.parsedom && sameMarks && sameStyles
+						return pel.parsedom == nel.parsedom && pel.isEqualStyles(nel) && pel.isEqualMarks(nel)
 					}
 					return false
 				}
@@ -280,6 +268,86 @@ class AlexEditor {
 				return ele
 			}
 			return mergeSimilarElement(element)
+		},
+		//子元素和父元素合并策略
+		element => {
+			//判断两个元素是否可以合并
+			const canMerge = (parent, child) => {
+				if ((parent.isInline() && child.isInline()) || (parent.isBlock() && child.isBlock())) {
+					//styles是否相同
+					let sameStyles = parent.isEqualStyles(child)
+					//marks是否相同
+					let sameMarks = parent.isEqualMarks(child)
+					//styles相同marks不同
+					if (sameStyles && !sameMarks) {
+						//如果父元素没有marks子元素有marks
+						if (!parent.hasMarks() && child.hasMarks()) {
+							sameMarks = true
+						}
+						//如果子元素没有marks父元素有marks
+						if (parent.hasMarks() && !child.hasMarks()) {
+							sameMarks = true
+						}
+					}
+					//marks相同styles不同
+					else if (sameMarks && !sameStyles) {
+						//如果父元素没有styles子元素有styles
+						if (!parent.hasStyles() && child.hasStyles()) {
+							sameStyles = true
+						}
+						//如果子元素没有styles父元素有styles
+						if (parent.hasStyles() && !child.hasStyles()) {
+							sameStyles = true
+						}
+					}
+					//父子元素styles和marks都不相同
+					else if (!sameMarks && !sameStyles) {
+						//父元素没有marks和styles，而子元素有
+						if (!parent.hasStyles() && !parent.hasMarks() && child.hasMarks() && child.hasStyles()) {
+							sameMarks = true
+							sameStyles = true
+						}
+						//父元素有marks和styles，而子元素没有
+						else if (parent.hasMarks() && parent.hasStyles() && !child.hasMarks() && !child.hasStyles()) {
+							sameMarks = true
+							sameStyles = true
+						}
+					}
+					return parent.parsedom == child.parsedom && sameMarks && sameStyles
+				}
+				return false
+			}
+			//两个元素的合并方法
+			const merge = (parent, child) => {
+				//如果可以合并
+				if (canMerge(parent, child)) {
+					//行内元素或者块元素合并
+					if (parent.isInline() || parent.isBlock()) {
+						//如果子元素有styles而父元素没有
+						if (child.hasStyles() && !parent.hasStyles()) {
+							parent.styles = { ...child.styles }
+						}
+						//如果子元素有marks而父元素没有
+						if (child.hasMarks() && !parent.hasMarks()) {
+							parent.marks = { ...child.marks }
+						}
+						parent.children.push(...child.children)
+						parent.children.forEach(item => {
+							item.parent = parent
+						})
+					}
+					//删除被合并的元素
+					const index = parent.children.findIndex(item => {
+						return child.isEqual(item)
+					})
+					parent.children.splice(index, 1)
+				}
+			}
+			//存在子元素并且子元素数量大于1
+			if (element.hasChildren() && element.children.length == 1) {
+				merge(element, element.children[0])
+			}
+			return element
 		},
 		//换行符清除规则
 		element => {

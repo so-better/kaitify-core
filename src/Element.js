@@ -208,6 +208,26 @@ class AlexElement {
 		}
 		return this.parent.getInline()
 	}
+	//比较两个元素样式是否一致
+	isEqualStyles(element) {
+		if (!this.hasStyles() && !element.hasStyles()) {
+			return true
+		}
+		if (this.hasStyles() && element.hasStyles() && Dap.common.equal(this.styles, element.styles)) {
+			return true
+		}
+		return false
+	}
+	//比较两个元素属性是否一致
+	isEqualMarks(element) {
+		if (!this.hasMarks() && !element.hasMarks()) {
+			return true
+		}
+		if (this.hasMarks() && element.hasMarks() && Dap.common.equal(this.marks, element.marks)) {
+			return true
+		}
+		return false
+	}
 	//渲染成真实dom
 	_renderElement() {
 		let el = null
