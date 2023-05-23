@@ -131,7 +131,7 @@ const editor = new AlexEditor(el, {
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性和 class 属性）
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange()` ：获取 anchor 和 focus 两个焦点之间的元素（如果焦点在文本中间，还会分割文本元素）
+-   `editor.getElementsByRange(includes)` ：获取 anchor 和 focus 两个焦点之间的元素，如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素
 -   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化，返回格式化后的元素
 -   `editor.formatElementStack()` ：对 editor.stack 进行内部的格式化规范校验处理
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不建议设置此参数
