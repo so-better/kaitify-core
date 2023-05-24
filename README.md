@@ -69,7 +69,7 @@ editor.setCursor()
 > 无法改变的固定规范：
 
 -   兄弟元素合并策略：相邻的行内元素如果 parsedom、marks 和 styles 完全相同，则会进行合并；相邻的文本元素会进行合并；相邻的换行符会进行合并
--   父子元素合并策略：如果父元素只有一个子元素并且与子元素的 parsedom 相同则会进行合并，二者的 marks 和 styles 进行整合，且子元素的会覆盖父元素的
+-   父子元素合并策略：如果父元素只有一个子元素并且与子元素的 parsedom 相同，则当二者的 marks 和 styls 都相同时会将子元素与父元素进行合并（如果父元素或者子元素的 marks 相同，但是其中一个没有 styles，也会进行合并；同理 styles 相同但是其中一个没有 marks，也会进行合并）
 -   块元素的子元素中换行符 \<br> 和其他元素不可同时存在（如果同时存在换行符会被移除）
 -   行内元素的子元素中如果存在换行符\<br>，会被设置为空元素，即行内元素的子元素不会有换行符的存在
 -   根元素必须全都是 block 类型的元素（如果根元素存在其他类型的元素，会进行一次强制转换，即调用 convertToBlock 方法进行转换）
@@ -132,7 +132,7 @@ const editor = new AlexEditor(el, {
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性和 class 属性）
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange(includes)` ：获取 anchor 和 focus 两个焦点之间的元素，如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素
+-   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个焦点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 true
 -   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化规范处理，返回格式化后的元素
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
@@ -146,6 +146,7 @@ const editor = new AlexEditor(el, {
 -   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部并设置真实光标于此，如果 element 指定了元素，则移动到该元素头部
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部并设置真实光标于此，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setStyle(styleObject)` ：根据虚拟光标所在位置设置样式，参数是一个对象，key 表示 css 样式名称，value 表示值
+-   `editor.removeAllStyles()` ：根据光标移除所有的样式
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
