@@ -607,6 +607,7 @@ class AlexEditor {
 				const anchor = new AlexPoint(anchorEle, range.startOffset)
 				const focus = new AlexPoint(focusEle, range.endOffset)
 				this.range = new AlexRange(anchor, focus)
+				this.emit('rangeUpdate', this.range)
 			}
 		}
 	}
@@ -1690,6 +1691,7 @@ class AlexEditor {
 		range.setStart(anchorResult.node, anchorResult.offset)
 		range.setEnd(focusResult.node, focusResult.offset)
 		selection.addRange(range)
+		this.emit('rangeUpdate', this.range)
 	}
 	//根据光标设置css样式
 	setStyle(styleObject) {
