@@ -1898,15 +1898,20 @@ class AlexEditor {
 	}
 	//触发自定义事件
 	emit(eventName, ...value) {
-		if (typeof this._events[eventName] == 'function') {
-			this._events[eventName].apply(this, [...value])
+		if (Array.isArray(this._events[eventName])) {
+			this._events[eventName].forEach(fn => {
+				fn.apply(this, [...value])
+			})
 			return true
 		}
 		return false
 	}
 	//监听自定义事件
 	on(eventName, eventHandle) {
-		this._events[eventName] = eventHandle
+		if (!this._events[eventName]) {
+			this._events[eventName] = []
+		}
+		this._events[eventName].push(eventHandle)
 	}
 }
 
