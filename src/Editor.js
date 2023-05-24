@@ -496,8 +496,6 @@ class AlexEditor {
 		const nextElement = this.getNextElementOfPoint(this.range.anchor)
 		//当前焦点所在的块元素
 		const anchorBlock = this.range.anchor.element.getBlock()
-		//当前焦点所在的行内元素
-		const anchorInline = this.range.anchor.element.getInline()
 		//起点和终点都在文本内
 		if (this.range.anchor.element.isText()) {
 			const val = this.range.anchor.element.textContent
@@ -534,6 +532,12 @@ class AlexEditor {
 					}
 				}
 			}
+			//文本元被删成了空白元素
+			else if (this.range.anchor.element.isSpaceText()) {
+				this.range.anchor.offset = 0
+				this.range.focus.offset = this.range.anchor.element.textContent.length
+				this.delete()
+			}
 		}
 		//起点和终点在自闭合元素内
 		else {
@@ -560,8 +564,6 @@ class AlexEditor {
 			}
 			//所在块元素不是空
 			else {
-				//删除的元素是否是换行符
-				const isBreak = this.range.anchor.element.isBreak()
 				//同块内前面存在可以获取焦点的元素
 				if (previousElement && anchorBlock.isContains(previousElement)) {
 					this.range.anchor.moveToEnd(previousElement)
@@ -572,8 +574,10 @@ class AlexEditor {
 					this.range.anchor.moveToStart(nextElement)
 					this.range.focus.moveToStart(nextElement)
 				}
-				//如果所在行内元素存在并且行内元素是空并且删除的是换行符
-				if (anchorInline && anchorInline.isEmpty() && isBreak) {
+				//判断是否空白元素，如果是则继续删除
+				if (this.range.anchor.element.isSpaceText()) {
+					this.range.anchor.offset = 0
+					this.range.focus.offset = this.range.anchor.element.textContent.length
 					this.delete()
 				}
 			}
