@@ -145,7 +145,7 @@ const editor = new AlexEditor(el, {
 -   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部并设置真实光标于此，如果 element 指定了元素，则移动到该元素头部
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部并设置真实光标于此，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.rangeRender()` ：根据虚拟光标的位置来渲染真实的光标或者选区
--   `editor.applyRange(object)` ：根据虚拟光标所在位置设置被选择范围内元素的 styles 和 marks。参数是一个对象，对象可设置 styles 和 marks 属性，分别表示设置元素的 styles 和 marks
+-   `editor.applyRange(object)` ：根据虚拟光标所在位置设置被选择范围内的 text 元素和 closed 元素的 styles 和 marks（由于 text 元素不存在 styles 和 marks，则会在 text 元素上创建一个 inline 元素`span`，并将该 text 元素作为其子元素，styles 和 marks 会被应用于该`span`上）；如果没有选择区域，则在当前光标位置创建一个包含空白元素的`span`元素。参数是一个对象，对象可设置 styles 和 marks 属性，分别表示设置元素的 styles 和 marks
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
