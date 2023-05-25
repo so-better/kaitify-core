@@ -531,10 +531,14 @@ class AlexEditor {
 					}
 				}
 			}
-			//文本元被删成了空白元素
+			//文本元素被删成了空白元素
 			else if (this.range.anchor.element.isSpaceText()) {
 				this.range.anchor.offset = 0
 				this.range.focus.offset = this.range.anchor.element.textContent.length
+				this.delete()
+			}
+			//起点和终点在空白字符上
+			else if (this.range.anchor.offset > 0 && Util.isSpaceText(this.range.anchor.element.textContent[this.range.anchor.offset - 1])) {
 				this.delete()
 			}
 		}
@@ -573,11 +577,18 @@ class AlexEditor {
 					this.range.anchor.moveToStart(nextElement)
 					this.range.focus.moveToStart(nextElement)
 				}
-				//判断是否空白元素，如果是则继续删除
-				if (this.range.anchor.element.isSpaceText()) {
-					this.range.anchor.offset = 0
-					this.range.focus.offset = this.range.anchor.element.textContent.length
-					this.delete()
+				//如果新的起点在文本元素上，需要对空白字符进行处理
+				if (this.range.anchor.element.isText()) {
+					//判断是否空白元素，如果是则继续删除
+					if (this.range.anchor.element.isSpaceText()) {
+						this.range.anchor.offset = 0
+						this.range.focus.offset = this.range.anchor.element.textContent.length
+						this.delete()
+					}
+					//起点和终点在空白字符上
+					else if (this.range.anchor.offset > 0 && Util.isSpaceText(this.range.anchor.element.textContent[this.range.anchor.offset - 1])) {
+						this.delete()
+					}
 				}
 			}
 		}
@@ -646,7 +657,6 @@ class AlexEditor {
 			this.rangeRender()
 			return
 		}
-		console.log('beforeInput没有监听到的inputType', e.inputType, e)
 	}
 	//监听中文输入
 	_handleChineseInput(e) {

@@ -60,9 +60,9 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否空白占位元素
+	//是否零宽度无断空白元素
 	isSpaceText() {
-		return this.isText() && !this.isEmpty() && /^\s+$/g.test(this.textContent)
+		return this.isText() && !this.isEmpty() && Util.isSpaceText(this.textContent)
 	}
 	//是否根元素
 	isRoot() {
@@ -287,10 +287,10 @@ class AlexElement {
 		}
 		return flat(elements)
 	}
-	//获取一个空白字符，用来占位防止行内元素没有内容被删除
+	//获取一个空白字符元素，用来占位防止行内元素没有内容被删除
 	static getSpaceElement() {
 		let span = document.createElement('span')
-		span.innerHTML = '&#xFEFF;'
+		span.innerHTML = '\uFEFF'
 		let el = new AlexElement('text', null, null, null, span.innerText)
 		span = null
 		return el

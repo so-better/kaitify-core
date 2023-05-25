@@ -56,5 +56,9 @@ export default {
 			return result
 		}
 		return flat(nodes)
+	},
+	//是否零宽度无断空白字符
+	isSpaceText(val) {
+		return /^[\uFEFF\s]+$/g.test(val)
 	}
 }
