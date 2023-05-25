@@ -120,6 +120,15 @@ const editor = new AlexEditor(el, {
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
+-   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
+-   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
+-   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化规范处理，返回格式化后的元素
+-   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
+-   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
+-   `editor.delete()` ：根据光标执行删除操作
+-   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
+-   `editor.insertParagraph()` ：在光标处换行
+-   `editor.insertElement(ele)` ：根据光标位置插入指定的元素，可用于在生成元素后向编辑器内插入。如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素
 -   `editor.setRecentlyPoint(point)` : 将指定焦点的元素设置为前后最近的 closed 或者 text 元素
 -   `editor.getPreviousElement(ele)` ：获取 ele 元素前一个兄弟元素，如果没有则返回 null
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
@@ -132,33 +141,24 @@ const editor = new AlexEditor(el, {
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性和 class 属性）
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个焦点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 true
--   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化规范处理，返回格式化后的元素
--   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
--   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
--   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
--   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
--   `editor.delete()` ：根据光标执行删除操作
--   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
--   `editor.insertParagraph()` ：在光标处换行
--   `editor.insertElement(ele)` ：根据光标位置插入指定的元素，可用于在生成元素后向编辑器内插入。如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素
--   `editor.setCursor()` ：根据虚拟光标来设置真实的光标
+-   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 true（如果一个父元素所有的子元素都在选区内，那么该父元素也会被认为是两个点之间的元素）
 -   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部并设置真实光标于此，如果 element 指定了元素，则移动到该元素头部
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部并设置真实光标于此，如果 element 指定了元素，则移动到该元素尾部
--   `editor.setStyle(styleObject)` ：根据虚拟光标所在位置设置样式，参数是一个对象，key 表示 css 样式名称，value 表示值
--   `editor.removeAllStyles()` ：根据光标移除所有的样式
+-   `editor.rangeRender()` ：根据虚拟光标的位置来渲染真实的光标或者选区
+-   `editor.applyRange(object)` ：根据虚拟光标所在位置设置被选择范围内元素的 styles 和 marks。参数是一个对象，对象可设置 styles 和 marks 属性，分别表示设置元素的 styles 和 marks
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
--   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
+-   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 
 > 下面是 editor 内部定义的事件：
 
-| 事件名称  | 事件说明                                                             |
-| --------- | -------------------------------------------------------------------- |
-| change    | 编辑的内容发生变化就会触发此事件，回调参数为编辑器当前值和编辑器旧值 |
-| blur      | 编辑器失去焦点时触发，回调参数为编辑器当前的值                       |
-| focus     | 编辑器获取焦点时触发，回调参数为编辑器当前的值                       |
-| pasteFile | 在编辑器里粘贴文件时触发，回调参数为文件数组                         |
+| 事件名称    | 事件说明                                                             |
+| ----------- | -------------------------------------------------------------------- |
+| change      | 编辑的内容发生变化就会触发此事件，回调参数为编辑器当前值和编辑器旧值 |
+| blur        | 编辑器失去焦点时触发，回调参数为编辑器当前的值                       |
+| focus       | 编辑器获取焦点时触发，回调参数为编辑器当前的值                       |
+| pasteFile   | 在编辑器里粘贴文件时触发，回调参数为文件数组                         |
+| rangeUpdate | 当编辑器的真实光标更新时触发，回调参数为当前的 alexRange 实例        |
 
 ### AlexElement：元素
 
@@ -201,7 +201,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.hasChildren()` ：el 是否有子元素
 -   `el.clone(deep)` ：将 el 元素进行克隆，返回一个新的元素，deep 为 true 表示深度克隆，即克隆子孙元素，默认为 true
 -   `el.convertToBlock()` ：将非 block 类型的元素转为 block 元素
--   `el.setEmpty()` ：将一个非空元素设置为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
+-   `el.toEmpty()` ：将一个非空元素设为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
 -   `el.getBlock()` ：获取该元素所在的块元素，如果本身是块元素则返回自身
 -   `el.getInline()` ：获取该元素所在的行内元素，如果该元素不在行内元素中则返回 null
 -   `el.isEqualStyles(element)` ：判断 el 与 element 的 styles 是否相同，如果二者都没有 styles 也会返回 true

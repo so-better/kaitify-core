@@ -177,7 +177,7 @@ class AlexElement {
 		element.parent = this
 	}
 	//设置为空元素
-	setEmpty() {
+	toEmpty() {
 		if (this.isEmpty()) {
 			return
 		}
