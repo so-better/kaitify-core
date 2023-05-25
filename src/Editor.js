@@ -1727,7 +1727,8 @@ class AlexEditor {
 		selection.addRange(range)
 		this.emit('rangeUpdate', this.range)
 	}
-	//根据光标设置元素的styles和marks（只会在文本元素和自闭合元素上设置）
+	//根据光标设置元素的styles和marks
+	//只针对文本元素和自闭合元素进行处理
 	applyRange(object) {
 		if (!Dap.common.isObject(object)) {
 			throw new Error('The argument must be an object')
