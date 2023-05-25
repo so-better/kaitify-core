@@ -50,10 +50,10 @@ editor.range.focus.moveToEnd(ele)
 //渲染
 editor.formatElementStack()
 editor.domRender()
-editor.setCursor()
+editor.rangeRender()
 ```
 
-> 自定义操作中，最后都需要使用 editor.formatElementStack、editor.domRender 和 editor.range.setCursor()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
+> 自定义操作中，最后都需要使用 editor.formatElementStack、editor.domRender 和 editor.range.rangeRender()，这三部分按顺序使用，缺一不可。主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
@@ -272,4 +272,4 @@ AlexHistory 通过以下方法来读取和操作历史记录：
 
 > editor 在每次执行 domRender 时，当 unPushHistory 参数为 false 时，都会自动把当前编辑器的 stack 和 range 保存到 history 中去
 
-> 自定义撤销和重做功能时，你需要通过 get 方法读取 stack 和 range，然后赋值给编辑器的 stack 和 range，然后执行 editor.domRender(true)并通过 editor.setCursor()设置真实光标
+> 自定义撤销和重做功能时，你需要通过 get 方法读取 stack 和 range，然后赋值给编辑器的 stack 和 range，然后执行 editor.domRender(true)并通过 editor.rangeRender()设置真实光标
