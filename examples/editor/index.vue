@@ -34,20 +34,28 @@ export default {
 	methods: {
 		setEditor(item) {
 			if (item == '设置字体') {
-				this.editor.setStyle({
-					'font-family': '华文仿宋'
+				this.editor.applyRange({
+					styles: {
+						'font-family': '华文仿宋'
+					}
 				})
 			} else if (item == '设置字号') {
-				this.editor.setStyle({
-					'font-size': '30px'
+				this.editor.applyRange({
+					styles: {
+						'font-size': '30px'
+					}
 				})
 			} else if (item == '设置前景色') {
-				this.editor.setStyle({
-					color: '#ff0000'
+				this.editor.applyRange({
+					styles: {
+						color: '#ff0000'
+					}
 				})
 			} else if (item == '设置背景色') {
-				this.editor.setStyle({
-					'background-color': '#ff0000'
+				this.editor.applyRange({
+					styles: {
+						'background-color': '#ff0000'
+					}
 				})
 			} else if (item == '插入代码块') {
 				const anchorBlock = this.editor.range.anchor.element.getBlock()
@@ -84,7 +92,7 @@ export default {
 							const text = new AlexElement('text', null, null, null, '\n')
 							this.editor.addElementBefore(text, breakElement)
 						}
-						el.setEmpty()
+						el.toEmpty()
 						if (index == 0) {
 							this.editor.addElementBefore(element, el)
 						}
@@ -152,7 +160,7 @@ export default {
 						const text = new AlexElement('text', null, null, null, '\n')
 						this.editor.addElementBefore(this.editor.formatElement(newEl), breakElement)
 						this.editor.addElementBefore(text, breakElement)
-						el.setEmpty()
+						el.toEmpty()
 						if (index == 0) {
 							this.editor.addElementBefore(element, el)
 						}
@@ -163,7 +171,7 @@ export default {
 			}
 			this.editor.formatElementStack()
 			this.editor.domRender()
-			this.editor.setCursor()
+			this.editor.rangeRender()
 		},
 		queryStyle() {
 			const inline = this.editor.range.anchor.element.getInline()
