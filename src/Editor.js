@@ -139,11 +139,24 @@ class AlexEditor {
 							}
 						})
 					}
+				} else if (['pre'].includes(element.parsedom)) {
+					element.isPreStyle = true
+				} else if (['blockquote'].includes(element.parsedom)) {
+					element.isPreStyle = true
+					if (element.hasMarks()) {
+						Object.assign(element.marks, {
+							style: 'white-space:pre-wrap'
+						})
+					} else {
+						element.marks = {
+							style: 'white-space:pre-wrap'
+						}
+					}
 				}
-				//块元素和行内元素移除styles
-				else if (element.isBlock() || element.isInline()) {
-					element.styles = null
-				}
+			}
+			//块元素和行内元素移除styles
+			if (element.isBlock() || element.isInline()) {
+				element.styles = null
 			}
 			return element
 		},

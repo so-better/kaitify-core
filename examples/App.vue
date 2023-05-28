@@ -12,7 +12,7 @@ export default {
 	},
 	data() {
 		return {
-			value: '<p style="color:#f30;">十年生死两茫茫，不思量，自难忘。</p><p>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</p><p>纵使相逢应不识，尘满面，鬓如霜。</p>'
+			value: '<blockquote>aaa</blockquote><p style="color:#f30;">十年生死两茫茫，不思量，自难忘。</p><p>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</p><p>纵使相逢应不识，尘满面，鬓如霜。</p>'
 		}
 	}
 }

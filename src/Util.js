@@ -41,7 +41,7 @@ export default {
 	},
 	//是否零宽度无断空白字符
 	isSpaceText(val) {
-		return /^[\uFEFF\s]+$/g.test(val)
+		return /^[\uFEFF]+$/g.test(val)
 	},
 	//判断子节点是否都是文本
 	isAllTextNode(node) {
