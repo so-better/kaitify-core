@@ -13,8 +13,10 @@ class AlexElement {
 		this.marks = marks
 		//样式集合
 		this.styles = styles
-		//text时的值
+		//文本值
 		this.textContent = textContent
+		//是否代码块样式
+		this.isPreStyle = false
 		//子元素
 		this.children = null
 		//父元素
@@ -42,13 +44,13 @@ class AlexElement {
 	isBreak() {
 		return this.isClosed() && this.parsedom == 'br'
 	}
-	//是否空
+	//是否空元素
 	isEmpty() {
-		//文本节点没有值认为是空
+		//文本节点没有值即为空
 		if (this.isText() && !this.textContent) {
 			return true
 		}
-		//行内和块元素
+		//行内和块元素没有子元素即为空
 		if (this.isInline() || this.isBlock()) {
 			if (!this.hasChildren()) {
 				return true
@@ -85,19 +87,6 @@ class AlexElement {
 		}
 		return this.isContains(element.parent)
 	}
-	//判断是否保留空白和换行符
-	isPreStyle() {
-		if (!this.isBlock()) {
-			return false
-		}
-		if (this.parsedom == 'pre') {
-			return true
-		}
-		if (this.hasStyles()) {
-			return ['pre-wrap', 'pre'].includes(this.styles['white-space'])
-		}
-		return false
-	}
 	//判断是否只包含换行符
 	isOnlyHasBreak() {
 		if (this.hasChildren()) {
@@ -126,6 +115,9 @@ class AlexElement {
 	}
 	//是否含有样式
 	hasStyles() {
+		if (this.isBlock() || this.isInline()) {
+			return false
+		}
 		if (!this.styles) {
 			return false
 		}
@@ -136,6 +128,9 @@ class AlexElement {
 	}
 	//是否有子元素
 	hasChildren() {
+		if (this.isClosed() || this.isText()) {
+			return false
+		}
 		if (Array.isArray(this.children)) {
 			return !!this.children.length
 		}
@@ -146,7 +141,7 @@ class AlexElement {
 		if (typeof deep != 'boolean') {
 			throw new Error('The parameter must be a Boolean')
 		}
-		let el = new AlexElement(this.type, this.parsedom, this.marks, this.styles, this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
 		if (deep && this.hasChildren()) {
 			this.children.forEach(child => {
 				let clonedChild = child.clone(deep)
@@ -165,14 +160,12 @@ class AlexElement {
 		if (this.isBlock()) {
 			throw new Error('This element is already of type "block"')
 		}
-		let element = this.clone(true)
-		if (this.isText()) {
-			this.textContent = null
-		}
+		let element = this.clone()
 		this.type = 'block'
-		this.parsedom = AlexElement.paragraph
+		this.parsedom = AlexElement.PARAGRAPH_NODE
 		this.marks = null
 		this.styles = null
+		this.textContent = null
 		this.children = [element]
 		element.parent = this
 	}
@@ -231,12 +224,25 @@ class AlexElement {
 	//渲染成真实dom
 	_renderElement() {
 		let el = null
-		//文本节点
+		//文本元素
 		if (this.isText()) {
-			el = document.createTextNode(this.textContent)
+			el = document.createElement(AlexElement.TEXT_NODE)
+			el.innerText = this.textContent
+			//设置属性
+			if (this.hasMarks()) {
+				for (let key in this.marks) {
+					el.setAttribute(key, this.marks[key])
+				}
+			}
+			//设置样式
+			if (this.hasStyles()) {
+				for (let key in this.styles) {
+					el.style.setProperty(key, this.styles[key])
+				}
+			}
 		}
-		//非文本节点
-		else {
+		//自闭合元素
+		else if (this.isClosed()) {
 			el = document.createElement(this.parsedom)
 			//设置属性
 			if (this.hasMarks()) {
@@ -250,11 +256,21 @@ class AlexElement {
 					el.style.setProperty(key, this.styles[key])
 				}
 			}
+		}
+		//块元素和行内元素
+		else {
+			el = document.createElement(this.parsedom)
+			//设置属性
+			if (this.hasMarks()) {
+				for (let key in this.marks) {
+					el.setAttribute(key, this.marks[key])
+				}
+			}
 			//渲染子元素
 			if (this.hasChildren()) {
 				for (let child of this.children) {
-					let childElm = child._renderElement()
-					el.appendChild(childElm)
+					child._renderElement()
+					el.appendChild(child._elm)
 				}
 			}
 		}
@@ -262,10 +278,11 @@ class AlexElement {
 		Dap.data.set(el, 'data-alex-editor-key', this.key)
 		//更新挂载的真实dom
 		this._elm = el
-		return el
 	}
 	//定义段落标签
-	static paragraph = 'p'
+	static PARAGRAPH_NODE = 'p'
+	//定义文本标签
+	static TEXT_NODE = 'span'
 	//判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement
@@ -289,11 +306,7 @@ class AlexElement {
 	}
 	//获取一个空白字符元素，用来占位防止行内元素没有内容被删除
 	static getSpaceElement() {
-		let span = document.createElement('span')
-		span.innerHTML = '\uFEFF'
-		let el = new AlexElement('text', null, null, null, span.innerText)
-		span = null
-		return el
+		return new AlexElement('text', null, null, null, '\uFEFF')
 	}
 }
 

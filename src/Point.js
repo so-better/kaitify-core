@@ -8,9 +8,11 @@ class AlexPoint {
 
 	//初始化
 	_init() {
+		//如果是文本元素
 		if (this.element.isText()) {
 			return
 		}
+		//如果是块元素或者行内元素
 		if (this.element.hasChildren()) {
 			if (this.element.children[this.offset]) {
 				this.element = this.element.children[this.offset]
@@ -43,7 +45,7 @@ class AlexPoint {
 		if (element.isEmpty()) {
 			throw new Error('The argument cannot be an empty element')
 		}
-		//如果是文本
+		//如果是文本元素
 		if (element.isText()) {
 			this.element = element
 			this.offset = element.textContent.length

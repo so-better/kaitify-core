@@ -39,26 +39,27 @@ export default {
 		Dap.data.set(window, 'data-alex-editor-key', key)
 		return key
 	},
-	//扁平化处理节点
-	flatNodes(nodes) {
-		const flat = arr => {
-			let result = []
-			arr.forEach(node => {
-				if (Dap.element.isElement(node, true)) {
-					result.push(node)
-					const childNodes = Array.from(node.childNodes)
-					if (childNodes.length) {
-						let arr = flat(childNodes)
-						result = [...result, ...arr]
-					}
-				}
-			})
-			return result
-		}
-		return flat(nodes)
-	},
 	//是否零宽度无断空白字符
 	isSpaceText(val) {
 		return /^[\uFEFF\s]+$/g.test(val)
+	},
+	//判断子节点是否都是文本
+	isAllTextNode(node) {
+		return Array.from(node.childNodes).every(el => {
+			return el.nodeType == 3
+		})
+	},
+	//判断子节点是否含有文本节点
+	hasTextNode(node) {
+		return Array.from(node.childNodes).some(el => {
+			return el.nodeType == 3
+		})
+	},
+	//深拷贝
+	clone(data) {
+		if (Dap.common.isObject(data) || Array.isArray(data)) {
+			return JSON.parse(JSON.stringify(data))
+		}
+		return data
 	}
 }

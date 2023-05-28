@@ -25,7 +25,7 @@ export default {
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.modelValue,
-			htmlPaste: true
+			htmlPaste: false
 		})
 		this.editor.on('change', val => {
 			this.$emit('update:modelValue', val)
@@ -34,9 +34,16 @@ export default {
 	methods: {
 		setEditor(item) {
 			if (item == '设置字体') {
-				this.editor.applyRange({
-					styles: {
-						'font-family': '华文仿宋'
+				const elements = this.editor.getElementsByRange(true)
+				elements.forEach(el => {
+					if (el.isText()) {
+						if (el.hasStyles()) {
+							el.styles['font-family'] = '华文仿宋'
+						} else {
+							el.styles = {
+								'font-family': '华文仿宋'
+							}
+						}
 					}
 				})
 			} else if (item == '设置字号') {
