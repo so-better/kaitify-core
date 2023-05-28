@@ -227,7 +227,7 @@ class AlexElement {
 		//文本元素
 		if (this.isText()) {
 			el = document.createElement(AlexElement.TEXT_NODE)
-			el.innerText = this.textContent
+			el.innerHTML = this.textContent
 			//设置属性
 			if (this.hasMarks()) {
 				for (let key in this.marks) {

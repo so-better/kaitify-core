@@ -1,6 +1,7 @@
 import AlexElement from './Element'
 import AlexPoint from './Point'
 import AlexRange from './Range'
+import Util from './Util'
 
 class AlexHistory {
 	constructor() {
@@ -91,7 +92,7 @@ class AlexHistory {
 
 	//复制元素，包括key也复制
 	_cloneElement(element) {
-		const el = new AlexElement(element.type, element.parsedom, element.marks, element.styles, element.textContent)
+		const el = new AlexElement(element.type, element.parsedom, Util.clone(element.marks), Util.clone(element.styles), element.textContent)
 		el.key = element.key
 		if (element.hasChildren()) {
 			element.children.forEach(child => {

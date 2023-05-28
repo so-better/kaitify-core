@@ -12,7 +12,7 @@ export default {
 	data() {
 		return {
 			editor: null,
-			menus: ['设置字体', '设置字号', '设置前景色', '设置背景色', '插入代码块', '插入标题', '插入引用']
+			menus: ['设置字体', '设置字号', '设置前景色', '设置背景色']
 		}
 	},
 	emits: ['update:modelValue'],
@@ -34,146 +34,99 @@ export default {
 	methods: {
 		setEditor(item) {
 			if (item == '设置字体') {
-				const elements = this.editor.getElementsByRange(true)
-				elements.forEach(el => {
-					if (el.isText()) {
-						if (el.hasStyles()) {
-							el.styles['font-family'] = '华文仿宋'
-						} else {
-							el.styles = {
-								'font-family': '华文仿宋'
+				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
+					const spaceText = AlexElement.getSpaceElement()
+					spaceText.styles = {
+						'font-family': '华文仿宋'
+					}
+					this.editor.insertElement(spaceText)
+				} else {
+					const elements = this.editor.getElementsByRange(true)
+					elements.forEach(el => {
+						if (el.isText()) {
+							if (el.hasStyles()) {
+								Object.assign(el.styles, {
+									'font-family': '华文仿宋'
+								})
+							} else {
+								el.styles = {
+									'font-family': '华文仿宋'
+								}
 							}
 						}
-					}
-				})
+					})
+				}
 			} else if (item == '设置字号') {
-				this.editor.applyRange({
-					styles: {
+				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
+					const spaceText = AlexElement.getSpaceElement()
+					spaceText.styles = {
 						'font-size': '30px'
 					}
-				})
+					this.editor.insertElement(spaceText)
+				} else {
+					const elements = this.editor.getElementsByRange(true)
+					elements.forEach(el => {
+						if (el.isText()) {
+							if (el.hasStyles()) {
+								Object.assign(el.styles, {
+									'font-size': '30px'
+								})
+							} else {
+								el.styles = {
+									'font-size': '30px'
+								}
+							}
+						}
+					})
+				}
 			} else if (item == '设置前景色') {
-				this.editor.applyRange({
-					styles: {
-						color: '#ff0000'
+				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
+					const spaceText = AlexElement.getSpaceElement()
+					spaceText.styles = {
+						color: '#78afde'
 					}
-				})
+					this.editor.insertElement(spaceText)
+				} else {
+					const elements = this.editor.getElementsByRange(true)
+					elements.forEach(el => {
+						if (el.isText()) {
+							if (el.hasStyles()) {
+								Object.assign(el.styles, {
+									color: '#78afde'
+								})
+							} else {
+								el.styles = {
+									color: '#78afde'
+								}
+							}
+						}
+					})
+				}
 			} else if (item == '设置背景色') {
-				this.editor.applyRange({
-					styles: {
-						'background-color': '#ff0000'
+				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
+					const spaceText = AlexElement.getSpaceElement()
+					spaceText.styles = {
+						'background-color': '#78afde',
+						color: '#fff'
 					}
-				})
-			} else if (item == '插入代码块') {
-				const anchorBlock = this.editor.range.anchor.element.getBlock()
-				const focusBlock = this.editor.range.focus.element.getBlock()
-				if (focusBlock.isEqual(anchorBlock)) {
-					anchorBlock.parsedom = 'pre'
-					this.editor.range.anchor.moveToEnd(anchorBlock)
-					this.editor.range.focus.moveToEnd(anchorBlock)
+					this.editor.insertElement(spaceText)
 				} else {
-					let element = new AlexElement('block', 'pre', null, null, null)
-					const breakElement = new AlexElement('closed', 'br', null, null, null)
-					this.editor.addElementTo(breakElement, element)
-					const elements = this.editor.getElementsByRange()
-					let blocks = []
+					const elements = this.editor.getElementsByRange(true)
 					elements.forEach(el => {
-						if (el.isBlock()) {
-							blocks.push(el)
-						} else {
-							const block = el.getBlock()
-							let flag = blocks.some(item => {
-								return item.isEqual(block)
-							})
-							if (!flag) {
-								blocks.push(block)
+						if (el.isText()) {
+							if (el.hasStyles()) {
+								Object.assign(el.styles, {
+									'background-color': '#78afde',
+									color: '#fff'
+								})
+							} else {
+								el.styles = {
+									'background-color': '#78afde',
+									color: '#fff'
+								}
 							}
 						}
 					})
-					blocks.forEach((el, index) => {
-						const newEl = el.clone(true)
-						newEl.parsedom = 'span'
-						newEl.type = 'inline'
-						this.editor.addElementBefore(this.editor.formatElement(newEl), breakElement)
-						if (index < blocks.length - 1) {
-							const text = new AlexElement('text', null, null, null, '\n')
-							this.editor.addElementBefore(text, breakElement)
-						}
-						el.toEmpty()
-						if (index == 0) {
-							this.editor.addElementBefore(element, el)
-						}
-					})
-					this.editor.range.anchor.moveToEnd(element)
-					this.editor.range.focus.moveToEnd(element)
-				}
-			} else if (item == '插入标题') {
-				const anchorBlock = this.editor.range.anchor.element.getBlock()
-				const focusBlock = this.editor.range.focus.element.getBlock()
-				if (focusBlock.isEqual(anchorBlock)) {
-					anchorBlock.parsedom = 'h1'
-					this.editor.range.anchor.moveToEnd(anchorBlock)
-					this.editor.range.focus.moveToEnd(anchorBlock)
-				} else {
-					const elements = this.editor.getElementsByRange()
-					let blocks = []
-					elements.forEach(el => {
-						if (el.isBlock()) {
-							blocks.push(el)
-						} else {
-							const block = el.getBlock()
-							let flag = blocks.some(item => {
-								return item.isEqual(block)
-							})
-							if (!flag) {
-								blocks.push(block)
-							}
-						}
-					})
-					blocks.forEach(el => {
-						el.parsedom = 'h1'
-					})
-				}
-			} else if (item == '插入引用') {
-				const anchorBlock = this.editor.range.anchor.element.getBlock()
-				const focusBlock = this.editor.range.focus.element.getBlock()
-				if (focusBlock.isEqual(anchorBlock)) {
-					anchorBlock.parsedom = 'blockquote'
-					this.editor.range.anchor.moveToEnd(anchorBlock)
-					this.editor.range.focus.moveToEnd(anchorBlock)
-				} else {
-					let element = new AlexElement('block', 'blockquote', null, null, null)
-					const breakElement = new AlexElement('closed', 'br', null, null, null)
-					this.editor.addElementTo(breakElement, element)
-					const elements = this.editor.getElementsByRange()
-					let blocks = []
-					elements.forEach(el => {
-						if (el.isBlock()) {
-							blocks.push(el)
-						} else {
-							const block = el.getBlock()
-							let flag = blocks.some(item => {
-								return item.isEqual(block)
-							})
-							if (!flag) {
-								blocks.push(block)
-							}
-						}
-					})
-					blocks.forEach((el, index) => {
-						const newEl = el.clone(true)
-						newEl.parsedom = 'span'
-						newEl.type = 'inline'
-						const text = new AlexElement('text', null, null, null, '\n')
-						this.editor.addElementBefore(this.editor.formatElement(newEl), breakElement)
-						this.editor.addElementBefore(text, breakElement)
-						el.toEmpty()
-						if (index == 0) {
-							this.editor.addElementBefore(element, el)
-						}
-					})
-					this.editor.range.anchor.moveToEnd(element)
-					this.editor.range.focus.moveToEnd(element)
 				}
 			}
 			this.editor.formatElementStack()
