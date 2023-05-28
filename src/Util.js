@@ -5,7 +5,7 @@ export default {
 		let o = {}
 		for (let attribute of el.attributes) {
 			//匹配事件、样式外的属性
-			if (!/(^on)|(^style$)/g.test(attribute.nodeName)) {
+			if (!/(^on)/g.test(attribute.nodeName)) {
 				o[attribute.nodeName] = attribute.nodeValue
 			}
 		}
@@ -61,5 +61,15 @@ export default {
 			return JSON.parse(JSON.stringify(data))
 		}
 		return data
+	},
+	//从marks中移除style属性后返回
+	getMarks(marks) {
+		let o = {}
+		for (let key in marks) {
+			if (key != 'style') {
+				o[key] = marks[key]
+			}
+		}
+		return o
 	}
 }

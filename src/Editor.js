@@ -227,7 +227,7 @@ class AlexEditor {
 						return true
 					}
 					if (pel.isText() && nel.isText()) {
-						return pel.isEqualStyles(nel)
+						return pel.isEqualStyles(nel) && pel.isEqualMarks(nel)
 					}
 					if (pel.isInline() && nel.isInline()) {
 						return pel.parsedom == nel.parsedom && pel.isEqualMarks(nel)
@@ -1193,7 +1193,7 @@ class AlexEditor {
 		if (Util.isAllTextNode(node)) {
 			//节点名称是文本标签名则直接转为文本元素
 			if (parsedom == AlexElement.TEXT_NODE) {
-				return new AlexElement('text', null, marks, styles, node.innerHTML)
+				return new AlexElement('text', null, Util.getMarks(marks), styles, node.innerHTML)
 			}
 			//该节点的标签名不是文本标签名则进行处理
 			const textNode = document.createElement(AlexElement.TEXT_NODE)

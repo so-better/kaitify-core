@@ -30,6 +30,7 @@ export default {
 		this.editor.on('change', val => {
 			this.$emit('update:modelValue', val)
 		})
+		console.log(this.editor.stack)
 	},
 	methods: {
 		setEditor(item) {
