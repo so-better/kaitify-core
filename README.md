@@ -66,13 +66,13 @@ editor.rangeRender()
 
 ### 编辑器规范
 
--   编辑器一开始将 dom 节点转为 AlexElement 元素时，会直接读取 node 的属性、样式，并且会将只包含文本内容的 span 转为 text 元素。另外，如果文本内容没有被 span 包裹，会自动加上一个 span 元素进行包裹。除文本元素外其余元素 type 默认都是“block”。在格式化处理时内部会对每一个元素根据它的 parsedom 进行一些重置，比如 a 标签的 type 会被改为“inline”、parsedom 是 pre 的元素会设置 isPreStyle 为 true、parsedom 为 blockquote 的元素会设置 isPreStyle 为 true，并且在 marks 中设置{ style:"white-space\:pre-wrap" }、block 和 inline 元素的 styles 会被移除等等
--   同级的元素如果有 block 类型元素，那么其他元素也会被强制转为 block 元素
--   块元素中换行符与其他元素不可能同时存在，另外如果存在多个换行符，也会置换为一个换行符。换行符仅仅在块元素没有其他子元素时作占位符使用
--   兄弟元素合并策略：相邻的空元素会被合并，相邻的文本元素如果样式和标记都一致也会被合并，相邻的行内元素如果标记和 parsedom 一致会被合并
--   父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只要一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
+1. 编辑器一开始将 dom 节点转为 AlexElement 元素时，会直接读取 node 的属性、样式，并且会将只包含文本内容的 span 转为 text 元素，其余元素节点转为块元素。另外，如果文本内容没有被 span 包裹，会自动加上一个 span 元素进行包裹。随后内部会对每一个元素根据它的 parsedom 进行一些重置，比如 a 标签的 type 会被改为“inline”、parsedom 是 pre 的元素会设置 isPreStyle 为 true、parsedom 为 blockquote 的元素会设置 isPreStyle 为 true，并且在 marks 中设置{ style:"white-space\:pre-wrap" }、block 和 inline 元素的 styles 会被移除等等
+2. 同级的元素如果有 block 类型元素，那么其他元素也会被强制转为 block 元素
+3. 块元素中换行符与其他元素不可能同时存在，另外如果存在多个换行符，也会置换为一个换行符。换行符仅仅在块元素没有其他子元素时作占位符使用
+4. 兄弟元素合并策略：相邻的空元素会被合并，相邻的文本元素如果样式和标记都一致也会被合并，相邻的行内元素如果标记和 parsedom 一致会被合并
+5. 父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只要一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
 
-> 我们提供了一个 renderRulers 函数，来使得我们可以对元素做一些额外的操作，请注意，该操作执行于上述第一个规范后，无法覆盖后续的格式化处理
+> 我们提供了一个 renderRulers 函数，来使得我们可以对元素设置自定义的规范。但是 renderRulers 函数执行于上述第一个规范后，在第二个规范之前，因此无法覆盖后续的格式化处理
 
 ```javascript
 const editor = new AlexEditor(el, {
@@ -201,7 +201,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `AlexElement.TEXT_NODE` ：定义文本元素的标签，默认是"span"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
--   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素。主要是用来占位防止行内元素没有内容被删除
+-   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素。
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
 
