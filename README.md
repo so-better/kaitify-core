@@ -99,7 +99,6 @@ const editor = new AlexEditor(el, {
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
--   `editor.formatElement(ele)` ：对传入的 AlexElement 实例进行格式化规范处理，返回格式化后的元素
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
 -   `editor.delete()` ：根据光标执行删除操作
 -   `editor.insertText(data)` ：根据光标位置向编辑器内插入文本
@@ -124,6 +123,12 @@ const editor = new AlexEditor(el, {
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部并设置真实光标于此，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
 -   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
+-   `editor.setStyle(styles)` ：根据光标设置文本元素和自闭合元素的指定样式
+-   `editor.removeStyle(styleNames)` ：根据光标移除文本元素和自闭合元素的指定样式，如果参数 styleNames 不存在，则移除文本元素和自闭合元素所有的样式
+-   `editor.queryStyle(name, value)` ：根据光标查询文本元素或者自闭合元素是否在某个样式下，name 表示样式名称，value 表示样式的值。如果 value 不存在，则仅判断是否拥有名为 name 的样式。如果光标进行了选区操作，则判断选区内的每个文本元素和自闭合元素，全部符合才会返回 true
+-   `editor.setMark(marks)` ：根据光标设置文本元素和自闭合元素的指定标记
+-   `editor.removeMark(markNames)` ：根据光标移除文本元素和自闭合元素的指定标记，如果参数 markNames 不存在，则移除文本元素和自闭合元素所有的标记
+-   `editor.queryMark(name, value)` ：根据光标查询文本元素或者自闭合元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素和自闭合元素，全部符合才会返回 true
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
@@ -199,8 +204,6 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素。主要是用来占位防止行内元素没有内容被删除
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
-
-> 自行创建的 AlexElement 实例可能不符合编辑器内部的规范，在插入编辑器并渲染后可能和我们预想的效果不太一样，甚至会出现 bug。因此在创建元素后，必须使用 editor.formatElement(element)方法来进行格式化，该方法会返回格式化后的元素（通过 parseNode 和 parseHtml 生成的 AlexElement 元素是已经格式化后的了，无需再格式化）
 
 ### AlexPoint：虚拟光标的点对象
 
