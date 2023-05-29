@@ -9,6 +9,7 @@ import ElementToStyle from './ElementToStyle'
 
 class AlexEditor {
 	constructor(el, options) {
+		//支持选择器
 		if (typeof el == 'string' && el) {
 			el = document.body.querySelector(el)
 		}
@@ -23,7 +24,7 @@ class AlexEditor {
 		//设置初始化后的标记
 		Dap.data.set(el, 'data-alex-editor-init', true)
 		//格式化options参数
-		options = this._formatOptions(options)
+		options = this.__formatOptions(options)
 		//编辑器容器
 		this.$el = el
 		//是否禁用
@@ -32,7 +33,7 @@ class AlexEditor {
 		this.value = options.value
 		//自定义编辑器元素的格式化规则
 		this.renderRules = options.renderRules
-		//粘贴时是否粘贴html
+		//粘贴是否携带样式
 		this.htmlPaste = options.htmlPaste
 		//编辑的range
 		this.range = null
@@ -49,27 +50,27 @@ class AlexEditor {
 		//格式化元素数组
 		this.formatElementStack()
 		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化stack
-		this.stack.length == 0 ? this._initStack() : null
+		this.stack.length == 0 ? this.__initStack() : null
 		//初始设置range
-		this._initRange()
+		this.__initRange()
 		//渲染dom
 		this.domRender()
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
 		//设置selection的监听更新range
-		Dap.event.on(document, 'selectionchange.alex_editor', this._handleSelectionChange.bind(this))
+		Dap.event.on(document, 'selectionchange.alex_editor', this.__handleSelectionChange.bind(this))
 		//监听内容输入
-		Dap.event.on(this.$el, 'beforeinput.alex_editor', this._handleBeforeInput.bind(this))
+		Dap.event.on(this.$el, 'beforeinput.alex_editor', this.__handleBeforeInput.bind(this))
 		//监听中文输入
-		Dap.event.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', this._handleChineseInput.bind(this))
+		Dap.event.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', this.__handleChineseInput.bind(this))
 		//监听键盘按下
-		Dap.event.on(this.$el, 'keydown.alex_editor', this._handleKeydown.bind(this))
+		Dap.event.on(this.$el, 'keydown.alex_editor', this.__handleKeydown.bind(this))
 		//监听编辑器剪切
-		Dap.event.on(this.$el, 'cut.alex_editor', this._handleCut.bind(this))
+		Dap.event.on(this.$el, 'cut.alex_editor', this.__handleCut.bind(this))
 		//监听编辑器粘贴
-		Dap.event.on(this.$el, 'paste.alex_editor', this._handlePaste.bind(this))
+		Dap.event.on(this.$el, 'paste.alex_editor', this.__handlePaste.bind(this))
 		//监听编辑器拖放
-		Dap.event.on(this.$el, 'drop.alex_editor', this._handleNodesChange.bind(this))
+		Dap.event.on(this.$el, 'drop.alex_editor', this.__handleNodesChange.bind(this))
 		//监听编辑器获取焦点
 		Dap.event.on(this.$el, 'focus.alex_editor', () => {
 			this.emit('focus', this.value)
@@ -80,7 +81,7 @@ class AlexEditor {
 		})
 	}
 	//格式化options参数
-	_formatOptions(options) {
+	__formatOptions(options) {
 		let opts = {
 			disabled: false,
 			renderRules: null,
@@ -103,7 +104,7 @@ class AlexEditor {
 		}
 		return opts
 	}
-	_formatUnchangeableRules = [
+	__formatUnchangeableRules = [
 		//修改元素的属性和自定义格式化规则
 		element => {
 			if (element.parsedom) {
@@ -139,9 +140,13 @@ class AlexEditor {
 							}
 						})
 					}
-				} else if (['pre'].includes(element.parsedom)) {
+				}
+				//pre标签默认为代码块样式
+				else if (['pre'].includes(element.parsedom)) {
 					element.isPreStyle = true
-				} else if (['blockquote'].includes(element.parsedom)) {
+				}
+				//引用标签设置代码块样式
+				else if (['blockquote'].includes(element.parsedom)) {
 					element.isPreStyle = true
 					if (element.hasMarks()) {
 						Object.assign(element.marks, {
@@ -157,13 +162,6 @@ class AlexEditor {
 			//块元素和行内元素移除styles
 			if (element.isBlock() || element.isInline()) {
 				element.styles = null
-			}
-			return element
-		},
-		//自定义元素格式化规则
-		element => {
-			if (typeof this.renderRules == 'function') {
-				element = this.renderRules.apply(this, [element])
 			}
 			return element
 		},
@@ -372,14 +370,6 @@ class AlexEditor {
 				}
 				//子元素是行内元素或者块元素
 				else {
-					//如果子元素有styles
-					if (child.hasStyles()) {
-						if (parent.hasStyles()) {
-							Object.assign(parent.styles, Util.clone(child.styles))
-						} else {
-							parent.styles = Util.clone(child.styles)
-						}
-					}
 					//如果子元素有marks
 					if (child.hasMarks()) {
 						if (parent.hasMarks()) {
@@ -400,6 +390,13 @@ class AlexEditor {
 			}
 			return element
 		},
+		//自定义元素格式化规则
+		element => {
+			if (typeof this.renderRules == 'function') {
+				element = this.renderRules.apply(this, [element])
+			}
+			return element
+		},
 		//光标所在元素为空元素的情况下重新设置光标
 		element => {
 			if (element.isEmpty()) {
@@ -416,14 +413,14 @@ class AlexEditor {
 		}
 	]
 	//初始化stack
-	_initStack() {
+	__initStack() {
 		const ele = new AlexElement('block', AlexElement.PARAGRAPH_NODE, null, null, null)
 		const breakEle = new AlexElement('closed', 'br', null, null, null)
 		this.addElementTo(breakEle, ele)
 		this.stack = [ele]
 	}
 	//初始设置range
-	_initRange() {
+	__initRange() {
 		const lastElement = this.stack[this.stack.length - 1]
 		const anchor = new AlexPoint(lastElement, 0)
 		const focus = new AlexPoint(lastElement, 0)
@@ -432,7 +429,7 @@ class AlexEditor {
 		this.range.focus.moveToEnd(lastElement)
 	}
 	//起始和结束点都在一个元素内的删除方法
-	_deleteInSameElement() {
+	__deleteInSameElement() {
 		if (!this.range.anchor.element.isEqual(this.range.focus.element)) {
 			return
 		}
@@ -544,7 +541,7 @@ class AlexEditor {
 		}
 	}
 	//监听selection改变
-	_handleSelectionChange() {
+	__handleSelectionChange() {
 		//如果编辑器禁用则不更新range
 		if (this.disabled) {
 			return
@@ -581,7 +578,7 @@ class AlexEditor {
 		}
 	}
 	//监听beforeinput
-	_handleBeforeInput(e) {
+	__handleBeforeInput(e) {
 		if (this.disabled) {
 			return
 		}
@@ -618,7 +615,7 @@ class AlexEditor {
 		}
 	}
 	//监听中文输入
-	_handleChineseInput(e) {
+	__handleChineseInput(e) {
 		if (this.disabled) {
 			return
 		}
@@ -638,7 +635,7 @@ class AlexEditor {
 		}
 	}
 	//监听键盘按下
-	_handleKeydown(e) {
+	__handleKeydown(e) {
 		if (this.disabled) {
 			return
 		}
@@ -668,7 +665,7 @@ class AlexEditor {
 		}
 	}
 	//监听粘贴事件
-	_handlePaste(e) {
+	__handlePaste(e) {
 		if (this.disabled) {
 			return
 		}
@@ -779,7 +776,7 @@ class AlexEditor {
 		}
 	}
 	//监听剪切事件
-	_handleCut(e) {
+	__handleCut(e) {
 		if (this.disabled) {
 			return
 		}
@@ -792,7 +789,7 @@ class AlexEditor {
 		}, 0)
 	}
 	//解决编辑器内元素节点与stack数据不符的情况，进行数据纠正
-	_handleNodesChange() {
+	__handleNodesChange() {
 		//加上setTimeout是为了保证this.$el.innerHTML获取的是最新的
 		setTimeout(() => {
 			this.stack = this.parseHtml(this.$el.innerHTML)
@@ -805,7 +802,7 @@ class AlexEditor {
 		}, 0)
 	}
 	//格式化单个元素
-	formatElement(ele) {
+	__formatElement(ele) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -835,7 +832,7 @@ class AlexEditor {
 			return element
 		}
 		//格式化
-		this._formatUnchangeableRules.forEach(fn => {
+		this.__formatUnchangeableRules.forEach(fn => {
 			ele = format(ele, fn)
 		})
 		//移除所有的空元素
@@ -850,7 +847,7 @@ class AlexEditor {
 				if (!ele.isBlock()) {
 					ele.convertToBlock()
 				}
-				ele = this.formatElement(ele)
+				ele = this.__formatElement(ele)
 				return ele
 			})
 			.filter(ele => {
@@ -874,7 +871,7 @@ class AlexEditor {
 					if (anchorBlock.isContains(previousElement)) {
 						this.range.anchor.moveToEnd(previousElement)
 						this.range.focus.moveToEnd(previousElement)
-						this._deleteInSameElement()
+						this.__deleteInSameElement()
 					}
 					//和当前焦点元素不在同一个块内
 					else {
@@ -887,14 +884,14 @@ class AlexEditor {
 			}
 			//正常删除
 			else {
-				this._deleteInSameElement()
+				this.__deleteInSameElement()
 			}
 		}
 		//批量删除
 		else {
 			//选区在一个元素内
 			if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-				this._deleteInSameElement()
+				this.__deleteInSameElement()
 			} else {
 				//获取选区元素数组
 				const rangeElements = this.getElementsByRange(false, false)
@@ -913,7 +910,7 @@ class AlexEditor {
 					let anchorOffset = this.range.anchor.offset
 					this.range.anchor.element = this.range.focus.element
 					this.range.anchor.offset = 0 //如果是文本，起点从文本起点0开始；如果是自闭合元素，起点从0开始
-					this._deleteInSameElement()
+					this.__deleteInSameElement()
 					//恢复起点光标位置
 					this.range.anchor.element = anchorElement
 					this.range.anchor.offset = anchorOffset
@@ -924,7 +921,7 @@ class AlexEditor {
 					this.range.focus.element = this.range.anchor.element
 					//如果是文本从文本终点开始，如果是自闭合元素从自闭合元素终点开始
 					this.range.focus.offset = endOffset
-					this._deleteInSameElement()
+					this.__deleteInSameElement()
 				}
 				if (hasMerge) {
 					this.mergeBlockElement(focusBlock)
@@ -1048,6 +1045,12 @@ class AlexEditor {
 	insertElement(ele) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
+		}
+		//先进行格式化处理
+		ele = this.__formatElement(ele)
+		//如果是空元素则不处理
+		if (ele.isEmpty()) {
+			return
 		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
