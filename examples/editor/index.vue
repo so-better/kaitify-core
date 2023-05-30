@@ -11,7 +11,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: '<p style="color:#f30;">十年生死两茫茫，不思量，自难忘。</p><p>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</p><p>纵使相逢应不识，尘满面，鬓如霜。<span style="text-decoration-line:underline"><img src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png" style="width:100px" /></span></p>',
+			value: '<p>十年生死两茫茫，不思量，自难忘。</p><p>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</p><p>纵使相逢应不识，尘满面，鬓如霜。<span style="text-decoration-line:underline"><img src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png" style="width:100px" /></span></p>',
 			editor: null
 		}
 	},
@@ -21,7 +21,14 @@ export default {
 		})
 	},
 	methods: {
-		setEditor() {}
+		setEditor() {
+			this.editor.setStyle({
+				color: '#f30'
+			})
+			this.editor.formatElementStack()
+			this.editor.domRender()
+			this.editor.rangeRender()
+		}
 	}
 }
 </script>
