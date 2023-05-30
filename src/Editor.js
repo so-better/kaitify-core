@@ -414,11 +414,11 @@ class AlexEditor {
 			if (element.isEmpty()) {
 				//移除空元素时判断该元素是否是起点元素，如果是则更新起点元素
 				if (this.range && this.range.anchor.element.isEqual(element)) {
-					this.setRecentlyPoint(this.range.anchor)
+					this.__setRecentlyPoint(this.range.anchor)
 				}
 				//移除空元素时判断该元素是否是终点元素，如果是则更新终点元素
 				if (this.range && this.range.focus.element.isEqual(element)) {
-					this.setRecentlyPoint(this.range.focus)
+					this.__setRecentlyPoint(this.range.focus)
 				}
 			}
 			return element
@@ -812,6 +812,21 @@ class AlexEditor {
 			this.domRender()
 			this.rangeRender()
 		}, 0)
+	}
+	//更新焦点的元素为最近的可设置光标的元素
+	__setRecentlyPoint(point) {
+		const previousElement = this.getPreviousElementOfPoint(point)
+		const nextElement = this.getNextElementOfPoint(point)
+		const block = point.element.getBlock()
+		if (previousElement && block.isContains(previousElement)) {
+			point.moveToEnd(previousElement)
+		} else if (nextElement && block.isContains(nextElement)) {
+			point.moveToStart(nextElement)
+		} else if (previousElement) {
+			point.moveToEnd(previousElement)
+		} else {
+			point.moveToStart(nextElement)
+		}
 	}
 	//格式化单个元素
 	__formatElement(ele) {
@@ -1516,23 +1531,8 @@ class AlexEditor {
 			ele.parent.children.splice(index, 1)
 		}
 	}
-	//更新焦点的元素为最近的可设置光标的元素
-	setRecentlyPoint(point) {
-		const previousElement = this.getPreviousElementOfPoint(point)
-		const nextElement = this.getNextElementOfPoint(point)
-		const block = point.element.getBlock()
-		if (previousElement && block.isContains(previousElement)) {
-			point.moveToEnd(previousElement)
-		} else if (nextElement && block.isContains(nextElement)) {
-			point.moveToStart(nextElement)
-		} else if (previousElement) {
-			point.moveToEnd(previousElement)
-		} else {
-			point.moveToStart(nextElement)
-		}
-	}
 	//获取选区之间的元素
-	getElementsByRange(includes = false, flat = true) {
+	getElementsByRange(includes = false, flat = false) {
 		//如果起点和终点在一个地方则返回空数组
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			return []
@@ -1705,7 +1705,7 @@ class AlexEditor {
 		})
 		return notFlatElements
 	}
-	//将真实的光标设置到指定元素开始
+	//将虚拟光标设置到指定元素开始处
 	collapseToStart(element) {
 		if (this.disabled) {
 			return
@@ -1714,15 +1714,15 @@ class AlexEditor {
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToStart(element)
 			this.range.focus.moveToStart(element)
-			this.rangeRender()
 		}
 		//文档最后面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack)
-			this.collapseToStart(flatElements[0])
+			this.range.anchor.moveToStart(flatElements[0])
+			this.range.focus.moveToStart(flatElements[0])
 		}
 	}
-	//将真实的光标设置到指定元素最后
+	//将虚拟光标设置到指定元素最后
 	collapseToEnd(element) {
 		if (this.disabled) {
 			return
@@ -1731,13 +1731,13 @@ class AlexEditor {
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToEnd(element)
 			this.range.focus.moveToEnd(element)
-			this.rangeRender()
 		}
 		//文档最后面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack)
 			const length = flatElements.length
-			this.collapseToEnd(flatElements[length - 1])
+			this.range.anchor.moveToEnd(flatElements[length - 1])
+			this.range.focus.moveToEnd(flatElements[length - 1])
 		}
 	}
 	//禁用编辑器
@@ -1777,7 +1777,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.getElementsByRange(true)
+			const elements = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText() || el.isClosed()) {
 					if (el.hasStyles()) {
@@ -1824,7 +1824,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.getElementsByRange(true)
+			const elements = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText() || el.isClosed()) {
 					//如果参数是数组，表示删除指定的样式
@@ -1863,7 +1863,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区元素
-		const elements = this.getElementsByRange(true)
+		const elements = this.getElementsByRange(true, true)
 		//判断每个文本元素或者自闭合元素是否都具有该样式
 		let flag = elements.every(el => {
 			if (el.isText() || el.isClosed()) {
@@ -1907,7 +1907,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.getElementsByRange(true)
+			const elements = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText() || el.isClosed()) {
 					if (el.hasMarks()) {
@@ -1954,7 +1954,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.getElementsByRange(true)
+			const elements = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText() || el.isClosed()) {
 					//如果参数是数组，表示删除指定的标记
@@ -1993,7 +1993,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区元素
-		const elements = this.getElementsByRange(true)
+		const elements = this.getElementsByRange(true, true)
 		//判断每个文本元素或者自闭合元素是否都具有该标记
 		let flag = elements.every(el => {
 			if (el.isText() || el.isClosed()) {
