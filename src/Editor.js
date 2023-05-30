@@ -105,7 +105,7 @@ class AlexEditor {
 		return opts
 	}
 	__formatUnchangeableRules = [
-		//修改元素的属性和自定义格式化规则
+		//元素自身规范
 		element => {
 			if (element.parsedom) {
 				//默认的自闭合元素
@@ -1336,6 +1336,21 @@ class AlexEditor {
 				return targetEle.isEqual(item)
 			})
 			this.addElementTo(newEle, targetEle.parent, index + 1)
+		}
+	}
+	//将指定元素从元素数组中移除
+	removeElement(ele) {
+		if (ele.isRoot()) {
+			const index = this.stack.findIndex(item => {
+				return ele.isEqual(item)
+			})
+			this.stack.splice(index, 1)
+		} else {
+			const index = ele.parent.children.findIndex(item => {
+				return ele.isEqual(item)
+			})
+			ele.parent.children.splice(index, 1)
+			ele.parent = null
 		}
 	}
 	//根据key查询元素

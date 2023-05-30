@@ -1,7 +1,7 @@
 <template>
 	<div class="editor">
 		<div class="editor-menus">
-			<div @click="setEditor(item)" class="editor-menu" v-for="item in menus">{{ item }}</div>
+			<div @click="setEditor" class="editor-menu">自定义插件</div>
 		</div>
 		<div class="editor-content" @click="queryStyle"></div>
 	</div>
@@ -11,135 +11,17 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			editor: null,
-			menus: ['设置字体', '设置字号', '设置前景色', '设置背景色']
-		}
-	},
-	emits: ['update:modelValue'],
-	props: {
-		modelValue: {
-			type: String,
-			default: '<p><br></p>'
+			value: '<p style="color:#f30;">十年生死两茫茫，不思量，自难忘。</p><p>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</p><p>纵使相逢应不识，尘满面，鬓如霜。<span style="text-decoration-line:underline"><img src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png" style="width:100px" /></span></p>',
+			editor: null
 		}
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
-			value: this.modelValue,
-			htmlPaste: false
+			value: this.value
 		})
-		this.editor.on('change', val => {
-			this.$emit('update:modelValue', val)
-		})
-		console.log(this.editor.stack)
 	},
 	methods: {
-		setEditor(item) {
-			if (item == '设置字体') {
-				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
-					const spaceText = AlexElement.getSpaceElement()
-					spaceText.styles = {
-						'font-family': '华文仿宋'
-					}
-					this.editor.insertElement(spaceText)
-				} else {
-					const elements = this.editor.getElementsByRange(true)
-					elements.forEach(el => {
-						if (el.isText()) {
-							if (el.hasStyles()) {
-								Object.assign(el.styles, {
-									'font-family': '华文仿宋'
-								})
-							} else {
-								el.styles = {
-									'font-family': '华文仿宋'
-								}
-							}
-						}
-					})
-				}
-			} else if (item == '设置字号') {
-				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
-					const spaceText = AlexElement.getSpaceElement()
-					spaceText.styles = {
-						'font-size': '30px'
-					}
-					this.editor.insertElement(spaceText)
-				} else {
-					const elements = this.editor.getElementsByRange(true)
-					elements.forEach(el => {
-						if (el.isText()) {
-							if (el.hasStyles()) {
-								Object.assign(el.styles, {
-									'font-size': '30px'
-								})
-							} else {
-								el.styles = {
-									'font-size': '30px'
-								}
-							}
-						}
-					})
-				}
-			} else if (item == '设置前景色') {
-				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
-					const spaceText = AlexElement.getSpaceElement()
-					spaceText.styles = {
-						color: '#78afde'
-					}
-					this.editor.insertElement(spaceText)
-				} else {
-					const elements = this.editor.getElementsByRange(true)
-					elements.forEach(el => {
-						if (el.isText()) {
-							if (el.hasStyles()) {
-								Object.assign(el.styles, {
-									color: '#78afde'
-								})
-							} else {
-								el.styles = {
-									color: '#78afde'
-								}
-							}
-						}
-					})
-				}
-			} else if (item == '设置背景色') {
-				if (this.editor.range.anchor.isEqual(this.editor.range.focus)) {
-					const spaceText = AlexElement.getSpaceElement()
-					spaceText.styles = {
-						'background-color': '#78afde',
-						color: '#fff'
-					}
-					this.editor.insertElement(spaceText)
-				} else {
-					const elements = this.editor.getElementsByRange(true)
-					elements.forEach(el => {
-						if (el.isText()) {
-							if (el.hasStyles()) {
-								Object.assign(el.styles, {
-									'background-color': '#78afde',
-									color: '#fff'
-								})
-							} else {
-								el.styles = {
-									'background-color': '#78afde',
-									color: '#fff'
-								}
-							}
-						}
-					})
-				}
-			}
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
-		},
-		queryStyle() {
-			const inline = this.editor.range.anchor.element.getInline()
-			if (inline && inline.hasStyles()) {
-				console.log(Object.assign({}, inline.styles))
-			}
-		}
+		setEditor() {}
 	}
 }
 </script>
