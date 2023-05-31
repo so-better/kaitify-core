@@ -110,12 +110,12 @@ const editor = new AlexEditor(el, {
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
 -   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
--   `editor.setStyle(styles)` ：根据虚拟光标设置文本元素和自闭合元素的指定样式
--   `editor.removeStyle(styleNames)` ：根据虚拟光标移除文本元素和自闭合元素的指定样式，如果参数 styleNames 不存在，则移除文本元素和自闭合元素所有的样式
--   `editor.queryStyle(name, value)` ：根据虚拟光标查询文本元素或者自闭合元素是否在某个样式下，name 表示样式名称，value 表示样式的值。如果 value 不存在，则仅判断是否拥有名为 name 的样式。如果光标进行了选区操作，则判断选区内的每个文本元素和自闭合元素，全部符合才会返回 true
--   `editor.setMark(marks)` ：根据虚拟光标设置文本元素和自闭合元素的指定标记
--   `editor.removeMark(markNames)` ：根据虚拟光标移除文本元素和自闭合元素的指定标记，如果参数 markNames 不存在，则移除文本元素和自闭合元素所有的标记
--   `editor.queryMark(name, value)` ：根据虚拟光标查询文本元素或者自闭合元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素和自闭合元素，全部符合才会返回 true
+-   `editor.setTextStyle(styles)` ：根据虚拟光标设置文本元素的指定样式
+-   `editor.removeTextStyle(styleNames)` ：根据虚拟光标移除文本元素的指定样式，如果参数 styleNames 不存在，则移除文本元素的所有样式
+-   `editor.queryTextStyle(name, value)` ：根据虚拟光标查询文本元素是否在某个样式下，name 表示样式名称，value 表示样式的值。如果 value 不存在，则仅判断是否拥有名为 name 的样式。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true
+-   `editor.setTextMark(marks)` ：根据虚拟光标设置文本元素的指定标记
+-   `editor.removeMark(markNames)` ：根据虚拟光标移除文本元素的指定标记，如果参数 markNames 不存在，则移除文本元素的所有标记
+-   `editor.queryTextMark(name, value)` ：根据虚拟光标查询文本元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
