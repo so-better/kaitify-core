@@ -66,13 +66,13 @@ editor.rangeRender()
 4.  兄弟元素合并策略：相邻的空元素会被合并，相邻的文本元素如果样式和标记都一致也会被合并，相邻的行内元素如果标记和 parsedom 一致会被合并
 5.  父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只要一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
 
-> 我们提供了一个 renderRulers 函数，来使得我们可以对元素设置自定义的规范，该函数作用于上述规范全部执行完毕后
+> 我们提供了一个 renderRulers 函数，来使得我们可以对元素设置自定义的规范，该函数作用于上述规范全部执行完毕后。
 
 ```javascript
 const editor = new AlexEditor(el, {
 	renderRules: function (element) {
 		//在这里处理元素
-		return element
+		//在处理中如果改变了元素之前的兄弟元素，你需要确保该兄弟元素符合规范或者使用formatElement方法来进行格式化
 	}
 })
 ```
@@ -86,11 +86,12 @@ const editor = new AlexEditor(el, {
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
+-   `editor.formatElement(ele)` ：对传入的元素进行格式化规范处理，该元素可以是尚未添加到 stack 中的元素【如果是这样的情况，你需要注意该元素是没有 parent 的】
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
 -   `editor.delete()` ：根据虚拟光标执行删除操作
 -   `editor.insertText(data)` ：根据虚拟光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在虚拟光标处换行
--   `editor.insertElement(ele)` ：根据虚拟光标位置插入指定的元素，如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素
+-   `editor.insertElement(ele)` ：根据虚拟光标位置插入指定的元素，如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素（在插入元素之前，为确保渲染结果符合预期，请先使用`formatElement`函数进行一次格式化操作）
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性）

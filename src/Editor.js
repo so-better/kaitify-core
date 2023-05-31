@@ -104,6 +104,7 @@ class AlexEditor {
 		}
 		return opts
 	}
+	//格式化函数数组
 	__formatUnchangeableRules = [
 		//元素自身规范
 		element => {
@@ -175,7 +176,6 @@ class AlexEditor {
 					element.marks = marks
 				}
 			}
-			return element
 		},
 		//其他类型元素与block元素在同一父元素下不能共存
 		element => {
@@ -191,7 +191,6 @@ class AlexEditor {
 					})
 				}
 			}
-			return element
 		},
 		//换行符清除规则
 		element => {
@@ -239,7 +238,6 @@ class AlexEditor {
 					})
 				}
 			}
-			return element
 		},
 		//兄弟元素合并策略（如果光标在子元素中可能会重新设置）
 		element => {
@@ -332,7 +330,7 @@ class AlexEditor {
 						pel.children.forEach(item => {
 							item.parent = pel
 						})
-						pel = mergeElement(pel)
+						mergeElement(pel)
 						//删除被合并的元素
 						const index = nel.parent.children.findIndex(item => {
 							return nel.isEqual(item)
@@ -351,9 +349,8 @@ class AlexEditor {
 						}
 					}
 				}
-				return ele
 			}
-			return mergeElement(element)
+			mergeElement(element)
 		},
 		//子元素和父元素合并策略
 		element => {
@@ -400,14 +397,12 @@ class AlexEditor {
 			if (element.hasChildren() && element.children.length == 1 && canMerge(element, element.children[0])) {
 				merge(element, element.children[0])
 			}
-			return element
 		},
 		//自定义元素格式化规则
 		element => {
 			if (typeof this.renderRules == 'function') {
-				element = this.renderRules.apply(this, [element])
+				this.renderRules.apply(this, [element])
 			}
-			return element
 		},
 		//光标所在元素为空元素的情况下重新设置光标
 		element => {
@@ -421,7 +416,6 @@ class AlexEditor {
 					this.__setRecentlyPoint(this.range.focus)
 				}
 			}
-			return element
 		}
 	]
 	//初始化stack
@@ -829,7 +823,7 @@ class AlexEditor {
 		}
 	}
 	//格式化单个元素
-	__formatElement(ele) {
+	formatElement(ele) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -837,50 +831,62 @@ class AlexEditor {
 		const format = (element, fn) => {
 			//从子孙元素开始格式化
 			if (element.hasChildren()) {
-				element.children = element.children.map(item => {
-					return format(item, fn)
-				})
+				let index = 0
+				//遍历子元素
+				while (index < element.children.length) {
+					let el = element.children[index]
+					//对该子元素进行格式化处理
+					format(el, fn)
+					//获取格式化后的元素序列
+					const newIndex = element.children.findIndex(item => {
+						return el.isEqual(item)
+					})
+					//向后格式化
+					index = newIndex + 1
+				}
 			}
-			//格式化自身后返回
-			return fn(element)
+			//格式化自身
+			fn(element)
 		}
 		//移除子孙元素中的空元素
 		const removeEmptyElement = element => {
 			if (element.hasChildren()) {
 				element.children.forEach(item => {
 					if (!item.isEmpty()) {
-						item = removeEmptyElement(item)
+						removeEmptyElement(item)
 					}
 				})
 				element.children = element.children.filter(item => {
 					return !item.isEmpty()
 				})
 			}
-			return element
 		}
 		//格式化
 		this.__formatUnchangeableRules.forEach(fn => {
-			ele = format(ele, fn)
+			format(ele, fn)
 		})
-		//移除所有的空元素
-		ele = removeEmptyElement(ele)
-		return ele
+		//移除该元素下所有的空元素
+		removeEmptyElement(ele)
 	}
 	//格式化stack
 	formatElementStack() {
-		this.stack = this.stack
-			.map(ele => {
-				//转为块元素
-				if (!ele.isBlock()) {
-					ele.convertToBlock()
-				}
-				ele = this.__formatElement(ele)
-				return ele
+		let index = 0
+		while (index < this.stack.length) {
+			const el = this.stack[index]
+			//转为块元素
+			if (!el.isBlock()) {
+				el.convertToBlock()
+			}
+			this.formatElement(el)
+			const newIndex = this.stack.findIndex(item => {
+				return el.isEqual(item)
 			})
-			.filter(ele => {
-				//移除根部的空元素
-				return !ele.isEmpty()
-			})
+			index = newIndex + 1
+		}
+		this.stack = this.stack.filter(ele => {
+			//移除根部的空元素
+			return !ele.isEmpty()
+		})
 	}
 	//根据光标位置删除编辑器内容
 	delete() {
@@ -1073,8 +1079,6 @@ class AlexEditor {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
-		//先进行格式化处理
-		ele = this.__formatElement(ele)
 		//如果是空元素则不处理
 		if (ele.isEmpty()) {
 			return
