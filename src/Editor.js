@@ -485,10 +485,25 @@ class AlexEditor {
 			this.range.anchor.element.parent.children.splice(index, 1)
 			//如果所在块元素为空
 			if (anchorBlock.isEmpty()) {
-				//如果删除的是换行符并且换行符前面还有可以获取焦点的元素，则更新焦点位置到前一个可获取焦点的元素
-				if (this.range.anchor.element.isBreak() && previousElement) {
-					this.range.anchor.moveToEnd(previousElement)
-					this.range.focus.moveToEnd(previousElement)
+				//如果删除的是换行符
+				if (this.range.anchor.element.isBreak()) {
+					//如果换行符前面还有可以获取焦点的元素，则更新焦点位置到前一个可获取焦点的元素
+					if (previousElement) {
+						this.range.anchor.moveToEnd(previousElement)
+						this.range.focus.moveToEnd(previousElement)
+					}
+					//否则删除此块元素并重新创建一个段落
+					else {
+						const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_NODE, null, null, null)
+						const breakEl = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEl, paragraph)
+						this.addElementBefore(paragraph, anchorBlock)
+						//删除该块元素
+						anchorBlock.toEmpty()
+						//移动起点和终点到新的段落
+						this.range.anchor.moveToEnd(paragraph)
+						this.range.focus.moveToEnd(paragraph)
+					}
 				}
 				//否则创建换行符
 				else {
@@ -893,6 +908,18 @@ class AlexEditor {
 						this.range.anchor.moveToEnd(previousElement)
 						this.range.focus.moveToEnd(previousElement)
 					}
+				}
+				//前一个可获取焦点的元素不存在，则把该元素删掉重新创建段落
+				else {
+					const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_NODE, null, null, null)
+					const breakEl = new AlexElement('closed', 'br', null, null, null)
+					this.addElementTo(breakEl, paragraph)
+					this.addElementBefore(paragraph, anchorBlock)
+					//删除该块元素
+					anchorBlock.toEmpty()
+					//移动起点和终点到新的段落
+					this.range.anchor.moveToEnd(paragraph)
+					this.range.focus.moveToEnd(paragraph)
 				}
 			}
 			//正常删除
