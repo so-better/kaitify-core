@@ -60,11 +60,11 @@ editor.rangeRender()
 
 ### 编辑器规范
 
-1.  编辑器一开始将 dom 节点转为 AlexElement 元素时，会直接读取 node 的属性、样式，并且会将只包含文本内容的 span 转为 text 元素，其余元素节点转为块元素。另外，如果文本内容没有被 span 包裹，会自动加上一个 span 元素进行包裹。随后内部会对每一个元素根据它的 parsedom 进行一些重置，比如 a 标签的 type 会被改为“inline”、parsedom 是 pre 的元素会设置 isPreStyle 为 true、parsedom 为 blockquote 的元素会设置 isPreStyle 为 true，并且在 marks 中设置{ style:"white-space\:pre-wrap" }、block 和 inline 元素的 styles 会被移除等等
+1.  元素默认类型和样式以及标记设定，例如 parsedom 为 span 的元素会被默认为 inline 元素，parsedom 为 img 的元素会被默认为 closed 元素
 2.  同级的元素如果有 block 类型元素，那么其他元素也会被强制转为 block 元素
 3.  块元素中换行符与其他元素不可能同时存在，另外如果存在多个换行符，也会置换为一个换行符。换行符仅仅在块元素没有其他子元素时作占位符使用
 4.  兄弟元素合并策略：相邻的空元素会被合并，相邻的文本元素如果样式和标记都一致也会被合并，相邻的行内元素如果标记和 parsedom 一致会被合并
-5.  父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只要一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
+5.  父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只有一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
 
 > 我们提供了一个 renderRulers 函数，来使得我们可以对元素设置自定义的规范，该函数作用于上述规范全部执行完毕后。
 
@@ -138,8 +138,8 @@ AlexElement 是 `alex-editor` 定义的一种特殊的数据结构，编辑器�
 
 -   type：元素类型，可取值"text"（文本元素）、"closed"（自闭合元素）、"inline"（行内元素）、"block"（块元素）
 -   parsedom：对应的需要渲染的真实节点名称（例："p"），如果是文本元素，此项为 null
--   marks：元素标记集合，对应需要渲染的真实节点的属性（如果是文本元素或者自闭合元素则不包括 style 属性，它们的样式由 styles 属性渲染）
--   styles：元素样式集合，对应需要渲染的真实节点的样式，如果是块元素和行内元素，此项为 null
+-   marks：元素标记集合，对应需要渲染的真实节点的属性（不包括 style 属性）
+-   styles：元素样式集合，对应需要渲染的真实节点的样式
 -   textContent：文本内容，非文本元素下此值为 null
 
 ```javascript
@@ -160,7 +160,6 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.parsedom` ：转换的真实节点名称
 -   `el.type` ：元素的类型
 -   `el.textContent` ：文本元素的文本值
--   `el.isPreStyle` ：仅块元素可设置此属性，设置此属性后表示该元素是代码块样式，它在换行、插入、删除和空格处理方面与一般的元素都不相同。如果是 pre 标签，则不需要设置样式，如果是其他标签，你还需要设置 marks 中的 style:"white-space\:pre-wrap"或者"white-space\:pre"
 -   `el.parent` ：父元素
 -   `el.children`：子元素数组
 -   `el.isText()` ：el 是否文本元素
@@ -174,6 +173,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isOnlyHasBreak()` ：el 的子元素是否只含有换行符`<br>`
+-   `el.isPreStyle()` ：el 是否为代码块样式的块元素，对于 styles 中含有"white-space":"pre" 或者 "white-space":"pre-wrap"样式的块元素，即认为是代码块样式元素。代码块样式的元素在空格、换行处理方面与一般元素不同
 -   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
 -   `el.hasMarks()` ：el 是否含有标记
 -   `el.hasStyles()` ：el 是否含有样式
