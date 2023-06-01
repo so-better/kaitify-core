@@ -95,7 +95,7 @@ const editor = new AlexEditor(el, {
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性）
--   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性和 class 属性）
+-   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性）
 -   `editor.addElementTo(childEle, parentEle, index)` ：将指定元素添加到父元素的子元素数组中
 -   `editor.addElementBefore(newEle, targetEle)` ：将指定元素添加到另一个元素前面
 -   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
