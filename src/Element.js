@@ -15,8 +15,6 @@ class AlexElement {
 		this.styles = styles
 		//文本值
 		this.textContent = textContent
-		//是否代码块样式
-		this.isPreStyle = false
 		//子元素
 		this.children = null
 		//父元素
@@ -96,6 +94,13 @@ class AlexElement {
 		}
 		return false
 	}
+	//是否代码块样式
+	isPreStyle() {
+		if (!this.isBlock()) {
+			return false
+		}
+		return this.hasStyles() && (this.styles['white-space'] == 'pre' || this.styles['white-space'] == 'pre-wrap')
+	}
 	//判断两个元素是否有包含关系
 	hasContains(element) {
 		if (!AlexElement.isElement(element)) {
@@ -115,13 +120,10 @@ class AlexElement {
 	}
 	//是否含有样式
 	hasStyles() {
-		if (this.isBlock() || this.isInline()) {
-			return false
-		}
 		if (!this.styles) {
 			return false
 		}
-		if (Dap.common.isObject) {
+		if (Dap.common.isObject(this.styles)) {
 			return !Dap.common.isEmptyObject(this.styles)
 		}
 		return false
@@ -228,50 +230,28 @@ class AlexElement {
 		if (this.isText()) {
 			el = document.createElement(AlexElement.TEXT_NODE)
 			el.innerHTML = this.textContent
-			//设置属性
-			if (this.hasMarks()) {
-				for (let key in this.marks) {
-					el.setAttribute(key, this.marks[key])
-				}
-			}
-			//设置样式
-			if (this.hasStyles()) {
-				for (let key in this.styles) {
-					el.style.setProperty(key, this.styles[key])
-				}
-			}
 		}
-		//自闭合元素
-		else if (this.isClosed()) {
-			el = document.createElement(this.parsedom)
-			//设置属性
-			if (this.hasMarks()) {
-				for (let key in this.marks) {
-					el.setAttribute(key, this.marks[key])
-				}
-			}
-			//设置样式
-			if (this.hasStyles()) {
-				for (let key in this.styles) {
-					el.style.setProperty(key, this.styles[key])
-				}
-			}
-		}
-		//块元素和行内元素
+		//非文本元素
 		else {
 			el = document.createElement(this.parsedom)
-			//设置属性
-			if (this.hasMarks()) {
-				for (let key in this.marks) {
-					el.setAttribute(key, this.marks[key])
-				}
-			}
 			//渲染子元素
 			if (this.hasChildren()) {
 				for (let child of this.children) {
 					child._renderElement()
 					el.appendChild(child._elm)
 				}
+			}
+		}
+		//设置属性
+		if (this.hasMarks()) {
+			for (let key in this.marks) {
+				el.setAttribute(key, this.marks[key])
+			}
+		}
+		//设置样式
+		if (this.hasStyles()) {
+			for (let key in this.styles) {
+				el.style.setProperty(key, this.styles[key])
 			}
 		}
 		//设置唯一key标记

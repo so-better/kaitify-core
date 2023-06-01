@@ -5,7 +5,7 @@ export default {
 		let o = {}
 		for (let attribute of el.attributes) {
 			//匹配事件、样式外的属性
-			if (!/(^on)/g.test(attribute.nodeName)) {
+			if (!/(^on)|(^style$)/g.test(attribute.nodeName)) {
 				o[attribute.nodeName] = attribute.nodeValue
 			}
 		}
@@ -43,33 +43,11 @@ export default {
 	isSpaceText(val) {
 		return /^[\uFEFF]+$/g.test(val)
 	},
-	//判断子节点是否都是文本
-	isAllTextNode(node) {
-		return Array.from(node.childNodes).every(el => {
-			return el.nodeType == 3
-		})
-	},
-	//判断子节点是否含有文本节点
-	hasTextNode(node) {
-		return Array.from(node.childNodes).some(el => {
-			return el.nodeType == 3
-		})
-	},
 	//深拷贝
 	clone(data) {
 		if (Dap.common.isObject(data) || Array.isArray(data)) {
 			return JSON.parse(JSON.stringify(data))
 		}
 		return data
-	},
-	//从marks中移除style属性后返回
-	getMarks(marks) {
-		let o = {}
-		for (let key in marks) {
-			if (key != 'style') {
-				o[key] = marks[key]
-			}
-		}
-		return o
 	}
 }

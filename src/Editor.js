@@ -117,63 +117,31 @@ class AlexEditor {
 				//默认的行内元素
 				else if (['span', 'a', 'label', 'code'].includes(element.parsedom)) {
 					element.type = 'inline'
-					element.styles = null
 				}
 				//不应当存在的元素
 				else if (['input', 'textarea', 'select', 'script', 'style', 'html', 'body', 'meta', 'link', 'head', 'title'].includes(element.parsedom)) {
-					element.type = 'inline'
-					element.parsedom = 'span'
-					element.children = null
-					element.styles = null
+					element.toEmpty()
 				}
 				//部分标签转为样式
 				else if (ElementToStyle[element.parsedom]) {
+					const styles = ElementToStyle[element.parsedom]
 					element.type = 'inline'
 					element.parsedom = 'span'
-					if (element.hasChildren()) {
-						element.children.forEach(item => {
-							if (item.isText()) {
-								if (item.hasStyles()) {
-									Object.assign(item.styles, Util.clone(ElementToStyle[element.parsedom]))
-								} else {
-									item.styles = Util.clone(ElementToStyle[element.parsedom])
-								}
-							}
-						})
-					}
-				}
-				//pre标签默认为代码块样式
-				else if (['pre'].includes(element.parsedom)) {
-					element.isPreStyle = true
-				}
-				//引用标签设置代码块样式
-				else if (['blockquote'].includes(element.parsedom)) {
-					element.isPreStyle = true
-					if (element.hasMarks()) {
-						Object.assign(element.marks, {
-							style: 'white-space:pre-wrap'
-						})
+					if (element.hasStyles()) {
+						Object.assign(element.styles, Util.clone(styles))
 					} else {
-						element.marks = {
-							style: 'white-space:pre-wrap'
-						}
+						element.styles = Util.clone(styles)
 					}
 				}
-			}
-			//块元素和行内元素移除styles
-			if (element.isBlock() || element.isInline()) {
-				element.styles = null
-			}
-			//自闭合元素和文本元素移除mark中的style属性
-			else if (element.isClosed() || element.isText()) {
-				if (element.hasMarks() && element.marks.hasOwnProperty('style')) {
-					let marks = {}
-					for (let key in element.marks) {
-						if (key != 'style') {
-							marks[key] = element.marks[key]
+				//部分标签设置代码块样式
+				else if (['blockquote', 'pre'].includes(element.parsedom)) {
+					if (element.hasStyles()) {
+						element.styles['white-space'] = element.parsedom == 'pre' ? 'pre' : 'pre-wrap'
+					} else {
+						element.styles = {
+							'white-space': element.parsedom == 'pre' ? 'pre' : 'pre-wrap'
 						}
 					}
-					element.marks = marks
 				}
 			}
 		},
@@ -251,7 +219,7 @@ class AlexEditor {
 						return pel.isEqualStyles(nel) && pel.isEqualMarks(nel)
 					}
 					if (pel.isInline() && nel.isInline()) {
-						return pel.parsedom == nel.parsedom && pel.isEqualMarks(nel)
+						return pel.parsedom == nel.parsedom && pel.isEqualMarks(nel) && pel.isEqualStyles(nel)
 					}
 					return false
 				}
@@ -372,19 +340,41 @@ class AlexEditor {
 				if (child.isText()) {
 					parent.type = 'text'
 					parent.parsedom = null
-					parent.styles = Util.clone(child.styles)
-					parent.marks = Util.clone(child.marks)
-					parent.textContent = child.textContent
-					parent.children = null
-				}
-				//子元素是行内元素或者块元素
-				else {
-					//如果子元素有marks
+					//如果子元素有标记
 					if (child.hasMarks()) {
 						if (parent.hasMarks()) {
 							Object.assign(parent.marks, Util.clone(child.marks))
 						} else {
 							parent.marks = Util.clone(child.marks)
+						}
+					}
+					//如果子元素有样式
+					if (child.hasStyles()) {
+						if (parent.hasStyles()) {
+							Object.assign(parent.styles, Util.clone(child.styles))
+						} else {
+							parent.styles = Util.clone(child.styles)
+						}
+					}
+					parent.textContent = child.textContent
+					parent.children = null
+				}
+				//子元素是行内元素或者块元素
+				else {
+					//如果子元素有标记
+					if (child.hasMarks()) {
+						if (parent.hasMarks()) {
+							Object.assign(parent.marks, Util.clone(child.marks))
+						} else {
+							parent.marks = Util.clone(child.marks)
+						}
+					}
+					//如果子元素有样式
+					if (child.hasStyles()) {
+						if (parent.hasStyles()) {
+							Object.assign(parent.styles, Util.clone(child.styles))
+						} else {
+							parent.styles = Util.clone(child.styles)
 						}
 					}
 					parent.children = [...child.children]
@@ -559,19 +549,19 @@ class AlexEditor {
 		const selection = window.getSelection()
 		if (selection.rangeCount) {
 			const range = selection.getRangeAt(0)
-			if (range.startContainer.isEqualNode(this.$el) || range.endContainer.isEqualNode(this.$el)) {
+			let anchorNode = range.startContainer
+			let focusNode = range.endContainer
+			//如果是文本节点
+			if (range.startContainer.nodeType == 3) {
+				anchorNode = range.startContainer.parentNode
+			}
+			if (range.endContainer.nodeType == 3) {
+				focusNode = range.endContainer.parentNode
+			}
+			if (anchorNode.isEqualNode(this.$el) || focusNode.isEqualNode(this.$el)) {
 				return
 			}
-			if (Dap.element.isContains(this.$el, range.startContainer) && Dap.element.isContains(this.$el, range.endContainer)) {
-				let anchorNode = range.startContainer
-				let focusNode = range.endContainer
-				//如果是文本节点
-				if (range.startContainer.nodeType == 3) {
-					anchorNode = range.startContainer.parentNode
-				}
-				if (range.endContainer.nodeType == 3) {
-					focusNode = range.endContainer.parentNode
-				}
+			if (Dap.element.isContains(this.$el, anchorNode) && Dap.element.isContains(this.$el, focusNode)) {
 				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
 				const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
 				const anchorEle = this.getElementByKey(anchorKey)
@@ -975,7 +965,7 @@ class AlexEditor {
 			//终点位置
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 			//在代码块中
-			if (anchorBlock.isPreStyle) {
+			if (anchorBlock.isPreStyle()) {
 				//焦点在代码块的终点位置
 				if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
 					this.insertText('\n\n')
@@ -990,7 +980,7 @@ class AlexEditor {
 				//焦点在当前块的起点位置
 				if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
 					//在该块之前插入一个新的段落，标签名称与上一个段落一致
-					const paragraph = new AlexElement('block', anchorBlock.parsedom, Util.clone(anchorBlock.marks), null, null)
+					const paragraph = new AlexElement('block', anchorBlock.parsedom, Util.clone(anchorBlock.marks), Util.clone(anchorBlock.styles), null)
 					const breakEle = new AlexElement('closed', 'br', null, null, null)
 					this.addElementTo(breakEle, paragraph)
 					this.addElementBefore(paragraph, anchorBlock)
@@ -1000,7 +990,7 @@ class AlexEditor {
 				//焦点在当前块的终点位置
 				else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
 					//在该块之后插入一个新的段落，标签名称与上一个段落一致
-					const paragraph = new AlexElement('block', anchorBlock.parsedom, Util.clone(anchorBlock.marks), null, null)
+					const paragraph = new AlexElement('block', anchorBlock.parsedom, Util.clone(anchorBlock.marks), Util.clone(anchorBlock.styles), null)
 					const breakEle = new AlexElement('closed', 'br', null, null, null)
 					this.addElementTo(breakEle, paragraph)
 					this.addElementAfter(paragraph, anchorBlock)
@@ -1042,7 +1032,7 @@ class AlexEditor {
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//不是代码块内则对空格进行处理
-			if (!this.range.anchor.element.getBlock().isPreStyle) {
+			if (!this.range.anchor.element.getBlock().isPreStyle()) {
 				data = data.replace(/\s+/g, () => {
 					const span = document.createElement('span')
 					span.innerHTML = '&nbsp;'
@@ -1231,43 +1221,24 @@ class AlexEditor {
 	}
 	//将dom节点转为元素
 	parseNode(node) {
-		if (!Dap.element.isElement(node)) {
-			throw new Error('The argument must be an element node')
+		if (!(node instanceof Node)) {
+			throw new Error('The argument must be an node')
 		}
+		if (!(node.nodeType == 1 || node.nodeType == 3)) {
+			throw new Error('The argument must be an element node or text node')
+		}
+		//文本节点
+		if (node.nodeType == 3) {
+			return new AlexElement('text', null, null, null, node.nodeValue)
+		}
+		//元素节点
 		const marks = Util.getAttributes(node)
 		const styles = Util.getStyles(node)
 		const parsedom = node.nodeName.toLocaleLowerCase()
-		//如果子节点都是文本节点
-		if (Util.isAllTextNode(node)) {
-			//节点名称是文本标签名则直接转为文本元素
-			if (parsedom == AlexElement.TEXT_NODE) {
-				return new AlexElement('text', null, Util.getMarks(marks), styles, node.innerHTML)
-			}
-			//该节点的标签名不是文本标签名则进行处理
-			const textNode = document.createElement(AlexElement.TEXT_NODE)
-			textNode.innerHTML = node.innerHTML
-			node.innerHTML = ''
-			node.appendChild(textNode)
-		}
-		//子节点含有文本节点，则给文本添加文本元素标签
-		else if (Util.hasTextNode(node)) {
-			const childNodes = Array.from(node.childNodes)
-			node.innerHTML = ''
-			childNodes.forEach(item => {
-				if (item.nodeType == 3) {
-					const textNode = document.createElement(AlexElement.TEXT_NODE)
-					textNode.innerHTML = item.textContent
-					node.appendChild(textNode)
-				} else {
-					node.appendChild(item)
-				}
-			})
-		}
-
 		//默认定义为块元素
 		let element = new AlexElement('block', parsedom, marks, styles, null)
 		Array.from(node.childNodes).forEach(childNode => {
-			if (Dap.element.isElement(childNode)) {
+			if (childNode.nodeType == 1 || childNode.nodeType == 3) {
 				const childEle = this.parseNode(childNode)
 				childEle.parent = element
 				if (element.hasChildren()) {
