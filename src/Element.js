@@ -248,7 +248,9 @@ class AlexElement {
 		//设置属性
 		if (this.hasMarks()) {
 			for (let key in this.marks) {
-				el.setAttribute(key, this.marks[key])
+				if (!/(^on)|(^style$)/g.test(key)) {
+					el.setAttribute(key, this.marks[key])
+				}
 			}
 		}
 		//设置样式
