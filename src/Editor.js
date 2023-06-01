@@ -492,7 +492,7 @@ class AlexEditor {
 						this.range.anchor.moveToEnd(previousElement)
 						this.range.focus.moveToEnd(previousElement)
 					}
-					//否则删除此块元素并重新创建一个段落
+					//否则创建段落并删除当前块元素
 					else {
 						const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_NODE, null, null, null)
 						const breakEl = new AlexElement('closed', 'br', null, null, null)
@@ -909,17 +909,15 @@ class AlexEditor {
 						this.range.focus.moveToEnd(previousElement)
 					}
 				}
-				//前一个可获取焦点的元素不存在，则把该元素删掉重新创建段落
+				//前一个可获取焦点的元素不存在
 				else {
+					//否则创建一个新的段落插入到当前块之前
 					const paragraph = new AlexElement('block', AlexElement.PARAGRAPH_NODE, null, null, null)
 					const breakEl = new AlexElement('closed', 'br', null, null, null)
 					this.addElementTo(breakEl, paragraph)
 					this.addElementBefore(paragraph, anchorBlock)
-					//删除该块元素
-					anchorBlock.toEmpty()
-					//移动起点和终点到新的段落
-					this.range.anchor.moveToEnd(paragraph)
-					this.range.focus.moveToEnd(paragraph)
+					//合并当前块和新建的段落
+					this.mergeBlockElement(anchorBlock)
 				}
 			}
 			//正常删除
