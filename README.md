@@ -173,7 +173,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isOnlyHasBreak()` ：el 的子元素是否只含有换行符`<br>`
--   `el.isPreStyle()` ：el 是否为代码块样式的块元素，对于 styles 中含有"white-space":"pre" 或者 "white-space":"pre-wrap"样式的块元素，即认为是代码块样式元素。代码块样式的元素在空格、换行处理方面与一般元素不同
+-   `el.isPreStyle()` ：el 是否为代码块样式的块元素，对于 styles 中含有"white-space":"pre" 或者 "white-space":"pre-wrap"样式的块元素，即认为是代码块样式元素（pre 标签默认就是代码块样式）。代码块样式的元素在空格、换行处理方面与一般元素不同
 -   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
 -   `el.hasMarks()` ：el 是否含有标记
 -   `el.hasStyles()` ：el 是否含有样式

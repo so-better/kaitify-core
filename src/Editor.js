@@ -133,16 +133,6 @@ class AlexEditor {
 						element.styles = Util.clone(styles)
 					}
 				}
-				//部分标签设置代码块样式
-				else if (['blockquote', 'pre'].includes(element.parsedom)) {
-					if (element.hasStyles()) {
-						element.styles['white-space'] = element.parsedom == 'pre' ? 'pre' : 'pre-wrap'
-					} else {
-						element.styles = {
-							'white-space': element.parsedom == 'pre' ? 'pre' : 'pre-wrap'
-						}
-					}
-				}
 			}
 		},
 		//其他类型元素与block元素在同一父元素下不能共存
@@ -966,12 +956,27 @@ class AlexEditor {
 			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
 			//在代码块中
 			if (anchorBlock.isPreStyle()) {
-				//焦点在代码块的终点位置
-				if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+				//起点在换行符上
+				if (this.range.anchor.element.isBreak()) {
 					this.insertText('\n\n')
 					this.range.anchor.offset -= 1
 					this.range.focus.offset -= 1
-				} else {
+				}
+				//起点在代码块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && anchorBlock.isContains(nextElement))) {
+					//终点位置的字符是换行符
+					if (this.range.anchor.element.isText() && this.range.anchor.element.textContent[this.range.anchor.offset - 1] == '\n') {
+						this.insertText('\n')
+					}
+					//终点位置的字符不是换行符
+					else {
+						this.insertText('\n\n')
+						this.range.anchor.offset -= 1
+						this.range.focus.offset -= 1
+					}
+				}
+				//普通的换行
+				else {
 					this.insertText('\n')
 				}
 			}

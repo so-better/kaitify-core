@@ -99,6 +99,9 @@ class AlexElement {
 		if (!this.isBlock()) {
 			return false
 		}
+		if (this.parsedom == 'pre') {
+			return true
+		}
 		return this.hasStyles() && (this.styles['white-space'] == 'pre' || this.styles['white-space'] == 'pre-wrap')
 	}
 	//判断两个元素是否有包含关系
