@@ -227,7 +227,7 @@ class AlexElement {
 		return false
 	}
 	//渲染成真实dom
-	_renderElement() {
+	__renderElement() {
 		let el = null
 		//文本元素
 		if (this.isText()) {
@@ -240,7 +240,7 @@ class AlexElement {
 			//渲染子元素
 			if (this.hasChildren()) {
 				for (let child of this.children) {
-					child._renderElement()
+					child.__renderElement()
 					el.appendChild(child._elm)
 				}
 			}

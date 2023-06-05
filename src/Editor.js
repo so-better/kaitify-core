@@ -1158,7 +1158,7 @@ class AlexEditor {
 	domRender(unPushHistory = false) {
 		this.$el.innerHTML = ''
 		this.stack.forEach(element => {
-			element._renderElement()
+			element.__renderElement()
 			this.$el.appendChild(element._elm)
 		})
 		this._oldValue = this.value
