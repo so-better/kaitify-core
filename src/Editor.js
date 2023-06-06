@@ -133,6 +133,10 @@ class AlexEditor {
 						element.styles = Util.clone(styles)
 					}
 				}
+				//特殊删除行为的元素
+				else if (['td', 'th'].includes(element.parsedom)) {
+					element.deletion = 'allow'
+				}
 			}
 		},
 		//其他类型元素与block元素在同一父元素下不能共存
@@ -1080,6 +1084,7 @@ class AlexEditor {
 		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果插入的是块元素
 			if (ele.isBlock()) {
 				//前一个可以获取焦点的元素
 				const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
@@ -1093,8 +1098,11 @@ class AlexEditor {
 				if (anchorBlock.isOnlyHasBreak()) {
 					//在该块之前插入
 					this.addElementBefore(ele, anchorBlock)
-					//然后把当前块与前一个进行合并
-					this.mergeBlockElement(anchorBlock)
+					//删除当前块
+					anchorBlock.toEmpty()
+					//重置光标
+					this.range.anchor.moveToEnd(ele)
+					this.range.focus.moveToEnd(ele)
 				}
 				//焦点在当前块的起点位置
 				else if (this.range.anchor.offset == 0 && !(previousElement && anchorBlock.isContains(previousElement))) {
@@ -1128,7 +1136,9 @@ class AlexEditor {
 					//在新的块之前插入
 					this.addElementBefore(ele, newBlock)
 				}
-			} else {
+			}
+			//插入的不是块元素
+			else {
 				//是文本
 				if (this.range.anchor.element.isText()) {
 					let val = this.range.anchor.element.textContent
@@ -1331,21 +1341,6 @@ class AlexEditor {
 				return targetEle.isEqual(item)
 			})
 			this.addElementTo(newEle, targetEle.parent, index + 1)
-		}
-	}
-	//将指定元素从元素数组中移除
-	removeElement(ele) {
-		if (ele.isRoot()) {
-			const index = this.stack.findIndex(item => {
-				return ele.isEqual(item)
-			})
-			this.stack.splice(index, 1)
-		} else {
-			const index = ele.parent.children.findIndex(item => {
-				return ele.isEqual(item)
-			})
-			ele.parent.children.splice(index, 1)
-			ele.parent = null
 		}
 	}
 	//根据key查询元素

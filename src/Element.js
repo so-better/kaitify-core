@@ -15,6 +15,8 @@ class AlexElement {
 		this.styles = styles
 		//文本值
 		this.textContent = textContent
+		//块元素的删除行为，default(默认行为：即块元素删空后会清除该块元素)/allow(块元素删空后不会清除该块元素)
+		this.deletion = 'default'
 		//子元素
 		this.children = null
 		//父元素
@@ -103,6 +105,16 @@ class AlexElement {
 			return true
 		}
 		return this.hasStyles() && (this.styles['white-space'] == 'pre' || this.styles['white-space'] == 'pre-wrap')
+	}
+	//是否不可编辑的
+	isUneditable() {
+		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
+			return true
+		}
+		if (this.isRoot()) {
+			return false
+		}
+		return this.parent.isUneditable()
 	}
 	//判断两个元素是否有包含关系
 	hasContains(element) {
