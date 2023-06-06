@@ -238,6 +238,16 @@ class AlexElement {
 		}
 		return false
 	}
+	//获取设置了不可编辑标记的元素
+	getUneditableElement() {
+		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
+			return this
+		}
+		if (this.isRoot()) {
+			return null
+		}
+		return this.parent.getUneditableElement()
+	}
 	//渲染成真实dom
 	__renderElement() {
 		let el = null
