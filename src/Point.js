@@ -1,27 +1,10 @@
 import AlexElement from './Element'
 class AlexPoint {
 	constructor(element, offset) {
+		//可以是任意元素
 		this.element = element
+		//如果是文本元素则表示光标在文本值中的序列，如果是其他元素，则只会是0或1
 		this.offset = offset
-		this._init()
-	}
-
-	//初始化
-	_init() {
-		//如果是文本元素
-		if (this.element.isText()) {
-			return
-		}
-		//如果是块元素或者行内元素
-		if (this.element.hasChildren()) {
-			if (this.element.children[this.offset]) {
-				this.element = this.element.children[this.offset]
-				this.offset = 0
-			} else {
-				this.element = this.element.children[this.offset - 1]
-				this.offset = 1
-			}
-		}
 	}
 
 	//是否Point类型数据
@@ -55,18 +38,10 @@ class AlexPoint {
 			this.element = element
 			this.offset = element.textContent.length
 		}
-		//如果是自闭合元素
-		else if (element.isClosed()) {
+		//其他元素
+		else {
 			this.element = element
 			this.offset = 1
-		}
-		//如果含有子元素
-		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty()
-			})
-			const length = flatElements.length
-			this.moveToEnd(flatElements[length - 1])
 		}
 	}
 
@@ -83,22 +58,10 @@ class AlexPoint {
 			this.element = element.getUneditableElement()
 			this.offset = 0
 		}
-		//文本元素
-		else if (element.isText()) {
+		//其他
+		else {
 			this.element = element
 			this.offset = 0
-		}
-		//自闭合元素
-		else if (element.isClosed()) {
-			this.element = element
-			this.offset = 0
-		}
-		//如果含有子元素
-		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty()
-			})
-			this.moveToStart(flatElements[0])
 		}
 	}
 }

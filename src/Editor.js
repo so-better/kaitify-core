@@ -441,25 +441,39 @@ class AlexEditor {
 		const selection = window.getSelection()
 		if (selection.rangeCount) {
 			const range = selection.getRangeAt(0)
-			let anchorNode = range.startContainer
-			let focusNode = range.endContainer
-			//如果是文本节点
+			let anchorNode = null
+			let focusNode = null
+			let anchorOffset = null
+			let focusOffset = null
+			//如果起点所在是文本节点
 			if (range.startContainer.nodeType == 3) {
 				anchorNode = range.startContainer.parentNode
+				anchorOffset = range.startOffset
 			}
+			//如果起点所在是元素节点
+			else if (range.startContainer.nodeType == 1) {
+				const childNodes = Array.from(range.startContainer.childNodes)
+				anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
+				anchorOffset = childNodes[range.startOffset] ? 0 : 1
+			}
+			//如果终点所在是文本节点
 			if (range.endContainer.nodeType == 3) {
 				focusNode = range.endContainer.parentNode
+				focusOffset = range.endOffset
 			}
-			if (anchorNode.isEqualNode(this.$el) || focusNode.isEqualNode(this.$el)) {
-				return
+			//如果终点所在是元素节点
+			else if (range.endContainer.nodeType == 1) {
+				const childNodes = Array.from(range.endContainer.childNodes)
+				focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
+				focusOffset = childNodes[range.endOffset] ? 0 : 1
 			}
 			if (Dap.element.isContains(this.$el, anchorNode) && Dap.element.isContains(this.$el, focusNode)) {
 				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
 				const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
 				const anchorEle = this.getElementByKey(anchorKey)
 				const focusEle = this.getElementByKey(focusKey)
-				const anchor = new AlexPoint(anchorEle, range.startOffset)
-				const focus = new AlexPoint(focusEle, range.endOffset)
+				const anchor = new AlexPoint(anchorEle, anchorOffset)
+				const focus = new AlexPoint(focusEle, focusOffset)
 				this.range = new AlexRange(anchor, focus)
 				this.emit('rangeUpdate', this.range)
 			}
@@ -1157,39 +1171,35 @@ class AlexEditor {
 					const index = this.stack.findIndex(item => {
 						return ele.isEqual(item)
 					})
-					if (point.offset == 0) {
-						offset = index
-					} else {
-						offset = index + 1
-					}
+					offset = point.offset + index
 				} else {
 					node = ele.parent._elm
 					const index = ele.parent.children.findIndex(item => {
 						return ele.isEqual(item)
 					})
-					if (point.offset == 0) {
-						offset = index
-					} else {
-						offset = index + 1
-					}
-				}
-			}
-			//如果是自闭合元素
-			else if (point.element.isClosed()) {
-				node = point.element.parent._elm
-				const index = point.element.parent.children.findIndex(item => {
-					return point.element.isEqual(item)
-				})
-				if (point.offset == 0) {
-					offset = index
-				} else {
-					offset = index + 1
+					offset = point.offset + index
 				}
 			}
 			//如果是文本元素
-			else {
+			else if (point.element.isText()) {
 				node = point.element._elm.childNodes[0]
 				offset = point.offset
+			}
+			//其他元素
+			else {
+				if (point.element.isRoot()) {
+					node = this.$el
+					const index = this.stack.findIndex(item => {
+						return point.element.isEqual(item)
+					})
+					offset = point.offset + index
+				} else {
+					node = point.element.parent._elm
+					const index = point.element.parent.children.findIndex(item => {
+						return point.element.isEqual(item)
+					})
+					offset = point.offset + index
+				}
 			}
 			return { node, offset }
 		}
