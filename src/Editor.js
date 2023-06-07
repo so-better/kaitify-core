@@ -40,11 +40,11 @@ class AlexEditor {
 		//创建历史记录
 		this.history = new AlexHistory()
 		//事件集合
-		this._events = {}
+		this.__events = {}
 		//旧的文本内容
-		this._oldValue = options.value
+		this.__oldValue = options.value
 		//是否正在输入中文
-		this._isInputChinese = false
+		this.__isInputChinese = false
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
 		//格式化元素数组
@@ -115,15 +115,15 @@ class AlexEditor {
 					element.children = null
 				}
 				//默认的行内元素
-				else if (['span', 'a', 'label', 'code'].includes(element.parsedom)) {
+				if (['span', 'a', 'label', 'code'].includes(element.parsedom)) {
 					element.type = 'inline'
 				}
 				//不应当存在的元素
-				else if (['input', 'textarea', 'select', 'script', 'style', 'html', 'body', 'meta', 'link', 'head', 'title'].includes(element.parsedom)) {
+				if (['input', 'textarea', 'select', 'script', 'style', 'html', 'body', 'meta', 'link', 'head', 'title'].includes(element.parsedom)) {
 					element.toEmpty()
 				}
 				//部分标签转为样式
-				else if (ElementToStyle[element.parsedom]) {
+				if (ElementToStyle[element.parsedom]) {
 					const styles = ElementToStyle[element.parsedom]
 					element.type = 'inline'
 					element.parsedom = 'span'
@@ -134,7 +134,7 @@ class AlexEditor {
 					}
 				}
 				//特殊删除行为的元素
-				else if (['tr', 'td', 'th'].includes(element.parsedom)) {
+				if (['td', 'th'].includes(element.parsedom)) {
 					element.deletion = 'allow'
 				}
 			}
@@ -379,10 +379,12 @@ class AlexEditor {
 							parent.styles = Util.clone(child.styles)
 						}
 					}
-					parent.children = [...child.children]
-					parent.children.forEach(item => {
-						item.parent = parent
-					})
+					if (child.hasChildren()) {
+						parent.children = [...child.children]
+						parent.children.forEach(item => {
+							item.parent = parent
+						})
+					}
 				}
 			}
 			//存在子元素并且子元素只有一个且父子元素可以合并
@@ -433,7 +435,7 @@ class AlexEditor {
 			return
 		}
 		//如果是中文输入则不更新range
-		if (this._isInputChinese) {
+		if (this.__isInputChinese) {
 			return
 		}
 		const selection = window.getSelection()
@@ -507,10 +509,10 @@ class AlexEditor {
 		}
 		e.preventDefault()
 		if (e.type == 'compositionstart') {
-			this._isInputChinese = true
+			this.__isInputChinese = true
 		}
 		if (e.type == 'compositionend') {
-			this._isInputChinese = false
+			this.__isInputChinese = false
 			//在中文输入结束后插入数据
 			if (e.data) {
 				this.insertText(e.data)
@@ -708,7 +710,7 @@ class AlexEditor {
 			throw new Error('The argument must be an AlexElement instance')
 		}
 		//格式化
-		const format = (element, fn) => {
+		const format = element => {
 			//从子孙元素开始格式化
 			if (element.hasChildren()) {
 				let index = 0
@@ -716,7 +718,7 @@ class AlexEditor {
 				while (index < element.children.length) {
 					let el = element.children[index]
 					//对该子元素进行格式化处理
-					format(el, fn)
+					format(el)
 					//获取格式化后的元素序列
 					const newIndex = element.children.findIndex(item => {
 						return el.isEqual(item)
@@ -726,7 +728,9 @@ class AlexEditor {
 				}
 			}
 			//格式化自身
-			fn(element)
+			this.__formatUnchangeableRules.forEach(fn => {
+				fn(element)
+			})
 		}
 		//移除子孙元素中的空元素
 		const removeEmptyElement = element => {
@@ -742,9 +746,7 @@ class AlexEditor {
 			}
 		}
 		//格式化
-		this.__formatUnchangeableRules.forEach(fn => {
-			format(ele, fn)
-		})
+		format(ele)
 		//移除该元素下所有的空元素
 		removeEmptyElement(ele)
 	}
@@ -1128,12 +1130,12 @@ class AlexEditor {
 			element.__renderElement()
 			this.$el.appendChild(element._elm)
 		})
-		this._oldValue = this.value
+		this.__oldValue = this.value
 		this.value = this.$el.innerHTML
 		//值有变化
-		if (this._oldValue != this.value) {
+		if (this.__oldValue != this.value) {
 			//触发change事件
-			this.emit('change', this.value, this._oldValue)
+			this.emit('change', this.value, this.__oldValue)
 			//unPushHistory如果是true则表示不加入历史记录中
 			if (!unPushHistory) {
 				//将本次的stack和range推入历史栈中
@@ -1973,8 +1975,8 @@ class AlexEditor {
 	}
 	//触发自定义事件
 	emit(eventName, ...value) {
-		if (Array.isArray(this._events[eventName])) {
-			this._events[eventName].forEach(fn => {
+		if (Array.isArray(this.__events[eventName])) {
+			this.__events[eventName].forEach(fn => {
 				fn.apply(this, [...value])
 			})
 			return true
@@ -1983,10 +1985,10 @@ class AlexEditor {
 	}
 	//监听自定义事件
 	on(eventName, eventHandle) {
-		if (!this._events[eventName]) {
-			this._events[eventName] = []
+		if (!this.__events[eventName]) {
+			this.__events[eventName] = []
 		}
-		this._events[eventName].push(eventHandle)
+		this.__events[eventName].push(eventHandle)
 	}
 	//销毁编辑器的方法
 	destroy() {
