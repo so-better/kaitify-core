@@ -8,7 +8,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: '<p>十年生<b><span>死两茫茫</span><span>死两茫茫</span></b><span contenteditable="false">，不思量，自难忘。</span></p><ol><li>十年生<b><span contenteditable="false">死两茫茫</span><span>死两茫茫</span></b><span contenteditable="false">，不思量，自难忘。</span></li><li>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</li><li>纵使相逢应不识，尘满面，鬓如霜。<span style="text-decoration-line:underline"><img src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png" style="width:100px" /></span></li></ol><table><tr><th>姓名</th><th>年龄</th><th>性别</th><th>得分</th></tr><tr><td>张三</td><td>28</td><td>男</td><td>98</td></tr></table>',
+			value: '<p>十年生<b><span>死两茫茫</span><span>死两茫茫</span></b><span contenteditable="false">，不思量，自难忘。</span></p><p>十年生<b><span>死两茫茫</span><span>死两茫茫</span></b><span contenteditable="false">，不思量，自难忘。</span></p><ol><li>十年生<b><span contenteditable="false">死两茫茫</span><span>死两茫茫</span></b><span contenteditable="false">，不思量，自难忘。</span></li><li>千里孤坟，<span style="font-weight:bold;color:#798af1">无处话凄凉</span>。</li><li>纵使相逢应不识，尘满面，鬓如霜。<span style="text-decoration-line:underline"><img src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png" style="width:100px" /></span></li></ol><table><tr><th>姓名</th><th>年龄</th><th>性别</th><th>得分</th></tr><tr><td>张三</td><td>28</td><td>男</td><td>98</td></tr></table>',
 			editor: null
 		}
 	},

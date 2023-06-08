@@ -868,6 +868,33 @@ class AlexEditor {
 			}
 			//如果光标不在内部块元素里
 			else {
+				//如果光标在所在元素的开始处
+				if (this.range.anchor.offset == 0) {
+					//前一个可设置光标的元素存在
+					if (previousElement) {
+						//如果光标不在根级块元素的开始处
+						if (block.isContains(previousElement)) {
+							this.range.anchor.moveToEnd(previousElement)
+							this.range.focus.moveToEnd(previousElement)
+							this.delete()
+						}
+						//如果光标在根级块元素的开始处
+						else {
+							//如果前一个可设置光标的元素在内部块内
+							if (previousElement.getInblock()) {
+								this.emit('deleteExtend', block, previousElement, 'start')
+							}
+							//如果前一个可设置光标的元素不在内部块内，则进行合并操作
+							else {
+							}
+						}
+					}
+					//前一个可设置光标的元素不存在
+					else {
+						//此时光标不仅在根级块的开始处，还是在编辑器的开始处
+						this.emit('deleteExtend', block, previousElement, 'start')
+					}
+				}
 			}
 		}
 	}
