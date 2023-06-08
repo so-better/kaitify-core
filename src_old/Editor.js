@@ -371,7 +371,180 @@ class AlexEditor {
 		//将指定的块元素设为空元素
 		ele.toEmpty()
 	}
+	//获取选区之间的元素
+	getElementsByRange(includes = false, flat = false) {
+		//如果起点和终点在一个地方则返回空数组
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			return []
+		}
+		let elements = []
+		//如果起点和终点是一个元素内
+		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
+			//如果包含起点和终点元素
+			if (includes) {
+				//文本
+				if (this.range.anchor.element.isText()) {
+					//起点在文本开始处并且终点在文本结尾处
+					if (this.range.anchor.offset == 0 && this.range.focus.offset == this.range.anchor.element.textContent.length) {
+						elements = [this.range.anchor.element]
+					}
+					//起点在文本开始处且终点不在文本结尾处
+					else if (this.range.anchor.offset == 0) {
+						let val = this.range.anchor.element.textContent
+						let newFocus = this.range.anchor.element.clone()
+						this.range.anchor.element.textContent = val.substring(0, this.range.focus.offset)
+						newFocus.textContent = val.substring(this.range.focus.offset)
+						this.addElementAfter(newFocus, this.range.anchor.element)
+						elements = [this.range.anchor.element]
+					}
+					//起点不在文本开始处，但是终点在文本结尾处
+					else if (this.range.focus.offset == this.range.anchor.element.textContent.length) {
+						let newFocus = this.range.anchor.element.clone()
+						let val = this.range.anchor.element.textContent
+						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+						newFocus.textContent = val.substring(this.range.anchor.offset)
+						this.addElementAfter(newFocus, this.range.anchor.element)
+						elements = [newFocus]
+						this.range.anchor.moveToStart(newFocus)
+						this.range.focus.moveToEnd(newFocus)
+					}
+					//起点不在文本开始处且终点不在文本结尾处
+					else {
+						let newEl = this.range.anchor.element.clone()
+						let newFocus = this.range.anchor.element.clone()
+						let val = this.range.anchor.element.textContent
+						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+						newEl.textContent = val.substring(this.range.anchor.offset, this.range.focus.offset)
+						newFocus.textContent = val.substring(this.range.focus.offset)
+						this.addElementAfter(newEl, this.range.anchor.element)
+						this.addElementAfter(newFocus, newEl)
+						this.range.anchor.moveToStart(newEl)
+						this.range.focus.moveToEnd(newEl)
+						elements = [newEl]
+					}
+				}
+				//自闭合元素
+				else {
+					elements = [this.range.anchor.element]
+				}
+			}
+		}
+		//起点和终点不在一个元素内
+		else {
+			const flatElements = AlexElement.flatElements(this.stack)
+			const anchorIndex = flatElements.findIndex(item => {
+				return this.range.anchor.element.isEqual(item)
+			})
+			const focusIndex = flatElements.findIndex(item => {
+				return this.range.focus.element.isEqual(item)
+			})
+			//获取选区之间的元素
+			for (let i = anchorIndex + 1; i < focusIndex; i++) {
+				if (!flatElements[i].hasContains(this.range.anchor.element) && !flatElements[i].hasContains(this.range.focus.element)) {
+					elements.push(flatElements[i])
+				}
+			}
+			if (includes) {
+				//起点是文本
+				if (this.range.anchor.element.isText()) {
+					//在文本最前面
+					if (this.range.anchor.offset == 0) {
+						elements.unshift(this.range.anchor.element)
+					}
+					//不在文本最后面
+					else if (this.range.anchor.offset < this.range.anchor.element.textContent.length) {
+						let newEl = this.range.anchor.element.clone()
+						let val = this.range.anchor.element.textContent
+						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+						newEl.textContent = val.substring(this.range.anchor.offset)
+						this.addElementAfter(newEl, this.range.anchor.element)
+						elements.unshift(newEl)
+						this.range.anchor.moveToStart(newEl)
+					}
+				}
+				//起点是自闭合元素且在自闭合元素前面
+				else if (this.range.anchor.offset == 0) {
+					elements.unshift(this.range.anchor.element)
+				}
 
+				//终点是文本
+				if (this.range.focus.element.isText()) {
+					//在文本最后面
+					if (this.range.focus.offset == this.range.focus.element.textContent.length) {
+						elements.push(this.range.focus.element)
+					}
+					//不在文本最前面
+					else if (this.range.focus.offset > 0) {
+						let newEl = this.range.focus.element.clone()
+						let val = this.range.focus.element.textContent
+						this.range.focus.element.textContent = val.substring(0, this.range.focus.offset)
+						newEl.textContent = val.substring(this.range.focus.offset)
+						this.addElementAfter(newEl, this.range.focus.element)
+						elements.push(this.range.focus.element)
+					}
+				}
+				//终点是自闭合元素且offset为1
+				else if (this.range.focus.offset == 1) {
+					elements.push(this.range.focus.element)
+				}
+			}
+		}
+
+		//针对子元素全部在选区内但是自身不在选区内的元素进行处理
+		let i = 0
+		while (i < elements.length) {
+			//如果是根元素则跳过
+			if (elements[i].isRoot()) {
+				i++
+			} else {
+				//判断父元素是否在数组里
+				let has = elements.some(item => {
+					return item.isEqual(elements[i].parent)
+				})
+				//父元素在数组里则跳过
+				if (has) {
+					i++
+				} else {
+					//父元素的每个子元素都在选区内
+					let allIn = elements[i].parent.children.every(item => {
+						return elements.some(e => {
+							return e.isEqual(item)
+						})
+					})
+					//将父元素加入进来
+					if (allIn) {
+						const index = elements.findIndex(item => {
+							return item.isEqual(elements[i])
+						})
+						elements.splice(index, 0, elements[i].parent)
+					} else {
+						i++
+					}
+				}
+			}
+		}
+
+		//返回扁平化数组
+		if (flat) {
+			return elements
+		}
+		let notFlatElements = []
+		elements.forEach(el => {
+			if (el.isRoot()) {
+				notFlatElements.push(el)
+			} else {
+				//父元素是否在扁平化数组里
+				const isIn = elements.some(item => {
+					return item.isEqual(el.parent)
+				})
+				//父元素不在
+				if (!isIn) {
+					notFlatElements.push(el)
+				}
+			}
+		})
+		return notFlatElements
+	}
 	//设置文本元素的样式
 	setTextStyle(styles) {
 		if (!Dap.common.isObject(styles)) {

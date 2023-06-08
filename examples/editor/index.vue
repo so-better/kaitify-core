@@ -1,8 +1,5 @@
 <template>
 	<div class="editor">
-		<div class="editor-menus">
-			<div @click="setEditor" class="editor-menu">自定义插件</div>
-		</div>
 		<div class="editor-content" @click="queryStyle"></div>
 	</div>
 </template>
@@ -19,17 +16,16 @@ export default {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value
 		})
+		this.editor.on('deleteExtend', (el, prevEl, type) => {
+			if (type == 'empty') {
+				const breakEl = new AlexElement('closed', 'br', null, null, null)
+				this.editor.addElementTo(breakEl, el)
+				this.editor.range.anchor.moveToEnd(breakEl)
+				this.editor.range.focus.moveToEnd(breakEl)
+			}
+		})
 	},
-	methods: {
-		setEditor() {
-			this.editor.setStyle({
-				color: '#f30'
-			})
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
-		}
-	}
+	methods: {}
 }
 </script>
 <style lang="less" scoped>
