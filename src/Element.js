@@ -5,7 +5,7 @@ class AlexElement {
 	constructor(type, parsedom, marks, styles, textContent) {
 		//key值
 		this.key = Util.getUniqueKey()
-		//类型 block/inline/text/closed
+		//类型 block/inblock/inline/text/closed
 		this.type = type
 		//真实节点名称
 		this.parsedom = parsedom
@@ -15,8 +15,6 @@ class AlexElement {
 		this.styles = styles
 		//文本值
 		this.textContent = textContent
-		//块元素的删除行为，default(默认行为：即块元素删空后会清除该块元素)/allow(块元素删空后不会清除该块元素)
-		this.deletion = 'default'
 		//子元素
 		this.children = null
 		//父元素
@@ -24,15 +22,15 @@ class AlexElement {
 		//真实dom
 		this._elm = null
 	}
-	//是否文本
-	isText() {
-		return this.type == 'text'
-	}
-	//是否块
+	//是否根级块元素
 	isBlock() {
 		return this.type == 'block'
 	}
-	//是否行内
+	//是否内部块元素
+	isInblock() {
+		return this.type == 'inblock'
+	}
+	//是否行内元素
 	isInline() {
 		return this.type == 'inline'
 	}
@@ -40,18 +38,22 @@ class AlexElement {
 	isClosed() {
 		return this.type == 'closed'
 	}
+	//是否文本
+	isText() {
+		return this.type == 'text'
+	}
 	//是否换行符
 	isBreak() {
 		return this.isClosed() && this.parsedom == 'br'
 	}
 	//是否空元素
 	isEmpty() {
-		//文本节点没有值即为空
-		if (this.isText() && !this.textContent) {
-			return true
+		//文本元素
+		if (this.isText()) {
+			return !this.textContent
 		}
-		//行内和块元素没有子元素即为空
-		if (this.isInline() || this.isBlock()) {
+		//根级块元素、内部块元素、行内元素
+		if (this.isBlock() || this.isInblock() || this.isInline()) {
 			if (!this.hasChildren()) {
 				return true
 			}
@@ -66,10 +68,6 @@ class AlexElement {
 	isSpaceText() {
 		return this.isText() && !this.isEmpty() && Util.isSpaceText(this.textContent)
 	}
-	//是否根元素
-	isRoot() {
-		return !this.parent
-	}
 	//判断两个Element是否相等
 	isEqual(element) {
 		if (!AlexElement.isElement(element)) {
@@ -82,7 +80,7 @@ class AlexElement {
 		if (this.isEqual(element)) {
 			return true
 		}
-		if (element.isRoot()) {
+		if (element.isBlock()) {
 			return false
 		}
 		return this.isContains(element.parent)
@@ -111,17 +109,10 @@ class AlexElement {
 		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
 			return true
 		}
-		if (this.isRoot()) {
+		if (this.isBlock()) {
 			return false
 		}
 		return this.parent.isUneditable()
-	}
-	//判断两个元素是否有包含关系
-	hasContains(element) {
-		if (!AlexElement.isElement(element)) {
-			return false
-		}
-		return this.isContains(element) || element.isContains(this)
 	}
 	//是否含有标记
 	hasMarks() {
@@ -172,14 +163,14 @@ class AlexElement {
 		}
 		return el
 	}
-	//转换成block元素
+	//转换成根级块元素
 	convertToBlock() {
 		if (this.isBlock()) {
 			throw new Error('This element is already of type "block"')
 		}
 		let element = this.clone()
 		this.type = 'block'
-		this.parsedom = AlexElement.PARAGRAPH_NODE
+		this.parsedom = AlexElement.BLOCK_NODE
 		this.marks = null
 		this.styles = null
 		this.textContent = null
@@ -197,23 +188,33 @@ class AlexElement {
 			this.type = 'inline'
 			this.parsedom = 'span'
 			this.children = null
-		} else if (this.isBlock() || this.isInline()) {
+		} else {
 			this.children = null
 		}
 	}
-	//获取所在块元素
+	//获取所在根级块元素
 	getBlock() {
 		if (this.isBlock()) {
 			return this
 		}
 		return this.parent.getBlock()
 	}
+	//获取所在内部块元素
+	getInblock() {
+		if (this.isInblock()) {
+			return this
+		}
+		if (this.isBlock()) {
+			return null
+		}
+		return this.parent.getInblock()
+	}
 	//获取所在行内元素
 	getInline() {
 		if (this.isInline()) {
 			return this
 		}
-		if (this.isRoot()) {
+		if (this.isBlock()) {
 			return null
 		}
 		return this.parent.getInline()
@@ -243,7 +244,7 @@ class AlexElement {
 		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
 			return this
 		}
-		if (this.isRoot()) {
+		if (this.isBlock()) {
 			return null
 		}
 		return this.parent.getUneditableElement()
@@ -286,10 +287,6 @@ class AlexElement {
 		//更新挂载的真实dom
 		this._elm = el
 	}
-	//定义段落标签
-	static PARAGRAPH_NODE = 'p'
-	//定义文本标签
-	static TEXT_NODE = 'span'
 	//判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement
@@ -311,10 +308,14 @@ class AlexElement {
 		}
 		return flat(elements)
 	}
-	//获取一个空白字符元素，用来占位防止行内元素没有内容被删除
+	//获取一个空白文本元素
 	static getSpaceElement() {
 		return new AlexElement('text', null, null, null, '\uFEFF')
 	}
+	//定义默认的根级块元素标签
+	static BLOCK_NODE = 'p'
+	//定义默认的文本元素标签
+	static TEXT_NODE = 'span'
 }
 
 export default AlexElement
