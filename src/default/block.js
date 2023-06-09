@@ -1,1 +1,63 @@
-export default ['p', 'div', 'table', 'ul', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+export default [
+	{
+		parsedom: 'p'
+	},
+	{
+		parsedom: 'div'
+	},
+	{
+		parsedom: 'table'
+	},
+	{
+		parsedom: 'ul'
+	},
+	{
+		parsedom: 'ol'
+	},
+	{
+		parsedom: 'h1'
+	},
+	{
+		parsedom: 'h2'
+	},
+	{
+		parsedom: 'h3'
+	},
+	{
+		parsedom: 'h4'
+	},
+	{
+		parsedom: 'h5'
+	},
+	{
+		parsedom: 'h6'
+	},
+	{
+		parsedom: 'blockquote'
+	},
+	{
+		parsedom: 'pre'
+	},
+	{
+		parsedom: 'address',
+		parse: 'p'
+	},
+	{
+		parsedom: 'article',
+		parse: 'p'
+	},
+	{
+		parsedom: 'aside',
+		parse: 'p'
+	},
+
+	{
+		parsedom: 'nav',
+		parse: 'p'
+	},
+
+	{
+		parsedom: 'section',
+		parse: 'p'
+	}
+]

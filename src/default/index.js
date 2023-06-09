@@ -1,13 +1,11 @@
 import block from './block'
+import inblock from './inblock'
 import inline from './inline'
 import closed from './closed'
-import inlineToSpan from './inlineToSpan'
-import notRender from './notRender'
 
 export default {
 	block,
+	inblock,
 	inline,
-	closed,
-	inlineToSpan,
-	notRender
+	closed
 }

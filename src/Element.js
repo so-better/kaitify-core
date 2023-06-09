@@ -104,16 +104,6 @@ class AlexElement {
 		}
 		return this.hasStyles() && (this.styles['white-space'] == 'pre' || this.styles['white-space'] == 'pre-wrap')
 	}
-	//是否不可编辑的
-	isUneditable() {
-		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
-			return true
-		}
-		if (this.isBlock()) {
-			return false
-		}
-		return this.parent.isUneditable()
-	}
 	//是否含有标记
 	hasMarks() {
 		if (!this.marks) {
@@ -143,6 +133,10 @@ class AlexElement {
 			return !!this.children.length
 		}
 		return false
+	}
+	//是否包含嵌套关系
+	hasContains(element) {
+		return this.isContains(element) || element.isContains(this)
 	}
 	//克隆当前元素,deep为true表示深度克隆
 	clone(deep = true) {
@@ -189,7 +183,9 @@ class AlexElement {
 			this.parsedom = 'span'
 			this.children = null
 		} else {
-			this.children = null
+			this.children.forEach(el => {
+				el.toEmpty()
+			})
 		}
 	}
 	//获取所在根级块元素
@@ -239,16 +235,6 @@ class AlexElement {
 		}
 		return false
 	}
-	//获取设置了不可编辑标记的元素
-	getUneditableElement() {
-		if (this.hasMarks() && (this.marks['contenteditable'] === false || this.marks['contenteditable'] === 'false')) {
-			return this
-		}
-		if (this.isBlock()) {
-			return null
-		}
-		return this.parent.getUneditableElement()
-	}
 	//渲染成真实dom
 	__renderElement() {
 		let el = null
@@ -271,7 +257,7 @@ class AlexElement {
 		//设置属性
 		if (this.hasMarks()) {
 			for (let key in this.marks) {
-				if (!/(^on)|(^style$)/g.test(key)) {
+				if (!/(^on)|(^style$)|(^contenteditable$)/g.test(key)) {
 					el.setAttribute(key, this.marks[key])
 				}
 			}

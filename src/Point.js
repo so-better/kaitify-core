@@ -40,13 +40,8 @@ class AlexPoint {
 		if (element.isEmpty()) {
 			throw new Error('The argument cannot be an empty element')
 		}
-		//如果该元素是不可编辑的
-		if (element.isUneditable()) {
-			this.element = element.getUneditableElement()
-			this.offset = 1
-		}
 		//如果是文本元素
-		else if (element.isText()) {
+		if (element.isText()) {
 			this.element = element
 			this.offset = element.textContent.length
 		}
@@ -73,13 +68,8 @@ class AlexPoint {
 		if (element.isEmpty()) {
 			throw new Error('The argument cannot be an empty element')
 		}
-		//如果该元素是不可编辑的
-		if (element.isUneditable()) {
-			this.element = element.getUneditableElement()
-			this.offset = 0
-		}
 		//文本元素
-		else if (element.isText()) {
+		if (element.isText()) {
 			this.element = element
 			this.offset = 0
 		}
