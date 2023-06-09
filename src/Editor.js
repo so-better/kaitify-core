@@ -948,6 +948,38 @@ class AlexEditor {
 			const hasInblock = elements.some(el => {
 				return el.isInblock()
 			})
+			//起点和终点都在同一个内部块中
+			if (anchorInblock && focusInblock && anchorInblock.isEqual(focusInblock)) {
+				elements.forEach(el => {
+					el.toEmpty()
+					if (anchorInblock.isEmpty()) {
+						const breakEl = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEl, anchorInblock)
+					}
+				})
+			}
+			//起点和终点不在同一个内部块中
+			else if (anchorInblock && focusInblock) {
+			}
+			//起点在内部块中，终点不在内部块中
+			else if (anchorInblock) {
+			}
+			//终点在内部块中，起点不在内部块中
+			else if (focusInblock) {
+			}
+			//起点和终点在同一个根级块元素中
+			else if (anchorBlock.isEqual(focusBlock)) {
+				elements.forEach(el => {
+					el.toEmpty()
+					if (anchorBlock.isEmpty()) {
+						const breakEl = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEl, anchorBlock)
+					}
+				})
+			}
+			//起点和终点不在一个根级块元素中
+			else {
+			}
 		}
 	}
 	//格式化单个元素

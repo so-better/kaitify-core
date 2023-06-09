@@ -14,14 +14,9 @@ export default {
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
-			value: this.value
-		})
-		this.editor.on('deleteExtend', (el, prevEl, type) => {
-			if (type == 'empty') {
-				const breakEl = new AlexElement('closed', 'br', null, null, null)
-				this.editor.addElementTo(breakEl, el)
-				this.editor.range.anchor.moveToEnd(breakEl)
-				this.editor.range.focus.moveToEnd(breakEl)
+			value: this.value,
+			renderRules: element => {
+				//console.log(element)
 			}
 		})
 	},
