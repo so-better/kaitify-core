@@ -1,1 +1,23 @@
-export default ['li', 'tfoot', 'tbody', 'thead', 'th', 'tr', 'td']
+export default [
+	{
+		parsedom: 'li'
+	},
+	{
+		parsedom: 'tfoot'
+	},
+	{
+		parsedom: 'tbody'
+	},
+	{
+		parsedom: 'thead'
+	},
+	{
+		parsedom: 'tr'
+	},
+	{
+		parsedom: 'th'
+	},
+	{
+		parsedom: 'td'
+	}
+]

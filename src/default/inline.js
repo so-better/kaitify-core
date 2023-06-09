@@ -52,5 +52,17 @@ export default [
 		parse: {
 			'text-decoration-line': 'line-through'
 		}
+	},
+	{
+		parsedom: 'abbr',
+		parse: true
+	},
+	{
+		parsedom: 'acronym',
+		parse: true
+	},
+	{
+		parsedom: 'bdo',
+		parse: true
 	}
 ]

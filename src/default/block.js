@@ -40,24 +40,23 @@ export default [
 	},
 	{
 		parsedom: 'address',
-		parse: 'p'
+		parse: true
 	},
 	{
 		parsedom: 'article',
-		parse: 'p'
+		parse: true
 	},
 	{
 		parsedom: 'aside',
-		parse: 'p'
+		parse: true
 	},
 
 	{
 		parsedom: 'nav',
-		parse: 'p'
+		parse: true
 	},
-
 	{
 		parsedom: 'section',
-		parse: 'p'
+		parse: true
 	}
 ]

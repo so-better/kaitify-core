@@ -106,46 +106,6 @@ class AlexEditor {
 	}
 	//格式化函数数组
 	__formatUnchangeableRules = [
-		//元素自身规范
-		element => {
-			if (element.parsedom) {
-				//默认的根级块元素
-				if (defaultConfig.block.includes(element.parsedom)) {
-					element.type = 'block'
-				}
-				//默认的内部块元素
-				else if (defaultConfig.inblock.includes(element.parsedom)) {
-					element.type = 'inblock'
-				}
-				//默认的行内元素
-				else if (defaultConfig.inline.includes(element.parsedom)) {
-					element.type = 'inline'
-					//部分行内元素转为带样式的span
-					if (defaultConfig.inlineToSpan[element.parsedom]) {
-						const styles = defaultConfig.inlineToSpan[element.parsedom]
-						element.type = 'inline'
-						element.parsedom = 'span'
-						if (element.hasStyles()) {
-							Object.assign(element.styles, Util.clone(styles))
-						} else {
-							element.styles = Util.clone(styles)
-						}
-					}
-				}
-				//默认的自闭合元素
-				else if (defaultConfig.closed.includes(element.parsedom)) {
-					element.type = 'closed'
-					element.children = null
-				}
-
-				//部分标签转为段落
-
-				//定义行为如block的内部块元素
-				if (element.isInblock() && ['li'].includes(element.parsedom)) {
-					element.behavior = 'block'
-				}
-			}
-		},
 		//自定义元素格式化规则
 		element => {
 			if (typeof this.renderRules == 'function') {
@@ -1113,8 +1073,10 @@ class AlexEditor {
 		node.innerHTML = html
 		let elements = []
 		Array.from(node.childNodes).forEach(el => {
-			const element = this.parseNode(el)
-			elements.push(element)
+			if (el.nodeType == 1 || el.nodeType == 3) {
+				const element = this.parseNode(el)
+				elements.push(element)
+			}
 		})
 		return elements
 	}
@@ -1128,25 +1090,71 @@ class AlexEditor {
 		}
 		//文本节点
 		if (node.nodeType == 3) {
-			return new AlexElement('text', null, null, null, node.nodeValue)
+			return new AlexElement('text', null, null, null, node.textContent)
 		}
 		//元素节点
 		const marks = Util.getAttributes(node)
 		const styles = Util.getStyles(node)
 		const parsedom = node.nodeName.toLocaleLowerCase()
-		//默认定义为内部块元素
-		let element = new AlexElement('inblock', parsedom, marks, styles, null)
-		Array.from(node.childNodes).forEach(childNode => {
-			if (childNode.nodeType == 1 || childNode.nodeType == 3) {
-				const childEle = this.parseNode(childNode)
-				childEle.parent = element
-				if (element.hasChildren()) {
-					element.children.push(childEle)
-				} else {
-					element.children = [childEle]
+		//默认配置
+		const block = defaultConfig.block.find(item => item.parsedom == parsedom)
+		const inblock = defaultConfig.inblock.find(item => item.parsedom == parsedom)
+		const inline = defaultConfig.inline.find(item => item.parsedom == parsedom)
+		const closed = defaultConfig.closed.find(item => item.parsedom == parsedom)
+		//创建的元素
+		let element = null
+		//构造参数
+		let config = {
+			type: '',
+			parsedom,
+			marks,
+			styles
+		}
+		//默认的根级块元素
+		if (block) {
+			config.type = 'block'
+			if (block.parse) {
+				config.parsedom = AlexElement.BLOCK_NODE
+			}
+		}
+		//默认的内部块元素
+		else if (inblock) {
+			config.type = 'inblock'
+		}
+		//默认的行内元素
+		else if (inline) {
+			config.type = 'inline'
+			if (inline.parse) {
+				config.parsedom = AlexElement.TEXT_NODE
+				if (Dap.common.isObject(inline.parse)) {
+					Object.assign(config.styles, Util.clone(inline.parse))
 				}
 			}
-		})
+		}
+		//默认的自闭合元素
+		else if (closed) {
+			config.type = 'closed'
+		}
+		//其余元素
+		else {
+			config.type = 'inline'
+			config.parsedom = 'span'
+		}
+		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
+		//如果是根部块元素或者内部块元素或者行内元素，则设置子元素
+		if (block || inblock || inline) {
+			Array.from(node.childNodes).forEach(childNode => {
+				if (childNode.nodeType == 1 || childNode.nodeType == 3) {
+					const childEle = this.parseNode(childNode)
+					childEle.parent = element
+					if (element.hasChildren()) {
+						element.children.push(childEle)
+					} else {
+						element.children = [childEle]
+					}
+				}
+			})
+		}
 		return element
 	}
 	//将指定块元素与另一个块元素进行合并
