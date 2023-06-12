@@ -1043,6 +1043,135 @@ class AlexEditor {
 		this.range.focus.element = this.range.anchor.element
 		this.range.focus.offset = this.range.anchor.offset
 	}
+	//根据光标位置向编辑器内插入文本
+	insertText(data) {
+		if (!data || typeof data != 'string') {
+			throw new Error('The argument must be a string')
+		}
+		//起点和终点在一个位置
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//不是代码块内则对空格进行处理
+			if (!this.range.anchor.element.isPreStyle()) {
+				data = data.replace(/\s+/g, () => {
+					const span = document.createElement('span')
+					span.innerHTML = '&nbsp;'
+					return span.innerText
+				})
+			}
+			//如果是文本
+			if (this.range.anchor.element.isText()) {
+				let val = this.range.anchor.element.textContent
+				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + data + val.substring(this.range.anchor.offset)
+				this.range.anchor.offset = this.range.anchor.offset + data.length
+				this.range.focus.offset = this.range.anchor.offset
+			}
+			//如果是自闭合元素
+			else {
+				const textEl = new AlexElement('text', null, null, null, data)
+				if (this.range.anchor.offset == 0) {
+					this.addElementBefore(textEl, this.range.anchor.element)
+				} else {
+					this.addElementAfter(textEl, this.range.anchor.element)
+				}
+				this.range.anchor.moveToEnd(textEl)
+				this.range.focus.moveToEnd(textEl)
+			}
+		}
+		//起点和终点不在一个位置，即存在选区
+		else {
+			this.delete()
+			this.__setRecentlyPoint(this.range.anchor)
+			this.__setRecentlyPoint(this.range.focus)
+			this.insertText(data)
+		}
+	}
+	//在光标处换行
+	insertParagraph() {
+		//起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//前一个可设置光标的元素
+			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+			//后一个可设置光标的元素
+			const nextElement = this.getNextElementOfPoint(this.range.anchor)
+			//光标所在的根级块元素
+			const block = this.range.anchor.element.getBlock()
+			//光标所在的内部块元素
+			const inblock = this.range.anchor.element.getInblock()
+			//终点位置
+			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			//起点在内部块里
+			if (inblock) {
+				//在代码块样式中
+				if (this.range.anchor.element.isPreStyle()) {
+					//起点在换行符上
+					if (this.range.anchor.element.isBreak()) {
+						this.insertText('\n\n')
+						this.range.anchor.offset -= 1
+						this.range.focus.offset -= 1
+					}
+					//起点在代码块的终点位置
+					else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
+						//终点位置的字符是换行符
+						if (this.range.anchor.element.isText() && this.range.anchor.element.textContent[this.range.anchor.offset - 1] == '\n') {
+							this.insertText('\n')
+						}
+						//终点位置的字符不是换行符
+						else {
+							this.insertText('\n\n')
+							this.range.anchor.offset -= 1
+							this.range.focus.offset -= 1
+						}
+					}
+					//普通的换行
+					else {
+						this.insertText('\n')
+					}
+				}
+				//不在代码块样式中
+				else {
+					if (inblock.behavior == 'block') {
+					}
+				}
+			}
+			//起点不在内部块里
+			else {
+				//在代码块样式中
+				if (this.range.anchor.element.isPreStyle()) {
+					//起点在换行符上
+					if (this.range.anchor.element.isBreak()) {
+						this.insertText('\n\n')
+						this.range.anchor.offset -= 1
+						this.range.focus.offset -= 1
+					}
+					//起点在代码块的终点位置
+					else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
+						//终点位置的字符是换行符
+						if (this.range.anchor.element.isText() && this.range.anchor.element.textContent[this.range.anchor.offset - 1] == '\n') {
+							this.insertText('\n')
+						}
+						//终点位置的字符不是换行符
+						else {
+							this.insertText('\n\n')
+							this.range.anchor.offset -= 1
+							this.range.focus.offset -= 1
+						}
+					}
+					//普通的换行
+					else {
+						this.insertText('\n')
+					}
+				}
+				//不在代码块样式中
+				else {
+				}
+			}
+		} else {
+			this.delete()
+			this.__setRecentlyPoint(this.range.anchor)
+			this.__setRecentlyPoint(this.range.focus)
+			this.insertParagraph()
+		}
+	}
 	//格式化单个元素
 	formatElement(ele) {
 		if (!AlexElement.isElement(ele)) {

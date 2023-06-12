@@ -96,15 +96,30 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否代码块样式
+	//判断元素是否在拥有代码块样式的块内
 	isPreStyle() {
-		if (!this.isBlock()) {
+		const block = this.getBlock()
+		const inblock = this.getInblock()
+		//在内部块里
+		if (inblock) {
+			if (inblock.parsedom == 'pre') {
+				return true
+			}
+			if (inblock.hasStyles() && (inblock.styles['white-space'] == 'pre' || inblock.styles['white-space'] == 'pre-wrap')) {
+				return true
+			}
+			return inblock.parent.isPreStyle()
+		}
+		//在根级块内
+		else {
+			if (block.parsedom == 'pre') {
+				return true
+			}
+			if (block.hasStyles() && (block.styles['white-space'] == 'pre' || block.styles['white-space'] == 'pre-wrap')) {
+				return true
+			}
 			return false
 		}
-		if (this.parsedom == 'pre') {
-			return true
-		}
-		return this.hasStyles() && (this.styles['white-space'] == 'pre' || this.styles['white-space'] == 'pre-wrap')
 	}
 	//是否含有标记
 	hasMarks() {
