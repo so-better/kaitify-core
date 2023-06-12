@@ -69,8 +69,8 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'cut.alex_editor', this.__handleCut.bind(this))
 		//监听编辑器粘贴
 		Dap.event.on(this.$el, 'paste.alex_editor', this.__handlePaste.bind(this))
-		//监听编辑器拖放
-		Dap.event.on(this.$el, 'drop.alex_editor', this.__handleNodesChange.bind(this))
+		//禁用编辑器拖放
+		Dap.event.on(this.$el, 'drop.alex_editor', e => e.preventDefault())
 		//监听编辑器获取焦点
 		Dap.event.on(this.$el, 'focus.alex_editor', () => {
 			this.emit('focus', this.value)
@@ -240,11 +240,21 @@ class AlexEditor {
 						if (nel.isEmpty()) {
 							//起点在后一个元素上，则直接将起点设置到前一个元素上
 							if (this.range && nel.isContains(this.range.anchor.element)) {
-								this.range.anchor.moveToEnd(pel)
+								if (pel.isEmpty()) {
+									this.range.anchor.element = pel
+									this.range.anchor.offset = 0
+								} else {
+									this.range.anchor.moveToEnd(pel)
+								}
 							}
 							//终点在后一个元素上，则直接将终点设置到前一个元素上
 							if (this.range && nel.isContains(this.range.focus.element)) {
-								this.range.focus.moveToEnd(pel)
+								if (pel.isEmpty()) {
+									this.range.focus.element = pel
+									this.range.focus.offset = 0
+								} else {
+									this.range.focus.moveToEnd(pel)
+								}
 							}
 							//删除被合并的元素
 							const index = nel.parent.children.findIndex(item => {
@@ -256,11 +266,21 @@ class AlexEditor {
 						else if (pel.isEmpty()) {
 							//起点在前一个元素上，则直接将起点设置到后一个元素上
 							if (this.range && pel.isContains(this.range.anchor.element)) {
-								this.range.anchor.moveToStart(nel)
+								if (nel.isEmpty()) {
+									this.range.anchor.element = nel
+									this.range.anchor.offset = 0
+								} else {
+									this.range.anchor.moveToStart(nel)
+								}
 							}
 							//终点在前一个元素上，则直接将终点设置到后一个元素上
 							if (this.range && pel.isContains(this.range.focus.element)) {
-								this.range.focus.moveToStart(nel)
+								if (nel.isEmpty()) {
+									this.range.focus.element = nel
+									this.range.focus.offset = 0
+								} else {
+									this.range.focus.moveToStart(nel)
+								}
 							}
 							//删除被合并的元素
 							const index = pel.parent.children.findIndex(item => {
@@ -1039,6 +1059,10 @@ class AlexEditor {
 				this.mergeBlockElement(focusBlock, anchorBlock)
 			}
 		}
+		//如果起点所在元素是空元素则更新起点
+		if (this.range.anchor.element.isEmpty()) {
+			this.__setRecentlyPoint(this.range.anchor)
+		}
 		//合并起点和终点
 		this.range.focus.element = this.range.anchor.element
 		this.range.focus.offset = this.range.anchor.offset
@@ -1080,8 +1104,6 @@ class AlexEditor {
 		//起点和终点不在一个位置，即存在选区
 		else {
 			this.delete()
-			this.__setRecentlyPoint(this.range.anchor)
-			this.__setRecentlyPoint(this.range.focus)
 			this.insertText(data)
 		}
 	}
@@ -1127,9 +1149,44 @@ class AlexEditor {
 						this.insertText('\n')
 					}
 				}
-				//不在代码块样式中
-				else {
-					if (inblock.behavior == 'block') {
+				//不在代码块样式中且内部块元素的行为值是block
+				else if (inblock.behavior == 'block') {
+					//起点在内部块元素的起点位置
+					if (this.range.anchor.offset == 0 && !(previousElement && inblock.isContains(previousElement))) {
+						//在该内部块之前插入一个新的内部块
+						const paragraph = inblock.clone(false)
+						const breakEle = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEle, paragraph)
+						this.addElementBefore(paragraph, inblock)
+					}
+					//起点在内部块元素的终点位置
+					else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
+						//在该内部块之后插入一个新的内部块
+						const paragraph = inblock.clone(false)
+						const breakEle = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEle, paragraph)
+						this.addElementAfter(paragraph, inblock)
+						this.range.anchor.moveToEnd(paragraph)
+						this.range.focus.moveToEnd(paragraph)
+					}
+					//起点在内部块元素的中间部分则需要切割
+					else {
+						const newInblock = inblock.clone()
+						this.addElementAfter(newInblock, inblock)
+						//记录起点所在元素在内部块元素中的序列
+						const elements = AlexElement.flatElements(inblock.children)
+						const index = elements.findIndex(item => {
+							return this.range.anchor.element.isEqual(item)
+						})
+						//将终点移动到内部块元素末尾
+						this.range.focus.moveToEnd(inblock)
+						this.delete()
+						//将终点移动到新的内部块元素
+						const newElements = AlexElement.flatElements(newInblock.children)
+						this.range.focus.element = newElements[index]
+						this.range.focus.offset = this.range.anchor.offset
+						this.range.anchor.moveToStart(newInblock)
+						this.delete()
 					}
 				}
 			}
@@ -1163,12 +1220,47 @@ class AlexEditor {
 				}
 				//不在代码块样式中
 				else {
+					//起点在根级块元素的起点位置
+					if (this.range.anchor.offset == 0 && !(previousElement && block.isContains(previousElement))) {
+						//在该根级块元素之前插入一个新的根级块元素
+						const paragraph = block.clone(false)
+						const breakEle = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEle, paragraph)
+						this.addElementBefore(paragraph, block)
+					}
+					//起点在根级块元素的终点位置
+					else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
+						//在该根级块元素之后插入一个新的根级块元素
+						const paragraph = block.clone(false)
+						const breakEle = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEle, paragraph)
+						this.addElementAfter(paragraph, block)
+						this.range.anchor.moveToEnd(paragraph)
+						this.range.focus.moveToEnd(paragraph)
+					}
+					//起点在根级块元素的中间部分则需要切割
+					else {
+						const newBlock = block.clone()
+						this.addElementAfter(newBlock, block)
+						//记录起点所在元素在根级块元素中的序列
+						const elements = AlexElement.flatElements(block.children)
+						const index = elements.findIndex(item => {
+							return this.range.anchor.element.isEqual(item)
+						})
+						//将终点移动到根级块元素的末尾
+						this.range.focus.moveToEnd(block)
+						this.delete()
+						//将终点移动到新的根级块元素
+						const newElements = AlexElement.flatElements(newBlock.children)
+						this.range.focus.element = newElements[index]
+						this.range.focus.offset = this.range.anchor.offset
+						this.range.anchor.moveToStart(newBlock)
+						this.delete()
+					}
 				}
 			}
 		} else {
 			this.delete()
-			this.__setRecentlyPoint(this.range.anchor)
-			this.__setRecentlyPoint(this.range.focus)
 			this.insertParagraph()
 		}
 	}

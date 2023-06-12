@@ -161,6 +161,7 @@ class AlexElement {
 			throw new Error('The parameter must be a Boolean')
 		}
 		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
+		el.behavior = this.behavior
 		if (deep && this.hasChildren()) {
 			this.children.forEach(child => {
 				let clonedChild = child.clone(deep)
@@ -195,14 +196,11 @@ class AlexElement {
 		}
 		if (this.isText()) {
 			this.textContent = null
-		} else if (this.isClosed()) {
-			this.type = 'inline'
-			this.parsedom = 'span'
-			this.children = null
 		} else {
-			this.children.forEach(el => {
-				el.toEmpty()
-			})
+			this.type = 'text'
+			this.parsedom = null
+			this.children = null
+			this.textContent = null
 		}
 	}
 	//获取所在根级块元素
