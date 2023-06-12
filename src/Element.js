@@ -19,6 +19,8 @@ class AlexElement {
 		this.children = null
 		//父元素
 		this.parent = null
+		//定义内部块元素的行为 default/block
+		this.behavior = 'default'
 		//真实dom
 		this._elm = null
 	}

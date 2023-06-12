@@ -1,3 +1,6 @@
+/**
+ * 在将node转为AlexElement数据时默认的根级块元素
+ */
 export default [
 	{
 		parsedom: 'p'

@@ -179,7 +179,7 @@ class AlexEditor {
 		element => {
 			if (element.hasChildren()) {
 				//根级块元素和内部块元素中的换行符
-				if (element.isBlock() && element.isInblock()) {
+				if (element.isBlock() || element.isInblock()) {
 					//是否有换行符
 					let hasBreak = element.children.some(el => {
 						return el.isBreak()
@@ -197,7 +197,7 @@ class AlexEditor {
 						})
 					}
 					//只有换行符并且存在多个换行符
-					else if (hasBreak && children.length > 1) {
+					else if (hasBreak && element.children.length > 1) {
 						//把除了第一个换行符外的其他换行符都置为空元素
 						element.children.forEach((el, index) => {
 							if (el.isBreak() && index > 0) {
@@ -740,6 +740,28 @@ class AlexEditor {
 			this.rangeRender()
 		}, 0)
 	}
+	//清空默认行为的内部块元素
+	__emptyDefaultBehaviorInblock(ele) {
+		if (!ele.isInblock()) {
+			return
+		}
+		if (ele.behavior != 'default') {
+			return
+		}
+		if (ele.hasChildren()) {
+			ele.children.forEach(item => {
+				if (item.isInblock()) {
+					this.__emptyDefaultBehaviorInblock(item)
+				} else {
+					item.toEmpty()
+					if (item.parent.isEmpty()) {
+						const breakEl = new AlexElement('closed', 'br', null, null, null)
+						this.addElementTo(breakEl, item.parent)
+					}
+				}
+			})
+		}
+	}
 	//根据光标进行删除操作
 	delete() {
 		//起点和终点在一起
@@ -762,16 +784,21 @@ class AlexEditor {
 							this.range.focus.moveToEnd(previousElement)
 							this.delete()
 						}
-						//如果光标在内部块元素的开始处
-						else {
-							//默认光标在内部块的开始处不做处理，这里触发一个事件，用于二次开发自定义开始处的删除操作
-							this.emit('deleteExtend', inblock, previousElement, 'start')
+						//如果光标在内部块元素的开始处并且行为值为block
+						else if (inblock.behavior == 'block') {
+							const previousBlock = previousElement.getBlock()
+							const previousInblock = previousElement.getInblock()
+							//前一个可获取焦点的元素在内部块内部，并且它的行为值是block，则进行合并操作
+							if (previousInblock) {
+								if (previousInblock.behavior == 'block') {
+									this.mergeBlockElement(inblock, previousInblock)
+								}
+							}
+							//不在内部块内部则合并根级块元素
+							else {
+								this.mergeBlockElement(inblock, previousBlock)
+							}
 						}
-					}
-					//前一个可设置光标的元素不存在
-					else {
-						//此时光标不仅在内部块的开始处，还是在编辑器的开始处
-						this.emit('deleteExtend', inblock, previousElement, 'start')
 					}
 				}
 				//如果光标在所在元素内部
@@ -816,18 +843,8 @@ class AlexEditor {
 						this.range.anchor.element.toEmpty()
 						//如果所在的内部块元素为空
 						if (inblock.isEmpty()) {
-							//如果删除的是换行符
-							if (isBreak) {
-								//没有定义删除拓展默认创建换行符
-								if (!this.emit('deleteExtend', inblock, previousElement, 'empty')) {
-									const breakEl = new AlexElement('closed', 'br', null, null, null)
-									this.addElementTo(breakEl, inblock)
-									this.range.anchor.moveToEnd(breakEl)
-									this.range.focus.moveToEnd(breakEl)
-								}
-							}
-							//如果删除的不是换行符则创建换行符
-							else {
+							//如果删除的不是换行符或者内部块的行为值是默认的或者前一个可获取焦点的元素不存在，则创建换行符
+							if (!isBreak || inblock.behavior == 'default' || !previousElement) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, inblock)
 								this.range.anchor.moveToEnd(breakEl)
@@ -851,21 +868,20 @@ class AlexEditor {
 						}
 						//如果光标在根级块元素的开始处
 						else {
-							//如果前一个可设置光标的元素在内部块内
-							if (previousElement.getInblock()) {
-								this.emit('deleteExtend', block, previousElement, 'start')
+							const previousInblock = previousElement.getInblock()
+							const previousBlock = previousElement.getBlock()
+							//如果前一个可设置光标的元素在内部块内并且它的行为值是block，则进行合并
+							if (previousInblock) {
+								if (previousInblock.behavior == 'block') {
+									//将根级块元素与内部块元素进行合并
+									this.mergeBlockElement(block, previousInblock)
+								}
 							}
-							//如果前一个可设置光标的元素不在内部块内，则进行合并操作
+							//如果前一个可设置光标的元素不在内部块内，则进行根级块元素的合并操作
 							else {
-								const previousBlock = previousElement.getBlock()
 								this.mergeBlockElement(block, previousBlock)
 							}
 						}
-					}
-					//前一个可设置光标的元素不存在
-					else {
-						//此时光标不仅在根级块的开始处，还是在编辑器的开始处
-						this.emit('deleteExtend', block, previousElement, 'start')
 					}
 				}
 				//如果光标在所在元素内部
@@ -910,19 +926,8 @@ class AlexEditor {
 						this.range.anchor.element.toEmpty()
 						//如果所在的根级块元素为空
 						if (block.isEmpty()) {
-							//如果删除的是换行符
-							if (isBreak) {
-								//如果前一个可设置光标的元素不存在，表示光标在编辑器的开始处，并且没有自定义删除拓展，则默认创建一个换行符
-								if (!previousElement && !this.emit('deleteExtend', block, previousElement, 'empty')) {
-									const breakEl = new AlexElement('closed', 'br', null, null, null)
-									this.addElementTo(breakEl, block)
-									this.range.anchor.moveToEnd(breakEl)
-									this.range.focus.moveToEnd(breakEl)
-								}
-								//其他情况下该块会被删除或者走自定义删除拓展的逻辑
-							}
-							//如果删除的不是换行符则创建换行符
-							else {
+							//如果删除的不是换行符或者前一个可获取焦点的元素不存在，则创建换行符
+							if (!isBreak || !previousElement) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, block)
 								this.range.anchor.moveToEnd(breakEl)
@@ -944,10 +949,6 @@ class AlexEditor {
 			const anchorBlock = this.range.anchor.element.getBlock()
 			//终点所在的根级块元素
 			const focusBlock = this.range.focus.element.getBlock()
-			//选区根部元素中是否有内部块元素
-			const hasInblock = elements.some(el => {
-				return el.isInblock()
-			})
 			//起点和终点都在同一个内部块中
 			if (anchorInblock && focusInblock && anchorInblock.isEqual(focusInblock)) {
 				elements.forEach(el => {
@@ -958,14 +959,59 @@ class AlexEditor {
 					}
 				})
 			}
-			//起点和终点不在同一个内部块中
+			//起点和终点都在内部块中但是不在同一个内部块中
 			else if (anchorInblock && focusInblock) {
+				elements.forEach(el => {
+					if (el.isInblock() && el.behavior == 'default') {
+						this.__emptyDefaultBehaviorInblock(el)
+					} else {
+						el.toEmpty()
+						if (el.parent && (el.parent.isInblock() || el.parent.isBlock()) && el.parent.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, el.parent)
+						}
+					}
+				})
+				//如果两个内部块的行为值都是block，则合并
+				if (anchorInblock.behavior == 'block' && focusInblock.behavior == 'block') {
+					this.mergeBlockElement(focusInblock, anchorInblock)
+				}
 			}
 			//起点在内部块中，终点不在内部块中
 			else if (anchorInblock) {
+				elements.forEach(el => {
+					if (el.isInblock() && el.behavior == 'default') {
+						this.__emptyDefaultBehaviorInblock(el)
+					} else {
+						el.toEmpty()
+						if (el.parent && (el.parent.isInblock() || el.parent.isBlock()) && el.parent.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, el.parent)
+						}
+					}
+				})
+				//如果起点所在内部块的行为值是block则合并
+				if (anchorInblock.behavior == 'block') {
+					this.mergeBlockElement(focusBlock, anchorInblock)
+				}
 			}
 			//终点在内部块中，起点不在内部块中
 			else if (focusInblock) {
+				elements.forEach(el => {
+					if (el.isInblock() && el.behavior == 'default') {
+						this.__emptyDefaultBehaviorInblock(el)
+					} else {
+						el.toEmpty()
+						if (el.parent && (el.parent.isInblock() || el.parent.isBlock()) && el.parent.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, el.parent)
+						}
+					}
+				})
+				//如果终点所在内部块的行为值是block则合并
+				if (focusInblock.behavior == 'block') {
+					this.mergeBlockElement(focusInblock, anchorBlock)
+				}
 			}
 			//起点和终点在同一个根级块元素中
 			else if (anchorBlock.isEqual(focusBlock)) {
@@ -979,8 +1025,23 @@ class AlexEditor {
 			}
 			//起点和终点不在一个根级块元素中
 			else {
+				elements.forEach(el => {
+					if (el.isInblock() && el.behavior == 'default') {
+						this.__emptyDefaultBehaviorInblock(el)
+					} else {
+						el.toEmpty()
+						if (el.parent && (el.parent.isInblock() || el.parent.isBlock()) && el.parent.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, el.parent)
+						}
+					}
+				})
+				this.mergeBlockElement(focusBlock, anchorBlock)
 			}
 		}
+		//合并起点和终点
+		this.range.focus.element = this.range.anchor.element
+		this.range.focus.offset = this.range.anchor.offset
 	}
 	//格式化单个元素
 	formatElement(ele) {
@@ -1187,9 +1248,13 @@ class AlexEditor {
 				}
 			})
 		}
+		//类型为内部块的li元素默认行为等同于block
+		if (inblock && inblock.parsedom == 'li') {
+			element.behavior = 'block'
+		}
 		return element
 	}
-	//将指定块元素与另一个块元素进行合并
+	//将指定元素与另一个元素进行合并（仅限内部块元素和根级块元素）
 	mergeBlockElement(ele, previousEle) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The first argument must be an AlexElement instance')
@@ -1197,15 +1262,14 @@ class AlexEditor {
 		if (!AlexElement.isElement(previousEle)) {
 			throw new Error('The second argument must be an AlexElement instance')
 		}
-		if (!ele.isBlock() || !previousEle.isBlock()) {
-			throw new Error('Elements that are not "block" cannot be merged')
+		if ((!ele.isBlock() && !ele.isInblock()) || (!previousEle.isBlock() && !previousEle.isInblock())) {
+			throw new Error('Elements that are not "block" or "inblock" cannot be merged')
 		}
 		previousEle.children.push(...ele.children)
 		previousEle.children.forEach(item => {
 			item.parent = previousEle
 		})
-		//将指定的块元素设为空元素
-		ele.toEmpty()
+		ele.children = null
 	}
 	//根据key查询元素
 	getElementByKey(key) {
