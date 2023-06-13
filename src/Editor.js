@@ -747,19 +747,6 @@ class AlexEditor {
 			this.rangeRender()
 		}, 0)
 	}
-	//解决编辑器内元素节点与stack数据不符的情况，进行数据纠正
-	__handleNodesChange() {
-		//加上setTimeout是为了保证this.$el.innerHTML获取的是最新的
-		setTimeout(() => {
-			this.stack = this.parseHtml(this.$el.innerHTML)
-			this.formatElementStack()
-			const flatElements = AlexElement.flatElements(this.stack)
-			this.range.anchor.moveToEnd(flatElements[flatElements.length - 1])
-			this.range.focus.moveToEnd(flatElements[flatElements.length - 1])
-			this.domRender()
-			this.rangeRender()
-		}, 0)
-	}
 	//清空默认行为的内部块元素
 	__emptyDefaultBehaviorInblock(ele) {
 		if (!ele.isInblock()) {
