@@ -1251,6 +1251,223 @@ class AlexEditor {
 			this.insertParagraph()
 		}
 	}
+	//根据光标插入元素
+	insertElement(ele) {
+		if (!AlexElement.isElement(ele)) {
+			throw new Error('The argument must be an AlexElement instance')
+		}
+		//如果是空元素则不处理
+		if (ele.isEmpty()) {
+			return
+		}
+		//起点和终点在一个位置
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//前一个可设置光标的元素
+			const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
+			//后一个可设置光标的元素
+			const nextElement = this.getNextElementOfPoint(this.range.anchor)
+			//光标所在的根级块元素
+			const block = this.range.anchor.element.getBlock()
+			//光标所在的内部块元素
+			const inblock = this.range.anchor.element.getInblock()
+			//终点位置
+			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			//如果插入的元素是内部块且行为值为block，同时光标在内部块里且所在内部块的行为值是block
+			if (ele.isInblock() && ele.behavior == 'block' && inblock && inblock.behavior == 'block') {
+				//光标所在内部块是一个只有换行符的块，则该块需要被覆盖
+				if (inblock.isOnlyHasBreak()) {
+					//在该内部块之前插入
+					this.addElementBefore(ele, inblock)
+					//删除当前内部块
+					inblock.toEmpty()
+				}
+				//光标在当前内部块的起点位置
+				else if (this.range.anchor.offset == 0 && !(previousElement && inblock.isContains(previousElement))) {
+					//在该内部块元素之前插入
+					this.addElementBefore(ele, inblock)
+				}
+				//光标在当前内部块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
+					//在该内部块元素之后插入
+					this.addElementAfter(ele, inblock)
+				}
+				//光标在当前内部块的中间部分则需要切割
+				else {
+					const newInblock = inblock.clone()
+					this.addElementAfter(newInblock, inblock)
+					//将终点移动到该内部块元素末尾
+					this.range.focus.moveToEnd(inblock)
+					//执行删除操作
+					this.delete()
+					//将终点移动到新内部块元素
+					const elements = AlexElement.flatElements(inblock.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newInblock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newInblock)
+					//执行删除操作
+					this.delete()
+					//在新的内部块之前插入
+					this.addElementBefore(ele, newInblock)
+				}
+			}
+			//如果插入的元素是内部块，同时光标在内部块里，但是两个内部块的行为值并非同时是block
+			else if (ele.isInblock() && inblock) {
+				//光标所在内部块是一个只有换行符的块
+				if (inblock.isOnlyHasBreak()) {
+					//插入到内部块里
+					this.addElementTo(ele, inblock, 0)
+				}
+				//光标在当前内部块的起点位置
+				else if (this.range.anchor.offset == 0 && !(previousElement && inblock.isContains(previousElement))) {
+					//插入到内部块里
+					this.addElementTo(ele, inblock, 0)
+				}
+				//光标在当前内部块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
+					//插入到内部块里
+					this.addElementTo(ele, inblock, inblock.children.length)
+				}
+				//光标在当前内部块的中间部分则需要切割
+				else {
+					const newInblock = inblock.clone()
+					this.addElementAfter(newInblock, inblock)
+					//将终点移动到该内部块元素末尾
+					this.range.focus.moveToEnd(inblock)
+					//执行删除操作
+					this.delete()
+					//将终点移动到新内部块元素
+					const elements = AlexElement.flatElements(inblock.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newInblock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newInblock)
+					//执行删除操作
+					this.delete()
+					//在新的内部块最前面插入元素
+					this.addElementTo(ele, newInblock)
+					//合并内部块
+					this.mergeBlockElement(newInblock, inblock)
+				}
+			}
+			//如果插入的元素是内部块，但是光标不在内部块中
+			else if (ele.isInblock()) {
+				//光标所在根级块是一个只有换行符的块
+				if (block.isOnlyHasBreak()) {
+					//插入到根级块里
+					this.addElementTo(ele, block, 0)
+				}
+				//光标在当前根级块的起点位置
+				else if (this.range.anchor.offset == 0 && !(previousElement && block.isContains(previousElement))) {
+					//插入到根级块里
+					this.addElementTo(ele, block, 0)
+				}
+				//光标在当前根级块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
+					//插入到根级块里
+					this.addElementTo(ele, block, block.children.length)
+				}
+				//光标在当前根级块的中间部分则需要切割
+				else {
+					const newBlock = block.clone()
+					this.addElementAfter(newBlock, block)
+					//将终点移动到该根级块元素末尾
+					this.range.focus.moveToEnd(block)
+					//执行删除操作
+					this.delete()
+					//将终点移动到新根级块元素
+					const elements = AlexElement.flatElements(block.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newBlock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newBlock)
+					//执行删除操作
+					this.delete()
+					//在新的根级块最前面插入元素
+					this.addElementTo(ele, newBlock)
+					//合并根级块
+					this.mergeBlockElement(newBlock, block)
+				}
+			}
+			//如果插入的元素是根级块
+			else if (ele.isBlock()) {
+				//光标所在根级块是一个只有换行符的块，则该块需要被覆盖
+				if (block.isOnlyHasBreak()) {
+					//在该根级块之前插入
+					this.addElementBefore(ele, block)
+					//删除当前根级块
+					block.toEmpty()
+				}
+				//光标在当前根级块的起点位置
+				else if (this.range.anchor.offset == 0 && !(previousElement && block.isContains(previousElement))) {
+					//在该根级块元素之前插入
+					this.addElementBefore(ele, block)
+				}
+				//光标在当前根级块的终点位置
+				else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
+					//在该根级块元素之后插入
+					this.addElementAfter(ele, block)
+				}
+				//光标在当前根级块的中间部分则需要切割
+				else {
+					const newBlock = block.clone()
+					this.addElementAfter(newBlock, block)
+					//将终点移动到该根级块元素末尾
+					this.range.focus.moveToEnd(block)
+					//执行删除操作
+					this.delete()
+					//将终点移动到新根级块元素
+					const elements = AlexElement.flatElements(block.children)
+					const index = elements.findIndex(item => {
+						return this.range.anchor.element.isEqual(item)
+					})
+					const newElements = AlexElement.flatElements(newBlock.children)
+					this.range.focus.element = newElements[index]
+					this.range.focus.offset = this.range.anchor.offset
+					this.range.anchor.moveToStart(newBlock)
+					//执行删除操作
+					this.delete()
+					//在新的根级块之前插入
+					this.addElementBefore(ele, newBlock)
+				}
+			}
+			//如果插入的是其他元素
+			else {
+				//是文本
+				if (this.range.anchor.element.isText()) {
+					let val = this.range.anchor.element.textContent
+					let newText = this.range.anchor.element.clone()
+					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
+					newText.textContent = val.substring(this.range.anchor.offset)
+					this.addElementAfter(newText, this.range.anchor.element)
+					this.addElementBefore(ele, newText)
+				}
+				//自闭合元素
+				else {
+					if (this.range.anchor.offset == 0) {
+						this.addElementBefore(ele, this.range.anchor.element)
+					} else {
+						this.addElementAfter(ele, this.range.anchor.element)
+					}
+				}
+			}
+			//重置光标
+			this.range.anchor.moveToEnd(ele)
+			this.range.focus.moveToEnd(ele)
+		} else {
+			this.delete()
+			this.insertElement(ele)
+		}
+	}
 	//格式化单个元素
 	formatElement(ele) {
 		if (!AlexElement.isElement(ele)) {

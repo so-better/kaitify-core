@@ -1,13 +1,6 @@
 class AlexEditor {
 	//根据光标插入元素
 	insertElement(ele) {
-		if (!AlexElement.isElement(ele)) {
-			throw new Error('The argument must be an AlexElement instance')
-		}
-		//如果是空元素则不处理
-		if (ele.isEmpty()) {
-			return
-		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//如果插入的是块元素
@@ -65,23 +58,6 @@ class AlexEditor {
 			}
 			//插入的不是块元素
 			else {
-				//是文本
-				if (this.range.anchor.element.isText()) {
-					let val = this.range.anchor.element.textContent
-					let newText = this.range.anchor.element.clone()
-					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
-					newText.textContent = val.substring(this.range.anchor.offset)
-					this.addElementAfter(newText, this.range.anchor.element)
-					this.addElementBefore(ele, newText)
-				}
-				//自闭合元素
-				else {
-					if (this.range.anchor.offset == 0) {
-						this.addElementBefore(ele, this.range.anchor.element)
-					} else {
-						this.addElementAfter(ele, this.range.anchor.element)
-					}
-				}
 			}
 			this.range.anchor.moveToEnd(ele)
 			this.range.focus.moveToEnd(ele)
