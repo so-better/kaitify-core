@@ -69,8 +69,8 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'cut.alex_editor', this.__handleCut.bind(this))
 		//监听编辑器粘贴
 		Dap.event.on(this.$el, 'paste.alex_editor', this.__handlePaste.bind(this))
-		//禁用编辑器拖放
-		Dap.event.on(this.$el, 'drop.alex_editor', e => e.preventDefault())
+		//禁用编辑器拖拽和拖放
+		Dap.event.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', e => e.preventDefault())
 		//监听编辑器获取焦点
 		Dap.event.on(this.$el, 'focus.alex_editor', () => {
 			this.emit('focus', this.value)
