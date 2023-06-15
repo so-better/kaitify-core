@@ -2074,6 +2074,292 @@ class AlexEditor {
 		this.disabled = false
 		this.$el.setAttribute('contenteditable', true)
 	}
+	//设置文本元素的样式
+	setTextStyle(styles) {
+		if (!Dap.common.isObject(styles)) {
+			throw new Error('The argument must be an object')
+		}
+		//起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是空白文本元素直接设置样式
+			if (this.range.anchor.element.isSpaceText()) {
+				if (this.range.anchor.element.hasStyles()) {
+					Object.assign(this.range.anchor.element.styles, Util.clone(styles))
+				} else {
+					this.range.anchor.element.styles = Util.clone(styles)
+				}
+			}
+			//如果是文本元素
+			else if (this.range.anchor.element.isText()) {
+				//新建一个空白文本元素
+				const el = AlexElement.getSpaceElement()
+				//继承文本元素的样式和标记
+				el.styles = Util.clone(this.range.anchor.element.styles)
+				el.marks = Util.clone(this.range.anchor.element.marks)
+				//设置样式
+				if (el.hasStyles()) {
+					Object.assign(el.styles, Util.clone(styles))
+				} else {
+					el.styles = Util.clone(styles)
+				}
+				//插入空白文本元素
+				this.insertElement(el)
+			}
+			//如果是自闭合元素
+			else {
+				const el = AlexElement.getSpaceElement()
+				el.styles = Util.clone(styles)
+				this.insertElement(el)
+			}
+		}
+		//不在同一个点
+		else {
+			const elements = this.getElementsByRange(true, true)
+			elements.forEach(el => {
+				if (el.isText()) {
+					if (el.hasStyles()) {
+						Object.assign(el.styles, Util.clone(styles))
+					} else {
+						el.styles = Util.clone(styles)
+					}
+				}
+			})
+		}
+	}
+	//移除文本元素的样式
+	removeTextStyle(styleNames) {
+		//移除样式的方法
+		const removeFn = el => {
+			//如果参数是数组，表示删除指定的样式
+			if (Array.isArray(styleNames)) {
+				if (el.hasStyles()) {
+					let styles = {}
+					for (let key in el.styles) {
+						if (!styleNames.includes(key)) {
+							styles[key] = el.styles[key]
+						}
+					}
+					el.styles = styles
+				}
+			}
+			//如果没有参数，则表示删除所有的样式
+			else {
+				el.styles = null
+			}
+		}
+		//如果起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是空白文本元素直接移除样式
+			if (this.range.anchor.element.isSpaceText()) {
+				removeFn(this.range.anchor.element)
+			}
+			//如果是文本元素则新建一个空白文本元素
+			else if (this.range.anchor.element.isText()) {
+				const el = AlexElement.getSpaceElement()
+				//继承文本元素的样式和标记
+				el.styles = Util.clone(this.range.anchor.element.styles)
+				el.marks = Util.clone(this.range.anchor.element.marks)
+				//移除样式
+				removeFn(el)
+				//插入
+				this.insertElement(el)
+			}
+		}
+		//起点和终点不在一起
+		else {
+			const elements = this.getElementsByRange(true, true)
+			elements.forEach(el => {
+				if (el.isText()) {
+					removeFn(el)
+				}
+			})
+		}
+	}
+	//查询虚拟光标包含的文本元素是否具有某个样式
+	queryTextStyle(name, value) {
+		if (!name) {
+			throw new Error('The first argument cannot be null')
+		}
+		//起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是文本元素并且具有样式
+			if (this.range.anchor.element.isText() && this.range.anchor.element.hasStyles()) {
+				//表示只查询是否具有样式名称
+				if (value == null || value == undefined) {
+					return this.range.anchor.element.styles.hasOwnProperty(name)
+				}
+				//查询是否具有某个样式值
+				return this.range.anchor.element.styles[name] == value
+			}
+			//不是文本元素或者没有样式直接返回false
+			return false
+		}
+		//起点和终点不在一起获取选区中的文本元素
+		const elements = this.getElementsByRange(true, true).filter(el => {
+			return el.isText()
+		})
+		//如果不包含文本元素直接返回false
+		if (elements.length == 0) {
+			return false
+		}
+		//判断每个文本元素是否都具有该样式
+		let flag = elements.every(el => {
+			//文本元素含有样式进一步判断
+			if (el.hasStyles()) {
+				if (value == null || value == undefined) {
+					return el.styles.hasOwnProperty(name)
+				}
+				return el.styles[name] == value
+			}
+			//文本元素没有样式直接返回false
+			return false
+		})
+		this.formatElementStack()
+		return flag
+	}
+	//设置文本元素的标记
+	setTextMark(marks) {
+		if (!Dap.common.isObject(marks)) {
+			throw new Error('The argument must be an object')
+		}
+		//在起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是空白文本元素直接设置标记
+			if (this.range.anchor.element.isSpaceText()) {
+				if (this.range.anchor.element.hasMarks()) {
+					Object.assign(this.range.anchor.element.marks, Util.clone(marks))
+				} else {
+					this.range.anchor.element.marks = Util.clone(marks)
+				}
+			}
+			//如果是文本元素
+			else if (this.range.anchor.element.isText()) {
+				//新建一个空白文本元素
+				const el = AlexElement.getSpaceElement()
+				//继承文本元素的样式和标记
+				el.styles = Util.clone(this.range.anchor.element.styles)
+				el.marks = Util.clone(this.range.anchor.element.marks)
+				//设置标记
+				if (el.hasMarks()) {
+					Object.assign(el.marks, Util.clone(marks))
+				} else {
+					el.marks = Util.clone(marks)
+				}
+				//插入空白文本元素
+				this.insertElement(el)
+			}
+			//如果是自闭合元素
+			else {
+				const el = AlexElement.getSpaceElement()
+				el.marks = Util.clone(marks)
+				this.insertElement(el)
+			}
+		}
+		//不在同一个点
+		else {
+			const elements = this.getElementsByRange(true, true)
+			elements.forEach(el => {
+				if (el.isText()) {
+					if (el.hasMarks()) {
+						Object.assign(el.marks, Util.clone(marks))
+					} else {
+						el.marks = Util.clone(marks)
+					}
+				}
+			})
+		}
+	}
+	//移除文本元素的标记
+	removeTextMark(markNames) {
+		//移除标记的方法
+		const removeFn = el => {
+			//如果参数是数组，表示删除指定的标记
+			if (Array.isArray(markNames)) {
+				if (el.hasMarks()) {
+					let marks = {}
+					for (let key in el.marks) {
+						if (!markNames.includes(key)) {
+							marks[key] = el.marks[key]
+						}
+					}
+					el.marks = marks
+				}
+			}
+			//如果没有参数，则表示删除所有的标记
+			else {
+				el.marks = null
+			}
+		}
+		//如果起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是空白文本元素直接移除标记
+			if (this.range.anchor.element.isSpaceText()) {
+				removeFn(this.range.anchor.element)
+			}
+			//如果是文本元素则新建一个空白文本元素
+			else if (this.range.anchor.element.isText()) {
+				const el = AlexElement.getSpaceElement()
+				//继承文本元素的样式和标记
+				el.styles = Util.clone(this.range.anchor.element.styles)
+				el.marks = Util.clone(this.range.anchor.element.marks)
+				//移除标记
+				removeFn(el)
+				//插入
+				this.insertElement(el)
+			}
+		}
+		//起点和终点不在一起
+		else {
+			const elements = this.getElementsByRange(true, true)
+			elements.forEach(el => {
+				if (el.isText()) {
+					removeFn(el)
+				}
+			})
+		}
+	}
+	//查询选区内的文本元素是否具有某个标记
+	queryTextMark(name, value) {
+		if (!name) {
+			throw new Error('The first argument cannot be null')
+		}
+		//起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			//如果是文本元素并且具有标记
+			if (this.range.anchor.element.isText() && this.range.anchor.element.hasMarks()) {
+				//表示只查询是否具标记名称
+				if (value == null || value == undefined) {
+					return this.range.anchor.element.marks.hasOwnProperty(name)
+				}
+				//查询是否具有某个样式值
+				return this.range.anchor.element.marks[name] == value
+			}
+			//不是文本元素或者没有标记直接返回false
+			return false
+		}
+		//起点和终点不在一起获取选区中的文本元素
+		const elements = this.getElementsByRange(true, true).filter(el => {
+			return el.isText()
+		})
+		//如果不包含文本元素直接返回false
+		if (elements.length == 0) {
+			return false
+		}
+		//判断每个文本元素是否都具有该标记
+		let flag = elements.every(el => {
+			//文本元素含有样式进一步判断
+			if (el.hasMarks()) {
+				if (value == null || value == undefined) {
+					return el.marks.hasOwnProperty(name)
+				}
+				return el.marks[name] == value
+			}
+			//文本元素没有样式直接返回false
+			return false
+		})
+		this.formatElementStack()
+		return flag
+	}
 	//触发自定义事件
 	emit(eventName, ...value) {
 		if (Array.isArray(this.__events[eventName])) {
