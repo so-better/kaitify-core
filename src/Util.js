@@ -49,5 +49,12 @@ export default {
 			return JSON.parse(JSON.stringify(data))
 		}
 		return data
+	},
+	//是否包含
+	isContains(parent, target) {
+		if (target.nodeType == 3) {
+			return Dap.element.isContains(parent, target.parentNode)
+		}
+		return Dap.element.isContains(parent, target)
 	}
 }

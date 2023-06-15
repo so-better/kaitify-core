@@ -490,41 +490,41 @@ class AlexEditor {
 		const selection = window.getSelection()
 		if (selection.rangeCount) {
 			const range = selection.getRangeAt(0)
-			let anchorNode = null
-			let focusNode = null
-			let anchorOffset = null
-			let focusOffset = null
-			//如果起点所在是文本节点
-			if (range.startContainer.nodeType == 3) {
-				anchorNode = range.startContainer.parentNode
-				anchorOffset = range.startOffset
-			}
-			//如果起点所在是元素节点
-			else if (range.startContainer.nodeType == 1) {
-				const childNodes = Array.from(range.startContainer.childNodes)
-				anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
-				anchorOffset = childNodes[range.startOffset] ? 0 : 1
-				if (anchorNode.nodeType == 3) {
-					anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
-					anchorNode = anchorNode.parentNode
+			if (Util.isContains(this.$el, range.startContainer) && Util.isContains(this.$el, range.endContainer)) {
+				let anchorNode = null
+				let focusNode = null
+				let anchorOffset = null
+				let focusOffset = null
+				//如果起点所在是文本节点
+				if (range.startContainer.nodeType == 3) {
+					anchorNode = range.startContainer.parentNode
+					anchorOffset = range.startOffset
 				}
-			}
-			//如果终点所在是文本节点
-			if (range.endContainer.nodeType == 3) {
-				focusNode = range.endContainer.parentNode
-				focusOffset = range.endOffset
-			}
-			//如果终点所在是元素节点
-			else if (range.endContainer.nodeType == 1) {
-				const childNodes = Array.from(range.endContainer.childNodes)
-				focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
-				focusOffset = childNodes[range.endOffset] ? 0 : 1
-				if (focusNode.nodeType == 3) {
-					focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
-					focusNode = focusNode.parentNode
+				//如果起点所在是元素节点
+				else if (range.startContainer.nodeType == 1) {
+					const childNodes = Array.from(range.startContainer.childNodes)
+					anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
+					anchorOffset = childNodes[range.startOffset] ? 0 : 1
+					if (anchorNode.nodeType == 3) {
+						anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
+						anchorNode = anchorNode.parentNode
+					}
 				}
-			}
-			if (Dap.element.isContains(this.$el, anchorNode) && Dap.element.isContains(this.$el, focusNode)) {
+				//如果终点所在是文本节点
+				if (range.endContainer.nodeType == 3) {
+					focusNode = range.endContainer.parentNode
+					focusOffset = range.endOffset
+				}
+				//如果终点所在是元素节点
+				else if (range.endContainer.nodeType == 1) {
+					const childNodes = Array.from(range.endContainer.childNodes)
+					focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
+					focusOffset = childNodes[range.endOffset] ? 0 : 1
+					if (focusNode.nodeType == 3) {
+						focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
+						focusNode = focusNode.parentNode
+					}
+				}
 				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
 				const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
 				const anchorEle = this.getElementByKey(anchorKey)
