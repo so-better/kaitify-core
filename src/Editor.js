@@ -790,6 +790,7 @@ class AlexEditor {
 							this.range.anchor.moveToEnd(previousElement)
 							this.range.focus.moveToEnd(previousElement)
 							this.delete()
+							return
 						}
 						//如果光标在内部块元素的开始处并且行为值为block
 						else if (inblock.behavior == 'block') {
@@ -816,6 +817,7 @@ class AlexEditor {
 						this.range.anchor.offset = 0
 						this.range.focus.offset = 0
 						this.delete()
+						return
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
@@ -832,9 +834,10 @@ class AlexEditor {
 						//如果删除的字符是空白文本，则再执行一次删除操作
 						if (isSpaceText) {
 							this.delete()
+							return
 						}
 						//如果内部块元素为空
-						else if (inblock.isEmpty()) {
+						if (inblock.isEmpty()) {
 							//建一个换行符元素作为占位元素
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, inblock)
@@ -872,6 +875,7 @@ class AlexEditor {
 							this.range.anchor.moveToEnd(previousElement)
 							this.range.focus.moveToEnd(previousElement)
 							this.delete()
+							return
 						}
 						//如果光标在根级块元素的开始处
 						else {
@@ -899,6 +903,7 @@ class AlexEditor {
 						this.range.anchor.offset = 0
 						this.range.focus.offset = 0
 						this.delete()
+						return
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
@@ -915,9 +920,10 @@ class AlexEditor {
 						//如果删除的字符是空白文本，则再执行一次删除操作
 						if (isSpaceText) {
 							this.delete()
+							return
 						}
 						//如果根级块元素为空
-						else if (block.isEmpty()) {
+						if (block.isEmpty()) {
 							//建一个换行符元素作为占位元素
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, block)
@@ -1053,6 +1059,7 @@ class AlexEditor {
 		//合并起点和终点
 		this.range.focus.element = this.range.anchor.element
 		this.range.focus.offset = this.range.anchor.offset
+		this.emit('delete')
 	}
 	//根据光标位置向编辑器内插入文本
 	insertText(data) {
