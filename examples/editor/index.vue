@@ -24,6 +24,9 @@ export default {
 				//console.log(element)
 			}
 		})
+		this.editor.on('insertParagraph', val => {
+			console.log('进行换行操作', val)
+		})
 		console.log(this.editor.stack)
 	},
 	methods: {
