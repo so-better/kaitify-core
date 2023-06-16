@@ -110,6 +110,8 @@ editor.rangeRender()
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
 
+> parseNode 方法内部在将 Node 节点转为 AlexElement 元素时，会有一个默认的处理转换过程，比如 li 标签会被转为行为值是"block"的内部块元素、b 标签会被转为带加粗样式的行内元素且 parsedom 为 span 等等。parseHtml 同理，其内部调用的仍然是 parseNode 方法
+
 > 下面是 editor 内部定义的事件：
 
 | 事件名称        | 事件说明                                                                                        |
@@ -120,9 +122,6 @@ editor.rangeRender()
 | pasteFile       | 在编辑器里粘贴文件时触发，回调参数为文件数组                                                    |
 | rangeUpdate     | 当编辑器的真实光标更新时触发，回调参数为当前的 alexRange 实例                                   |
 | insertParagraph | 调用 insertParagraph 方法执行换行操作时触发，回调参数为换行后光标所在的根级块元素或者内部块元素 |
-| delete          | 调用 delete 方法执行删除操作完成后触发，无回调参数                                              |
-
-> parseNode 方法内部在将 Node 节点转为 AlexElement 元素时，会有一个默认的处理转换过程，比如 li 标签会被转为行为值是"block"的内部块元素、b 标签会被转为带加粗样式的行内元素且 parsedom 为 span 等等。parseHtml 同理，其内部调用的仍然是 parseNode 方法
 
 ### AlexElement：元素
 
