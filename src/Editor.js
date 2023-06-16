@@ -1059,7 +1059,6 @@ class AlexEditor {
 		//合并起点和终点
 		this.range.focus.element = this.range.anchor.element
 		this.range.focus.offset = this.range.anchor.offset
-		this.emit('delete')
 	}
 	//根据光标位置向编辑器内插入文本
 	insertText(data) {
