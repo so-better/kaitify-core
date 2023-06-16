@@ -58,24 +58,14 @@ editor.rangeRender()
 | renderRules | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
 | htmlPaste   | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
 
-### 编辑器规范
+### 编辑器内部规范
 
-1.  元素默认类型和样式以及标记设定，例如 parsedom 为 span 的元素会被默认为 inline 元素，parsedom 为 img 的元素会被默认为 closed 元素
-2.  同级的元素如果有 block 类型元素，那么其他元素也会被强制转为 block 元素
-3.  块元素中换行符与其他元素不可能同时存在，另外如果存在多个换行符，也会置换为一个换行符。换行符仅仅在块元素没有其他子元素时作占位符使用
-4.  兄弟元素合并策略：相邻的空元素会被合并，相邻的文本元素如果样式和标记都一致也会被合并，相邻的行内元素如果标记和 parsedom 一致会被合并
-5.  父子元素合并策略：父元素只有一个子元素，且该子元素与父元素都是行内元素或者块元素，只要它们的 parsedom 相同就会被合并；父元素只有一个子元素，且该子元素是文本元素，父元素的 parsedom 等于文本标签即 AlexElement.TEXT_NODE，则父元素会与子元素合并
-
-> 我们提供了一个 renderRulers 函数，来使得我们可以对元素设置自定义的规范，该函数作用于上述规范全部执行完毕后。
-
-```javascript
-const editor = new AlexEditor(el, {
-	renderRules: function (element) {
-		//在这里处理元素
-		//在处理中如果改变了元素之前的兄弟元素，你需要确保该兄弟元素符合规范或者使用formatElement方法来进行格式化
-	}
-})
-```
+-   stack 数组元素只能是 block 元素，同时 block 元素只会出现在根部，如果某个元素的子元素是 block 元素，那么该 block 元素会被转为 inline 元素或者 inblock 元素
+-   inblock 与其他元素不能同时存在于子元素数组中，如果某个元素的子元素数组中含有 inblock 元素，那么其他子元素也必然是 inblock 元素，否则该 inblock 元素会被转为 inline 元素
+-   inblock 元素的父元素必然是 block 元素或者 inblock 元素
+-   换行符与其他元素不能同时存在，并且如果某个元素下存在多个换行符则会被清除为一个换行符
+-   兄弟元素合并策略：相邻的两个文本元素的 styles 和 marks 相同则会被合并；相邻的两个行内元素的 parsedom、styles 和 marks 相同则会被合并
+-   父子元素合并策略：父元素的子元素只有一个，并且该子元素是文本元素，父元素是 parsedom==AlexElement.TEXT_NODE 的行内元素，则子元素会父元素进行合并；父元素的子元素只有一个，inline 元素、inblock 元素如果与父元素的 parsedom 一致，marks 和 styles 也一致，那么会与父元素合并
 
 ### AlexEditor 编辑器
 
@@ -86,27 +76,26 @@ const editor = new AlexEditor(el, {
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
--   `editor.formatElement(ele)` ：对传入的元素进行格式化规范处理，该元素可以是尚未添加到 stack 中的元素【如果是这样的情况，你需要注意该元素是没有 parent 的】
--   `editor.formatElementStack()` ：对 editor.stack 进行格式化规范处理
 -   `editor.delete()` ：根据虚拟光标执行删除操作
 -   `editor.insertText(data)` ：根据虚拟光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在虚拟光标处换行
--   `editor.insertElement(ele)` ：根据虚拟光标位置插入指定的元素，如果插入的是块元素并且光标所在的块元素只含有换行符，那么插入的块元素会覆盖光标所在的块元素（在插入元素之前，为确保渲染结果符合预期，请先使用`formatElement`函数进行一次格式化操作）
+-   `editor.insertElement(ele)` ：根据虚拟光标位置插入指定的元素
+-   `editor.formatElement(ele)` ：对传入的元素进行格式化，该元素可以是尚未添加到 stack 中的元素【如果是这样的情况，你需要注意该元素是没有 parent 的】
+-   `editor.formatElementStack()` ：对 editor.stack 进行格式化
 -   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性）
 -   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性）
--   `editor.addElementTo(childEle, parentEle, index)` ：将指定元素添加到父元素的子元素数组中
--   `editor.addElementBefore(newEle, targetEle)` ：将指定元素添加到另一个元素前面
--   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
--   `editor.removeElement(ele)` ：将元素从父元素或者 stack 中移除，执行此操作后元素的 parent 为 null
+-   `editor.mergeBlockElement(ele,previousEle)` ：将 ele 与前一个兄弟元素进行合并，ele 会置为空元素，子元素全部添加到前一个兄弟元素下【仅针对根级块元素和内部块元素】
 -   `editor.getElementByKey(key)` ：根据 key 查询元素
 -   `editor.getPreviousElement(ele)` ：获取 ele 元素前一个兄弟元素，如果没有则返回 null
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.mergeBlockElement(ele)` ：将指定的块元素与其前一个块元素进行合并
--   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false（如果一个父元素所有的子元素都在选区内，那么该父元素也会被认为是两个点之间的元素）
+-   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false
+-   `editor.addElementTo(childEle, parentEle, index)` ：将指定元素添加到父元素的子元素数组中
+-   `editor.addElementBefore(newEle, targetEle)` ：将指定元素添加到另一个元素前面
+-   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
 -   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
 -   `editor.collapseToEnd(element)` ：将虚拟光标移动到文档尾部，如果 element 指定了元素，则移动到该元素尾部
 -   `editor.setDisabled()` ：设置编辑器禁用，此时不可编辑
@@ -136,7 +125,7 @@ const editor = new AlexEditor(el, {
 AlexElement 是 `alex-editor` 定义的一种特殊的数据结构，编辑器初始化时将 html 内容转为 AlexElement 数组，并挂载在编辑器实例上（ `editor.stack` ），后续的任意操作都将通过修改该组数据结构来更新编辑器内容。
 其构造函数包含以下几个参数：
 
--   type：元素类型，可取值"text"（文本元素）、"closed"（自闭合元素）、"inline"（行内元素）、"block"（块元素）
+-   type：元素类型，可取值"text"（文本元素）、"closed"（自闭合元素）、"inline"（行内元素）、"inblock"（内部块元素）、"block"（根级块元素）
 -   parsedom：对应的需要渲染的真实节点名称（例："p"），如果是文本元素，此项为 null
 -   marks：元素标记集合，对应需要渲染的真实节点的属性（不包括 style 属性）
 -   styles：元素样式集合，对应需要渲染的真实节点的样式
@@ -155,43 +144,49 @@ const textElement = new AlexElement('text', null, null, null, null, '我是一�
 AlexElement 提供以下几种语法来方便我们的操作：
 
 -   `el.key` ：元素的唯一值
--   `el.styles` ：元素的样式集合
--   `el.marks` ：元素的标记集合
--   `el.parsedom` ：转换的真实节点名称
 -   `el.type` ：元素的类型
+-   `el.parsedom` ：转换的真实节点名称
+-   `el.marks` ：元素的标记集合
+-   `el.styles` ：元素的样式集合
 -   `el.textContent` ：文本元素的文本值
--   `el.parent` ：父元素
 -   `el.children`：子元素数组
--   `el.isText()` ：el 是否文本元素
--   `el.isBlock()` ：el 是否块元素
+-   `el.parent` ：父元素
+-   `el.behavior` ：元素的行为值【仅在 type="inblock"时有效】，默认值为 default，可取值 block【如果设置为 block，其行为与根级块元素相似】
+-   `el.isBlock()` ：el 是否根级块元素
+-   `el.isInblock()` ：el 是否内部块元素
 -   `el.isInline()` ：el 是否行内元素
 -   `el.isClosed()` ：el 是否自闭合元素
+-   `el.isText()` ：el 是否文本元素
 -   `el.isBreak()` ：el 是否是换行符`<br>`
--   `el.isEmpty()` ：el 是否是空元素。文本没有值，行内和块元素没有子元素或者子元素都是 null 的话，都是空元素
+-   `el.isEmpty()` ：el 是否是空元素。【文本元素没有值，行内元素、内部块元素和根级块元素没有子元素或者子元素都是空元素 的话，则判定为空元素】
 -   `el.isSpaceText()` ：el 是否只含有空白字符的 text 元素
--   `el.isRoot()` ：el 是否是根元素，即 AlexElement.elementStack 数组中的元素
 -   `el.isEqual(element)` ：el 是否与 element 相等，即二者是否同一个元素
 -   `el.isContains(element)` ：el 是否包含 element。如果两个元素相等也认为是包含关系
 -   `el.isOnlyHasBreak()` ：el 的子元素是否只含有换行符`<br>`
--   `el.isPreStyle()` ：el 是否为代码块样式的块元素，对于 styles 中含有"white-space":"pre" 或者 "white-space":"pre-wrap"样式的块元素，即认为是代码块样式元素（pre 标签默认就是代码块样式）。代码块样式的元素在空格、换行处理方面与一般元素不同
--   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
+-   `el.isPreStyle()` ：el 是否为代码块样式的根级块元素或者内部块元素，对于 styles 中含有"white-space":"pre" 或者 "white-space":"pre-wrap"样式的根级块元素或内部块元素，即认为是代码块样式元素（pre 标签默认就是代码块样式）。代码块样式的元素在空格、换行处理方面与一般元素不同
 -   `el.hasMarks()` ：el 是否含有标记
 -   `el.hasStyles()` ：el 是否含有样式
 -   `el.hasChildren()` ：el 是否有子元素
+-   `el.hasContains(element)` ：el 与 element 是否拥有包含关系。即 el 包含 element 或者 element 包含 el 都视为拥有包含关系
 -   `el.clone(deep)` ：将 el 元素进行克隆，返回一个新的元素，deep 为 true 表示深度克隆，即克隆子孙元素，默认为 true
 -   `el.convertToBlock()` ：将非 block 类型的元素转为 block 元素
 -   `el.toEmpty()` ：将一个非空元素设为空元素（如果你希望在编辑器内部进行格式化的时候删除此元素，可以使用此方法设为空元素，因为空元素会在格式化时删除）
--   `el.getBlock()` ：获取该元素所在的块元素，如果本身是块元素则返回自身
--   `el.getInline()` ：获取该元素所在的行内元素，如果该元素不在行内元素中则返回 null
+-   `el.getBlock()` ：获取该元素所在的根级块元素，如果自身是根级块元素则返回自身
+-   `el.getInblock()` ：获取该元素所在的内部块元素，如果自身是内部块元素则返回自身
+-   `el.getInline()` ：获取该元素所在的行内元素，如果自身是行内元素则返回自身，如果该元素不在行内元素中则返回 null
 -   `el.isEqualStyles(element)` ：判断 el 与 element 的 styles 是否相同，如果二者都没有 styles 也会返回 true
 -   `el.isEqualMarks(element)` ：判断 el 与 element 的 marks 是否相同，如果二者都没有 marks 也会返回 true
--   `AlexElement.PARAGRAPH_NODE` ：定义段落元素，默认是"p"
--   `AlexElement.TEXT_NODE` ：定义文本元素的标签，默认是"span"
 -   `AlexElement.isElement(val)` ：判断 val 是否 AlexElement 对象
 -   `AlexElement.flatElements(elements)` ：将 elements 元素数组转为扁平化元素数组
--   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素。
+-   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素
+-   `AlexElement.BLOCK_NODE` ：定义段落元素，默认是"p"
+-   `AlexElement.TEXT_NODE` ：定义文本元素的标签，默认是"span"
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
+
+> 在内部块元素内部执行删除操作时，当内部块元素为空时，始终给一个换行符进行占位，该元素不会被删除；在内部块元素内部执行换行操作无效；向内部块元素插入内部块元素时，直接作为其子元素；
+
+> 如果你希望内部块元素在删除、换行和插入操作时拥有和根级块元素一样的表现，设置其行为属性值 behavior 为"block"
 
 ### AlexPoint：虚拟光标的点对象
 
