@@ -120,6 +120,8 @@ editor.rangeRender()
 | pasteFile   | 在编辑器里粘贴文件时触发，回调参数为文件数组                         |
 | rangeUpdate | 当编辑器的真实光标更新时触发，回调参数为当前的 alexRange 实例        |
 
+> parseNode 方法内部在将 Node 节点转为 AlexElement 元素时，会有一个默认的处理转换过程，比如 li 标签会被转为行为值是"block"的内部块元素、b 标签会被转为带加粗样式的行内元素且 parsedom 为 span 等等。parseHtml 同理，其内部调用的仍然是 parseNode 方法
+
 ### AlexElement：元素
 
 AlexElement 是 `alex-editor` 定义的一种特殊的数据结构，编辑器初始化时将 html 内容转为 AlexElement 数组，并挂载在编辑器实例上（ `editor.stack` ），后续的任意操作都将通过修改该组数据结构来更新编辑器内容。
