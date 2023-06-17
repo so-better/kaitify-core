@@ -288,6 +288,24 @@ class AlexElement {
 		//更新挂载的真实dom
 		this._elm = el
 	}
+	//完全复制元素，包括key也复制
+	__cloneElement() {
+		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
+		el.behavior = this.behavior
+		el.key = this.key
+		if (this.hasChildren()) {
+			this.children.forEach(child => {
+				let clonedChild = child.__cloneElement()
+				if (el.hasChildren()) {
+					el.children.push(clonedChild)
+				} else {
+					el.children = [clonedChild]
+				}
+				clonedChild.parent = el
+			})
+		}
+		return el
+	}
 	//判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement

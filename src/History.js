@@ -1,7 +1,6 @@
 import AlexElement from './Element'
 import AlexPoint from './Point'
 import AlexRange from './Range'
-import Util from './Util'
 
 class AlexHistory {
 	constructor() {
@@ -19,7 +18,7 @@ class AlexHistory {
 		}
 		//生成一个新的stack
 		const newStack = stack.map(ele => {
-			return this._cloneElement(ele)
+			return ele.__cloneElement()
 		})
 		//查找新stack中anchor对应的元素
 		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
@@ -67,7 +66,7 @@ class AlexHistory {
 		const { stack, range } = this.records[this.current]
 		//创建新的stack
 		const newStack = stack.map(ele => {
-			return this._cloneElement(ele)
+			return ele.__cloneElement()
 		})
 		//查找新stack中anchor对应的元素
 		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
@@ -88,24 +87,6 @@ class AlexHistory {
 			stack: newStack,
 			range: newRange
 		}
-	}
-
-	//复制元素，包括key也复制
-	_cloneElement(element) {
-		const el = new AlexElement(element.type, element.parsedom, Util.clone(element.marks), Util.clone(element.styles), element.textContent)
-		el.key = element.key
-		if (element.hasChildren()) {
-			element.children.forEach(child => {
-				let clonedChild = this._cloneElement(child)
-				if (el.hasChildren()) {
-					el.children.push(clonedChild)
-				} else {
-					el.children = [clonedChild]
-				}
-				clonedChild.parent = el
-			})
-		}
-		return el
 	}
 }
 

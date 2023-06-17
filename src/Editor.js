@@ -51,6 +51,8 @@ class AlexEditor {
 		this.formatElementStack()
 		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化stack
 		this.stack.length == 0 ? this.__initStack() : null
+		//旧stack
+		this.__oldStack = null
 		//初始设置range
 		this.__initRange()
 		//渲染dom
@@ -768,6 +770,12 @@ class AlexEditor {
 				}
 			})
 		}
+	}
+	//克隆stack
+	__cloneStack() {
+		return this.stack.map(el => {
+			return el.__cloneElement()
+		})
 	}
 	//根据光标进行删除操作
 	delete() {
@@ -1545,12 +1553,14 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
+		console.log(this.__oldStack, this.stack)
 		this.$el.innerHTML = ''
 		this.stack.forEach(element => {
 			element.__renderElement()
 			this.$el.appendChild(element._elm)
 		})
 		this.__oldValue = this.value
+		this.__oldStack = this.__cloneStack()
 		this.value = this.$el.innerHTML
 		//值有变化
 		if (this.__oldValue != this.value) {
