@@ -289,13 +289,14 @@ class AlexElement {
 		this._elm = el
 	}
 	//完全复制元素，包括key也复制
-	__cloneElement() {
+	__fullClone() {
 		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.key = this.key
+		el._elm = this._elm
 		if (this.hasChildren()) {
 			this.children.forEach(child => {
-				let clonedChild = child.__cloneElement()
+				let clonedChild = child.__fullClone()
 				if (el.hasChildren()) {
 					el.children.push(clonedChild)
 				} else {

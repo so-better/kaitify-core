@@ -13,27 +13,28 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: '<ol><li>十年生死两茫茫，不思量，<video style="width:300px;" autoplay muted controls src="https://www.mvi-web.cn/bg.mp4"></video>自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ol><ul><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><a href="www.baidu.com">百度一下，你就知道</a></p>',
+			value: '<ol><li>十年生死两茫茫，不思量，<video style="width:300px;" autoplay muted controls src="https://www.mvi-web.cn/bg.mp4"></video>自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ol><ul><li><span style="color:#f30">十年生死两茫茫，不思量</span>，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><img style="width:100px" src="https://www.mvi-web.cn/bg.mp4"/><a href="www.baidu.com">百度一下，你就知道</a></p>',
 			editor: null
 		}
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
+			htmlPaste: true,
 			renderRules: element => {
 				//console.log(element)
 			}
 		})
-		this.editor.on('insertParagraph', val => {
-			console.log('进行换行操作', val)
+		this.editor.on('change', val => {
+			console.log('输入', val)
 		})
 	},
 	methods: {
 		insertElemenet() {
-			const el = new AlexElement('closed', 'img', { src: 'https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png' }, null, null)
-			//const text = new AlexElement('text', null, null, null, '插入的内部块')
-			//this.editor.addElementTo(text, el)
-			this.editor.insertElement(el)
+			const arr = this.editor.parseHtml('<p>333444</p><p>1112222</p>')
+			arr.forEach(el => {
+				this.editor.insertElement(el)
+			})
 			this.editor.formatElementStack()
 			this.editor.domRender()
 			this.editor.rangeRender()
@@ -47,7 +48,9 @@ export default {
 			this.editor.rangeRender()
 		},
 		setTextMark() {
-			this.editor.removeTextMark('class')
+			this.editor.setTextMark({
+				class: 'bold'
+			})
 			this.editor.formatElementStack()
 			this.editor.domRender()
 			this.editor.rangeRender()

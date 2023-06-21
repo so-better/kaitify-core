@@ -505,11 +505,18 @@ class AlexEditor {
 				//如果起点所在是元素节点
 				else if (range.startContainer.nodeType == 1) {
 					const childNodes = Array.from(range.startContainer.childNodes)
-					anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
-					anchorOffset = childNodes[range.startOffset] ? 0 : 1
-					if (anchorNode.nodeType == 3) {
-						anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
-						anchorNode = anchorNode.parentNode
+					if (childNodes.length) {
+						anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
+						anchorOffset = childNodes[range.startOffset] ? 0 : 1
+						if (anchorNode.nodeType == 3) {
+							anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
+							anchorNode = anchorNode.parentNode
+						}
+					}
+					//如果没有子节点，表示是被认为是closed的元素
+					else {
+						anchorNode = range.startContainer
+						anchorOffset = 0
 					}
 				}
 				//如果终点所在是文本节点
@@ -520,11 +527,18 @@ class AlexEditor {
 				//如果终点所在是元素节点
 				else if (range.endContainer.nodeType == 1) {
 					const childNodes = Array.from(range.endContainer.childNodes)
-					focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
-					focusOffset = childNodes[range.endOffset] ? 0 : 1
-					if (focusNode.nodeType == 3) {
-						focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
-						focusNode = focusNode.parentNode
+					if (childNodes.length) {
+						focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
+						focusOffset = childNodes[range.endOffset] ? 0 : 1
+						if (focusNode.nodeType == 3) {
+							focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
+							focusNode = focusNode.parentNode
+						}
+					}
+					//如果没有子节点，表示是被认为是closed的元素
+					else {
+						focusNode = range.endContainer
+						focusOffset = 1
 					}
 				}
 				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
@@ -774,8 +788,123 @@ class AlexEditor {
 	//克隆stack
 	__cloneStack() {
 		return this.stack.map(el => {
-			return el.__cloneElement()
+			return el.__fullClone()
 		})
+	}
+	//移除被删除元素的dom
+	__removeDeletedElementDom() {
+		const fn = elements => {
+			elements.forEach(el => {
+				//该元素在新stack中是否存在
+				const isExist = AlexElement.flatElements(this.stack).some(item => {
+					return item.isEqual(el)
+				})
+				//如果存在并且有子元素
+				if (isExist && el.hasChildren()) {
+					//递归处理子元素
+					fn(el.children)
+				}
+				//如果不存在表示该元素被删除了
+				else if (!isExist) {
+					//移除dom
+					el._elm.remove()
+				}
+			})
+		}
+		fn(this.__oldStack)
+	}
+	//更新元素的dom
+	__updateElementDom() {
+		const fn = elements => {
+			elements.forEach(el => {
+				//旧stack中的对应元素
+				const oldElement = AlexElement.flatElements(this.__oldStack).find(item => {
+					return item.isEqual(el)
+				})
+				//如果对应元素存在
+				if (oldElement) {
+					//如果type或者parsedom不一致，则直接替换dom
+					if (oldElement.type != el.type || oldElement.parsedom != el.parsedom) {
+						el.__renderElement()
+						oldElement._elm.parentNode.insertBefore(el._elm, oldElement._elm)
+						oldElement._elm.remove()
+					}
+					//否则更新dom
+					else {
+						//先将旧元素的真实dom赋值给新元素
+						el._elm = oldElement._elm
+						//如果marks不一致更新dom的属性
+						if (!oldElement.isEqualMarks(el)) {
+							//先清除该dom所有的属性
+							if (oldElement.hasMarks()) {
+								for (let key in oldElement.marks) {
+									el._elm.removeAttribute(key)
+								}
+							}
+							//设置新的属性
+							if (el.hasMarks()) {
+								for (let key in el.marks) {
+									if (!/(^on)|(^style$)|(^contenteditable$)/g.test(key)) {
+										el._elm.setAttribute(key, el.marks[key])
+									}
+								}
+							}
+						}
+						//如果styles不一致更新dom的样式
+						if (!oldElement.isEqualStyles(el)) {
+							//先清除该dom所有的样式
+							el._elm.removeAttribute('style')
+							//设置新的样式
+							if (el.hasStyles()) {
+								for (let key in el.styles) {
+									el._elm.style.setProperty(key, el.styles[key])
+								}
+							}
+						}
+						//如果textContent不一致，则更新文本
+						if (el.isText() && oldElement.textContent != el.textContent) {
+							el._elm.innerHTML = el.textContent
+						}
+						if (el.hasChildren()) {
+							fn(el.children)
+						}
+					}
+				}
+				//如果不存在则表示该元素是新插入的
+				else if (!oldElement) {
+					//渲染元素
+					el.__renderElement()
+					//获取前一个兄弟元素
+					const previousElement = this.getPreviousElement(el)
+					//如果前一个兄弟元素存在
+					if (previousElement) {
+						//在前一个兄弟元素的真实dom后插入此元素的dom
+						previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
+					}
+					//前一个兄弟元素不存在
+					else {
+						//如果是根级块级元素
+						if (el.isBlock()) {
+							if (this.$el.firstElementChild) {
+								this.$el.insertBefore(el._elm, this.$el.firstElementChild)
+							} else {
+								this.$el.appendChild(el._elm)
+							}
+						}
+						//不是根级块
+						else {
+							const parent = el.parent._elm
+							if (parent.firstElementChild) {
+								parent.insertBefore(el._elm, parent.firstElementChild)
+							} else {
+								parent.appendChild(el._elm)
+							}
+						}
+					}
+				}
+			})
+		}
+		fn(this.stack)
 	}
 	//根据光标进行删除操作
 	delete() {
@@ -1553,12 +1682,21 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
-		console.log(this.__oldStack, this.stack)
-		this.$el.innerHTML = ''
-		this.stack.forEach(element => {
-			element.__renderElement()
-			this.$el.appendChild(element._elm)
-		})
+		//局部进行渲染
+		if (this.__oldStack) {
+			//移除被删除的元素的dom
+			this.__removeDeletedElementDom()
+			//插入新的dom或者更新已存在的dom
+			this.__updateElementDom()
+		}
+		//第一次渲染
+		else {
+			this.$el.innerHTML = ''
+			this.stack.forEach(element => {
+				element.__renderElement()
+				this.$el.appendChild(element._elm)
+			})
+		}
 		this.__oldValue = this.value
 		this.__oldStack = this.__cloneStack()
 		this.value = this.$el.innerHTML
@@ -1724,23 +1862,9 @@ class AlexEditor {
 		if (!key) {
 			throw new Error('You need to specify a key to do the query')
 		}
-		const searchFn = elements => {
-			let element = null
-			for (let el of elements) {
-				if (el.key == key) {
-					element = el
-					break
-				}
-				if (el.hasChildren()) {
-					element = searchFn(el.children)
-					if (element) {
-						break
-					}
-				}
-			}
-			return element
-		}
-		return searchFn(this.stack)
+		return AlexElement.flatElements(this.stack).find(element => {
+			return element.key == key
+		})
 	}
 	//获取指定元素的前一个兄弟元素（会过滤空元素）
 	getPreviousElement(ele) {

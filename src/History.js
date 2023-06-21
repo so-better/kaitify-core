@@ -18,7 +18,7 @@ class AlexHistory {
 		}
 		//生成一个新的stack
 		const newStack = stack.map(ele => {
-			return ele.__cloneElement()
+			return ele.__fullClone()
 		})
 		//查找新stack中anchor对应的元素
 		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
@@ -66,7 +66,7 @@ class AlexHistory {
 		const { stack, range } = this.records[this.current]
 		//创建新的stack
 		const newStack = stack.map(ele => {
-			return ele.__cloneElement()
+			return ele.__fullClone()
 		})
 		//查找新stack中anchor对应的元素
 		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
