@@ -56,5 +56,15 @@ export default {
 			return Dap.element.isContains(parent, target.parentNode)
 		}
 		return Dap.element.isContains(parent, target)
+	},
+	//blob转base64字符串
+	blobToBase64(blob) {
+		return new Promise(resolve => {
+			const fileReader = new FileReader()
+			fileReader.onload = e => {
+				resolve(e.target.result)
+			}
+			fileReader.readAsDataURL(blob)
+		})
 	}
 }

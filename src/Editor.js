@@ -71,6 +71,8 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'cut.alex_editor', this.__handleCut.bind(this))
 		//监听编辑器粘贴
 		Dap.event.on(this.$el, 'paste.alex_editor', this.__handlePaste.bind(this))
+		//监听编辑器复制
+		Dap.event.on(this.$el, 'copy.alex_editor', this.__handleCopy.bind(this))
 		//禁用编辑器拖拽和拖放
 		Dap.event.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', e => e.preventDefault())
 		//监听编辑器获取焦点
@@ -557,36 +559,32 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
-		//以下输入类型使用系统的默认行为
-		if (e.inputType == 'insertFromPaste' || e.inputType == 'deleteByCut' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop' || e.inputType == 'insertCompositionText') {
+		//以下输入类型不进行处理
+		if (e.inputType == 'deleteByCut' || e.inputType == 'insertFromPaste' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop' || e.inputType == 'insertCompositionText') {
 			return
 		}
+		//禁用系统默认行为
 		e.preventDefault()
 		//插入文本
-		if (e.inputType == 'insertText') {
-			if (e.data) {
-				this.insertText(e.data)
-				this.formatElementStack()
-				this.domRender()
-				this.rangeRender()
-			}
-			return
+		if (e.inputType == 'insertText' && e.data) {
+			this.insertText(e.data)
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
 		}
 		//插入段落
-		if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
+		else if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
 			this.insertParagraph()
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
-			return
 		}
 		//删除内容
-		if (e.inputType == 'deleteContentBackward') {
+		else if (e.inputType == 'deleteContentBackward') {
 			this.delete()
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
-			return
 		}
 	}
 	//监听中文输入
@@ -639,129 +637,35 @@ class AlexEditor {
 			}
 		}
 	}
-	//监听粘贴事件
-	__handlePaste(e) {
-		if (this.disabled) {
-			return
-		}
-		const files = e.clipboardData.files
-		//粘贴文件
-		if (files.length) {
-			e.preventDefault()
-			if (!this.emit('pasteFile', files)) {
-				let parseImageFn = []
-				Array.from(files).forEach(file => {
-					//将图片文件和视频转为base64
-					if (file.type && /^((image\/)|(video\/))/g.test(file.type)) {
-						parseImageFn.push(Dap.file.dataFileToBase64(file))
-					}
-				})
-				Promise.all(parseImageFn).then(urls => {
-					urls.forEach((url, index) => {
-						let el = null
-						//视频
-						if (/^(data:video\/)/g.test(url)) {
-							const marks = {
-								src: url,
-								autoplay: true,
-								muted: true,
-								controls: true
-							}
-							const styles = {
-								width: 'auto',
-								'max-width': '100%'
-							}
-							el = new AlexElement('closed', 'video', marks, styles, null)
-						}
-						//图片
-						else {
-							const marks = {
-								src: url
-							}
-							const styles = {
-								width: 'auto',
-								'max-width': '100%'
-							}
-							el = new AlexElement('closed', 'img', marks, styles, null)
-						}
-						this.insertElement(el)
-						this.formatElementStack()
-						this.domRender(index < urls.length - 1)
-						this.rangeRender()
-					})
-				})
-			}
-		}
-		//粘贴纯文本
-		else if (!this.htmlPaste) {
-			e.preventDefault()
-			const data = e.clipboardData.getData('text/plain')
-			if (data) {
-				this.insertText(data)
-				this.formatElementStack()
-				this.domRender()
-				this.rangeRender()
-			}
-		}
-		//粘贴html：以下是针对浏览器原本的粘贴功能，进行节点和光标的更新
-		else {
-			let element = null
-			const end = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
-			//在元素结尾处
-			if (this.range.focus.offset == end) {
-				const nextElement = this.getNextElementOfPoint(this.range.focus)
-				if (nextElement) {
-					element = nextElement
-				}
-			} else {
-				element = this.range.focus.element
-			}
-			const elements = AlexElement.flatElements(this.stack)
-			const index = elements.findIndex(item => {
-				return element && item.isEqual(element)
-			})
-			//获取焦点元素距离扁平化数组结尾的距离
-			const lastLength = elements.length - 1 - index
-			setTimeout(() => {
-				//重新渲染
-				this.stack = this.parseHtml(this.$el.innerHTML)
-				this.formatElementStack()
-				const flatElements = AlexElement.flatElements(this.stack)
-				//index>-1说明不是在编辑器的尾部进行的粘贴
-				if (index > -1) {
-					//根据之前计算的lastLength获取焦点元素的位置
-					const newIndex = flatElements.length - 1 - lastLength
-					this.range.anchor.moveToStart(flatElements[newIndex])
-					this.range.focus.moveToStart(flatElements[newIndex])
-					//将焦点移动到前一个可获取焦点的元素，即粘贴内容的最后
-					const previousElement = this.getPreviousElementOfPoint(this.range.anchor)
-					if (previousElement) {
-						this.range.anchor.moveToEnd(previousElement)
-						this.range.focus.moveToEnd(previousElement)
-					}
-				}
-				//在编辑器尾部粘贴
-				else {
-					this.range.anchor.moveToEnd(flatElements[flatElements.length - 1])
-					this.range.focus.moveToEnd(flatElements[flatElements.length - 1])
-				}
-				this.domRender()
-				this.rangeRender()
-			}, 0)
-		}
-	}
-	//监听剪切事件
-	__handleCut(e) {
-		if (this.disabled) {
-			return
-		}
-		//加上setTimeout是为了在剪切事件后进行处理，起到延时作用
-		setTimeout(() => {
-			this.delete()
+	//监听编辑器剪切
+	async __handleCut(e) {
+		e.preventDefault()
+		const isRealCut = await this.cut()
+		if (isRealCut) {
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
-		}, 0)
+		}
+	}
+	//监听编辑器粘贴
+	async __handlePaste(e) {
+		e.preventDefault()
+		const isRealPaste = await this.paste()
+		if (isRealPaste) {
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
+	//监听编辑器复制
+	async __handleCopy(e) {
+		e.preventDefault()
+		const isRealCopy = await this.copy()
+		if (isRealCopy) {
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
 	}
 	//清空默认行为的内部块元素
 	__emptyDefaultBehaviorInblock(ele) {
@@ -905,6 +809,130 @@ class AlexEditor {
 			})
 		}
 		fn(this.stack)
+	}
+	//根据光标进行粘贴操作
+	async paste() {
+		//是否真正成功执行粘贴
+		let isRealPaste = false
+		const clipboardItems = await navigator.clipboard.read()
+		const clipboardItem = clipboardItems[0]
+		const getTypeFunctions = []
+		for (const type of clipboardItem.types) {
+			getTypeFunctions.push(clipboardItem.getType(type))
+		}
+		const blobs = await Promise.all(getTypeFunctions)
+		for (let blob of blobs) {
+			//存在纯文本数据
+			if (blob.type == 'text/plain') {
+				//是纯文本粘贴
+				if (!this.htmlPaste) {
+					const data = await blob.text()
+					if (data) {
+						this.insertText(data)
+						isRealPaste = true
+					}
+				}
+			}
+			//存在html数据
+			else if (blob.type == 'text/html') {
+				//非纯文本粘贴
+				if (this.htmlPaste) {
+					const data = await blob.text()
+					if (data) {
+						const elements = this.parseHtml(data).filter(el => {
+							return !el.isEmpty()
+						})
+						const length = elements.length
+						this.insertElement(elements[0])
+						this.formatElement(elements[0])
+						for (let i = 1; i < length; i++) {
+							this.addElementAfter(elements[i], elements[i - 1])
+						}
+						this.range.anchor.moveToEnd(elements[length - 1])
+						this.range.focus.moveToEnd(elements[length - 1])
+						isRealPaste = true
+					}
+				}
+			}
+		}
+		return isRealPaste
+	}
+	//根据光标进行剪切操作
+	async cut() {
+		const isRealCopy = await this.copy()
+		if (isRealCopy) {
+			this.delete()
+		}
+		return isRealCopy
+	}
+	//根据光标执行复制操作
+	async copy() {
+		const rangeElements = this.getElementsByRange(true, false)
+		if (rangeElements.length == 0) {
+			return false
+		}
+		//针对子元素全部在选区内但是自身不在选区内的元素进行处理
+		let i = 0
+		while (i < rangeElements.length) {
+			//如果是根级块元素则跳过
+			if (rangeElements[i].isBlock()) {
+				i++
+			} else {
+				//判断父元素是否在数组里
+				let has = rangeElements.some(item => {
+					return item.isEqual(rangeElements[i].parent)
+				})
+				//父元素在数组里则跳过
+				if (has) {
+					i++
+				} else {
+					//父元素的每个子元素都在选区内
+					let allIn = rangeElements[i].parent.children.every(item => {
+						return rangeElements.some(e => {
+							return e.isEqual(item)
+						})
+					})
+					//将父元素加入进来
+					if (allIn) {
+						const index = rangeElements.findIndex(item => {
+							return item.isEqual(rangeElements[i])
+						})
+						rangeElements.splice(index, 0, rangeElements[i].parent)
+					} else {
+						i++
+					}
+				}
+			}
+		}
+		let elements = []
+		rangeElements.forEach(el => {
+			if (el.isBlock()) {
+				elements.push(el)
+			} else {
+				//父元素是否在扁平化数组里
+				const isIn = rangeElements.some(item => {
+					return item.isEqual(el.parent)
+				})
+				//父元素不在
+				if (!isIn) {
+					elements.push(el)
+				}
+			}
+		})
+		let html = ''
+		let text = ''
+		elements.forEach(el => {
+			const newEl = el.clone()
+			newEl.__renderElement()
+			html += newEl._elm.outerHTML
+			text += newEl._elm.innerText
+		})
+		const clipboardItem = new ClipboardItem({
+			'text/html': new Blob([html], { type: 'text/html' }),
+			'text/plain': new Blob([text], { type: 'text/plain' })
+		})
+		await navigator.clipboard.write([clipboardItem])
+		return true
 	}
 	//根据光标进行删除操作
 	delete() {
@@ -1713,6 +1741,10 @@ class AlexEditor {
 	}
 	//根据anchor和focus来设置真实的光标
 	rangeRender() {
+		//如果编辑器被禁用则无法设置真实光标
+		if (this.disabled) {
+			return
+		}
 		//将虚拟光标位置转为真实光标位置
 		const handler = point => {
 			let node = null
@@ -2084,7 +2116,6 @@ class AlexEditor {
 				}
 			}
 		}
-
 		//返回扁平化数组
 		if (flat) {
 			return elements
@@ -2530,7 +2561,7 @@ class AlexEditor {
 		this.setDisabled()
 		//移除相关监听事件
 		Dap.event.off(document, 'selectionchange.alex_editor')
-		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
+		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
 	}
 }
 export default AlexEditor

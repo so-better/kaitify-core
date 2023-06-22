@@ -26,7 +26,7 @@ export default {
 			}
 		})
 		this.editor.on('change', val => {
-			console.log('输入', val)
+			//console.log('输入', val)
 		})
 	},
 	methods: {
