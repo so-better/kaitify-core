@@ -256,7 +256,7 @@ class AlexElement {
 		//文本元素
 		if (this.isText()) {
 			el = document.createElement(AlexElement.TEXT_NODE)
-			el.innerHTML = this.textContent
+			el.innerText = this.textContent
 		}
 		//非文本元素
 		else {

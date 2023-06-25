@@ -595,8 +595,7 @@ class AlexEditor {
 		e.preventDefault()
 		if (e.type == 'compositionstart') {
 			this.__isInputChinese = true
-		}
-		if (e.type == 'compositionend') {
+		} else if (e.type == 'compositionend') {
 			this.__isInputChinese = false
 			//在中文输入结束后插入数据
 			if (e.data) {
@@ -767,7 +766,7 @@ class AlexEditor {
 						}
 						//如果textContent不一致，则更新文本
 						if (el.isText() && oldElement.textContent != el.textContent) {
-							el._elm.innerHTML = el.textContent
+							el._elm.innerText = el.textContent
 						}
 						if (el.hasChildren()) {
 							fn(el.children)
@@ -809,6 +808,60 @@ class AlexEditor {
 			})
 		}
 		fn(this.stack)
+	}
+	//过滤非法dom
+	__filterIllegalDom() {
+		const fn = node => {
+			const childNodes = Array.from(node.childNodes)
+			childNodes.forEach(childNode => {
+				//元素节点
+				if (childNode.nodeType == 1) {
+					//获取key
+					const key = Dap.data.get(childNode, 'data-alex-editor-key')
+					//如果key存在
+					if (key) {
+						//根据key获取元素
+						const element = this.getElementByKey(key)
+						//如果元素存在则继续向下执行
+						if (element) {
+							fn(childNode)
+						}
+						//如果元素不存在则移除该dom
+						else {
+							childNode.remove()
+						}
+					}
+					//如果key不存在则移除该dom
+					else {
+						childNode.remove()
+					}
+				}
+				//文本节点
+				else if (childNode.nodeType == 3) {
+					//获取父节点
+					const textNode = childNode.parentNode
+					//父节点如果是文本类型元素的标签名
+					if (textNode.nodeName.toLocaleLowerCase() == AlexElement.TEXT_NODE) {
+						//获取key
+						const key = Dap.data.get(textNode, 'data-alex-editor-key')
+						//根据key获取元素
+						const element = this.getElementByKey(key)
+						if (element.textContent != childNode.textContent) {
+							textContent.remove()
+						}
+					}
+					//父节点如果不是文本类型元素的标签名则直接移除
+					else {
+						childNode.remove()
+					}
+				}
+				//不是文本节点和元素节点直接移除
+				else {
+					childNode.remove()
+				}
+			})
+		}
+		fn(this.$el)
 	}
 	//根据光标进行粘贴操作
 	async paste() {
@@ -1716,6 +1769,8 @@ class AlexEditor {
 			this.__removeDeletedElementDom()
 			//插入新的dom或者更新已存在的dom
 			this.__updateElementDom()
+			//过滤非法dom，即不属于stack中的元素生成的dom
+			this.__filterIllegalDom()
 		}
 		//第一次渲染
 		else {

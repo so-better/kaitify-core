@@ -13,7 +13,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: '<ol><li>十年生死两茫茫，不思量，<video style="width:300px;" autoplay muted controls src="https://www.mvi-web.cn/bg.mp4"></video>自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ol><ul><li><span style="color:#f30">十年生死两茫茫，不思量</span>，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><img style="width:100px" src="https://www.mvi-web.cn/bg.mp4"/><a href="www.baidu.com">百度一下，你就知道</a></p>',
+			value: '<ul><li><span style="color:#f30">十年生死两茫茫，不思量</span>，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><img style="width:100px" src="https://www.mvi-web.cn/bg.mp4"/><a href="www.baidu.com">百度一下，你就知道</a></p>',
 			editor: null
 		}
 	},
