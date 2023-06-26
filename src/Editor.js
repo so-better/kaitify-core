@@ -595,6 +595,10 @@ class AlexEditor {
 						if (el.isText() && oldElement.textContent != el.textContent) {
 							el._elm.innerText = el.textContent
 						}
+						//如果所在的父元素改变了，则重新插入dom
+						if (el.parent && oldElement.parent && !el.parent.isEqual(oldElement.parent)) {
+							this.__insertNewDom(el, false)
+						}
 						if (el.hasChildren()) {
 							fn(el.children)
 						}
@@ -608,10 +612,12 @@ class AlexEditor {
 		}
 		fn(this.stack)
 	}
-	//插入新的dom（该dom之前不存在于编辑器内）
-	__insertNewDom(el) {
-		//渲染元素
-		el.__renderElement()
+	//将元素的真实dom插入新的位置，如果该dom之前不存在于编辑器内则reRender需要为true
+	__insertNewDom(el, reRender = true) {
+		if (reRender) {
+			//渲染元素
+			el.__renderElement()
+		}
 		//获取前一个兄弟元素
 		const previousElement = this.getPreviousElement(el)
 		//如果前一个兄弟元素存在
@@ -937,14 +943,9 @@ class AlexEditor {
 						const elements = this.parseHtml(data).filter(el => {
 							return !el.isEmpty()
 						})
-						const length = elements.length
-						this.insertElement(elements[0])
-						this.formatElement(elements[0])
-						for (let i = 1; i < length; i++) {
-							this.addElementAfter(elements[i], elements[i - 1])
+						for (let i = 0; i < elements.length; i++) {
+							this.insertElement(elements[i], false)
 						}
-						this.range.anchor.moveToEnd(elements[length - 1])
-						this.range.focus.moveToEnd(elements[length - 1])
 						isRealPaste = true
 					}
 				}
@@ -1531,7 +1532,7 @@ class AlexEditor {
 		}
 	}
 	//根据光标插入元素
-	insertElement(ele) {
+	insertElement(ele, cover = true) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -1554,7 +1555,7 @@ class AlexEditor {
 			//如果插入的元素是内部块且行为值为block，同时光标在内部块里且所在内部块的行为值是block
 			if (ele.isInblock() && ele.behavior == 'block' && inblock && inblock.behavior == 'block') {
 				//光标所在内部块是一个只有换行符的块，则该块需要被覆盖
-				if (inblock.isOnlyHasBreak()) {
+				if (inblock.isOnlyHasBreak() && cover) {
 					//在该内部块之前插入
 					this.addElementBefore(ele, inblock)
 					//删除当前内部块
@@ -1680,7 +1681,7 @@ class AlexEditor {
 			//如果插入的元素是根级块
 			else if (ele.isBlock()) {
 				//光标所在根级块是一个只有换行符的块，则该块需要被覆盖
-				if (block.isOnlyHasBreak()) {
+				if (block.isOnlyHasBreak() && cover) {
 					//在该根级块之前插入
 					this.addElementBefore(ele, block)
 					//删除当前根级块
@@ -1744,7 +1745,7 @@ class AlexEditor {
 			this.range.focus.moveToEnd(ele)
 		} else {
 			this.delete()
-			this.insertElement(ele)
+			this.insertElement(ele, cover)
 		}
 	}
 	//格式化单个元素

@@ -5,7 +5,7 @@
 			<button style="margin-left: 10px" @click="setTextStyle">设置样式</button>
 			<button style="margin-left: 10px" @click="setTextMark">设置标记</button>
 		</div>
-		<div class="editor-content" @click="queryStyle"></div>
+		<div class="editor-content"></div>
 	</div>
 </template>
 <script>
@@ -13,7 +13,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: '<ul><li><span style="color:#f30">十年生死两茫茫，不思量</span>，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><img style="width:100px" src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png"/><a href="www.baidu.com">百度一下，你就知道</a></p>',
+			value: '<ul><li><span style="color:#f30">十年生死两茫茫，不思量</span>，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li><li>十年生死两茫茫，不思量，自难忘。</li></ul><p>十年生死两茫茫</p><blockquote><br></blockquote><p>十年生死两茫茫<a href="https://www.baidu.com">百度一下，你就知道</a><img style="width:100px" src="https://www.mvi-web.cn/mvi-resources/images/mvi_image_0_1676971974565.png"/><a href="www.baidu.com">百度一下，你就知道</a><video src="https://www.mvi-web.cn/bg.mp4" autoplay loop controls muted style="width:300px;"></video>333</p>',
 			editor: null
 		}
 	},
