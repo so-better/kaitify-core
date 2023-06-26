@@ -76,13 +76,16 @@ editor.rangeRender()
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
+-   `editor.paste()` ：根据虚拟光标执行粘贴操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行粘贴操作
+-   `editor.cut()` ：根据虚拟光标执行剪切操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行剪切操作
+-   `editor.copy()` ：根据虚拟光标执行复制操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行复制操作
 -   `editor.delete()` ：根据虚拟光标执行删除操作
 -   `editor.insertText(data)` ：根据虚拟光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在虚拟光标处换行
--   `editor.insertElement(ele)` ：根据虚拟光标位置插入指定的元素
+-   `editor.insertElement(ele,cover=true)` ：根据虚拟光标位置插入指定的元素，cover 为 true 会在某些情况下进行覆盖操作（情况 1：向根级块内插入根级块元素，如果被插入的根级块元素只有换行符，则插入的根级块元素会覆盖此根级块元素；情况 2：向行为值为 block 的内部块内插入内部块，如果被插入的内部块元素只有换行符，则插入的内部块元素会覆盖此内部块元素）
 -   `editor.formatElement(ele)` ：对传入的元素进行格式化，该元素可以是尚未添加到 stack 中的元素【如果是这样的情况，你需要注意该元素是没有 parent 的】
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化
--   `editor.domRender(unPushHistory)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
+-   `editor.domRender(unPushHistory=false)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性）
 -   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性）
@@ -92,8 +95,8 @@ editor.rangeRender()
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange(includes,flat)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false
--   `editor.addElementTo(childEle, parentEle, index)` ：将指定元素添加到父元素的子元素数组中
+-   `editor.getElementsByRange(includes=false,flat=false)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false
+-   `editor.addElementTo(childEle, parentEle, index=0)` ：将指定元素添加到父元素的子元素数组中
 -   `editor.addElementBefore(newEle, targetEle)` ：将指定元素添加到另一个元素前面
 -   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
 -   `editor.collapseToStart(element)` ：将虚拟光标移动到文档头部，如果 element 指定了元素，则移动到该元素头部
@@ -119,9 +122,13 @@ editor.rangeRender()
 | change          | 编辑的内容发生变化就会触发此事件，回调参数为编辑器当前值和编辑器旧值                            |
 | blur            | 编辑器失去焦点时触发，回调参数为编辑器当前的值                                                  |
 | focus           | 编辑器获取焦点时触发，回调参数为编辑器当前的值                                                  |
-| pasteFile       | 在编辑器里粘贴文件时触发，回调参数为文件数组                                                    |
 | rangeUpdate     | 当编辑器的真实光标更新时触发，回调参数为当前的 alexRange 实例                                   |
 | insertParagraph | 调用 insertParagraph 方法执行换行操作时触发，回调参数为换行后光标所在的根级块元素或者内部块元素 |
+| copy            | 进行复制操作时触发                                                                              |
+| cut             | 进行剪切操作时触发                                                                              |
+| paste           | 进行粘贴操作时触发                                                                              |
+
+> 请注意，如果不是本地安全环境或者 https 安全环境下，可能无法使用复制、剪切和粘贴操作，此时浏览器控制台会进行告警提示。这是由于 clipboard 语法在非安全环境下无法使用导致的，属于浏览器限制
 
 ### AlexElement：元素
 

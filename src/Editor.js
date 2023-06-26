@@ -951,6 +951,9 @@ class AlexEditor {
 				}
 			}
 		}
+		if (isRealPaste) {
+			this.emit('paste')
+		}
 		return isRealPaste
 	}
 	//根据光标进行剪切操作
@@ -961,6 +964,7 @@ class AlexEditor {
 		const isRealCopy = await this.copy()
 		if (isRealCopy) {
 			this.delete()
+			this.emit('cut')
 		}
 		return isRealCopy
 	}
@@ -1034,6 +1038,7 @@ class AlexEditor {
 			'text/plain': new Blob([text], { type: 'text/plain' })
 		})
 		await navigator.clipboard.write([clipboardItem])
+		this.emit('copy')
 		return true
 	}
 	//根据光标进行删除操作
