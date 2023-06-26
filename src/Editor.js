@@ -59,6 +59,9 @@ class AlexEditor {
 		this.domRender()
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
+		//判断复制粘贴语法是否能够使用
+		this.useClipboard = true
+		this.__judgeUseClipboard()
 		//设置selection的监听更新range
 		Dap.event.on(document, 'selectionchange.alex_editor', this.__handleSelectionChange.bind(this))
 		//监听内容输入
@@ -481,190 +484,15 @@ class AlexEditor {
 			point.moveToStart(nextElement)
 		}
 	}
-	//监听selection改变
-	__handleSelectionChange() {
-		//如果编辑器禁用则不更新range
-		if (this.disabled) {
-			return
+	//判断是否可以使用Clipboard
+	__judgeUseClipboard() {
+		if (!window.ClipboardItem) {
+			this.useClipboard = false
+			console.warn("window.ClipboardItem must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
 		}
-		//如果是中文输入则不更新range
-		if (this.__isInputChinese) {
-			return
-		}
-		const selection = window.getSelection()
-		if (selection.rangeCount) {
-			const range = selection.getRangeAt(0)
-			if (Util.isContains(this.$el, range.startContainer) && Util.isContains(this.$el, range.endContainer)) {
-				let anchorNode = null
-				let focusNode = null
-				let anchorOffset = null
-				let focusOffset = null
-				//如果起点所在是文本节点
-				if (range.startContainer.nodeType == 3) {
-					anchorNode = range.startContainer.parentNode
-					anchorOffset = range.startOffset
-				}
-				//如果起点所在是元素节点
-				else if (range.startContainer.nodeType == 1) {
-					const childNodes = Array.from(range.startContainer.childNodes)
-					if (childNodes.length) {
-						anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
-						anchorOffset = childNodes[range.startOffset] ? 0 : 1
-						if (anchorNode.nodeType == 3) {
-							anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
-							anchorNode = anchorNode.parentNode
-						}
-					}
-					//如果没有子节点，表示是被认为是closed的元素
-					else {
-						anchorNode = range.startContainer
-						anchorOffset = 0
-					}
-				}
-				//如果终点所在是文本节点
-				if (range.endContainer.nodeType == 3) {
-					focusNode = range.endContainer.parentNode
-					focusOffset = range.endOffset
-				}
-				//如果终点所在是元素节点
-				else if (range.endContainer.nodeType == 1) {
-					const childNodes = Array.from(range.endContainer.childNodes)
-					if (childNodes.length) {
-						focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
-						focusOffset = childNodes[range.endOffset] ? 0 : 1
-						if (focusNode.nodeType == 3) {
-							focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
-							focusNode = focusNode.parentNode
-						}
-					}
-					//如果没有子节点，表示是被认为是closed的元素
-					else {
-						focusNode = range.endContainer
-						focusOffset = 1
-					}
-				}
-				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
-				const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
-				const anchorEle = this.getElementByKey(anchorKey)
-				const focusEle = this.getElementByKey(focusKey)
-				const anchor = new AlexPoint(anchorEle, anchorOffset)
-				const focus = new AlexPoint(focusEle, focusOffset)
-				this.range = new AlexRange(anchor, focus)
-				this.emit('rangeUpdate', this.range)
-			}
-		}
-	}
-	//监听beforeinput
-	__handleBeforeInput(e) {
-		if (this.disabled) {
-			return
-		}
-		//以下输入类型不进行处理
-		if (e.inputType == 'deleteByCut' || e.inputType == 'insertFromPaste' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop' || e.inputType == 'insertCompositionText') {
-			return
-		}
-		//禁用系统默认行为
-		e.preventDefault()
-		//插入文本
-		if (e.inputType == 'insertText' && e.data) {
-			this.insertText(e.data)
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-		//插入段落
-		else if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
-			this.insertParagraph()
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-		//删除内容
-		else if (e.inputType == 'deleteContentBackward') {
-			this.delete()
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-	}
-	//监听中文输入
-	__handleChineseInput(e) {
-		if (this.disabled) {
-			return
-		}
-		e.preventDefault()
-		if (e.type == 'compositionstart') {
-			this.__isInputChinese = true
-		} else if (e.type == 'compositionend') {
-			this.__isInputChinese = false
-			//在中文输入结束后插入数据
-			if (e.data) {
-				this.insertText(e.data)
-				this.formatElementStack()
-				this.__safariLinkHandle()
-				this.domRender()
-				this.rangeRender()
-			}
-		}
-	}
-	//监听键盘按下
-	__handleKeydown(e) {
-		if (this.disabled) {
-			return
-		}
-		//撤销
-		if (Keyboard.Undo(e)) {
-			e.preventDefault()
-			const historyRecord = this.history.get(-1)
-			if (historyRecord) {
-				this.stack = historyRecord.stack
-				this.range = historyRecord.range
-				this.formatElementStack()
-				this.domRender(true)
-				this.rangeRender()
-			}
-		}
-		//重做
-		else if (Keyboard.Redo(e)) {
-			e.preventDefault()
-			const historyRecord = this.history.get(1)
-			if (historyRecord) {
-				this.stack = historyRecord.stack
-				this.range = historyRecord.range
-				this.formatElementStack()
-				this.domRender(true)
-				this.rangeRender()
-			}
-		}
-	}
-	//监听编辑器剪切
-	async __handleCut(e) {
-		e.preventDefault()
-		const isRealCut = await this.cut()
-		if (isRealCut) {
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-	}
-	//监听编辑器粘贴
-	async __handlePaste(e) {
-		e.preventDefault()
-		const isRealPaste = await this.paste()
-		if (isRealPaste) {
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-	}
-	//监听编辑器复制
-	async __handleCopy(e) {
-		e.preventDefault()
-		const isRealCopy = await this.copy()
-		if (isRealCopy) {
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
+		if (!navigator.clipboard) {
+			this.useClipboard = false
+			console.warn("navigator.clipboard must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
 		}
 	}
 	//清空默认行为的内部块元素
@@ -888,8 +716,197 @@ class AlexEditor {
 			this.__insertNewDom(linkEle)
 		}
 	}
+	//监听selection改变
+	__handleSelectionChange() {
+		//如果编辑器禁用则不更新range
+		if (this.disabled) {
+			return
+		}
+		//如果是中文输入则不更新range
+		if (this.__isInputChinese) {
+			return
+		}
+		const selection = window.getSelection()
+		if (selection.rangeCount) {
+			const range = selection.getRangeAt(0)
+			if (Util.isContains(this.$el, range.startContainer) && Util.isContains(this.$el, range.endContainer)) {
+				let anchorNode = null
+				let focusNode = null
+				let anchorOffset = null
+				let focusOffset = null
+				//如果起点所在是文本节点
+				if (range.startContainer.nodeType == 3) {
+					anchorNode = range.startContainer.parentNode
+					anchorOffset = range.startOffset
+				}
+				//如果起点所在是元素节点
+				else if (range.startContainer.nodeType == 1) {
+					const childNodes = Array.from(range.startContainer.childNodes)
+					if (childNodes.length) {
+						anchorNode = childNodes[range.startOffset] ? childNodes[range.startOffset] : childNodes[range.startOffset - 1]
+						anchorOffset = childNodes[range.startOffset] ? 0 : 1
+						if (anchorNode.nodeType == 3) {
+							anchorOffset = anchorOffset == 0 ? 0 : anchorNode.textContent.length
+							anchorNode = anchorNode.parentNode
+						}
+					}
+					//如果没有子节点，表示是被认为是closed的元素
+					else {
+						anchorNode = range.startContainer
+						anchorOffset = 0
+					}
+				}
+				//如果终点所在是文本节点
+				if (range.endContainer.nodeType == 3) {
+					focusNode = range.endContainer.parentNode
+					focusOffset = range.endOffset
+				}
+				//如果终点所在是元素节点
+				else if (range.endContainer.nodeType == 1) {
+					const childNodes = Array.from(range.endContainer.childNodes)
+					if (childNodes.length) {
+						focusNode = childNodes[range.endOffset] ? childNodes[range.endOffset] : childNodes[range.endOffset - 1]
+						focusOffset = childNodes[range.endOffset] ? 0 : 1
+						if (focusNode.nodeType == 3) {
+							focusOffset = focusOffset == 0 ? 0 : focusNode.textContent.length
+							focusNode = focusNode.parentNode
+						}
+					}
+					//如果没有子节点，表示是被认为是closed的元素
+					else {
+						focusNode = range.endContainer
+						focusOffset = 1
+					}
+				}
+				const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
+				const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
+				const anchorEle = this.getElementByKey(anchorKey)
+				const focusEle = this.getElementByKey(focusKey)
+				const anchor = new AlexPoint(anchorEle, anchorOffset)
+				const focus = new AlexPoint(focusEle, focusOffset)
+				this.range = new AlexRange(anchor, focus)
+				this.emit('rangeUpdate', this.range)
+			}
+		}
+	}
+	//监听beforeinput
+	__handleBeforeInput(e) {
+		if (this.disabled) {
+			return
+		}
+		//以下输入类型不进行处理
+		if (e.inputType == 'deleteByCut' || e.inputType == 'insertFromPaste' || e.inputType == 'deleteByDrag' || e.inputType == 'insertFromDrop' || e.inputType == 'insertCompositionText') {
+			return
+		}
+		//禁用系统默认行为
+		e.preventDefault()
+		//插入文本
+		if (e.inputType == 'insertText' && e.data) {
+			this.insertText(e.data)
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+		//插入段落
+		else if (e.inputType == 'insertParagraph' || e.inputType == 'insertLineBreak') {
+			this.insertParagraph()
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+		//删除内容
+		else if (e.inputType == 'deleteContentBackward') {
+			this.delete()
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
+	//监听中文输入
+	__handleChineseInput(e) {
+		if (this.disabled) {
+			return
+		}
+		e.preventDefault()
+		if (e.type == 'compositionstart') {
+			this.__isInputChinese = true
+		} else if (e.type == 'compositionend') {
+			this.__isInputChinese = false
+			//在中文输入结束后插入数据
+			if (e.data) {
+				this.insertText(e.data)
+				this.formatElementStack()
+				this.__safariLinkHandle()
+				this.domRender()
+				this.rangeRender()
+			}
+		}
+	}
+	//监听键盘按下
+	__handleKeydown(e) {
+		if (this.disabled) {
+			return
+		}
+		//撤销
+		if (Keyboard.Undo(e)) {
+			e.preventDefault()
+			const historyRecord = this.history.get(-1)
+			if (historyRecord) {
+				this.stack = historyRecord.stack
+				this.range = historyRecord.range
+				this.formatElementStack()
+				this.domRender(true)
+				this.rangeRender()
+			}
+		}
+		//重做
+		else if (Keyboard.Redo(e)) {
+			e.preventDefault()
+			const historyRecord = this.history.get(1)
+			if (historyRecord) {
+				this.stack = historyRecord.stack
+				this.range = historyRecord.range
+				this.formatElementStack()
+				this.domRender(true)
+				this.rangeRender()
+			}
+		}
+	}
+	//监听编辑器剪切
+	async __handleCut(e) {
+		e.preventDefault()
+		const isRealCut = await this.cut()
+		if (isRealCut) {
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
+	//监听编辑器粘贴
+	async __handlePaste(e) {
+		e.preventDefault()
+		const isRealPaste = await this.paste()
+		if (isRealPaste) {
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
+	//监听编辑器复制
+	async __handleCopy(e) {
+		e.preventDefault()
+		const isRealCopy = await this.copy()
+		if (isRealCopy) {
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
 	//根据光标进行粘贴操作
 	async paste() {
+		if (!this.useClipboard) {
+			return false
+		}
 		//是否真正成功执行粘贴
 		let isRealPaste = false
 		const clipboardItems = await navigator.clipboard.read()
@@ -937,6 +954,9 @@ class AlexEditor {
 	}
 	//根据光标进行剪切操作
 	async cut() {
+		if (!this.useClipboard) {
+			return false
+		}
 		const isRealCopy = await this.copy()
 		if (isRealCopy) {
 			this.delete()
@@ -945,6 +965,9 @@ class AlexEditor {
 	}
 	//根据光标执行复制操作
 	async copy() {
+		if (!this.useClipboard) {
+			return false
+		}
 		const rangeElements = this.getElementsByRange(true, false)
 		if (rangeElements.length == 0) {
 			return false
@@ -1005,7 +1028,7 @@ class AlexEditor {
 			html += newEl._elm.outerHTML
 			text += newEl._elm.innerText
 		})
-		const clipboardItem = new ClipboardItem({
+		const clipboardItem = new window.ClipboardItem({
 			'text/html': new Blob([html], { type: 'text/html' }),
 			'text/plain': new Blob([text], { type: 'text/plain' })
 		})
