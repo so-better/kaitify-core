@@ -196,11 +196,13 @@ class AlexElement {
 		}
 		if (this.isText()) {
 			this.textContent = null
+			this._elm = null
 		} else {
 			this.type = 'text'
 			this.parsedom = null
 			this.children = null
 			this.textContent = null
+			this._elm = null
 		}
 	}
 	//获取所在根级块元素
