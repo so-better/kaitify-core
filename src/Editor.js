@@ -774,30 +774,43 @@ class AlexEditor {
 				}
 				//如果不存在则表示该元素是新插入的
 				else if (!oldElement) {
-					//渲染元素
-					el.__renderElement()
-					//获取后一个兄弟元素
-					const nextElement = this.getNextElement(el)
-					//如果后一个兄弟元素存在
-					if (nextElement) {
-						//在后一个兄弟元素的真实dom前插入此元素的dom
-						nextElement._elm.parentNode.insertBefore(el._elm, nextElement._elm)
-					}
-					//如果后一个兄弟元素不存在则表示需要将元素插入到父元素或者编辑器最后
-					else {
-						//如果是根级块级元素则插入到编辑器最后
-						if (el.isBlock()) {
-							this.$el.appendChild(el._elm)
-						}
-						//不是根级块
-						else {
-							el.parent._elm.appendChild(el._elm)
-						}
-					}
+					this.__insertNewDom(el)
 				}
 			})
 		}
 		fn(this.stack)
+	}
+	//插入新的dom（该dom之前不存在于编辑器内）
+	__insertNewDom(el) {
+		//渲染元素
+		el.__renderElement()
+		//获取前一个兄弟元素
+		const previousElement = this.getPreviousElement(el)
+		//如果前一个兄弟元素存在
+		if (previousElement) {
+			//在前一个兄弟元素的真实dom后插入此元素的dom
+			previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
+		}
+		//前一个兄弟元素不存在
+		else {
+			//如果是根级块级元素
+			if (el.isBlock()) {
+				if (this.$el.firstElementChild) {
+					this.$el.insertBefore(el._elm, this.$el.firstElementChild)
+				} else {
+					this.$el.appendChild(el._elm)
+				}
+			}
+			//不是根级块
+			else {
+				const parent = el.parent._elm
+				if (parent.firstElementChild) {
+					parent.insertBefore(el._elm, parent.firstElementChild)
+				} else {
+					parent.appendChild(el._elm)
+				}
+			}
+		}
 	}
 	//过滤非法dom
 	__filterIllegalDom() {
@@ -871,26 +884,8 @@ class AlexEditor {
 			}
 			//移除a标签本身
 			linkEle._elm.remove()
-			//重新渲染a标签dom
-			linkEle.__renderElement()
-			//获取后一个兄弟元素
-			const nextElement = this.getNextElement(linkEle)
-			//如果后一个兄弟元素存在
-			if (nextElement) {
-				//在后一个兄弟元素的真实dom前插入此元素的dom
-				nextElement._elm.parentNode.insertBefore(linkEle._elm, nextElement._elm)
-			}
-			//如果后一个兄弟元素不存在则表示需要将元素插入到父元素或者编辑器最后
-			else {
-				//如果是根级块级元素则插入到编辑器最后
-				if (linkEle.isBlock()) {
-					this.$el.appendChild(linkEle._elm)
-				}
-				//不是根级块
-				else {
-					linkEle.parent._elm.appendChild(linkEle._elm)
-				}
-			}
+			//重新插入链接的dom
+			this.__insertNewDom(linkEle)
 		}
 	}
 	//根据光标进行粘贴操作

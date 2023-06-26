@@ -31,7 +31,7 @@ export default {
 	},
 	methods: {
 		insertElemenet() {
-			const arr = this.editor.parseHtml('<p>333444</p><p>1112222</p>')
+			const arr = this.editor.parseHtml('<p>333444</p>')
 			arr.forEach(el => {
 				this.editor.insertElement(el)
 			})
