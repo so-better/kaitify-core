@@ -307,6 +307,16 @@ class AlexElement {
 		}
 		return el
 	}
+	//获取元素所在的链接元素
+	__getLink() {
+		if (this.parsedom == 'a') {
+			return this
+		}
+		if (this.isBlock()) {
+			return null
+		}
+		return this.parent.__getLink()
+	}
 	//判断是否该类型数据
 	static isElement(val) {
 		return val instanceof AlexElement

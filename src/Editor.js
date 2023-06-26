@@ -601,6 +601,7 @@ class AlexEditor {
 			if (e.data) {
 				this.insertText(e.data)
 				this.formatElementStack()
+				this.__safariLinkHandle()
 				this.domRender()
 				this.rangeRender()
 			}
@@ -734,8 +735,6 @@ class AlexEditor {
 					}
 					//否则更新dom
 					else {
-						//先将旧元素的真实dom赋值给新元素
-						el._elm = oldElement._elm
 						//如果marks不一致更新dom的属性
 						if (!oldElement.isEqualMarks(el)) {
 							//先清除该dom所有的属性
@@ -777,31 +776,22 @@ class AlexEditor {
 				else if (!oldElement) {
 					//渲染元素
 					el.__renderElement()
-					//获取前一个兄弟元素
-					const previousElement = this.getPreviousElement(el)
-					//如果前一个兄弟元素存在
-					if (previousElement) {
-						//在前一个兄弟元素的真实dom后插入此元素的dom
-						previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
+					//获取后一个兄弟元素
+					const nextElement = this.getNextElement(el)
+					//如果后一个兄弟元素存在
+					if (nextElement) {
+						//在后一个兄弟元素的真实dom前插入此元素的dom
+						nextElement._elm.parentNode.insertBefore(el._elm, nextElement._elm)
 					}
-					//前一个兄弟元素不存在
+					//如果后一个兄弟元素不存在则表示需要将元素插入到父元素或者编辑器最后
 					else {
-						//如果是根级块级元素
+						//如果是根级块级元素则插入到编辑器最后
 						if (el.isBlock()) {
-							if (this.$el.firstElementChild) {
-								this.$el.insertBefore(el._elm, this.$el.firstElementChild)
-							} else {
-								this.$el.appendChild(el._elm)
-							}
+							this.$el.appendChild(el._elm)
 						}
 						//不是根级块
 						else {
-							const parent = el.parent._elm
-							if (parent.firstElementChild) {
-								parent.insertBefore(el._elm, parent.firstElementChild)
-							} else {
-								parent.appendChild(el._elm)
-							}
+							el.parent._elm.appendChild(el._elm)
 						}
 					}
 				}
@@ -839,18 +829,19 @@ class AlexEditor {
 				//文本节点
 				else if (childNode.nodeType == 3) {
 					//获取父节点
-					const textNode = childNode.parentNode
-					//父节点如果是文本类型元素的标签名
-					if (textNode.nodeName.toLocaleLowerCase() == AlexElement.TEXT_NODE) {
-						//获取key
-						const key = Dap.data.get(textNode, 'data-alex-editor-key')
+					const parentNode = childNode.parentNode
+					//获取key
+					const key = Dap.data.get(parentNode, 'data-alex-editor-key')
+					//如果key存在则继续判断
+					if (key) {
 						//根据key获取元素
 						const element = this.getElementByKey(key)
-						if (element.textContent != childNode.textContent) {
-							textContent.remove()
+						//如果元素不存在或者不是文本元素，则移除
+						if (!element || !element.isText()) {
+							childNode.remove()
 						}
 					}
-					//父节点如果不是文本类型元素的标签名则直接移除
+					//key不存在则移除
 					else {
 						childNode.remove()
 					}
@@ -862,6 +853,45 @@ class AlexEditor {
 			})
 		}
 		fn(this.$el)
+	}
+	//解决safari下在a标签末尾输入中文导致a标签消失的bug
+	__safariLinkHandle() {
+		//判断是否在safari下
+		const { Safari } = Dap.platform.browser()
+		//获取焦点所在的a标签
+		const linkEle = this.range.anchor.element.__getLink()
+		//如果在safari下并且焦点在a标签中
+		if (Safari && linkEle) {
+			//移除a标签下的所有dom
+			if (linkEle.hasChildren()) {
+				const elements = AlexElement.flatElements(linkEle.children)
+				for (let i = elements.length - 1; i >= 0; i--) {
+					elements[i]._elm.remove()
+				}
+			}
+			//移除a标签本身
+			linkEle._elm.remove()
+			//重新渲染a标签dom
+			linkEle.__renderElement()
+			//获取后一个兄弟元素
+			const nextElement = this.getNextElement(linkEle)
+			//如果后一个兄弟元素存在
+			if (nextElement) {
+				//在后一个兄弟元素的真实dom前插入此元素的dom
+				nextElement._elm.parentNode.insertBefore(linkEle._elm, nextElement._elm)
+			}
+			//如果后一个兄弟元素不存在则表示需要将元素插入到父元素或者编辑器最后
+			else {
+				//如果是根级块级元素则插入到编辑器最后
+				if (linkEle.isBlock()) {
+					this.$el.appendChild(linkEle._elm)
+				}
+				//不是根级块
+				else {
+					linkEle.parent._elm.appendChild(linkEle._elm)
+				}
+			}
+		}
 	}
 	//根据光标进行粘贴操作
 	async paste() {
@@ -1871,10 +1901,11 @@ class AlexEditor {
 		let element = null
 		//构造参数
 		let config = {
-			type: '',
+			type: 'inblock',
 			parsedom,
 			marks,
-			styles
+			styles,
+			behavior: 'default'
 		}
 		//默认的根级块元素
 		if (block) {
@@ -1886,6 +1917,9 @@ class AlexEditor {
 		//默认的内部块元素
 		else if (inblock) {
 			config.type = 'inblock'
+			if (inblock.block) {
+				config.behavior = 'block'
+			}
 		}
 		//默认的行内元素
 		else if (inline) {
@@ -1907,6 +1941,8 @@ class AlexEditor {
 			config.parsedom = 'span'
 		}
 		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
+		//设置行为值
+		element.behavior = config.behavior
 		//如果是根部块元素或者内部块元素或者行内元素，则设置子元素
 		if (block || inblock || inline) {
 			Array.from(node.childNodes).forEach(childNode => {
@@ -1920,10 +1956,6 @@ class AlexEditor {
 					}
 				}
 			})
-		}
-		//类型为内部块的li元素默认行为等同于block
-		if (inblock && inblock.parsedom == 'li') {
-			element.behavior = 'block'
 		}
 		return element
 	}

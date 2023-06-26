@@ -3,7 +3,8 @@
  */
 export default [
 	{
-		parsedom: 'li'
+		parsedom: 'li',
+		block: true
 	},
 	{
 		parsedom: 'tfoot'
