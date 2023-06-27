@@ -1759,6 +1759,9 @@ class AlexEditor {
 		}
 		//移除子孙元素中的空元素
 		const removeEmptyElement = element => {
+			if (element.isEmpty()) {
+				return
+			}
 			if (element.hasChildren()) {
 				element.children.forEach(item => {
 					if (!item.isEmpty()) {
@@ -1783,13 +1786,15 @@ class AlexEditor {
 				const ele = this.stack[index]
 				//格式化
 				format(ele, fn)
-				//移除该元素下所有的空元素
-				removeEmptyElement(ele)
 				const newIndex = this.stack.findIndex(item => {
 					return ele.isEqual(item)
 				})
 				index = newIndex + 1
 			}
+		})
+		//移除子孙元素中的空元素
+		this.stack.forEach(ele => {
+			removeEmptyElement(ele)
 		})
 		//移除根部的空元素
 		this.stack = this.stack.filter(ele => {
