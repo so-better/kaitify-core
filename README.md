@@ -15,9 +15,14 @@
 ```javascript
 import AlexEditor from 'alex-editor'
 const el = document.body.querySlector('#editor')
+//创建编辑器实例
 const editor = new AlexEditor(el, {
 	value: '<p>hello,我是一个编辑器</p>'
 })
+//对编辑器的元素数组进行格式化
+editor.formatElementStack()
+//进行dom渲染
+editor.domRender()
 ```
 
 此时，一个基本的富文本编辑器已经创建好了，但是需要注意的是，这个富文本编辑器仅仅是一个可输入的区域，没有任何其他额外的功能
@@ -31,6 +36,10 @@ const el = document.body.querySlector('#editor')
 const editor = new AlexEditor(el, {
 	value: '<p>hello,我是一个编辑器</p>'
 })
+//对编辑器的元素数组进行格式化
+editor.formatElementStack()
+//进行dom渲染
+editor.domRender()
 //获取AlexRange实例
 const range = editor.range
 ```
@@ -47,16 +56,16 @@ editor.domRender()
 editor.rangeRender()
 ```
 
-> 对于修改了 stack 数组的操作，最后都需要使用 editor.formatElementStack、editor.domRender 和 editor.range.rangeRender，这三个方法按顺序使用，主要作用是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置
+> 初始化创建编辑器以及每次对编辑器的元素进行操作时，需要使用 editor.formatElementStack、editor.domRender 和 editor.range.rangeRender 来（重新）渲染编辑器，这三个方法需要按顺序使用，主要作用分别是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置。
 
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
-| 属性        | 类型     | 说明                                                                                                                                                                                        | 可取值     | 默认值           |
-| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
-| value       | string   | 初始化时设置的编辑器内容                                                                                                                                                                    | -          | "\<p>\<br>\</p>" |
-| disabled    | boolean  | 初始化时是否禁用编辑器                                                                                                                                                                      | true/false | false            |
-| renderRules | function | 自定义编辑器格式化规则，回调参数为 element，表示当前要渲染的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回（不能修改父子元素关系，要么直接从父组件中删除子元素） | -          | -                |
-| htmlPaste   | boolean  | 粘贴时是否携带样式                                                                                                                                                                          | true/false | false            |
+| 属性        | 类型    | 说明                                                                                                                                                                                      | 可取值     | 默认值           |
+| ----------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
+| value       | string  | 初始化时设置的编辑器内容                                                                                                                                                                  | -          | "\<p>\<br>\</p>" |
+| disabled    | boolean | 初始化时是否禁用编辑器                                                                                                                                                                    | true/false | false            |
+| renderRules | array   | 数组的每个元素必须是一个函数，作为自定义编辑器格式化元素的规则，其回调参数为 element，表示当前要进行格式化处理的 AlexElement 实例，你可以针对该实例或者其子孙元素进行操作，并将该元素返回 | -          | -                |
+| htmlPaste   | boolean | 粘贴时是否携带样式                                                                                                                                                                        | true/false | false            |
 
 ### 编辑器内部规范
 
@@ -83,7 +92,6 @@ editor.rangeRender()
 -   `editor.insertText(data)` ：根据虚拟光标位置向编辑器内插入文本
 -   `editor.insertParagraph()` ：在虚拟光标处换行
 -   `editor.insertElement(ele,cover=true)` ：根据虚拟光标位置插入指定的元素，cover 为 true 会在某些情况下进行覆盖操作（情况 1：向根级块内插入根级块元素，如果被插入的根级块元素只有换行符，则插入的根级块元素会覆盖此根级块元素；情况 2：向行为值为 block 的内部块内插入内部块，如果被插入的内部块元素只有换行符，则插入的内部块元素会覆盖此内部块元素）
--   `editor.formatElement(ele)` ：对传入的元素进行格式化，该元素可以是尚未添加到 stack 中的元素【如果是这样的情况，你需要注意该元素是没有 parent 的】
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化
 -   `editor.domRender(unPushHistory=false)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
