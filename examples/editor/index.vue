@@ -28,6 +28,8 @@ export default {
 		this.editor.on('change', val => {
 			//console.log('输入', val)
 		})
+		this.editor.formatElementStack()
+		this.editor.domRender()
 	},
 	methods: {
 		insertElemenet() {

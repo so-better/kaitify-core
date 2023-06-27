@@ -47,16 +47,10 @@ class AlexEditor {
 		this.__isInputChinese = false
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
-		//格式化元素数组
-		this.formatElementStack()
-		//如果元素数组为空则说明给的初始值不符合要求，则此时初始化stack
-		this.stack.length == 0 ? this.__initStack() : null
 		//旧stack
 		this.__oldStack = null
 		//初始设置range
 		this.__initRange()
-		//渲染dom
-		this.domRender()
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
 		//判断复制粘贴语法是否能够使用
@@ -91,7 +85,7 @@ class AlexEditor {
 	__formatOptions(options) {
 		let opts = {
 			disabled: false,
-			renderRules: null,
+			renderRules: [],
 			htmlPaste: false,
 			value: '<p><br></p>'
 		}
@@ -99,7 +93,7 @@ class AlexEditor {
 			if (typeof options.disabled == 'boolean') {
 				opts.disabled = options.disabled
 			}
-			if (typeof options.renderRules == 'function') {
+			if (Array.isArray(options.renderRules)) {
 				opts.renderRules = options.renderRules
 			}
 			if (typeof options.value == 'string' && options.value) {
@@ -111,14 +105,8 @@ class AlexEditor {
 		}
 		return opts
 	}
-	//格式化函数数组
+	//默认的格式化规则数组
 	__formatUnchangeableRules = [
-		//自定义元素格式化规则
-		element => {
-			if (typeof this.renderRules == 'function') {
-				this.renderRules.apply(this, [element])
-			}
-		},
 		//stack数组元素只能是根级块元素
 		element => {
 			if (!element.parent && !element.isBlock() && !element.isEmpty()) {
@@ -448,13 +436,6 @@ class AlexEditor {
 			}
 		}
 	]
-	//初始化stack
-	__initStack() {
-		const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
-		const breakEle = new AlexElement('closed', 'br', null, null, null)
-		this.addElementTo(breakEle, ele)
-		this.stack = [ele]
-	}
 	//初始设置range
 	__initRange() {
 		const lastElement = this.stack[this.stack.length - 1]
@@ -1753,13 +1734,10 @@ class AlexEditor {
 			this.insertElement(ele, cover)
 		}
 	}
-	//格式化单个元素
-	formatElement(ele) {
-		if (!AlexElement.isElement(ele)) {
-			throw new Error('The argument must be an AlexElement instance')
-		}
+	//格式化stack
+	formatElementStack() {
 		//格式化
-		const format = element => {
+		const format = (element, fn) => {
 			//从子孙元素开始格式化
 			if (element.hasChildren()) {
 				let index = 0
@@ -1767,7 +1745,7 @@ class AlexEditor {
 				while (index < element.children.length) {
 					let el = element.children[index]
 					//对该子元素进行格式化处理
-					format(el)
+					format(el, fn)
 					//获取格式化后的元素序列
 					const newIndex = element.children.findIndex(item => {
 						return el.isEqual(item)
@@ -1777,9 +1755,7 @@ class AlexEditor {
 				}
 			}
 			//格式化自身
-			this.__formatUnchangeableRules.forEach(fn => {
-				fn(element)
-			})
+			fn.apply(this, [element])
 		}
 		//移除子孙元素中的空元素
 		const removeEmptyElement = element => {
@@ -1794,26 +1770,38 @@ class AlexEditor {
 				})
 			}
 		}
-		//格式化
-		format(ele)
-		//移除该元素下所有的空元素
-		removeEmptyElement(ele)
-	}
-	//格式化stack
-	formatElementStack() {
-		let index = 0
-		while (index < this.stack.length) {
-			const el = this.stack[index]
-			this.formatElement(el)
-			const newIndex = this.stack.findIndex(item => {
-				return el.isEqual(item)
-			})
-			index = newIndex + 1
-		}
+		//获取自定义的格式化规则
+		let renderRules = this.renderRules.filter(fn => {
+			return typeof fn == 'function'
+		})
+		//将自定义的格式化规则加入到默认规则之前
+		renderRules = [...renderRules, ...this.__formatUnchangeableRules]
+		//遍历从而对每个元素进行格式化
+		renderRules.forEach(fn => {
+			let index = 0
+			while (index < this.stack.length) {
+				const ele = this.stack[index]
+				//格式化
+				format(ele, fn)
+				//移除该元素下所有的空元素
+				removeEmptyElement(ele)
+				const newIndex = this.stack.findIndex(item => {
+					return ele.isEqual(item)
+				})
+				index = newIndex + 1
+			}
+		})
+		//移除根部的空元素
 		this.stack = this.stack.filter(ele => {
-			//移除根部的空元素
 			return !ele.isEmpty()
 		})
+		//如果元素数组为空则说明给的初始值不符合要求，此时初始化stack
+		if (this.stack.length == 0) {
+			const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
+			const breakEle = new AlexElement('closed', 'br', null, null, null)
+			this.addElementTo(breakEle, ele)
+			this.stack = [ele]
+		}
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
