@@ -1061,6 +1061,11 @@ class AlexEditor {
 							}
 						}
 					}
+					//前一个可设置光标的元素不存在
+					else {
+						//光标此刻在内部块的开始处，也在编辑器的开始处
+						this.emit('deleteExtend', 1)
+					}
 				}
 				//如果光标在所在元素内部
 				else {
@@ -1106,12 +1111,22 @@ class AlexEditor {
 						this.range.anchor.element.toEmpty()
 						//如果所在的内部块元素为空
 						if (inblock.isEmpty()) {
-							//如果删除的不是换行符或者内部块的行为值是默认的或者前一个可获取焦点的元素不存在，则创建换行符
-							if (!isBreak || inblock.behavior == 'default' || !previousElement) {
+							//如果删除的不是换行符或者内部块的行为值是默认的，则创建换行符
+							if (!isBreak || inblock.behavior == 'default') {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, inblock)
 								this.range.anchor.moveToEnd(breakEl)
 								this.range.focus.moveToEnd(breakEl)
+							}
+							//删除的是换行符并且内部块的行为值是block，但是前一个可以获取焦点的元素不存在
+							else if (!previousElement) {
+								//此刻光标在内部块的开始处，也在编辑器的开始处，且内部块为空了
+								if (!this.emit('deleteExtend', 2)) {
+									const breakEl = new AlexElement('closed', 'br', null, null, null)
+									this.addElementTo(breakEl, inblock)
+									this.range.anchor.moveToEnd(breakEl)
+									this.range.focus.moveToEnd(breakEl)
+								}
 							}
 						}
 					}
@@ -1146,6 +1161,11 @@ class AlexEditor {
 								this.mergeBlockElement(block, previousBlock)
 							}
 						}
+					}
+					//前一个可设置光标的元素不存在
+					else {
+						//光标此刻在根级块的开始处，也在编辑器的开始处
+						this.emit('deleteExtend', 1)
 					}
 				}
 				//如果光标在所在元素内部
@@ -1192,12 +1212,22 @@ class AlexEditor {
 						this.range.anchor.element.toEmpty()
 						//如果所在的根级块元素为空
 						if (block.isEmpty()) {
-							//如果删除的不是换行符或者前一个可获取焦点的元素不存在，则创建换行符
-							if (!isBreak || !previousElement) {
+							//如果删除的不是换行符
+							if (!isBreak) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, block)
 								this.range.anchor.moveToEnd(breakEl)
 								this.range.focus.moveToEnd(breakEl)
+							}
+							//如果是换行符但是前一个可以设置光标的元素不存在
+							else if (!previousElement) {
+								//此刻光标在根级块的开始处，也在编辑器的开始处，且根级块为空了
+								if (!this.emit('deleteExtend', 2)) {
+									const breakEl = new AlexElement('closed', 'br', null, null, null)
+									this.addElementTo(breakEl, block)
+									this.range.anchor.moveToEnd(breakEl)
+									this.range.focus.moveToEnd(breakEl)
+								}
 							}
 						}
 					}
