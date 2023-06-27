@@ -56,8 +56,6 @@ editor.domRender()
 editor.rangeRender()
 ```
 
-> 初始化创建编辑器以及每次对编辑器的元素进行操作时，需要使用 editor.formatElementStack、editor.domRender 和 editor.range.rangeRender 来（重新）渲染编辑器，这三个方法需要按顺序使用，主要作用分别是格式化编辑器元素数组、渲染编辑器 dom 内容，设置真实光标位置。
-
 ### 创建 editor 实例的第二个构造参数 options 是一个对象，具体包含以下属性：
 
 | 属性        | 类型    | 说明                                                                                                                                                                                      | 可取值     | 默认值           |
@@ -93,7 +91,7 @@ editor.rangeRender()
 -   `editor.insertParagraph()` ：在虚拟光标处换行
 -   `editor.insertElement(ele,cover=true)` ：根据虚拟光标位置插入指定的元素，cover 为 true 会在某些情况下进行覆盖操作（情况 1：向根级块内插入根级块元素，如果被插入的根级块元素只有换行符，则插入的根级块元素会覆盖此根级块元素；情况 2：向行为值为 block 的内部块内插入内部块，如果被插入的内部块元素只有换行符，则插入的内部块元素会覆盖此内部块元素）
 -   `editor.formatElementStack()` ：对 editor.stack 进行格式化
--   `editor.domRender(unPushHistory=false)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数
+-   `editor.domRender(unPushHistory=false)` ：渲染编辑器 dom 内容，该方法会触发 value 的更新，如果 unPushHistory 为 true，则本次操作不会添加到历史记录中去，除了做“撤销”和“重做”功能时一般情况下不设置此参数。
 -   `editor.rangeRender()` ：根据虚拟光标来渲染真实的光标或者选区
 -   `editor.parseHtml(html)` ：将 html 文本内容转为 AlexElement 元素，返回一个元素数组（转换过程中会移除节点的 on 开头的属性）
 -   `editor.parseNode(node)` ：将 node 节点转为 AlexElement 元素（转换过程中会移除节点的 on 开头的属性）
@@ -122,6 +120,9 @@ editor.rangeRender()
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
 
 > parseNode 方法内部在将 Node 节点转为 AlexElement 元素时，会有一个默认的处理转换过程，比如 li 标签会被转为行为值是"block"的内部块元素、b 标签会被转为带加粗样式的行内元素且 parsedom 为 span 等等。parseHtml 同理，其内部调用的仍然是 parseNode 方法
+
+> 在创建编辑器时需要调用 formatElementStack 方法、domRender 方法来进行编辑器的格式化和 dom 渲染
+> 只要对编辑器的 stack 数组内的元素或者虚拟光标进行了操作，就应当使用 formatElementStack 和 domRender 来重新渲染编辑器
 
 > 下面是 editor 内部定义的事件：
 
