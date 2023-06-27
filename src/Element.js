@@ -196,9 +196,13 @@ class AlexElement {
 		}
 		if (this.isText()) {
 			this.textContent = null
+			this.marks = null
+			this.styles = null
 			this._elm = null
 		} else {
 			this.type = 'text'
+			this.marks = null
+			this.styles = null
 			this.parsedom = null
 			this.children = null
 			this.textContent = null
