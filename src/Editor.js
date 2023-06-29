@@ -445,7 +445,7 @@ class AlexEditor {
 		this.range.anchor.moveToEnd(lastElement)
 		this.range.focus.moveToEnd(lastElement)
 	}
-	//range更正：如果在换行符后面，则更为在换行符前面
+	//range更正：如果在换行符后面，则更为在换行符前面【源码内设置光标到换行符的地方都使用了moveToStart，渐少触发该纠正函数，毕竟要重新渲染光标】
 	__rectifyRangeInBreak() {
 		let isRectify = false
 		if (this.range.anchor.element.isBreak() && this.range.anchor.offset == 1) {
