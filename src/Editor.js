@@ -445,6 +445,21 @@ class AlexEditor {
 		this.range.anchor.moveToEnd(lastElement)
 		this.range.focus.moveToEnd(lastElement)
 	}
+	//range更正：如果在换行符后面，则更为在换行符前面
+	__rectifyRangeInBreak() {
+		let isRectify = false
+		if (this.range.anchor.element.isBreak() && this.range.anchor.offset == 1) {
+			this.range.anchor.offset = 0
+			isRectify = true
+		}
+		if (this.range.focus.element.isBreak() && this.range.focus.offset == 1) {
+			this.range.focus.offset = 0
+			isRectify = true
+		}
+		if (isRectify) {
+			this.rangeRender()
+		}
+	}
 	//更新焦点的元素为最近的可设置光标的元素
 	__setRecentlyPoint(point) {
 		const previousElement = this.getPreviousElementOfPoint(point)
@@ -772,6 +787,7 @@ class AlexEditor {
 				const anchor = new AlexPoint(anchorEle, anchorOffset)
 				const focus = new AlexPoint(focusEle, focusOffset)
 				this.range = new AlexRange(anchor, focus)
+				this.__rectifyRangeInBreak()
 				this.emit('rangeUpdate', this.range)
 			}
 		}
@@ -1099,8 +1115,8 @@ class AlexEditor {
 							//建一个换行符元素作为占位元素
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, inblock)
-							this.range.anchor.moveToEnd(breakEl)
-							this.range.focus.moveToEnd(breakEl)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
 						}
 					}
 					//如果光标在自闭合元素内
@@ -1115,8 +1131,8 @@ class AlexEditor {
 							if (!isBreak || inblock.behavior == 'default') {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, inblock)
-								this.range.anchor.moveToEnd(breakEl)
-								this.range.focus.moveToEnd(breakEl)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
 							}
 							//删除的是换行符并且内部块的行为值是block，但是前一个可以获取焦点的元素不存在
 							else if (!previousElement) {
@@ -1124,8 +1140,8 @@ class AlexEditor {
 								if (!this.emit('deleteExtend', 2)) {
 									const breakEl = new AlexElement('closed', 'br', null, null, null)
 									this.addElementTo(breakEl, inblock)
-									this.range.anchor.moveToEnd(breakEl)
-									this.range.focus.moveToEnd(breakEl)
+									this.range.anchor.moveToStart(breakEl)
+									this.range.focus.moveToStart(breakEl)
 								}
 							}
 						}
@@ -1200,8 +1216,8 @@ class AlexEditor {
 							//建一个换行符元素作为占位元素
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, block)
-							this.range.anchor.moveToEnd(breakEl)
-							this.range.focus.moveToEnd(breakEl)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
 						}
 					}
 					//如果光标在自闭合元素内
@@ -1216,8 +1232,8 @@ class AlexEditor {
 							if (!isBreak) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, block)
-								this.range.anchor.moveToEnd(breakEl)
-								this.range.focus.moveToEnd(breakEl)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
 							}
 							//如果是换行符但是前一个可以设置光标的元素不存在
 							else if (!previousElement) {
@@ -1225,8 +1241,8 @@ class AlexEditor {
 								if (!this.emit('deleteExtend', 2)) {
 									const breakEl = new AlexElement('closed', 'br', null, null, null)
 									this.addElementTo(breakEl, block)
-									this.range.anchor.moveToEnd(breakEl)
-									this.range.focus.moveToEnd(breakEl)
+									this.range.anchor.moveToStart(breakEl)
+									this.range.focus.moveToStart(breakEl)
 								}
 							}
 						}
@@ -1444,8 +1460,8 @@ class AlexEditor {
 						const breakEle = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEle, paragraph)
 						this.addElementAfter(paragraph, inblock)
-						this.range.anchor.moveToEnd(paragraph)
-						this.range.focus.moveToEnd(paragraph)
+						this.range.anchor.moveToStart(breakEle)
+						this.range.focus.moveToStart(breakEle)
 						this.emit('insertParagraph', paragraph)
 					}
 					//起点在内部块元素的中间部分则需要切割
@@ -1516,8 +1532,8 @@ class AlexEditor {
 						const breakEle = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEle, paragraph)
 						this.addElementAfter(paragraph, block)
-						this.range.anchor.moveToEnd(paragraph)
-						this.range.focus.moveToEnd(paragraph)
+						this.range.anchor.moveToStart(breakEle)
+						this.range.focus.moveToStart(breakEle)
 						this.emit('insertParagraph', paragraph)
 					}
 					//起点在根级块元素的中间部分则需要切割
@@ -1905,7 +1921,6 @@ class AlexEditor {
 		range.setStart(anchorResult.node, anchorResult.offset)
 		range.setEnd(focusResult.node, focusResult.offset)
 		selection.addRange(range)
-		this.emit('rangeUpdate', this.range)
 	}
 	//将html转为元素
 	parseHtml(html) {
