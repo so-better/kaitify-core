@@ -888,12 +888,10 @@ class AlexEditor {
 	//监听编辑器粘贴
 	async __handlePaste(e) {
 		e.preventDefault()
-		const isRealPaste = await this.paste()
-		if (isRealPaste) {
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
+		await this.paste()
+		this.formatElementStack()
+		this.domRender()
+		this.rangeRender()
 	}
 	//监听编辑器复制
 	async __handleCopy(e) {
@@ -910,8 +908,6 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return false
 		}
-		//是否真正成功执行粘贴
-		let isRealPaste = false
 		const clipboardItems = await navigator.clipboard.read()
 		const clipboardItem = clipboardItems[0]
 		const getTypeFunctions = []
@@ -919,21 +915,61 @@ class AlexEditor {
 			getTypeFunctions.push(clipboardItem.getType(type))
 		}
 		const blobs = await Promise.all(getTypeFunctions)
+		//是否只含有图片文件
+		const isOnlyImage = blobs.every(blob => {
+			return blob.type.startsWith('image/')
+		})
+		//是否只含有视频文件
+		const isOnlyVideo = blobs.every(blob => {
+			return blob.type.startsWith('video/')
+		})
 		for (let blob of blobs) {
+			//存在图片文件
+			if (isOnlyImage && blob.type.startsWith('image/')) {
+				if (!this.emit('pasteImage', blob)) {
+					const url = await Util.blobToBase64(blob)
+					const image = new AlexElement(
+						'closed',
+						'img',
+						{
+							src: url
+						},
+						null,
+						null
+					)
+					this.insertElement(image)
+				}
+			}
+			//存在视频文件
+			else if (isOnlyVideo && blob.type.startsWith('video/')) {
+				if (!this.emit('pasteVideo', blob)) {
+					const url = await Util.blobToBase64(blob)
+					const video = new AlexElement(
+						'closed',
+						'video',
+						{
+							src: url
+						},
+						null,
+						null
+					)
+					this.insertElement(video)
+				}
+			}
 			//存在纯文本数据
-			if (blob.type == 'text/plain') {
-				//是纯文本粘贴
+			else if (blob.type == 'text/plain') {
+				//纯文本粘贴
 				if (!this.htmlPaste) {
 					const data = await blob.text()
 					if (data) {
 						this.insertText(data)
-						isRealPaste = true
+						this.emit('paste', data)
 					}
 				}
 			}
 			//存在html数据
 			else if (blob.type == 'text/html') {
-				//非纯文本粘贴
+				//携带样式粘贴
 				if (this.htmlPaste) {
 					const data = await blob.text()
 					if (data) {
@@ -943,15 +979,11 @@ class AlexEditor {
 						for (let i = 0; i < elements.length; i++) {
 							this.insertElement(elements[i], false)
 						}
-						isRealPaste = true
+						this.emit('paste', data)
 					}
 				}
 			}
 		}
-		if (isRealPaste) {
-			this.emit('paste')
-		}
-		return isRealPaste
 	}
 	//根据光标进行剪切操作
 	async cut() {

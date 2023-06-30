@@ -83,7 +83,7 @@ editor.rangeRender()
 -   `editor.range` ：editor 内部创建的 AlexRange 实例，通过该属性来操控 anchor、focus 和设置光标。请勿修改此属性
 -   `editor.stack` ：存放编辑器内所有的 AlexElement 元素的数组
 -   `editor.history` ：editor 内部创建的 AlexHistory 实例，通过该属性来操控历史的记录，请勿修改此属性
--   `editor.paste()` ：根据虚拟光标执行粘贴操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行粘贴操作
+-   `editor.paste()` ：根据虚拟光标执行粘贴操作，该方法返回一个 promise 对象
 -   `editor.cut()` ：根据虚拟光标执行剪切操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行剪切操作
 -   `editor.copy()` ：根据虚拟光标执行复制操作，该方法返回一个 promise 对象，promise 的 then 方法只含有一个布尔类型的参数，表示是否有效执行复制操作
 -   `editor.delete()` ：根据虚拟光标执行删除操作
@@ -136,6 +136,8 @@ editor.rangeRender()
 | copy            | 进行复制操作时触发                                                                                                                                |
 | cut             | 进行剪切操作时触发                                                                                                                                |
 | paste           | 进行粘贴操作时触发                                                                                                                                |
+| pasteImage      | 自定义图片粘贴，回调参数为图片的 blob 对象                                                                                                        |
+| pasteVideo      | 自定义视频的粘贴，回调参数为视频的 blob 对象                                                                                                      |
 | deleteInStart   | 当光标在编辑器的开始处执行删除时会触发此事件，回调参数为光标所在的根级块元素或者内部块元素                                                        |
 
 > 请注意，如果不是本地安全环境或者 https 安全环境下，可能无法使用复制、剪切和粘贴操作，此时浏览器控制台会进行告警提示。这是由于 clipboard 语法在非安全环境下无法使用导致的，属于浏览器限制
