@@ -1440,7 +1440,7 @@ class AlexEditor {
 					else {
 						this.insertText('\n')
 					}
-					this.emit('insertParagraph')
+					this.emit('insertParagraph', null, inblock)
 				}
 				//不在代码块样式中且内部块元素的行为值是block
 				else if (inblock.behavior == 'block') {
@@ -1451,7 +1451,7 @@ class AlexEditor {
 						const breakEle = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEle, paragraph)
 						this.addElementBefore(paragraph, inblock)
-						this.emit('insertParagraph', inblock)
+						this.emit('insertParagraph', inblock, paragraph)
 					}
 					//起点在内部块元素的终点位置
 					else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
@@ -1462,7 +1462,7 @@ class AlexEditor {
 						this.addElementAfter(paragraph, inblock)
 						this.range.anchor.moveToStart(breakEle)
 						this.range.focus.moveToStart(breakEle)
-						this.emit('insertParagraph', paragraph)
+						this.emit('insertParagraph', paragraph, inblock)
 					}
 					//起点在内部块元素的中间部分则需要切割
 					else {
@@ -1482,7 +1482,7 @@ class AlexEditor {
 						this.range.focus.offset = this.range.anchor.offset
 						this.range.anchor.moveToStart(newInblock)
 						this.delete()
-						this.emit('insertParagraph', newInblock)
+						this.emit('insertParagraph', newInblock, inblock)
 					}
 				}
 			}
@@ -1513,6 +1513,7 @@ class AlexEditor {
 					else {
 						this.insertText('\n')
 					}
+					this.emit('insertParagraph', null, block)
 				}
 				//不在代码块样式中
 				else {
@@ -1523,7 +1524,7 @@ class AlexEditor {
 						const breakEle = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEle, paragraph)
 						this.addElementBefore(paragraph, block)
-						this.emit('insertParagraph', block)
+						this.emit('insertParagraph', block, paragraph)
 					}
 					//起点在根级块元素的终点位置
 					else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
@@ -1534,7 +1535,7 @@ class AlexEditor {
 						this.addElementAfter(paragraph, block)
 						this.range.anchor.moveToStart(breakEle)
 						this.range.focus.moveToStart(breakEle)
-						this.emit('insertParagraph', paragraph)
+						this.emit('insertParagraph', paragraph, block)
 					}
 					//起点在根级块元素的中间部分则需要切割
 					else {
@@ -1554,7 +1555,7 @@ class AlexEditor {
 						this.range.focus.offset = this.range.anchor.offset
 						this.range.anchor.moveToStart(newBlock)
 						this.delete()
-						this.emit('insertParagraph', newBlock)
+						this.emit('insertParagraph', newBlock, block)
 					}
 				}
 			}
