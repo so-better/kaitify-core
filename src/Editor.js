@@ -1080,7 +1080,7 @@ class AlexEditor {
 					//前一个可设置光标的元素不存在
 					else {
 						//光标此刻在内部块的开始处，也在编辑器的开始处
-						this.emit('deleteExtend', 1)
+						this.emit('deleteInStart', inblock)
 					}
 				}
 				//如果光标在所在元素内部
@@ -1137,12 +1137,10 @@ class AlexEditor {
 							//删除的是换行符并且内部块的行为值是block，但是前一个可以获取焦点的元素不存在
 							else if (!previousElement) {
 								//此刻光标在内部块的开始处，也在编辑器的开始处，且内部块为空了
-								if (!this.emit('deleteExtend', 2)) {
-									const breakEl = new AlexElement('closed', 'br', null, null, null)
-									this.addElementTo(breakEl, inblock)
-									this.range.anchor.moveToStart(breakEl)
-									this.range.focus.moveToStart(breakEl)
-								}
+								const breakEl = new AlexElement('closed', 'br', null, null, null)
+								this.addElementTo(breakEl, inblock)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
 							}
 						}
 					}
@@ -1181,7 +1179,7 @@ class AlexEditor {
 					//前一个可设置光标的元素不存在
 					else {
 						//光标此刻在根级块的开始处，也在编辑器的开始处
-						this.emit('deleteExtend', 1)
+						this.emit('deleteInStart', block)
 					}
 				}
 				//如果光标在所在元素内部
@@ -1238,12 +1236,10 @@ class AlexEditor {
 							//如果是换行符但是前一个可以设置光标的元素不存在
 							else if (!previousElement) {
 								//此刻光标在根级块的开始处，也在编辑器的开始处，且根级块为空了
-								if (!this.emit('deleteExtend', 2)) {
-									const breakEl = new AlexElement('closed', 'br', null, null, null)
-									this.addElementTo(breakEl, block)
-									this.range.anchor.moveToStart(breakEl)
-									this.range.focus.moveToStart(breakEl)
-								}
+								const breakEl = new AlexElement('closed', 'br', null, null, null)
+								this.addElementTo(breakEl, block)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
 							}
 						}
 					}
