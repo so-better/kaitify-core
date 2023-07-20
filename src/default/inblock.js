@@ -23,5 +23,8 @@ export default [
 	},
 	{
 		parsedom: 'td'
+	},
+	{
+		parsedom: 'colgroup'
 	}
 ]

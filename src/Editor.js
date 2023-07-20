@@ -1914,6 +1914,7 @@ class AlexEditor {
 				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
 			}
+			this.emit('domRender')
 		}
 	}
 	//根据anchor和focus来设置真实的光标

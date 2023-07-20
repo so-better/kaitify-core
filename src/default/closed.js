@@ -6,6 +6,9 @@ export default [
 		parsedom: 'br'
 	},
 	{
+		parsedom: 'col'
+	},
+	{
 		parsedom: 'img'
 	},
 	{
