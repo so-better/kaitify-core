@@ -195,18 +195,21 @@ class AlexElement {
 			return
 		}
 		if (this.isText()) {
-			this.textContent = null
 			this.marks = null
 			this.styles = null
+			this.textContent = null
 			this._elm = null
-		} else {
+		} else if (this.isClosed()) {
 			this.type = 'text'
+			this.parsedom = null
 			this.marks = null
 			this.styles = null
-			this.parsedom = null
-			this.children = null
 			this.textContent = null
 			this._elm = null
+		} else if (this.hasChildren()) {
+			this.children.forEach(el => {
+				el.toEmpty()
+			})
 		}
 	}
 	//获取所在根级块元素

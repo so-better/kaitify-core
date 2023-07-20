@@ -926,8 +926,8 @@ class AlexEditor {
 		for (let blob of blobs) {
 			//存在图片文件
 			if (isOnlyImage && blob.type.startsWith('image/')) {
-				if (!this.emit('pasteImage', blob)) {
-					const url = await Util.blobToBase64(blob)
+				const url = await Util.blobToBase64(blob)
+				if (!this.emit('pasteImage', url)) {
 					const image = new AlexElement(
 						'closed',
 						'img',
@@ -942,8 +942,8 @@ class AlexEditor {
 			}
 			//存在视频文件
 			else if (isOnlyVideo && blob.type.startsWith('video/')) {
-				if (!this.emit('pasteVideo', blob)) {
-					const url = await Util.blobToBase64(blob)
+				const url = await Util.blobToBase64(blob)
+				if (!this.emit('pasteVideo', url)) {
 					const video = new AlexElement(
 						'closed',
 						'video',
