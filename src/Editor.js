@@ -1127,10 +1127,17 @@ class AlexEditor {
 					//如果光标在空白元素文本内
 					if (this.range.anchor.element.isSpaceText()) {
 						this.range.anchor.element.toEmpty()
-						this.range.anchor.offset = 0
-						this.range.focus.offset = 0
-						this.delete()
-						return
+						if (inblock.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, inblock)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
+						} else {
+							this.range.anchor.offset = 0
+							this.range.focus.offset = 0
+							this.delete()
+							return
+						}
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
@@ -1226,10 +1233,17 @@ class AlexEditor {
 					//如果光标在空白元素文本内
 					if (this.range.anchor.element.isSpaceText()) {
 						this.range.anchor.element.toEmpty()
-						this.range.anchor.offset = 0
-						this.range.focus.offset = 0
-						this.delete()
-						return
+						if (block.isEmpty()) {
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, block)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
+						} else {
+							this.range.anchor.offset = 0
+							this.range.focus.offset = 0
+							this.delete()
+							return
+						}
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
