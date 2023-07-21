@@ -204,6 +204,7 @@ AlexElement 提供以下几种语法来方便我们的操作：
 -   `AlexElement.getSpaceElement()`：返回一个空白元素，该元素是一个 text 元素，其内容不显示，但是不会被认定为空元素
 -   `AlexElement.BLOCK_NODE` ：定义段落元素，默认是"p"
 -   `AlexElement.TEXT_NODE` ：定义文本元素的标签，默认是"span"
+-   `AlexElement.VOID_NODES` ：定义不显示的元素标签数组，存在于该数组中的元素标签所表示的元素在批量删除行为时会被过滤掉
 
 > 自行创建的 AlexElement 元素实例，向编辑器内插入需要添加到某元素的 children 里，并且该元素的 parent 设为某元素。你可以选择 editor.addElementTo、editor.addElementBefore 和 editor.addElementAfter 来插入新的元素，此时不需要你自己设置 children 和 parent
 

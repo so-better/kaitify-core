@@ -356,6 +356,8 @@ class AlexElement {
 	static BLOCK_NODE = 'p'
 	//定义默认的文本元素标签
 	static TEXT_NODE = 'span'
+	//定义不显示的元素标签
+	static VOID_NODES = ['colgroup', 'col']
 }
 
 export default AlexElement
