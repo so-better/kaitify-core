@@ -115,6 +115,8 @@ editor.rangeRender()
 -   `editor.setTextMark(marks)` ：根据虚拟光标设置文本元素的指定标记
 -   `editor.removeMark(markNames)` ：根据虚拟光标移除文本元素的指定标记，如果参数 markNames 不存在，则移除文本元素的所有标记
 -   `editor.queryTextMark(name, value)` ：根据虚拟光标查询文本元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true
+-   `editor.setIndent()` ：增加所在根级块元素或者所在内部块元素（行为值为"block"）的缩进
+-   `editor.outIndent()` ：减少所在根级块元素或者所在内部块元素（行为值为"block"）的缩进
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
 -   `editor.on(eventName, eventHandle)` ：对 editor 进行监听，第一个参数为监听的事件名称，第二个参数为监听的回调函数，回调函数的参数具体有哪些取决于 emit 方法
 -   `editor.destroy()` ：销毁编辑器，主要是设置编辑器不可编辑，同时移除编辑相关的事件。当编辑器对应的元素从页面中移除前，应当调用一次该方法进行事件解绑处理
