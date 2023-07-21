@@ -591,7 +591,9 @@ class AlexEditor {
 						}
 						//如果textContent不一致，则更新文本
 						if (el.isText() && oldElement.textContent != el.textContent) {
-							el._elm.innerText = el.textContent
+							el._elm.innerHTML = ''
+							const text = document.createTextNode(el.textContent)
+							el._elm.appendChild(text)
 						}
 						//如果所在的父元素改变了，则重新插入dom
 						if (el.parent && oldElement.parent && !el.parent.isEqual(oldElement.parent)) {

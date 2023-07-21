@@ -265,7 +265,8 @@ class AlexElement {
 		//文本元素
 		if (this.isText()) {
 			el = document.createElement(AlexElement.TEXT_NODE)
-			el.innerText = this.textContent
+			const text = document.createTextNode(this.textContent)
+			el.appendChild(text)
 		}
 		//非文本元素
 		else {
