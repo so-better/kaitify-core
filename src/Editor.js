@@ -885,11 +885,17 @@ class AlexEditor {
 		else if (Keyboard.Indent(e)) {
 			e.preventDefault()
 			this.setIndent()
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
 		}
 		//减少缩进
 		else if (Keyboard.Outdent(e)) {
 			e.preventDefault()
 			this.setOutdent()
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
 		}
 	}
 	//监听编辑器剪切
@@ -2790,9 +2796,6 @@ class AlexEditor {
 				}
 			})
 		}
-		this.formatElementStack()
-		this.domRender()
-		this.rangeRender()
 	}
 	//减少缩进
 	setOutdent() {
@@ -2827,9 +2830,6 @@ class AlexEditor {
 				}
 			})
 		}
-		this.formatElementStack()
-		this.domRender()
-		this.rangeRender()
 	}
 	//触发自定义事件
 	emit(eventName, ...value) {
