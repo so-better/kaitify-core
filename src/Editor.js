@@ -838,7 +838,6 @@ class AlexEditor {
 		if (e.type == 'compositionstart') {
 			this.__isInputChinese = true
 		} else if (e.type == 'compositionend') {
-			this.__isInputChinese = false
 			//在中文输入结束后插入数据
 			if (e.data) {
 				this.insertText(e.data)
@@ -847,6 +846,10 @@ class AlexEditor {
 				this.domRender()
 				this.rangeRender()
 			}
+			//加上延时器避免过早修改中文输入标识导致删除中文拼音时触发range更新
+			setTimeout(() => {
+				this.__isInputChinese = false
+			}, 0)
 		}
 	}
 	//监听键盘按下
