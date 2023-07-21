@@ -66,5 +66,13 @@ export default {
 			}
 			fileReader.readAsDataURL(blob)
 		})
+	},
+	//生成唯一值
+	createGuid() {
+		//获取当前guid，不存在则从0开始
+		let guid = Dap.data.get(document.documentElement, 'mvi-editor-guid') || 0
+		guid++
+		Dap.data.set(document.body, 'mvi-editor-guid', guid)
+		return guid
 	}
 }

@@ -25,6 +25,8 @@ class AlexEditor {
 		Dap.data.set(el, 'data-alex-editor-init', true)
 		//格式化options参数
 		options = this.__formatOptions(options)
+		//编辑器唯一id
+		this.__guid = Util.createGuid()
 		//编辑器容器
 		this.$el = el
 		//是否禁用
@@ -57,7 +59,7 @@ class AlexEditor {
 		this.useClipboard = true
 		this.__judgeUseClipboard()
 		//设置selection的监听更新range
-		Dap.event.on(document, 'selectionchange.alex_editor', this.__handleSelectionChange.bind(this))
+		Dap.event.on(document, `selectionchange.alex_editor_${this.__guid}`, this.__handleSelectionChange.bind(this))
 		//监听内容输入
 		Dap.event.on(this.$el, 'beforeinput.alex_editor', this.__handleBeforeInput.bind(this))
 		//监听中文输入
@@ -2571,7 +2573,6 @@ class AlexEditor {
 			//文本元素没有样式直接返回false
 			return false
 		})
-		this.formatElementStack()
 		return flag
 	}
 	//设置文本元素的标记
@@ -2714,7 +2715,6 @@ class AlexEditor {
 			//文本元素没有样式直接返回false
 			return false
 		})
-		this.formatElementStack()
 		return flag
 	}
 	//触发自定义事件
@@ -2739,7 +2739,7 @@ class AlexEditor {
 		//去除可编辑效果
 		this.setDisabled()
 		//移除相关监听事件
-		Dap.event.off(document, 'selectionchange.alex_editor')
+		Dap.event.off(document, `selectionchange.alex_editor_${this.__guid}`)
 		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
 	}
 }
