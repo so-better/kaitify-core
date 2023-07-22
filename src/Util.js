@@ -15,20 +15,28 @@ export default {
 	getStyles(el) {
 		let o = {}
 		if (el.getAttribute('style')) {
-			const styles = el
-				.getAttribute('style')
-				.split(';')
-				.filter(item => {
-					return item
-				})
-			for (let style of styles) {
-				const res = style.split(':')
-				const key = res[0].trim()
-				const val = res[1].trim()
-				o[key] = val
+			const styles = el.getAttribute('style')
+			let i = 0
+			let start = 0
+			let splitStyles = []
+			while (i < styles.length) {
+				if (styles[i] == ';' && styles.substring(i + 1, i + 8) != 'base64,') {
+					splitStyles.push(styles.substring(start, i))
+					start = i + 1
+				}
+				//到最后了，并且最后没有分号
+				if (i == styles.length - 1 && start < i) {
+					splitStyles.push(styles.substring(start, i))
+				}
+				i++
 			}
+			splitStyles.forEach(style => {
+				const index = style.indexOf(':')
+				const property = style.substring(0, index).trim()
+				const value = style.substring(index + 1).trim()
+				o[property] = value
+			})
 		}
-
 		return o
 	},
 	//生成唯一key
