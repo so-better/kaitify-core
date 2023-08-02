@@ -136,8 +136,8 @@ editor.rangeRender()
 | rangeUpdate     | 当编辑器的真实光标更新时触发，回调参数为当前的 alexRange 实例                                                                                     |
 | insertParagraph | 调用 insertParagraph 方法执行换行操作时触发，回调参数有两个，依次为为换行后光标所在的根级块元素或者内部块元素，以及前一个根级块元素或者内部块元素 |
 | copy            | 进行复制操作时触发                                                                                                                                |
-| cut             | 进行剪切操作时触发                                                                                                                                |
-| paste           | 进行粘贴操作时触发                                                                                                                                |
+| cut             | 进行剪切操作时触发（剪切操作也会触发 copy 事件）                                                                                                  |
+| paste           | 进行粘贴操作时触发，回调参数为粘贴的内容（如果 htmlPaste 为 true，回调参数为粘贴的内容和内容转换后的 AlexEelemnt 数组）                           |
 | pasteImage      | 自定义图片粘贴（剪切板数据仅有图片时），回调参数为图片的 base64 字符串                                                                            |
 | pasteVideo      | 自定义视频的粘贴（剪切板数据仅有视频时），回调参数为视频的 base64 字符串                                                                          |
 | deleteInStart   | 当光标在编辑器的开始处执行删除时会触发此事件，回调参数为光标所在的根级块元素或者内部块元素                                                        |

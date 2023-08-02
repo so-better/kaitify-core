@@ -1002,7 +1002,7 @@ class AlexEditor {
 						for (let i = 0; i < elements.length; i++) {
 							this.insertElement(elements[i], false)
 						}
-						this.emit('paste', data)
+						this.emit('paste', data, elements)
 					}
 				}
 			}
