@@ -101,7 +101,7 @@ editor.rangeRender()
 -   `editor.getNextElement(ele)` ：获取 ele 元素后一个兄弟元素，如果没有则返回 null
 -   `editor.getPreviousElementOfPoint(point)` ：根据指定焦点向前查询可以设置焦点的最近的元素
 -   `editor.getNextElementOfPoint(point)` ：根据指定焦点向后查询可以设置焦点的最近的元素
--   `editor.getElementsByRange(includes=false,flat=false)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false
+-   `editor.getElementsByRange(includes=false,flat=false)` ：获取 anchor 和 focus 两个点之间的元素。如果 includes 为 true，则返回结果包含起点和终点所在元素，并且如果焦点在文本中间，还会分割文本元素，默认为 false；如果 flat 是 true 则返回是扁平化处理后的元素数组，如果是 false 则返回原结构，默认为 false【该方法可能会引起 stack 数据变化，使用后需要使用 formatElementStack 进行格式化】
 -   `editor.addElementTo(childEle, parentEle, index=0)` ：将指定元素添加到父元素的子元素数组中
 -   `editor.addElementBefore(newEle, targetEle)` ：将指定元素添加到另一个元素前面
 -   `editor.addElementAfter(newEle, targetEle)` ：将指定元素添加到另一个元素后面
@@ -111,10 +111,10 @@ editor.rangeRender()
 -   `editor.setEnabled()` ：设置编辑器启用，此时可以编辑
 -   `editor.setTextStyle(styles)` ：根据虚拟光标设置文本元素的指定样式
 -   `editor.removeTextStyle(styleNames)` ：根据虚拟光标移除文本元素的指定样式，如果参数 styleNames 不存在，则移除文本元素的所有样式
--   `editor.queryTextStyle(name, value)` ：根据虚拟光标查询文本元素是否在某个样式下，name 表示样式名称，value 表示样式的值。如果 value 不存在，则仅判断是否拥有名为 name 的样式。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true
+-   `editor.queryTextStyle(name, value)` ：根据虚拟光标查询文本元素是否在某个样式下，name 表示样式名称，value 表示样式的值。如果 value 不存在，则仅判断是否拥有名为 name 的样式。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true【当虚拟光标起点和终点不在一起时，该方法内部会调用 getElementsByRange，此时需要使用 formatElementStack 进行格式化】
 -   `editor.setTextMark(marks)` ：根据虚拟光标设置文本元素的指定标记
 -   `editor.removeMark(markNames)` ：根据虚拟光标移除文本元素的指定标记，如果参数 markNames 不存在，则移除文本元素的所有标记
--   `editor.queryTextMark(name, value)` ：根据虚拟光标查询文本元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true
+-   `editor.queryTextMark(name, value)` ：根据虚拟光标查询文本元素是否在某个标记下，name 表示标记名称，value 表示标记的值。如果 value 不存在，则仅判断是否拥有名为 name 的标记。如果光标进行了选区操作，则判断选区内的每个文本元素，全部符合才会返回 true【当虚拟光标起点和终点不在一起时，该方法内部会调用 getElementsByRange，此时需要使用 formatElementStack 进行格式化】
 -   `editor.setIndent()` ：增加所在根级块元素或者所在内部块元素（行为值为"block"）的缩进
 -   `editor.setOutdent()` ：减少所在根级块元素或者所在内部块元素（行为值为"block"）的缩进
 -   `editor.emit(eventName, ...value)` ：触发指定的监听事件，第一个参数为事件名称，后面的参数都是回调参数
