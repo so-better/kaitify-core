@@ -986,7 +986,7 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						this.insertText(data)
-						this.emit('paste', data)
+						this.emit('pasteText', data)
 					}
 				}
 			}
@@ -1002,7 +1002,7 @@ class AlexEditor {
 						for (let i = 0; i < elements.length; i++) {
 							this.insertElement(elements[i], false)
 						}
-						this.emit('paste', data, elements)
+						this.emit('pasteHtml', data, elements)
 					}
 				}
 			}
