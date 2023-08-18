@@ -94,7 +94,7 @@ export default {
 		border: 1px solid #ddd;
 		padding: 6px 10px;
 		overflow: auto;
-		height: 600px;
+		min-height: 200;
 		border-radius: 4px;
 
 		:deep(p) {

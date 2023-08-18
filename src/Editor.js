@@ -722,6 +722,35 @@ class AlexEditor {
 			this.__insertNewDom(linkEle)
 		}
 	}
+	//判断焦点是否在可视范围内，如果不在则进行设置
+	__setRangeInVisible() {
+		const fn = root => {
+			const el = this.range.focus.element._elm
+			const childRect = Dap.element.getElementBounding(el)
+			const parentRect = Dap.element.getElementBounding(root)
+			//在可视窗口之外
+			if (Math.abs(childRect.top) < Math.abs(parentRect.top) || Math.abs(childRect.bottom) < Math.abs(parentRect.bottom)) {
+				Dap.element
+					.setScrollTop({
+						el: root,
+						number: 0
+					})
+					.then(() => {
+						const tempChildRect = Dap.element.getElementBounding(el)
+						const tempParentRect = Dap.element.getElementBounding(root)
+						Dap.element.setScrollTop({
+							el: root,
+							number: tempChildRect.top - tempParentRect.top
+						})
+					})
+			}
+		}
+		let root = this.$el
+		while (Dap.element.isElement(root) && root != document.documentElement) {
+			fn(root)
+			root = root.parentNode
+		}
+	}
 	//监听selection改变
 	__handleSelectionChange() {
 		//如果编辑器禁用则不更新range
@@ -1957,6 +1986,8 @@ class AlexEditor {
 				this.history.push(this.stack, this.range)
 			}
 		}
+		//判断焦点所在元素是否在滚动条内
+		this.__setRangeInVisible()
 	}
 	//根据anchor和focus来设置真实的光标
 	rangeRender() {
