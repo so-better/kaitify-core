@@ -1925,6 +1925,7 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
+		this.emit('beforeRender')
 		//局部进行渲染
 		if (this.__oldStack) {
 			//移除被删除的元素的dom
@@ -1942,6 +1943,7 @@ class AlexEditor {
 				this.$el.appendChild(element._elm)
 			})
 		}
+		this.emit('afterRender')
 		this.__oldValue = this.value
 		this.__oldStack = this.__cloneStack()
 		this.value = this.$el.innerHTML
@@ -1954,7 +1956,6 @@ class AlexEditor {
 				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
 			}
-			this.emit('domRender')
 		}
 	}
 	//根据anchor和focus来设置真实的光标
