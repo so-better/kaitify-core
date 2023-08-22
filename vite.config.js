@@ -1,25 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-import vueSetupExtend from 'vite-plugin-vue-setup-extend'
-import autoImport from 'unplugin-auto-import/vite'
 
 export default defineConfig({
-	plugins: [
-		vue(),
-		vueSetupExtend(),
-		autoImport({
-			imports: [
-				'vue',
-				'vue-router',
-				{
-					vuex: ['useStore']
-				}
-			],
-			resolvers: [],
-			dts: false
-		})
-	],
+	plugins: [vue()],
 	build: {
 		//打包后的目录名称
 		outDir: 'lib',
@@ -45,13 +29,6 @@ export default defineConfig({
 			// 生产环境移除console
 			compress: {
 				drop_console: true
-			}
-		}
-	},
-	css: {
-		preprocessorOptions: {
-			less: {
-				javascriptEnabled: true // 使用 less 编写样式的 UI 库（如 antd）时建议加入这个设置
 			}
 		}
 	}
