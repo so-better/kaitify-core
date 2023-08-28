@@ -967,62 +967,23 @@ class AlexEditor {
 			getTypeFunctions.push(clipboardItem.getType(type))
 		}
 		const blobs = await Promise.all(getTypeFunctions)
-		//是否只含有图片文件
-		const isOnlyImage = blobs.every(blob => {
-			return blob.type.startsWith('image/')
+		//是否存在html和资源文件
+		const hasHtml = blobs.some(blob => {
+			return blob.type == 'text/html'
 		})
-		//是否只含有视频文件
-		const isOnlyVideo = blobs.every(blob => {
-			return blob.type.startsWith('video/')
-		})
-		for (let blob of blobs) {
-			//存在图片文件
-			if (isOnlyImage && blob.type.startsWith('image/')) {
-				const url = await Util.blobToBase64(blob)
-				if (!this.emit('pasteImage', url)) {
-					const image = new AlexElement(
-						'closed',
-						'img',
-						{
-							src: url
-						},
-						null,
-						null
-					)
-					this.insertElement(image)
-				}
-			}
-			//存在视频文件
-			else if (isOnlyVideo && blob.type.startsWith('video/')) {
-				const url = await Util.blobToBase64(blob)
-				if (!this.emit('pasteVideo', url)) {
-					const video = new AlexElement(
-						'closed',
-						'video',
-						{
-							src: url
-						},
-						null,
-						null
-					)
-					this.insertElement(video)
-				}
-			}
-			//存在纯文本数据
-			else if (blob.type == 'text/plain') {
+		//只要存在html
+		if (hasHtml) {
+			for (let blob of blobs) {
 				//纯文本粘贴
-				if (!this.htmlPaste) {
+				if (blob.type == 'text/plain' && !this.htmlPaste) {
 					const data = await blob.text()
 					if (data) {
 						this.insertText(data)
 						this.emit('pasteText', data)
 					}
 				}
-			}
-			//存在html数据
-			else if (blob.type == 'text/html') {
 				//携带样式粘贴
-				if (this.htmlPaste) {
+				else if (blob.type == 'text/html' && this.htmlPaste) {
 					const data = await blob.text()
 					if (data) {
 						const elements = this.parseHtml(data).filter(el => {
@@ -1032,6 +993,51 @@ class AlexEditor {
 							this.insertElement(elements[i], false)
 						}
 						this.emit('pasteHtml', data, elements)
+					}
+				}
+			}
+		}
+		//不存在html
+		else {
+			for (let blob of blobs) {
+				//图片粘贴
+				if (blob.type.startsWith('image/')) {
+					const url = await Util.blobToBase64(blob)
+					if (!this.emit('pasteImage', url)) {
+						const image = new AlexElement(
+							'closed',
+							'img',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(image)
+					}
+				}
+				//视频粘贴
+				else if (blob.type.startsWith('video/')) {
+					const url = await Util.blobToBase64(blob)
+					if (!this.emit('pasteVideo', url)) {
+						const video = new AlexElement(
+							'closed',
+							'video',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(video)
+					}
+				}
+				//文字粘贴
+				else if (blob.type == 'text/plain') {
+					const data = await blob.text()
+					if (data) {
+						this.insertText(data)
+						this.emit('pasteText', data)
 					}
 				}
 			}
