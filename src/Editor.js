@@ -89,7 +89,7 @@ class AlexEditor {
 			disabled: false,
 			renderRules: [],
 			htmlPaste: false,
-			value: '<p><br></p>'
+			value: ''
 		}
 		if (Dap.common.isObject(options)) {
 			if (typeof options.disabled == 'boolean') {
