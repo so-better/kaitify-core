@@ -1961,8 +1961,17 @@ class AlexEditor {
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
 		this.emit('beforeRender')
+		const isFirstRender = !this.__oldStack
+		//第一次渲染
+		if (isFirstRender) {
+			this.$el.innerHTML = ''
+			this.stack.forEach(element => {
+				element.__renderElement()
+				this.$el.appendChild(element._elm)
+			})
+		}
 		//局部进行渲染
-		if (this.__oldStack) {
+		else {
 			//移除被删除的元素的dom
 			this.__removeDeletedElementDom()
 			//插入新的dom或者更新已存在的dom
@@ -1970,23 +1979,23 @@ class AlexEditor {
 			//过滤非法dom，即不属于stack中的元素生成的dom
 			this.__filterIllegalDom()
 		}
-		//第一次渲染
-		else {
-			this.$el.innerHTML = ''
-			this.stack.forEach(element => {
-				element.__renderElement()
-				this.$el.appendChild(element._elm)
-			})
-		}
 		this.emit('afterRender')
 		this.__oldValue = this.value
 		this.__oldStack = this.__cloneStack()
 		this.value = this.$el.innerHTML
-		//值有变化
-		if (this.__oldValue != this.value) {
+		//第一次渲染
+		if (isFirstRender) {
+			//如果unPushHistory为false，则加入历史记录
+			if (!unPushHistory) {
+				//将本次的stack和range推入历史栈中
+				this.history.push(this.stack, this.range)
+			}
+		}
+		//不是第一次渲染，并且值有变化
+		else if (this.__oldValue != this.value) {
 			//触发change事件
 			this.emit('change', this.value, this.__oldValue)
-			//unPushHistory如果是true则表示不加入历史记录中
+			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
 				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
