@@ -906,22 +906,6 @@ class AlexEditor {
 				this.rangeRender()
 			}
 		}
-		//缩进
-		else if (Keyboard.Indent(e)) {
-			e.preventDefault()
-			this.setIndent()
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
-		//减少缩进
-		else if (Keyboard.Outdent(e)) {
-			e.preventDefault()
-			this.setOutdent()
-			this.formatElementStack()
-			this.domRender()
-			this.rangeRender()
-		}
 	}
 	//监听编辑器剪切
 	async __handleCut(e) {
@@ -2862,82 +2846,6 @@ class AlexEditor {
 		return {
 			result: flag,
 			effect: res.effect
-		}
-	}
-	//增加缩进
-	setIndent() {
-		const fn = element => {
-			if (element.hasStyles()) {
-				if (element.styles.hasOwnProperty('text-indent')) {
-					let val = element.styles['text-indent']
-					if (val.endsWith('em')) {
-						val = parseFloat(val)
-					} else {
-						val = 0
-					}
-					element.styles['text-indent'] = `${val + 2}em`
-				} else {
-					element.styles['text-indent'] = '2em'
-				}
-			} else {
-				element.styles = {
-					'text-indent': '2em'
-				}
-			}
-		}
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			const block = this.range.anchor.element.getBlock()
-			const inblock = this.range.anchor.element.getInblock()
-			if (inblock && inblock.behavior == 'block') {
-				fn(inblock)
-			} else {
-				fn(block)
-			}
-		} else {
-			const { elements } = this.getElementsByRange(true, false)
-			elements.forEach(el => {
-				const block = el.getBlock()
-				const inblock = el.getInblock()
-				if (inblock && inblock.behavior == 'block') {
-					fn(inblock)
-				} else {
-					fn(block)
-				}
-			})
-		}
-	}
-	//减少缩进
-	setOutdent() {
-		const fn = element => {
-			if (element.hasStyles() && element.styles.hasOwnProperty('text-indent')) {
-				let val = element.styles['text-indent']
-				if (val.endsWith('em')) {
-					val = parseFloat(val)
-				} else {
-					val = 0
-				}
-				element.styles['text-indent'] = `${val - 2 >= 0 ? val - 2 : 0}em`
-			}
-		}
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			const block = this.range.anchor.element.getBlock()
-			const inblock = this.range.anchor.element.getInblock()
-			if (inblock && inblock.behavior == 'block') {
-				fn(inblock)
-			} else {
-				fn(block)
-			}
-		} else {
-			const { elements } = this.getElementsByRange(true, false)
-			elements.forEach(el => {
-				const block = el.getBlock()
-				const inblock = el.getInblock()
-				if (inblock && inblock.behavior == 'block') {
-					fn(inblock)
-				} else {
-					fn(block)
-				}
-			})
 		}
 	}
 	//触发自定义事件
