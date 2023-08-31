@@ -1068,37 +1068,40 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return false
 		}
-		const rangeElements = this.getElementsByRange(true, false)
-		if (rangeElements.length == 0) {
-			return false
+		const res = this.getElementsByRange(true, false)
+		if (res.elements.length == 0) {
+			return {
+				result: false,
+				effect: res.effect
+			}
 		}
 		//针对子元素全部在选区内但是自身不在选区内的元素进行处理
 		let i = 0
-		while (i < rangeElements.length) {
+		while (i < res.elements.length) {
 			//如果是根级块元素则跳过
-			if (rangeElements[i].isBlock()) {
+			if (res.elements[i].isBlock()) {
 				i++
 			} else {
 				//判断父元素是否在数组里
-				let has = rangeElements.some(item => {
-					return item.isEqual(rangeElements[i].parent)
+				let has = res.elements.some(item => {
+					return item.isEqual(res.elements[i].parent)
 				})
 				//父元素在数组里则跳过
 				if (has) {
 					i++
 				} else {
 					//父元素的每个子元素都在选区内
-					let allIn = rangeElements[i].parent.children.every(item => {
-						return rangeElements.some(e => {
+					let allIn = res.elements[i].parent.children.every(item => {
+						return res.elements.some(e => {
 							return e.isEqual(item)
 						})
 					})
 					//将父元素加入进来
 					if (allIn) {
-						const index = rangeElements.findIndex(item => {
-							return item.isEqual(rangeElements[i])
+						const index = res.elements.findIndex(item => {
+							return item.isEqual(res.elements[i])
 						})
-						rangeElements.splice(index, 0, rangeElements[i].parent)
+						res.elements.splice(index, 0, res.elements[i].parent)
 					} else {
 						i++
 					}
@@ -1106,12 +1109,12 @@ class AlexEditor {
 			}
 		}
 		let elements = []
-		rangeElements.forEach(el => {
+		res.elements.forEach(el => {
 			if (el.isBlock()) {
 				elements.push(el)
 			} else {
 				//父元素是否在扁平化数组里
-				const isIn = rangeElements.some(item => {
+				const isIn = res.elements.some(item => {
 					return item.isEqual(el.parent)
 				})
 				//父元素不在
@@ -1134,7 +1137,10 @@ class AlexEditor {
 		})
 		await navigator.clipboard.write([clipboardItem])
 		this.emit('copy')
-		return true
+		return {
+			result: true,
+			effect: res.effect
+		}
 	}
 	//根据光标进行删除操作
 	delete() {
@@ -1360,7 +1366,8 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.getElementsByRange(true, false).filter(el => {
+			const res = this.getElementsByRange(true, false)
+			const elements = res.elements.filter(el => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(el.parsedom)
 			})
@@ -2274,10 +2281,14 @@ class AlexEditor {
 	}
 	//获取选区之间的元素
 	getElementsByRange(includes = false, flat = false) {
-		//如果起点和终点在一个地方则返回空数组
+		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			return []
+			return {
+				effect: false,
+				elements: []
+			}
 		}
+		let effect = false
 		let elements = []
 		//如果起点和终点是一个元素内
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
@@ -2297,6 +2308,7 @@ class AlexEditor {
 						newFocus.textContent = val.substring(this.range.focus.offset)
 						this.addElementAfter(newFocus, this.range.anchor.element)
 						elements = [this.range.anchor.element]
+						effect = true
 					}
 					//起点不在文本开始处，但是终点在文本结尾处
 					else if (this.range.focus.offset == this.range.anchor.element.textContent.length) {
@@ -2308,6 +2320,7 @@ class AlexEditor {
 						elements = [newFocus]
 						this.range.anchor.moveToStart(newFocus)
 						this.range.focus.moveToEnd(newFocus)
+						effect = true
 					}
 					//起点不在文本开始处且终点不在文本结尾处
 					else {
@@ -2322,6 +2335,7 @@ class AlexEditor {
 						this.range.anchor.moveToStart(newEl)
 						this.range.focus.moveToEnd(newEl)
 						elements = [newEl]
+						effect = true
 					}
 				}
 				//自闭合元素
@@ -2361,13 +2375,13 @@ class AlexEditor {
 						this.addElementAfter(newEl, this.range.anchor.element)
 						elements.unshift(newEl)
 						this.range.anchor.moveToStart(newEl)
+						effect = true
 					}
 				}
 				//起点是自闭合元素且在自闭合元素前面
 				else if (this.range.anchor.offset == 0) {
 					elements.unshift(this.range.anchor.element)
 				}
-
 				//终点是文本
 				if (this.range.focus.element.isText()) {
 					//在文本最后面
@@ -2382,6 +2396,7 @@ class AlexEditor {
 						newEl.textContent = val.substring(this.range.focus.offset)
 						this.addElementAfter(newEl, this.range.focus.element)
 						elements.push(this.range.focus.element)
+						effect = true
 					}
 				}
 				//终点是自闭合元素且offset为1
@@ -2392,8 +2407,12 @@ class AlexEditor {
 		}
 		//返回扁平化数组
 		if (flat) {
-			return elements
+			return {
+				effect,
+				elements
+			}
 		}
+		//否则返回正常结构的数据
 		let notFlatElements = []
 		elements.forEach(el => {
 			if (el.isBlock()) {
@@ -2409,7 +2428,10 @@ class AlexEditor {
 				}
 			}
 		})
-		return notFlatElements
+		return {
+			effect: effect,
+			elements: notFlatElements
+		}
 	}
 	//将指定元素添加到父元素的子元素数组中
 	addElementTo(childEle, parentEle, index = 0) {
@@ -2566,7 +2588,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.getElementsByRange(true, true)
+			const { elements } = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText()) {
 					if (el.hasStyles()) {
@@ -2619,7 +2641,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.getElementsByRange(true, true)
+			const { elements } = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText()) {
 					removeFn(el)
@@ -2638,21 +2660,34 @@ class AlexEditor {
 			if (this.range.anchor.element.isText() && this.range.anchor.element.hasStyles()) {
 				//表示只查询是否具有样式名称
 				if (value == null || value == undefined) {
-					return this.range.anchor.element.styles.hasOwnProperty(name)
+					return {
+						result: this.range.anchor.element.styles.hasOwnProperty(name),
+						effect: false
+					}
 				}
 				//查询是否具有某个样式值
-				return this.range.anchor.element.styles[name] == value
+				return {
+					result: this.range.anchor.element.styles[name] == value,
+					effect: false
+				}
 			}
-			//不是文本元素或者没有样式直接返回false
-			return false
+			//不是文本元素或者没有样式直接返回
+			return {
+				result: false,
+				effect: false
+			}
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		const elements = this.getElementsByRange(true, true).filter(el => {
+		const res = this.getElementsByRange(true, true)
+		const elements = res.elements.filter(el => {
 			return el.isText()
 		})
 		//如果不包含文本元素直接返回false
 		if (elements.length == 0) {
-			return false
+			return {
+				result: false,
+				effect: res.effect
+			}
 		}
 		//判断每个文本元素是否都具有该样式
 		let flag = elements.every(el => {
@@ -2666,7 +2701,10 @@ class AlexEditor {
 			//文本元素没有样式直接返回false
 			return false
 		})
-		return flag
+		return {
+			result: flag,
+			effect: res.effect
+		}
 	}
 	//设置文本元素的标记
 	setTextMark(marks) {
@@ -2708,7 +2746,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.getElementsByRange(true, true)
+			const { elements } = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText()) {
 					if (el.hasMarks()) {
@@ -2761,7 +2799,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.getElementsByRange(true, true)
+			const { elements } = this.getElementsByRange(true, true)
 			elements.forEach(el => {
 				if (el.isText()) {
 					removeFn(el)
@@ -2780,21 +2818,34 @@ class AlexEditor {
 			if (this.range.anchor.element.isText() && this.range.anchor.element.hasMarks()) {
 				//表示只查询是否具标记名称
 				if (value == null || value == undefined) {
-					return this.range.anchor.element.marks.hasOwnProperty(name)
+					return {
+						effect: false,
+						result: this.range.anchor.element.marks.hasOwnProperty(name)
+					}
 				}
 				//查询是否具有某个样式值
-				return this.range.anchor.element.marks[name] == value
+				return {
+					effect: false,
+					result: this.range.anchor.element.marks[name] == value
+				}
 			}
 			//不是文本元素或者没有标记直接返回false
-			return false
+			return {
+				effect: false,
+				result: false
+			}
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		const elements = this.getElementsByRange(true, true).filter(el => {
+		const res = this.getElementsByRange(true, true)
+		const elements = res.elements.filter(el => {
 			return el.isText()
 		})
 		//如果不包含文本元素直接返回false
 		if (elements.length == 0) {
-			return false
+			return {
+				result: false,
+				effect: res.effect
+			}
 		}
 		//判断每个文本元素是否都具有该标记
 		let flag = elements.every(el => {
@@ -2808,7 +2859,10 @@ class AlexEditor {
 			//文本元素没有样式直接返回false
 			return false
 		})
-		return flag
+		return {
+			result: flag,
+			effect: res.effect
+		}
 	}
 	//增加缩进
 	setIndent() {
@@ -2840,7 +2894,7 @@ class AlexEditor {
 				fn(block)
 			}
 		} else {
-			const elements = this.getElementsByRange(true, false)
+			const { elements } = this.getElementsByRange(true, false)
 			elements.forEach(el => {
 				const block = el.getBlock()
 				const inblock = el.getInblock()
@@ -2874,7 +2928,7 @@ class AlexEditor {
 				fn(block)
 			}
 		} else {
-			const elements = this.getElementsByRange(true, false)
+			const { elements } = this.getElementsByRange(true, false)
 			elements.forEach(el => {
 				const block = el.getBlock()
 				const inblock = el.getInblock()
