@@ -927,8 +927,8 @@ class AlexEditor {
 	async __handleCut(e) {
 		e.preventDefault()
 		const isRealCut = await this.cut()
-		this.formatElementStack()
 		if (isRealCut) {
+			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
 		}
@@ -945,8 +945,8 @@ class AlexEditor {
 	async __handleCopy(e) {
 		e.preventDefault()
 		const isRealCopy = await this.copy()
-		this.formatElementStack()
 		if (isRealCopy) {
+			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
 		}
