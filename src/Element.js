@@ -4,7 +4,7 @@ import Util from './Util'
 class AlexElement {
 	constructor(type, parsedom, marks, styles, textContent) {
 		//key值
-		this.key = Util.getUniqueKey()
+		this.key = Util.createUniqueKey()
 		//类型 block/inblock/inline/text/closed
 		this.type = type
 		//真实节点名称
