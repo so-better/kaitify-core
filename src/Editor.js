@@ -73,15 +73,11 @@ class AlexEditor {
 		//监听编辑器复制
 		Dap.event.on(this.$el, 'copy.alex_editor', this.__handleCopy.bind(this))
 		//禁用编辑器拖拽和拖放
-		Dap.event.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', e => e.preventDefault())
+		Dap.event.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', this.__handleDragDrop.bind(this))
 		//监听编辑器获取焦点
-		Dap.event.on(this.$el, 'focus.alex_editor', () => {
-			this.emit('focus', this.value)
-		})
+		Dap.event.on(this.$el, 'focus.alex_editor', this.__handleFocus.bind(this))
 		//监听编辑器失去焦点
-		Dap.event.on(this.$el, 'blur.alex_editor', () => {
-			this.emit('blur', this.value)
-		})
+		Dap.event.on(this.$el, 'blur.alex_editor', this.__handleBlur.bind(this))
 	}
 	//格式化options参数
 	__formatOptions(options) {
@@ -447,7 +443,7 @@ class AlexEditor {
 		this.range.anchor.moveToEnd(lastElement)
 		this.range.focus.moveToEnd(lastElement)
 	}
-	//range更正：如果在换行符后面，则更为在换行符前面【源码内设置光标到换行符的地方都使用了moveToStart，渐少触发该纠正函数，毕竟要重新渲染光标】
+	//range更正：如果在换行符后面，则更为在换行符前面【源码内设置光标到换行符的地方都使用了moveToStart，减少触发该纠正函数，毕竟要重新渲染光标】
 	__rectifyRangeInBreak() {
 		let isRectify = false
 		if (this.range.anchor.element.isBreak() && this.range.anchor.offset == 1) {
@@ -954,6 +950,18 @@ class AlexEditor {
 			this.domRender()
 			this.rangeRender()
 		}
+	}
+	//监听编辑器拖拽和拖放
+	__handleDragDrop(e) {
+		e.preventDefault()
+	}
+	//监听编辑器获取焦点
+	__handleFocus(e) {
+		this.emit('focus', this.value)
+	}
+	//监听编辑器失去焦点
+	__handleBlur(e) {
+		this.emit('blur', this.value)
 	}
 	//根据光标进行粘贴操作
 	async paste() {

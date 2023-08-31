@@ -3,11 +3,11 @@ class AlexPoint {
 	constructor(element, offset) {
 		this.element = element
 		this.offset = offset
-		this._init()
+		this.__init()
 	}
 
 	//初始化
-	_init() {
+	__init() {
 		if (this.element.isText() || this.element.isClosed()) {
 			return
 		}
