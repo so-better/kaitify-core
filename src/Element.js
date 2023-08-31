@@ -259,6 +259,78 @@ class AlexElement {
 		}
 		return false
 	}
+	//获取两个元素不一样的marks
+	__getDiffMarks(element) {
+		if (this.hasMarks()) {
+			if (element.hasMarks()) {
+				const selfMarkNames = Object.keys(this.marks)
+				const thatMarkNames = Object.keys(element.marks)
+				return {
+					more: selfMarkNames.filter(item => {
+						return (!thatMarkNames.includes(item) || element.marks[item] != this.marks[item]) && !/(^on)|(^style$)|(^contenteditable$)/g.test(item)
+					}),
+					less: thatMarkNames.filter(item => {
+						return (!selfMarkNames.includes(item) || element.marks[item] != this.marks[item]) && !/(^on)|(^style$)|(^contenteditable$)/g.test(item)
+					})
+				}
+			} else {
+				return {
+					more: Object.keys(this.marks).filter(item => {
+						return !/(^on)|(^style$)|(^contenteditable$)/g.test(item)
+					}),
+					less: []
+				}
+			}
+		} else {
+			if (element.hasMarks()) {
+				return {
+					more: [],
+					less: Object.keys(element.marks).filter(item => {
+						return !/(^on)|(^style$)|(^contenteditable$)/g.test(item)
+					})
+				}
+			} else {
+				return {
+					more: [],
+					less: []
+				}
+			}
+		}
+	}
+	//获取两个元素不一样的styles
+	__getDiffStyles(element) {
+		if (this.hasStyles()) {
+			if (element.hasStyles()) {
+				const selfStyleNames = Object.keys(this.styles)
+				const thatStyleNames = Object.keys(element.styles)
+				return {
+					more: selfStyleNames.filter(item => {
+						return !thatStyleNames.includes(item) || element.styles[item] != this.styles[item]
+					}),
+					less: thatStyleNames.filter(item => {
+						return !selfStyleNames.includes(item) || element.styles[item] != this.styles[item]
+					})
+				}
+			} else {
+				return {
+					more: Object.keys(this.styles),
+					less: []
+				}
+			}
+		} else {
+			if (element.hasStyles()) {
+				return {
+					more: [],
+					less: Object.keys(element.styles)
+				}
+			} else {
+				return {
+					more: [],
+					less: []
+				}
+			}
+		}
+	}
 	//渲染成真实dom
 	__renderElement() {
 		let el = null

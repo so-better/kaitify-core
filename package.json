@@ -4,8 +4,8 @@
 	"private": false,
 	"type": "module",
 	"author": "lingkai",
-	"main": "lib/alex-editor.umd.js",
-	"module": "lib/alex-editor.es.js",
+	"main": "src/index.js",
+	"module": "src/index.js",
 	"license": "MIT",
 	"description": "一个轻量级JS底层基础的富文本编辑器",
 	"scripts": {

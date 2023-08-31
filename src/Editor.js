@@ -47,6 +47,8 @@ class AlexEditor {
 		this.__oldValue = options.value
 		//是否正在输入中文
 		this.__isInputChinese = false
+		//是否内部修改真实光标引起selctionChange事件
+		this.__innerSelectionChange = false
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
 		//旧stack
@@ -443,21 +445,6 @@ class AlexEditor {
 		this.range.anchor.moveToEnd(lastElement)
 		this.range.focus.moveToEnd(lastElement)
 	}
-	//range更正：如果在换行符后面，则更为在换行符前面【源码内设置光标到换行符的地方都使用了moveToStart，减少触发该纠正函数，毕竟要重新渲染光标】
-	__rectifyRangeInBreak() {
-		let isRectify = false
-		if (this.range.anchor.element.isBreak() && this.range.anchor.offset == 1) {
-			this.range.anchor.offset = 0
-			isRectify = true
-		}
-		if (this.range.focus.element.isBreak() && this.range.focus.offset == 1) {
-			this.range.focus.offset = 0
-			isRectify = true
-		}
-		if (isRectify) {
-			this.rangeRender()
-		}
-	}
 	//更新焦点的元素为最近的可设置光标的元素
 	__setRecentlyPoint(point) {
 		const previousElement = this.getPreviousElementOfPoint(point)
@@ -511,192 +498,6 @@ class AlexEditor {
 			})
 		}
 	}
-	//克隆stack
-	__cloneStack() {
-		return this.stack.map(el => {
-			return el.__fullClone()
-		})
-	}
-	//移除被删除元素的dom
-	__removeDeletedElementDom() {
-		const fn = elements => {
-			elements.forEach(el => {
-				//该元素在新stack中是否存在
-				const isExist = AlexElement.flatElements(this.stack).some(item => {
-					return item.isEqual(el)
-				})
-				//如果存在并且有子元素
-				if (isExist && el.hasChildren()) {
-					//递归处理子元素
-					fn(el.children)
-				}
-				//如果不存在表示该元素被删除了
-				else if (!isExist) {
-					//移除dom
-					el._elm.remove()
-				}
-			})
-		}
-		fn(this.__oldStack)
-	}
-	//更新元素的dom
-	__updateElementDom() {
-		const fn = elements => {
-			elements.forEach(el => {
-				//旧stack中的对应元素
-				const oldElement = AlexElement.flatElements(this.__oldStack).find(item => {
-					return item.isEqual(el)
-				})
-				//如果对应元素存在
-				if (oldElement) {
-					//如果type或者parsedom不一致，则直接替换dom
-					if (oldElement.type != el.type || oldElement.parsedom != el.parsedom) {
-						el.__renderElement()
-						oldElement._elm.parentNode.insertBefore(el._elm, oldElement._elm)
-						oldElement._elm.remove()
-					}
-					//否则更新dom
-					else {
-						//如果marks不一致更新dom的属性
-						if (!oldElement.isEqualMarks(el)) {
-							//先清除该dom所有的属性
-							if (oldElement.hasMarks()) {
-								for (let key in oldElement.marks) {
-									el._elm.removeAttribute(key)
-								}
-							}
-							//设置新的属性
-							if (el.hasMarks()) {
-								for (let key in el.marks) {
-									if (!/(^on)|(^style$)|(^contenteditable$)/g.test(key)) {
-										el._elm.setAttribute(key, el.marks[key])
-									}
-								}
-							}
-						}
-						//如果styles不一致更新dom的样式
-						if (!oldElement.isEqualStyles(el)) {
-							//先清除该dom所有的样式
-							el._elm.removeAttribute('style')
-							//设置新的样式
-							if (el.hasStyles()) {
-								for (let key in el.styles) {
-									el._elm.style.setProperty(key, el.styles[key])
-								}
-							}
-						}
-						//如果textContent不一致，则更新文本
-						if (el.isText() && oldElement.textContent != el.textContent) {
-							el._elm.innerHTML = ''
-							const text = document.createTextNode(el.textContent)
-							el._elm.appendChild(text)
-						}
-						//如果所在的父元素改变了，则重新插入dom
-						if (el.parent && oldElement.parent && !el.parent.isEqual(oldElement.parent)) {
-							this.__insertNewDom(el, false)
-						}
-						if (el.hasChildren()) {
-							fn(el.children)
-						}
-					}
-				}
-				//如果不存在则表示该元素是新插入的
-				else if (!oldElement) {
-					this.__insertNewDom(el)
-				}
-			})
-		}
-		fn(this.stack)
-	}
-	//将元素的真实dom插入新的位置，如果该dom之前不存在于编辑器内则reRender需要为true
-	__insertNewDom(el, reRender = true) {
-		if (reRender) {
-			//渲染元素
-			el.__renderElement()
-		}
-		//获取前一个兄弟元素
-		const previousElement = this.getPreviousElement(el)
-		//如果前一个兄弟元素存在
-		if (previousElement) {
-			//在前一个兄弟元素的真实dom后插入此元素的dom
-			previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
-		}
-		//前一个兄弟元素不存在
-		else {
-			//如果是根级块级元素
-			if (el.isBlock()) {
-				if (this.$el.firstElementChild) {
-					this.$el.insertBefore(el._elm, this.$el.firstElementChild)
-				} else {
-					this.$el.appendChild(el._elm)
-				}
-			}
-			//不是根级块
-			else {
-				const parent = el.parent._elm
-				if (parent.firstElementChild) {
-					parent.insertBefore(el._elm, parent.firstElementChild)
-				} else {
-					parent.appendChild(el._elm)
-				}
-			}
-		}
-	}
-	//过滤非法dom
-	__filterIllegalDom() {
-		const fn = node => {
-			const childNodes = Array.from(node.childNodes)
-			childNodes.forEach(childNode => {
-				//元素节点
-				if (childNode.nodeType == 1) {
-					//获取key
-					const key = Dap.data.get(childNode, 'data-alex-editor-key')
-					//如果key存在
-					if (key) {
-						//根据key获取元素
-						const element = this.getElementByKey(key)
-						//如果元素存在则继续向下执行
-						if (element) {
-							fn(childNode)
-						}
-						//如果元素不存在则移除该dom
-						else {
-							childNode.remove()
-						}
-					}
-					//如果key不存在则移除该dom
-					else {
-						childNode.remove()
-					}
-				}
-				//文本节点
-				else if (childNode.nodeType == 3) {
-					//获取父节点
-					const parentNode = childNode.parentNode
-					//获取key
-					const key = Dap.data.get(parentNode, 'data-alex-editor-key')
-					//如果key存在则继续判断
-					if (key) {
-						//根据key获取元素
-						const element = this.getElementByKey(key)
-						//如果元素不存在或者不是文本元素，则移除
-						if (!element || !element.isText()) {
-							childNode.remove()
-						}
-					}
-					//key不存在则移除
-					else {
-						childNode.remove()
-					}
-				}
-				//不是文本节点和元素节点直接移除
-				else {
-					childNode.remove()
-				}
-			})
-		}
-		fn(this.$el)
-	}
 	//解决safari下在a标签末尾输入中文导致a标签消失的bug
 	__safariLinkHandle() {
 		//判断是否在safari下
@@ -747,6 +548,99 @@ class AlexEditor {
 			root = root.parentNode
 		}
 	}
+	//将元素的真实dom插入新的位置，如果该dom之前不存在于编辑器内则reRender需要为true
+	__insertNewDom(el, reRender = true) {
+		if (reRender) {
+			//渲染元素
+			el.__renderElement()
+		}
+		//获取前一个兄弟元素
+		const previousElement = this.getPreviousElement(el)
+		//如果前一个兄弟元素存在
+		if (previousElement) {
+			//在前一个兄弟元素的真实dom后插入此元素的dom
+			previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
+		}
+		//前一个兄弟元素不存在
+		else {
+			//如果是根级块级元素
+			if (el.isBlock()) {
+				if (this.$el.firstElementChild) {
+					this.$el.insertBefore(el._elm, this.$el.firstElementChild)
+				} else {
+					this.$el.appendChild(el._elm)
+				}
+			}
+			//不是根级块
+			else {
+				const parent = el.parent._elm
+				if (parent.firstElementChild) {
+					parent.insertBefore(el._elm, parent.firstElementChild)
+				} else {
+					parent.appendChild(el._elm)
+				}
+			}
+		}
+	}
+	//动态更新dom
+	__updateChildren(oldElements, newElements) {
+		const length = newElements.length
+		for (let i = 0; i < length; i++) {
+			const newElement = newElements[i]
+			const oldElement = oldElements[i]
+			//旧的不存在，说明是新增的元素
+			if (!oldElement) {
+				this.__insertNewDom(newElement)
+				continue
+			}
+			//如果parsedom或者type不一样，则直接替换
+			if (newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
+				newElement.__renderElement()
+				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
+				continue
+			}
+			newElement._elm = oldElement._elm
+			//更新marks
+			const diffMarks = newElement.__getDiffMarks(oldElement)
+			if (diffMarks.less.length) {
+				const length = diffMarks.less.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.removeAttribute(diffMarks.less[i])
+				}
+			}
+			if (diffMarks.more.length) {
+				const length = diffMarks.more.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.setAttribute(diffMarks.more[i], newElement.marks[diffMarks.more[i]])
+				}
+			}
+			//更新styles
+			const diffStyles = newElement.__getDiffStyles(oldElement)
+			if (diffStyles.less.length) {
+				const length = diffStyles.less.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.style.setProperty(diffStyles[i], '')
+				}
+			}
+			if (diffStyles.more.length) {
+				const length = diffStyles.more.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.style.setProperty(diffStyles[i], newElement.styles[diffStyles[i]])
+				}
+			}
+			//更新文本
+			if (newElement.isText() && newElement.textContent != oldElement.textContent) {
+				newElement._elm.innerHTML = ''
+				const text = document.createTextNode(newElement.textContent)
+				newElement._elm.appendChild(text)
+				continue
+			}
+			//更新子元素
+			if (newElement.hasChildren()) {
+				this.__updateChildren(oldElement.children || [], newElement.children)
+			}
+		}
+	}
 	//监听selection改变
 	__handleSelectionChange() {
 		//如果编辑器禁用则不更新range
@@ -755,6 +649,10 @@ class AlexEditor {
 		}
 		//如果是中文输入则不更新range
 		if (this.__isInputChinese) {
+			return
+		}
+		//如果是内部修改range则不触发
+		if (this.__innerSelectionChange) {
 			return
 		}
 		const selection = window.getSelection()
@@ -816,7 +714,6 @@ class AlexEditor {
 				const anchor = new AlexPoint(anchorEle, anchorOffset)
 				const focus = new AlexPoint(focusEle, focusOffset)
 				this.range = new AlexRange(anchor, focus)
-				this.__rectifyRangeInBreak()
 				this.emit('rangeUpdate', this.range)
 			}
 		}
@@ -1960,9 +1857,9 @@ class AlexEditor {
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
 		this.emit('beforeRender')
-		const isFirstRender = !this.__oldStack
+		const firstRender = !this.__oldStack
 		//第一次渲染
-		if (isFirstRender) {
+		if (firstRender) {
 			this.$el.innerHTML = ''
 			this.stack.forEach(element => {
 				element.__renderElement()
@@ -1971,19 +1868,18 @@ class AlexEditor {
 		}
 		//局部进行渲染
 		else {
-			//移除被删除的元素的dom
-			this.__removeDeletedElementDom()
-			//插入新的dom或者更新已存在的dom
-			this.__updateElementDom()
-			//过滤非法dom，即不属于stack中的元素生成的dom
-			this.__filterIllegalDom()
+			const t = Date.now()
+			this.__updateChildren(this.__oldStack, this.stack)
+			console.log('domRender需要的时间3', (Date.now() - t) / 1000 + 's')
 		}
 		this.emit('afterRender')
 		this.__oldValue = this.value
-		this.__oldStack = this.__cloneStack()
+		this.__oldStack = this.stack.map(el => {
+			return el.__fullClone()
+		})
 		this.value = this.$el.innerHTML
 		//第一次渲染
-		if (isFirstRender) {
+		if (firstRender) {
 			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
 				//将本次的stack和range推入历史栈中
@@ -2028,6 +1924,7 @@ class AlexEditor {
 			}
 			return { node, offset }
 		}
+		this.__innerSelectionChange = true
 		const anchorResult = handler(this.range.anchor)
 		const focusResult = handler(this.range.focus)
 		//设置光标
@@ -2037,6 +1934,10 @@ class AlexEditor {
 		range.setStart(anchorResult.node, anchorResult.offset)
 		range.setEnd(focusResult.node, focusResult.offset)
 		selection.addRange(range)
+		setTimeout(() => {
+			this.__innerSelectionChange = false
+			this.emit('rangeUpdate', this.range)
+		}, 0)
 	}
 	//将html转为元素
 	parseHtml(html) {
