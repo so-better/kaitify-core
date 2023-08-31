@@ -40,7 +40,7 @@ export default {
 		return o
 	},
 	//生成唯一key
-	getUniqueKey() {
+	createUniqueKey() {
 		//获取唯一id
 		let key = Dap.data.get(window, 'data-alex-editor-key') || 0
 		key++
@@ -77,10 +77,10 @@ export default {
 	},
 	//生成唯一值
 	createGuid() {
-		//获取当前guid，不存在则从0开始
-		let guid = Dap.data.get(document.documentElement, 'mvi-editor-guid') || 0
-		guid++
-		Dap.data.set(document.body, 'mvi-editor-guid', guid)
-		return guid
+		//获取唯一id
+		let key = Dap.data.get(window, 'data-alex-editor-guid') || 0
+		key++
+		Dap.data.set(window, 'data-alex-editor-guid', key)
+		return key
 	}
 }
