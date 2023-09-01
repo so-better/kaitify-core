@@ -438,12 +438,10 @@ class AlexEditor {
 	]
 	//初始设置range
 	__initRange() {
-		const lastElement = this.stack[this.stack.length - 1]
-		const anchor = new AlexPoint(lastElement, 0)
-		const focus = new AlexPoint(lastElement, 0)
+		const firstElement = this.stack[0]
+		const anchor = new AlexPoint(firstElement, 0)
+		const focus = new AlexPoint(firstElement, 0)
 		this.range = new AlexRange(anchor, focus)
-		this.range.anchor.moveToEnd(lastElement)
-		this.range.focus.moveToEnd(lastElement)
 	}
 	//更新焦点的元素为最近的可设置光标的元素
 	__setRecentlyPoint(point) {
@@ -521,25 +519,47 @@ class AlexEditor {
 	}
 	//判断焦点是否在可视范围内，如果不在则进行设置
 	__setRangeInVisible() {
+		const isHiddenTop = (childRectTop, parentRectTop) => {
+			if (childRectTop >= 0 && parentRectTop >= 0) {
+				return childRectTop < parentRectTop
+			}
+			if (childRectTop < 0) {
+				return true
+			}
+			return false
+		}
+		const isHiddenBottom = (childRectBottom, parentRectBottom) => {
+			if (childRectBottom >= 0 && parentRectBottom >= 0) {
+				return childRectBottom < parentRectBottom
+			}
+			if (childRectBottom < 0) {
+				return true
+			}
+			return false
+		}
 		const fn = root => {
-			const el = this.range.focus.element._elm
-			const childRect = Dap.element.getElementBounding(el)
-			const parentRect = Dap.element.getElementBounding(root)
-			//在可视窗口之外
-			if (Math.abs(childRect.top) < Math.abs(parentRect.top) || Math.abs(childRect.bottom) < Math.abs(parentRect.bottom)) {
-				Dap.element
-					.setScrollTop({
-						el: root,
-						number: 0
-					})
-					.then(() => {
-						const tempChildRect = Dap.element.getElementBounding(el)
-						const tempParentRect = Dap.element.getElementBounding(root)
-						Dap.element.setScrollTop({
+			const scrollHeight = Dap.element.getScrollHeight(root)
+			//存在滚动条
+			if (root.clientHeight < scrollHeight) {
+				const el = this.range.focus.element._elm
+				const childRect = Dap.element.getElementBounding(el)
+				const parentRect = Dap.element.getElementBounding(root)
+				//在可视窗口之外
+				if (isHiddenTop(childRect.top, parentRect.top) || isHiddenBottom(childRect.bottom, parentRect.bottom)) {
+					Dap.element
+						.setScrollTop({
 							el: root,
-							number: tempChildRect.top - tempParentRect.top
+							number: 0
 						})
-					})
+						.then(() => {
+							const tempChildRect = Dap.element.getElementBounding(el)
+							const tempParentRect = Dap.element.getElementBounding(root)
+							Dap.element.setScrollTop({
+								el: root,
+								number: tempChildRect.top - tempParentRect.top
+							})
+						})
+				}
 			}
 		}
 		let root = this.$el
@@ -584,13 +604,20 @@ class AlexEditor {
 	}
 	//动态更新dom
 	__updateChildren(oldElements, newElements) {
-		const length = newElements.length
+		const newLength = newElements.length
+		const oldLength = oldElements.length
+		const length = newLength > oldLength ? newLength : oldLength
 		for (let i = 0; i < length; i++) {
 			const newElement = newElements[i]
 			const oldElement = oldElements[i]
 			//旧的不存在，说明是新增的元素
 			if (!oldElement) {
 				this.__insertNewDom(newElement)
+				continue
+			}
+			//新的不存在，说明是已删除的元素
+			if (!newElement) {
+				oldElement._elm.remove()
 				continue
 			}
 			//如果parsedom或者type不一样，则直接替换
@@ -807,8 +834,8 @@ class AlexEditor {
 	//监听编辑器剪切
 	async __handleCut(e) {
 		e.preventDefault()
-		const isRealCut = await this.cut()
-		if (isRealCut) {
+		const succes = await this.cut()
+		if (succes) {
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
@@ -825,8 +852,9 @@ class AlexEditor {
 	//监听编辑器复制
 	async __handleCopy(e) {
 		e.preventDefault()
-		const isRealCopy = await this.copy()
-		if (isRealCopy) {
+		const { succes, effect } = await this.copy()
+		//如果复制成功并且对数据有影响
+		if (succes && effect) {
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
@@ -856,7 +884,7 @@ class AlexEditor {
 			getTypeFunctions.push(clipboardItem.getType(type))
 		}
 		const blobs = await Promise.all(getTypeFunctions)
-		//是否存在html和资源文件
+		//是否存在html
 		const hasHtml = blobs.some(blob => {
 			return blob.type == 'text/html'
 		})
@@ -937,22 +965,22 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return false
 		}
-		const isRealCopy = await this.copy()
-		if (isRealCopy) {
+		const { success } = await this.copy(true)
+		if (success) {
 			this.delete()
 			this.emit('cut')
 		}
-		return isRealCopy
+		return success
 	}
 	//根据光标执行复制操作
-	async copy() {
+	async copy(isCut = false) {
 		if (!this.useClipboard) {
 			return false
 		}
 		const res = this.getElementsByRange(true, false)
 		if (res.elements.length == 0) {
 			return {
-				result: false,
+				success: false,
 				effect: res.effect
 			}
 		}
@@ -1017,9 +1045,11 @@ class AlexEditor {
 			'text/plain': new Blob([text], { type: 'text/plain' })
 		})
 		await navigator.clipboard.write([clipboardItem])
-		this.emit('copy')
+		if (!isCut) {
+			this.emit('copy', res.effect)
+		}
 		return {
-			result: true,
+			success: true,
 			effect: res.effect
 		}
 	}
@@ -1868,9 +1898,7 @@ class AlexEditor {
 		}
 		//局部进行渲染
 		else {
-			const t = Date.now()
 			this.__updateChildren(this.__oldStack, this.stack)
-			console.log('domRender需要的时间3', (Date.now() - t) / 1000 + 's')
 		}
 		this.emit('afterRender')
 		this.__oldValue = this.value
