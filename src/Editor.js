@@ -622,7 +622,7 @@ class AlexEditor {
 				continue
 			}
 			//如果parsedom或者type不一样，则直接替换
-			if (newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
+			if (newElement.key != oldElement.key || newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
 				newElement.__renderElement()
 				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
 				continue
