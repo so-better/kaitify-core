@@ -3,12 +3,15 @@ export default {
 	//获取属性集合
 	getAttributes(el) {
 		let o = {}
-		for (let attribute of el.attributes) {
+		const length = el.attributes.length
+		for (let i = 0; i < length; i++) {
+			const attribute = el.attributes[i]
 			//匹配事件、样式外的属性
 			if (!/(^on)|(^style$)|(^contenteditable$)/g.test(attribute.nodeName)) {
 				o[attribute.nodeName] = attribute.nodeValue
 			}
 		}
+
 		return o
 	},
 	//获取样式集合

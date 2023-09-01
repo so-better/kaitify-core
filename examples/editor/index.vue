@@ -1,9 +1,9 @@
 <template>
 	<div class="editor">
 		<div style="margin-bottom: 20px">
-			<button @click="insertElemenet">插入元素</button>
+			<button @click="queryTextStyle">查询样式</button>
 			<button style="margin-left: 10px" @click="setTextStyle">设置样式</button>
-			<button style="margin-left: 10px" @click="setTextMark">设置标记</button>
+			<button style="margin-left: 10px" @click="removeTextStyle">移除样式</button>
 		</div>
 		<div class="editor-content"></div>
 	</div>
@@ -107,9 +107,9 @@ export default {
 		this.editor.domRender()
 	},
 	methods: {
-		async insertElemenet() {
-			const { success, effect } = await this.editor.copy()
-			console.log(success, effect)
+		queryTextStyle() {
+			const flag = this.editor.queryTextStyle('color', '#87f390')
+			console.log(flag)
 		},
 		setTextStyle() {
 			this.editor.setTextStyle({
@@ -119,10 +119,8 @@ export default {
 			this.editor.domRender()
 			this.editor.rangeRender()
 		},
-		setTextMark() {
-			this.editor.setTextMark({
-				class: 'bold'
-			})
+		removeTextStyle() {
+			this.editor.removeTextStyle()
 			this.editor.formatElementStack()
 			this.editor.domRender()
 			this.editor.rangeRender()

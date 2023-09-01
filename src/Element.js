@@ -345,25 +345,25 @@ class AlexElement {
 			el = document.createElement(this.parsedom)
 			//渲染子元素
 			if (this.hasChildren()) {
-				for (let child of this.children) {
+				this.children.forEach(child => {
 					child.__renderElement()
 					el.appendChild(child._elm)
-				}
+				})
 			}
 		}
 		//设置属性
 		if (this.hasMarks()) {
-			for (let key in this.marks) {
+			Object.keys(this.marks).forEach(key => {
 				if (!/(^on)|(^style$)|(^contenteditable$)/g.test(key)) {
 					el.setAttribute(key, this.marks[key])
 				}
-			}
+			})
 		}
 		//设置样式
 		if (this.hasStyles()) {
-			for (let key in this.styles) {
+			Object.keys(this.styles).forEach(key => {
 				el.style.setProperty(key, this.styles[key])
-			}
+			})
 		}
 		//设置唯一key标记
 		Dap.data.set(el, 'data-alex-editor-key', this.key)
@@ -407,15 +407,16 @@ class AlexElement {
 	static flatElements(elements) {
 		const flat = arr => {
 			let result = []
-			arr.forEach(element => {
-				if (AlexElement.isElement(element)) {
-					result.push(element)
-					if (element.hasChildren()) {
-						let arr = flat(element.children)
-						result = [...result, ...arr]
+			const length = arr.length
+			for (let i = 0; i < length; i++) {
+				if (AlexElement.isElement(arr[i])) {
+					result.push(arr[i])
+					if (arr[i].hasChildren()) {
+						let childResult = flat(arr[i].children)
+						result = [...result, ...childResult]
 					}
 				}
-			})
+			}
 			return result
 		}
 		return flat(elements)
