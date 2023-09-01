@@ -2314,7 +2314,7 @@ class AlexEditor {
 		//以上代码生成notFlagResult
 		return notFlatResult
 	}
-	//分割选区选中的元素
+	//分割选区选中的元素，会更新光标位置
 	splitElementsByRange(includes = false, flat = false) {
 		const result = this.getElementsByRange(includes, flat)
 		let elements = []
