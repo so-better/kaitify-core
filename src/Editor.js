@@ -604,90 +604,68 @@ class AlexEditor {
 		}
 	}
 	//更新dom
-	__updateDoms() {
-		const oldElements = AlexElement.flatElements(this.__oldStack)
-		const newElements = AlexElement.flatElements(this.stack)
-		//修改dom或者新增dom
-		const update = elements => {
-			let length = elements.length
-			for (let i = 0; i < length; i++) {
-				const key = elements[i].key
-				const newElement = elements[i]
-				const oldElement = oldElements.find(el => el.key == key)
-				//旧元素不存在表示新插入的dom
-				if (!oldElement) {
-					this.__insertNewDom(newElement)
-					continue
-				}
-				//type或者parsedom有变化则直接更新dom
-				if (newElement.type != oldElement.type || newElement.parsedom != oldElement.parsedom) {
-					newElement.__renderElement()
-					oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
-					continue
-				}
-				//更新新元素的dom
-				newElement._elm = oldElement._elm
-				//更新marks
-				const diffMarks = newElement.__getDiffMarks(oldElement)
-				if (diffMarks.less.length) {
-					const length = diffMarks.less.length
-					for (let j = 0; j < length; j++) {
-						newElement._elm.removeAttribute(diffMarks.less[j])
-					}
-				}
-				if (diffMarks.more.length) {
-					const length = diffMarks.more.length
-					for (let j = 0; j < length; j++) {
-						newElement._elm.setAttribute(diffMarks.more[j], newElement.marks[diffMarks.more[j]])
-					}
-				}
-				//更新styles
-				const diffStyles = newElement.__getDiffStyles(oldElement)
-				if (diffStyles.less.length) {
-					const length = diffStyles.less.length
-					for (let j = 0; j < length; j++) {
-						newElement._elm.style.setProperty(diffStyles.less[j], '')
-					}
-				}
-				if (diffStyles.more.length) {
-					const length = diffStyles.more.length
-					for (let j = 0; j < length; j++) {
-						newElement._elm.style.setProperty(diffStyles.more[j], newElement.styles[diffStyles.more[j]])
-					}
-				}
-				//更新文本
-				if (newElement.isText() && newElement.textContent != oldElement.textContent) {
-					newElement._elm.innerHTML = ''
-					const text = document.createTextNode(newElement.textContent)
-					newElement._elm.appendChild(text)
-					continue
-				}
-				//存在子元素，则对子元素进行处理
-				if (newElement.hasChildren()) {
-					update(newElement.children)
+	__updateDoms(oldElements, newElements) {
+		const oldLength = oldElements.length
+		const newLength = newElements.length
+		const length = newLength > oldLength ? newLength : oldLength
+		for (let i = 0; i < length; i++) {
+			const newElement = newElements[i]
+			const oldElement = oldElements[i]
+			//旧的不存在，说明是新增的元素
+			if (!oldElement) {
+				this.__insertNewDom(newElement)
+				continue
+			}
+			//新的不存在，说明是已删除的元素
+			if (!newElement) {
+				oldElement._elm.remove()
+				continue
+			}
+			//如果parsedom或者type不一样，则直接替换
+			if (newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
+				newElement.__renderElement()
+				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
+				continue
+			}
+			newElement._elm = oldElement._elm
+			//更新marks
+			const diffMarks = newElement.__getDiffMarks(oldElement)
+			if (diffMarks.less.length) {
+				const length = diffMarks.less.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.removeAttribute(diffMarks.less[i])
 				}
 			}
-		}
-		//移除被删除的dom
-		const remove = elements => {
-			let length = elements.length
-			for (let i = 0; i < length; i++) {
-				const key = elements[i].key
-				const oldElement = elements[i]
-				const newElement = newElements.find(el => el.key == key)
-				//新元素不存在则表示该dom需要被删除
-				if (!newElement) {
-					oldElement._elm.remove()
-					continue
-				}
-				//更新子元素
-				if (oldElement.hasChildren()) {
-					remove(oldElement.children)
+			if (diffMarks.more.length) {
+				const length = diffMarks.more.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.setAttribute(diffMarks.more[i], newElement.marks[diffMarks.more[i]])
 				}
 			}
+			//更新styles
+			const diffStyles = newElement.__getDiffStyles(oldElement)
+			if (diffStyles.less.length) {
+				const length = diffStyles.less.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.style.setProperty(diffStyles.less[i], '')
+				}
+			}
+			if (diffStyles.more.length) {
+				const length = diffStyles.more.length
+				for (let i = 0; i < length; i++) {
+					newElement._elm.style.setProperty(diffStyles.more[i], newElement.styles[diffStyles.more[i]])
+				}
+			}
+			//更新文本
+			if (newElement.isText() && newElement.textContent != oldElement.textContent) {
+				newElement._elm.innerHTML = ''
+				const text = document.createTextNode(newElement.textContent)
+				newElement._elm.appendChild(text)
+				continue
+			}
+			//更新子元素
+			this.__updateDoms(oldElement.children || [], newElement.children || [])
 		}
-		update(this.stack)
-		remove(this.__oldStack)
 	}
 	//监听selection改变
 	__handleSelectionChange() {
@@ -1897,7 +1875,7 @@ class AlexEditor {
 		}
 		//局部进行渲染
 		else {
-			this.__updateDoms()
+			this.__updateDoms(this.__oldStack, this.stack)
 		}
 		//设置旧值
 		this.__oldValue = this.value

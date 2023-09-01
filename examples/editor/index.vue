@@ -105,34 +105,19 @@ export default {
 		})
 		this.editor.formatElementStack()
 		this.editor.domRender()
-		const element = this.editor.getElementByKey(1)
-		const element2 = this.editor.getElementByKey(4)
-		console.log(element, element2)
 	},
 	methods: {
 		queryTextStyle() {
-			const element = this.editor.getElementByKey(1)
-			element.parsedom = 'h3'
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
+			const flag = this.editor.queryTextStyle('color', '#87f390')
+			console.log(flag)
 		},
 		setTextStyle() {
-			const element = this.editor.getElementByKey(1)
-			const element2 = this.editor.getElementByKey(4)
-			const temp = element.children
-			element.children = element2.children
-			element2.children = temp
-			element.children.forEach(child => {
-				child.parent = element
-			})
-			element2.children.forEach(child => {
-				child.parent = element
+			this.editor.setTextStyle({
+				color: '#87f390'
 			})
 			this.editor.formatElementStack()
 			this.editor.domRender()
 			this.editor.rangeRender()
-			console.log(element, element2)
 		},
 		removeTextStyle() {
 			this.editor.removeTextStyle()
