@@ -619,6 +619,7 @@ class AlexEditor {
 					this.__insertNewDom(newElement)
 					continue
 				}
+				//更新新元素的dom
 				newElement._elm = oldElement._elm
 				//更新marks
 				const diffMarks = newElement.__getDiffMarks(oldElement)
