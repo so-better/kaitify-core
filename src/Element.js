@@ -405,21 +405,20 @@ class AlexElement {
 	}
 	//扁平化处理元素数组
 	static flatElements(elements) {
-		const flat = arr => {
+		const fn = arr => {
 			let result = []
+			let index = 0
 			const length = arr.length
-			for (let i = 0; i < length; i++) {
-				if (AlexElement.isElement(arr[i])) {
-					result.push(arr[i])
-					if (arr[i].hasChildren()) {
-						let childResult = flat(arr[i].children)
-						result = [...result, ...childResult]
-					}
+			while (index < length) {
+				result.push(arr[index])
+				if (arr[index].hasChildren()) {
+					result.push(...fn(arr[index].children))
 				}
+				index++
 			}
 			return result
 		}
-		return flat(elements)
+		return fn(elements)
 	}
 	//获取一个空白文本元素
 	static getSpaceElement() {

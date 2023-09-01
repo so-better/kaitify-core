@@ -25,8 +25,6 @@ class AlexEditor {
 		Dap.data.set(el, 'data-alex-editor-init', true)
 		//格式化options参数
 		options = this.__formatOptions(options)
-		//编辑器唯一id
-		this.__guid = Util.createGuid()
 		//编辑器容器
 		this.$el = el
 		//是否禁用
@@ -39,8 +37,14 @@ class AlexEditor {
 		this.htmlPaste = options.htmlPaste
 		//编辑的range
 		this.range = null
+		//复制粘贴语法是否能够使用
+		this.useClipboard = true
 		//创建历史记录
 		this.history = new AlexHistory()
+		//将html内容转为元素数组
+		this.stack = this.parseHtml(this.value)
+		//编辑器唯一id
+		this.__guid = Util.createGuid()
 		//事件集合
 		this.__events = {}
 		//旧的文本内容
@@ -49,14 +53,13 @@ class AlexEditor {
 		this.__isInputChinese = false
 		//是否内部修改真实光标引起selctionChange事件
 		this.__innerSelectionChange = false
-		//将html内容转为元素数组
-		this.stack = this.parseHtml(this.value)
+		//旧的stack
+		this.__oldStack = null
 		//初始设置range
 		this.__initRange()
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
 		//判断复制粘贴语法是否能够使用
-		this.useClipboard = true
 		this.__judgeUseClipboard()
 		//设置selection的监听更新range
 		Dap.event.on(document, `selectionchange.alex_editor_${this.__guid}`, this.__handleSelectionChange.bind(this))
@@ -599,6 +602,85 @@ class AlexEditor {
 				}
 			}
 		}
+	}
+	//更新dom
+	__updateDoms() {
+		const oldElements = AlexElement.flatElements(this.__oldStack)
+		const newElements = AlexElement.flatElements(this.stack)
+		//修改dom或者新增dom
+		const update = elements => {
+			let length = elements.length
+			for (let i = 0; i < length; i++) {
+				const key = elements[i].key
+				const newElement = elements[i]
+				const oldElement = oldElements.find(el => el.key == key)
+				//旧元素不存在表示新插入的dom
+				if (!oldElement) {
+					this.__insertNewDom(newElement)
+					continue
+				}
+				newElement._elm = oldElement._elm
+				//更新marks
+				const diffMarks = newElement.__getDiffMarks(oldElement)
+				if (diffMarks.less.length) {
+					const length = diffMarks.less.length
+					for (let j = 0; j < length; j++) {
+						newElement._elm.removeAttribute(diffMarks.less[j])
+					}
+				}
+				if (diffMarks.more.length) {
+					const length = diffMarks.more.length
+					for (let j = 0; j < length; j++) {
+						newElement._elm.setAttribute(diffMarks.more[j], newElement.marks[diffMarks.more[j]])
+					}
+				}
+				//更新styles
+				const diffStyles = newElement.__getDiffStyles(oldElement)
+				if (diffStyles.less.length) {
+					const length = diffStyles.less.length
+					for (let j = 0; j < length; j++) {
+						newElement._elm.style.setProperty(diffStyles.less[j], '')
+					}
+				}
+				if (diffStyles.more.length) {
+					const length = diffStyles.more.length
+					for (let j = 0; j < length; j++) {
+						newElement._elm.style.setProperty(diffStyles.more[j], newElement.styles[diffStyles.more[j]])
+					}
+				}
+				//更新文本
+				if (newElement.isText() && newElement.textContent != oldElement.textContent) {
+					newElement._elm.innerHTML = ''
+					const text = document.createTextNode(newElement.textContent)
+					newElement._elm.appendChild(text)
+					continue
+				}
+				//更新子元素
+				if (newElement.hasChildren()) {
+					update(newElement.children)
+				}
+			}
+		}
+		//移除被删除的dom
+		const remove = elements => {
+			let length = elements.length
+			for (let i = 0; i < length; i++) {
+				const key = elements[i].key
+				const oldElement = elements[i]
+				const newElement = newElements.find(el => el.key == key)
+				//新元素不存在则表示该dom需要被删除
+				if (!newElement) {
+					oldElement._elm.remove()
+					continue
+				}
+				//更新子元素
+				if (oldElement.hasChildren()) {
+					remove(oldElement.children)
+				}
+			}
+		}
+		update(this.stack)
+		remove(this.__oldStack)
 	}
 	//监听selection改变
 	__handleSelectionChange() {
@@ -1794,9 +1876,11 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
+		//触发事件
 		this.emit('beforeRender')
-		const firstRender = !this.__oldValue
-		//第一次渲染
+		//是否第一次渲染
+		const firstRender = !this.__oldStack
+		//如果是第一次渲染
 		if (firstRender) {
 			this.$el.innerHTML = ''
 			this.stack.forEach(element => {
@@ -1806,9 +1890,14 @@ class AlexEditor {
 		}
 		//局部进行渲染
 		else {
+			this.__updateDoms()
 		}
+		//触发事件
 		this.emit('afterRender')
+		//设置旧值
 		this.__oldValue = this.value
+		this.__oldStack = this.stack.map(ele => ele.__fullClone())
+		//设置新值
 		this.value = this.$el.innerHTML
 		//如果是第一次渲染
 		if (firstRender) {
@@ -1990,9 +2079,27 @@ class AlexEditor {
 		if (!key) {
 			throw new Error('You need to specify a key to do the query')
 		}
-		return AlexElement.flatElements(this.stack).find(element => {
-			return element.key == key
-		})
+		const fn = elements => {
+			let element = null
+			let i = 0
+			let length = elements.length
+			while (i < length) {
+				if (elements[i].key == key) {
+					element = elements[i]
+					break
+				}
+				if (elements[i].hasChildren()) {
+					const el = fn(elements[i].children)
+					if (el) {
+						element = el
+						break
+					}
+				}
+				i++
+			}
+			return element
+		}
+		return fn(this.stack)
 	}
 	//获取指定元素的前一个兄弟元素（会过滤空元素）
 	getPreviousElement(ele) {
