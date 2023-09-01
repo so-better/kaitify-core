@@ -44,15 +44,13 @@ class AlexEditor {
 		//事件集合
 		this.__events = {}
 		//旧的文本内容
-		this.__oldValue = options.value
+		this.__oldValue = null
 		//是否正在输入中文
 		this.__isInputChinese = false
 		//是否内部修改真实光标引起selctionChange事件
 		this.__innerSelectionChange = false
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
-		//旧stack
-		this.__oldStack = null
 		//初始设置range
 		this.__initRange()
 		//编辑器禁用和启用设置
@@ -599,72 +597,6 @@ class AlexEditor {
 				} else {
 					parent.appendChild(el._elm)
 				}
-			}
-		}
-	}
-	//动态更新dom
-	__updateChildren(oldElements, newElements) {
-		const newLength = newElements.length
-		const oldLength = oldElements.length
-		const length = newLength > oldLength ? newLength : oldLength
-		for (let i = 0; i < length; i++) {
-			const newElement = newElements[i]
-			const oldElement = oldElements[i]
-			//旧的不存在，说明是新增的元素
-			if (!oldElement) {
-				this.__insertNewDom(newElement)
-				continue
-			}
-			//新的不存在，说明是已删除的元素
-			if (!newElement) {
-				oldElement._elm.remove()
-				continue
-			}
-			//如果parsedom或者type不一样，则直接替换
-			if (newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
-				newElement.__renderElement()
-				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
-				continue
-			}
-			newElement._elm = oldElement._elm
-			//更新marks
-			const diffMarks = newElement.__getDiffMarks(oldElement)
-			if (diffMarks.less.length) {
-				const length = diffMarks.less.length
-				for (let i = 0; i < length; i++) {
-					newElement._elm.removeAttribute(diffMarks.less[i])
-				}
-			}
-			if (diffMarks.more.length) {
-				const length = diffMarks.more.length
-				for (let i = 0; i < length; i++) {
-					newElement._elm.setAttribute(diffMarks.more[i], newElement.marks[diffMarks.more[i]])
-				}
-			}
-			//更新styles
-			const diffStyles = newElement.__getDiffStyles(oldElement)
-			if (diffStyles.less.length) {
-				const length = diffStyles.less.length
-				for (let i = 0; i < length; i++) {
-					newElement._elm.style.setProperty(diffStyles.less[i], '')
-				}
-			}
-			if (diffStyles.more.length) {
-				const length = diffStyles.more.length
-				for (let i = 0; i < length; i++) {
-					newElement._elm.style.setProperty(diffStyles.more[i], newElement.styles[diffStyles.more[i]])
-				}
-			}
-			//更新文本
-			if (newElement.isText() && newElement.textContent != oldElement.textContent) {
-				newElement._elm.innerHTML = ''
-				const text = document.createTextNode(newElement.textContent)
-				newElement._elm.appendChild(text)
-				continue
-			}
-			//更新子元素
-			if (newElement.hasChildren()) {
-				this.__updateChildren(oldElement.children || [], newElement.children)
 			}
 		}
 	}
@@ -1863,7 +1795,7 @@ class AlexEditor {
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
 		this.emit('beforeRender')
-		const firstRender = !this.__oldStack
+		const firstRender = !this.__oldValue
 		//第一次渲染
 		if (firstRender) {
 			this.$el.innerHTML = ''
@@ -1874,23 +1806,17 @@ class AlexEditor {
 		}
 		//局部进行渲染
 		else {
-			this.__updateChildren(this.__oldStack, this.stack)
 		}
 		this.emit('afterRender')
 		this.__oldValue = this.value
-		this.__oldStack = this.stack.map(el => {
-			return el.__fullClone()
-		})
 		this.value = this.$el.innerHTML
-		//第一次渲染
+		//如果是第一次渲染
 		if (firstRender) {
-			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
-				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
 			}
 		}
-		//不是第一次渲染，并且值有变化
+		//不是第一次渲染，则根据值是否变化来决定
 		else if (this.__oldValue != this.value) {
 			//触发change事件
 			this.emit('change', this.value, this.__oldValue)
