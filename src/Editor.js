@@ -619,6 +619,12 @@ class AlexEditor {
 					this.__insertNewDom(newElement)
 					continue
 				}
+				//type或者parsedom有变化则直接更新dom
+				if (newElement.type != oldElement.type || newElement.parsedom != oldElement.parsedom) {
+					newElement.__renderElement()
+					oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
+					continue
+				}
 				//更新新元素的dom
 				newElement._elm = oldElement._elm
 				//更新marks
@@ -656,7 +662,7 @@ class AlexEditor {
 					newElement._elm.appendChild(text)
 					continue
 				}
-				//更新子元素
+				//存在子元素，则对子元素进行处理
 				if (newElement.hasChildren()) {
 					update(newElement.children)
 				}
