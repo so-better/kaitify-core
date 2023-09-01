@@ -1892,8 +1892,6 @@ class AlexEditor {
 		else {
 			this.__updateDoms()
 		}
-		//触发事件
-		this.emit('afterRender')
 		//设置旧值
 		this.__oldValue = this.value
 		this.__oldStack = this.stack.map(ele => ele.__fullClone())
@@ -1917,6 +1915,8 @@ class AlexEditor {
 		}
 		//判断焦点所在元素是否在滚动条内
 		this.__setRangeInVisible()
+		//触发事件
+		this.emit('afterRender')
 	}
 	//根据anchor和focus来设置真实的光标
 	rangeRender() {
