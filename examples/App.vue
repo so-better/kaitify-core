@@ -24,16 +24,23 @@ export default {
 	background: #fff;
 	border-radius: 4px;
 }
-.area {
-	display: block;
-	width: 100%;
-	padding: 10px;
-	background-color: #faf9f9;
-	color: #333;
-	font-size: 14px;
+html {
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 0;
+}
+
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
-	margin-bottom: 10px;
-	height: 100px;
-	overflow: auto;
+	outline: none;
+}
+
+#app {
+	height: 100%;
+	overflow-y: auto;
 }
 </style>

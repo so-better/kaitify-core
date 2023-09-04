@@ -129,12 +129,6 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-	outline: none;
-}
 .editor {
 	display: block;
 	width: 100%;
@@ -161,7 +155,7 @@ export default {
 	.editor-content {
 		border: 1px solid #ddd;
 		padding: 6px 10px;
-		height: 400px;
+		height: 2000px;
 		overflow: auto;
 		border-radius: 4px;
 

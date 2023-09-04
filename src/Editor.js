@@ -520,46 +520,44 @@ class AlexEditor {
 	}
 	//判断焦点是否在可视范围内，如果不在则进行设置
 	__setRangeInVisible() {
-		const isHiddenTop = (childRectTop, parentRectTop) => {
-			if (childRectTop >= 0 && parentRectTop >= 0) {
-				return childRectTop < parentRectTop
-			}
-			if (childRectTop < 0) {
-				return true
-			}
-			return false
-		}
-		const isHiddenBottom = (childRectBottom, parentRectBottom) => {
-			if (childRectBottom >= 0 && parentRectBottom >= 0) {
-				return childRectBottom < parentRectBottom
-			}
-			if (childRectBottom < 0) {
-				return true
-			}
-			return false
-		}
-		const fn = root => {
+		const fn = async root => {
 			const scrollHeight = Dap.element.getScrollHeight(root)
 			//存在滚动条
 			if (root.clientHeight < scrollHeight) {
-				const el = this.range.focus.element._elm
-				const childRect = Dap.element.getElementBounding(el)
-				const parentRect = Dap.element.getElementBounding(root)
-				//在可视窗口之外
-				if (isHiddenTop(childRect.top, parentRect.top) || isHiddenBottom(childRect.bottom, parentRect.bottom)) {
-					Dap.element
-						.setScrollTop({
-							el: root,
-							number: 0
-						})
-						.then(() => {
-							const tempChildRect = Dap.element.getElementBounding(el)
-							const tempParentRect = Dap.element.getElementBounding(root)
-							Dap.element.setScrollTop({
-								el: root,
-								number: tempChildRect.top - tempParentRect.top
-							})
-						})
+				const selection = window.getSelection()
+				if (selection.rangeCount == 0) {
+					return
+				}
+				const range = selection.getRangeAt(0)
+				const rects = range.getClientRects()
+				let target = range
+				if (rects.length == 0) {
+					target = this.range.focus.element._elm
+				}
+				const childRect = target.getBoundingClientRect()
+				const parentRect = root.getBoundingClientRect()
+				if (childRect.top < parentRect.top) {
+					await Dap.element.setScrollTop({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollTop({
+						el: root,
+						number: tempChildRect.top - tempParentRect.top
+					})
+				} else if (childRect.bottom > parentRect.bottom) {
+					await Dap.element.setScrollTop({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollTop({
+						el: root,
+						number: tempChildRect.bottom - tempParentRect.bottom
+					})
 				}
 			}
 		}
@@ -621,7 +619,7 @@ class AlexEditor {
 				oldElement._elm.remove()
 				continue
 			}
-			//如果parsedom或者type不一样，则直接替换
+			//如果key/parsedom/type不一样，则直接替换
 			if (newElement.key != oldElement.key || newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
 				newElement.__renderElement()
 				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
@@ -1421,29 +1419,11 @@ class AlexEditor {
 			if (inblock) {
 				//在代码块样式中
 				if (this.range.anchor.element.isPreStyle()) {
-					//起点在换行符上
-					if (this.range.anchor.element.isBreak()) {
-						this.insertText('\n\n')
-						this.range.anchor.offset -= 1
-						this.range.focus.offset -= 1
-					}
-					//起点在代码块的终点位置
-					else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
-						//终点位置的字符是换行符
-						if (this.range.anchor.element.isText() && this.range.anchor.element.textContent[this.range.anchor.offset - 1] == '\n') {
-							this.insertText('\n')
-						}
-						//终点位置的字符不是换行符
-						else {
-							this.insertText('\n\n')
-							this.range.anchor.offset -= 1
-							this.range.focus.offset -= 1
-						}
-					}
-					//普通的换行
-					else {
-						this.insertText('\n')
-					}
+					this.insertText('\n')
+					const text = AlexElement.getSpaceElement()
+					this.insertElement(text)
+					this.range.anchor.moveToEnd(text)
+					this.range.focus.moveToEnd(text)
 					this.emit('insertParagraph', null, inblock)
 				}
 				//不在代码块样式中且内部块元素的行为值是block
@@ -1494,29 +1474,11 @@ class AlexEditor {
 			else {
 				//在代码块样式中
 				if (this.range.anchor.element.isPreStyle()) {
-					//起点在换行符上
-					if (this.range.anchor.element.isBreak()) {
-						this.insertText('\n\n')
-						this.range.anchor.offset -= 1
-						this.range.focus.offset -= 1
-					}
-					//起点在代码块的终点位置
-					else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
-						//终点位置的字符是换行符
-						if (this.range.anchor.element.isText() && this.range.anchor.element.textContent[this.range.anchor.offset - 1] == '\n') {
-							this.insertText('\n')
-						}
-						//终点位置的字符不是换行符
-						else {
-							this.insertText('\n\n')
-							this.range.anchor.offset -= 1
-							this.range.focus.offset -= 1
-						}
-					}
-					//普通的换行
-					else {
-						this.insertText('\n')
-					}
+					this.insertText('\n')
+					const text = AlexElement.getSpaceElement()
+					this.insertElement(text)
+					this.range.anchor.moveToEnd(text)
+					this.range.focus.moveToEnd(text)
 					this.emit('insertParagraph', null, block)
 				}
 				//不在代码块样式中
@@ -1898,8 +1860,6 @@ class AlexEditor {
 				this.history.push(this.stack, this.range)
 			}
 		}
-		//判断焦点所在元素是否在滚动条内
-		this.__setRangeInVisible()
 		//触发事件
 		this.emit('afterRender')
 	}
@@ -1939,6 +1899,7 @@ class AlexEditor {
 		range.setEnd(focusResult.node, focusResult.offset)
 		selection.addRange(range)
 		setTimeout(() => {
+			this.__setRangeInVisible()
 			this.__innerSelectionChange = false
 			this.emit('rangeUpdate', this.range)
 		}, 0)
