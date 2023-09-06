@@ -2666,7 +2666,6 @@ class AlexEditor {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
-
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//如果是文本元素并且具有标记
@@ -2694,7 +2693,7 @@ class AlexEditor {
 			//文本元素含有样式进一步判断
 			if (item.element.hasMarks()) {
 				if (value == null || value == undefined) {
-					return item.element.styles.hasOwnProperty(name)
+					return item.element.marks.hasOwnProperty(name)
 				}
 				return item.element.marks[name] == value
 			}
