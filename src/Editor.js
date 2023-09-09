@@ -545,7 +545,7 @@ class AlexEditor {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollTop({
 						el: root,
-						number: tempChildRect.top - tempParentRect.top
+						number: tempChildRect.top - tempParentRect.top - tempChildRect.height * 2
 					})
 				} else if (childRect.bottom > parentRect.bottom) {
 					await Dap.element.setScrollTop({
@@ -556,7 +556,7 @@ class AlexEditor {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollTop({
 						el: root,
-						number: tempChildRect.bottom - tempParentRect.bottom
+						number: tempChildRect.bottom - tempParentRect.bottom + tempChildRect.height * 2
 					})
 				}
 			}
