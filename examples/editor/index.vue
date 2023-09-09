@@ -13,79 +13,27 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<blockquote><span>&nbsp;MVI内提供了很多现有的辅助样式类，用于简单的样式修改，可以直接使用，无需你再次手写样式&nbsp;&nbsp;&nbsp;</span></blockquote><p><br></p><p><br></p><h5><span>Y轴滚动回弹：解决dom元素在ios端的滚动条滚动不流畅、弹性动画丢失的问题</span></h5><p><br></p><pre><span>&lt;div&nbsp;class="mvi-scrolling-touch"&gt;&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>文本样式</span></h5><p><br></p><pre><span>&lt;!--&nbsp;错误文本样式&nbsp;--&gt;&nbsp;
-&lt;p&nbsp;class="mvi-text-error"&gt;Hello&nbsp;World&lt;/p&gt;</span></pre><pre><span>&lt;!--&nbsp;警告文本样式&nbsp;--&gt;
-&lt;p&nbsp;class="mvi-text-warn"&gt;Hello&nbsp;World&lt;/p&gt;</span></pre><pre><span>&lt;!--&nbsp;信息文本样式&nbsp;--&gt;
-&lt;p&nbsp;class="mvi-text-info"&gt;Hello&nbsp;World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 成功文本样式 --&gt;
-&lt;p class="mvi-text-success"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 首要文本样式 --&gt;
-&lt;p class="mvi-text-primary"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 链接文本样式 --&gt;
-&lt;p class="mvi-text-link"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 柔和文本样式 --&gt;
-&lt;p class="mvi-text-muted"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 白色文本样式 --&gt;
-&lt;p class="mvi-text-white"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 副文本样式 --&gt;
-&lt;p class="mvi-text-sub"&gt;Hello World&lt;/p&gt;</span></pre><p><br></p><p><br></p><h5><span>背景样式</span></h5><p><br></p><pre><span>&lt;!-- 成功背景色 --&gt;
-&lt;p class="mvi-bg-success"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 警告背景色 --&gt;
-&lt;p class="mvi-bg-warn"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 信息背景色 --&gt;
-&lt;p class="mvi-bg-info"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 首要背景色 --&gt;
-&lt;p class="mvi-bg-primary"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 错误背景色 --&gt;
-&lt;p class="mvi-bg-error"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 柔和背景色 --&gt;
-&lt;p class="mvi-bg-muted"&gt;Hello World&lt;/p&gt;</span></pre><p><br></p><p><br></p><h5><span>文本对齐方式</span></h5><p><br></p><pre><span>&lt;!-- 左对齐 --&gt;
-&lt;p class="mvi-text-left"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 右对齐 --&gt;
-&lt;p class="mvi-text-right"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 居中对齐 --&gt;
-&lt;p class="mvi-text-center"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 两端对齐 --&gt;
-&lt;p class="mvi-text-justify"&gt;Hello World&lt;/p&gt;</span></pre><p><br></p><p><br></p><h5><span>水平垂直居中：使用flex来设置元素内容的水平和垂直居中</span></h5><p><br></p><pre><span>&lt;!-- 块元素内容水平垂直居中 --&gt;
-&lt;div class="mvi-flex-center"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 行内元素内容水平垂直居中 --&gt;
-&lt;div class="mvi-inline-center"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>flex布局</span></h5><p><br></p><pre><span>&lt;!-- 从左到右排列 --&gt;
-&lt;div class="mvi-flex-start"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 从右到左排列 --&gt;
-&lt;div class="mvi-flex-end"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 两端排列 --&gt;
-&lt;div class="mvi-flex-between"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 等分排列 --&gt;
-&lt;div class="mvi-flex-around"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>圆角辅助</span></h5><p><br></p><pre><span>&lt;!-- 默认圆角 --&gt;
-&lt;div class="mvi-radius-default"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 大圆角 --&gt;
-&lt;div class="mvi-radius-round"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 圆形 --&gt;
-&lt;div class="mvi-radius-circle"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>文本粗细</span></h5><p><br></p><pre><span>&lt;!-- 加粗 --&gt;
-&lt;div class="mvi-text-bold"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 默认 --&gt;
-&lt;div class="mvi-text-normal"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 变细 --&gt;
-&lt;div class="mvi-text-light"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>外边距辅助：类名最后的数字取值范围为0-20</span></h5><p><br></p><pre><span>&lt;!-- 外边距 --&gt;
-&lt;div class="mvi-m-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 左外边距 --&gt;
-&lt;div class="mvi-ml-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 右外边距 --&gt;
-&lt;div class="mvi-mr-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 上外边距 --&gt;
-&lt;div class="mvi-mt-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 下外边距 --&gt;
-&lt;div class="mvi-mb-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 水平外边距 --&gt;
-&lt;div class="mvi-mx-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 垂直外边距 --&gt;
-&lt;div class="mvi-my-1"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>内边距辅助：类名最后数字取值范围为0-20</span></h5><p><br></p><pre><span>&lt;!-- 内边距 --&gt;
-&lt;div class="mvi-p-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 左内边距 --&gt;
-&lt;div class="mvi-pl-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 右内边距 --&gt;
-&lt;div class="mvi-pr-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 上内边距 --&gt;
-&lt;div class="mvi-pt-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 下内边距 --&gt;
-&lt;div class="mvi-pb-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 水平内边距 --&gt;
-&lt;div class="mvi-px-1"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 垂直内边距 --&gt;
-&lt;div class="mvi-py-1"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>文本省略</span></h5><p><br></p><pre><span>&lt;!-- 单行文本溢出省略 --&gt;
-&lt;div class="mvi-text-ellipsis"&gt;Hello World&lt;/div&gt;</span></pre><pre><span>&lt;!-- 多行文本溢出省略，类名后的数字取值范围为1-5，表示超出1-5行后显示省略号 --&gt;
-&lt;div class="mvi-ellipsis-1"&gt;Hello World&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>鼠标悬浮手指</span></h5><p><br></p><pre><span>&lt;p class="mvi-cursor-pointer"&gt;Hello World&lt;/p&gt;</span></pre><p><br></p><p><br></p><h5><span>输入框默认样式：仅在input元素上有效</span></h5><p><br></p><pre><span>&lt;input type="text" class="mvi-default-input" /&gt;</span></pre><p><br></p><p><br></p><h5><span>文本域默认样式：仅在textarea元素上有效</span></h5><p><br></p><pre><span>&lt;textarea class="mvi-default-textarea"&gt;&lt;/textarea&gt;</span></pre><p><br></p><p><br></p><h5><span>按钮默认样式：任意元素有效</span></h5><p><br></p><pre><span>&lt;div class="mvi-default-btn"&gt;Button&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>字体大小辅助</span></h5><p><br></p><pre><span>&lt;!-- 较小的字体 --&gt;
-&lt;p class="mvi-font-small"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- 默认字体 --&gt;
-&lt;p class="mvi-font-default"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h1标题字体 --&gt;
-&lt;p class="mvi-font-h1"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h2标题字体 --&gt;
-&lt;p class="mvi-font-h2"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h3标题字体 --&gt;
-&lt;p class="mvi-font-h3"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h4标题字体 --&gt;
-&lt;p class="mvi-font-h4"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h5标题字体 --&gt;
-&lt;p class="mvi-font-h5"&gt;Hello World&lt;/p&gt;</span></pre><pre><span>&lt;!-- h6标题字体 --&gt;
-&lt;p class="mvi-font-h6"&gt;Hello World&lt;/p&gt;</span></pre><p><br></p><p><br></p><h5><span>基于断点的隐藏辅助类</span></h5><p><br></p><pre><span>&lt;!-- 在任意情况下都隐藏元素 --&gt;
-&lt;div class="mvi-hidden"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 小于1920px下隐藏元素 --&gt;
-&lt;div class="mvi-hidden-down-lg"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 小于1440px下隐藏元素 --&gt;
-&lt;div class="mvi-hidden-down-md"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 小于992px下隐藏元素 --&gt;
-&lt;div class="mvi-hidden-down-sm"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 小于640px下隐藏元素 --&gt;
-&lt;div class="mvi-hidden-down-xs"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 大于等于1920px时隐藏元素 --&gt;
-&lt;div class="mvi-hidden-up-xl"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 大于等于1440px时隐藏元素 --&gt;
-&lt;div class="mvi-hidden-up-lg"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 大于等于992px时隐藏元素 --&gt;
-&lt;div class="mvi-hidden-up-md"&gt;&lt;/div&gt;</span></pre><pre><span>&lt;!-- 大于等于640px时隐藏元素 --&gt;
-&lt;div class="mvi-hidden-up-sm"&gt;&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>阴影辅助类</span></h5><p><br></p><pre><span>&lt;!-- 显示阴影效果 --&gt;
-&lt;div class="mvi-shadow"&gt;&lt;/div&gt;</span></pre><p><br></p><p><br></p><h5><span>vue动画辅助类（需要结合vue的transition组件，该辅助类作为transition组件的name值直接传入）</span></h5><p><br></p><pre><span>&lt;!-- 渐变 --&gt;
-&lt;transition name="mvi-transition-fade"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自右向左渐入 --&gt;
-&lt;transition name="mvi-transition-left"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自左向右渐入 --&gt;
-&lt;transition name="mvi-transition-right"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自上向下渐入 --&gt;
-&lt;transition name="mvi-transition-down"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自下向上渐入 --&gt;
-&lt;transition name="mvi-transition-up"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自小变大渐入 --&gt;
-&lt;transition name="mvi-transition-large"&gt;&lt;/transition&gt;</span></pre><pre><span>&lt;!-- 自大变小渐入 --&gt;
-&lt;transition name="mvi-transition-small"&gt;&lt;/transition&gt;</span></pre><p><br></p>`,
+			value: `<h5><span>基本使用</span></h5><p><br></p><p><span>使用</span><span data-code-style="mvi-editor-code">v-model</span><span>来控制动作列表的显示和隐藏，使用</span><span data-code-style="mvi-editor-code">options</span><span>属性来配置动作列表，</span><span data-code-style="mvi-editor-code">@select</span><span>表示选择列表后触发的事件</span></p><pre mvi-editor-element-key="27"><span class="mvi-hljs-tag"><span>&lt;</span><span class="mvi-hljs-name">m-actionsheet</span><span> </span><span class="mvi-hljs-attr">v-model</span><span>=</span><span class="mvi-hljs-string">"show"</span><span> </span><span class="mvi-hljs-attr">:options</span><span>=</span><span class="mvi-hljs-string">"options"</span><span> @</span><span class="mvi-hljs-attr">select</span><span>=</span><span class="mvi-hljs-string">"doSelect"</span><span>&gt;&lt;/</span><span class="mvi-hljs-name">m-actionsheet</span><span>&gt;</span></span></pre><pre mvi-editor-element-key="63"><span class="mvi-hljs-keyword">export</span><span> </span><span class="mvi-hljs-keyword">default</span><span> {
+    </span><span class="mvi-hljs-title function_">data</span><span>() {
+        </span><span class="mvi-hljs-keyword">return</span><span> {
+            </span><span class="mvi-hljs-attr">show</span><span>: </span><span class="mvi-hljs-literal">false</span><span>,
+            </span><span class="mvi-hljs-attr">options</span><span>: [
+                {
+                    </span><span class="mvi-hljs-attr">label</span><span>: </span><span class="mvi-hljs-string">'分享到朋友圈'</span><span>
+                },
+                {
+                    </span><span class="mvi-hljs-attr">label</span><span>: </span><span class="mvi-hljs-string">'分享到QQ空间'</span><span>
+                }
+            ]
+        }
+    },
+    </span><span class="mvi-hljs-attr">methods</span><span>: {
+        </span><span class="mvi-hljs-title function_">change</span><span>(</span><span class="mvi-hljs-params">item, index</span><span>) {
+            </span><span class="mvi-hljs-comment">//如果选择第一个则输出：{label: '分享到朋友圈'} 0</span><span>
+            </span><span class="mvi-hljs-variable language_">console</span><span>.</span><span class="mvi-hljs-title function_">log</span><span>(item, index)
+        }
+    }
+}</span></pre><p><br></p><p><br></p><h5><span>Props</span></h5><p><br></p><table mvi-editor-element-key="141"><colgroup><col width="15.96%"><col width="9.38%"><col width="47.87%"><col width="16.57%"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>v-model</span></td><td><span>boolean</span></td><td><span>控制动作列表显示隐藏</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>overlay-color</span></td><td><span>string</span></td><td><span>遮罩层颜色</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>z-index</span></td><td><span>number</span></td><td><span>层级</span></td><td><span>-</span></td><td><span>900</span></td></tr><tr><td><span>timeout</span></td><td><span>number</span></td><td><span>显示或者隐藏的动画时长，单位ms</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>round</span></td><td><span>boolean</span></td><td><span>是否显示圆角</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>title</span></td><td><span>string</span></td><td><span>顶部标题文字内容</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>closable</span></td><td><span>boolean</span></td><td><span>点击遮罩是否可关闭</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>动作列表的选项数据配</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>show-cancel</span></td><td><span>boolean</span></td><td><span>是否显示取消按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>cancel-text</span></td><td><span>string</span></td><td><span>取消按钮的文字内容</span></td><td><span>-</span></td><td><span>"取消"</span></td></tr><tr><td><span>active</span></td><td><span>boolean</span></td><td><span>列表和取消按钮是否显示点击态</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>mount-el</span></td><td><span>string</span></td><td><span>指定挂载的父元素，值为选择器名称，如果不设置，默认挂载在定位父元素下</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>select-close</span></td><td><span>boolean</span></td><td><span>选择完是否自动关闭</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>use-padding</span></td><td><span>boolean</span></td><td><span>局部显示时是否考虑滚动条影响</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>size</span></td><td><span>string</span></td><td><span>组件尺寸</span></td><td><span>"medium"/"large"</span></td><td><span>"medium"</span></td></tr></tbody></table><p><br></p><blockquote><span>options参数是一个数组，每个元素具体包含以下属性：</span></blockquote><table mvi-editor-element-key="43557"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>label</span></td><td><span>string</span></td><td><span>选项主文字内容</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>disabled</span></td><td><span>boolean</span></td><td><span>选项是否禁用</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>loading</span></td><td><span>boolean</span></td><td><span>选项是否显示加载状态</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>placement</span></td><td><span>string</span></td><td><span>选项显示图标时表示图标的位置</span></td><td><span>"left"/"right"</span></td><td><span>"left"</span></td></tr><tr><td><span>icon</span></td><td><span>string&nbsp;|&nbsp;object</span></td><td><span>选项显示的图标，如果是字符串，则表示Icon组件的type值，如果是对象，则参考icon组件的几个属性</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><br></p><h5><span>Events</span></h5><p><br></p><table mvi-editor-element-key="78873"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>事件</span></td><td><span>说明</span></td></tr><tr><td><span>select</span></td><td><span>当点击列表某一项时触发，回调参数为item和index，分别表示选择的那一项数据和序列</span></td></tr></tbody></table><p><br></p><p><br></p><p><br></p><p><br></p><p><br></p>`,
 			editor: null
 		}
 	},

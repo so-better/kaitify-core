@@ -9,6 +9,9 @@ class AlexPoint {
 	//初始化
 	__init() {
 		if (this.element.isText() || this.element.isClosed()) {
+			if (AlexElement.VOID_NODES.includes(this.element.parsedom)) {
+				throw new Error('Invisible element cannot be set as focal point')
+			}
 			return
 		}
 		//如果是根级块元素或者内部块元素或者行内元素
@@ -47,13 +50,16 @@ class AlexPoint {
 		}
 		//如果是自闭合元素
 		else if (element.isClosed()) {
+			if (AlexElement.VOID_NODES.includes(element.parsedom)) {
+				throw new Error('Invisible element cannot be set as focal point')
+			}
 			this.element = element
 			this.offset = 1
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty()
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 			})
 			const length = flatElements.length
 			this.moveToEnd(flatElements[length - 1])
@@ -75,13 +81,16 @@ class AlexPoint {
 		}
 		//自闭合元素
 		else if (element.isClosed()) {
+			if (AlexElement.VOID_NODES.includes(element.parsedom)) {
+				throw new Error('Invisible element cannot be set as focal point')
+			}
 			this.element = element
 			this.offset = 0
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty()
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 			})
 			this.moveToStart(flatElements[0])
 		}
