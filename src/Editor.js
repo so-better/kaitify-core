@@ -55,6 +55,8 @@ class AlexEditor {
 		this.__innerSelectionChange = false
 		//旧的stack
 		this.__oldStack = null
+		//取消中文输入标识的延时器
+		this.__chineseInputTimer = null
 		//初始设置range
 		this.__initRange()
 		//编辑器禁用和启用设置
@@ -782,6 +784,12 @@ class AlexEditor {
 		}
 		e.preventDefault()
 		if (e.type == 'compositionstart') {
+			//每次开始输入中文时先清除延时器
+			if (this.__chineseInputTimer) {
+				clearTimeout(this.__chineseInputTimer)
+				this.__chineseInputTimer = null
+			}
+			//改变标识
 			this.__isInputChinese = true
 		} else if (e.type == 'compositionend') {
 			//在中文输入结束后插入数据
@@ -800,7 +808,7 @@ class AlexEditor {
 				this.rangeRender()
 			}
 			//加上延时器避免过早修改中文输入标识导致删除中文拼音时触发range更新
-			setTimeout(() => {
+			this.__chineseInputTimer = setTimeout(() => {
 				this.__isInputChinese = false
 			}, 0)
 		}
