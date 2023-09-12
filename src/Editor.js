@@ -621,8 +621,8 @@ class AlexEditor {
 			}
 			//如果key/parsedom/type不一样，则直接替换
 			if (newElement.key != oldElement.key || newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
-				newElement.__renderElement()
-				oldElement._elm.parentNode.replaceChild(newElement._elm, oldElement._elm)
+				oldElement._elm.remove()
+				this.__insertNewDom(newElement)
 				continue
 			}
 			newElement._elm = oldElement._elm
@@ -791,6 +791,13 @@ class AlexEditor {
 				this.__safariLinkHandle()
 				this.domRender()
 				this.rangeRender()
+				//解决中文输入非法dom的bug
+				if (this.range.anchor.element._elm && this.range.anchor.element._elm.previousSibling) {
+					//如果前一个兄弟元素是文本元素或者没有key，则移除该元素
+					if (this.range.anchor.element._elm.previousSibling.nodeType == 3 || !Dap.data.get(this.range.anchor.element._elm.previousSibling, 'data-alex-editor-key')) {
+						this.range.anchor.element._elm.previousSibling.remove()
+					}
+				}
 			}
 			//加上延时器避免过早修改中文输入标识导致删除中文拼音时触发range更新
 			setTimeout(() => {
