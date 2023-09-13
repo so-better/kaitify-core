@@ -26,8 +26,9 @@ export default defineConfig({
 		},
 		sourcemap: false, //是否构建source map 文件
 		terserOptions: {
-			// 生产环境移除console
+			// 生产环境移除console和debugger
 			compress: {
+				drop_debugger: true,
 				drop_console: true
 			}
 		}

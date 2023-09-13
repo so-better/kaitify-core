@@ -59,7 +59,7 @@ class AlexPoint {
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty()
 			})
 			const length = flatElements.length
 			this.moveToEnd(flatElements[length - 1])
@@ -90,7 +90,7 @@ class AlexPoint {
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty()
 			})
 			this.moveToStart(flatElements[0])
 		}

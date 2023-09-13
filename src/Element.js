@@ -77,7 +77,7 @@ class AlexElement {
 		}
 		return this.key == element.key
 	}
-	//是否包含指定节点
+	//是否包含指定元素
 	isContains(element) {
 		if (this.isEqual(element)) {
 			return true
@@ -410,6 +410,11 @@ class AlexElement {
 			let index = 0
 			const length = arr.length
 			while (index < length) {
+				//如果是不显示元素，直接跳过
+				if (AlexElement.VOID_NODES.includes(arr[index].parsedom)) {
+					index++
+					continue
+				}
 				result.push(arr[index])
 				if (arr[index].hasChildren()) {
 					result.push(...fn(arr[index].children))
