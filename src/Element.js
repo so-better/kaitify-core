@@ -410,11 +410,6 @@ class AlexElement {
 			let index = 0
 			const length = arr.length
 			while (index < length) {
-				//如果是不显示元素，直接跳过
-				if (AlexElement.VOID_NODES.includes(arr[index].parsedom)) {
-					index++
-					continue
-				}
 				result.push(arr[index])
 				if (arr[index].hasChildren()) {
 					result.push(...fn(arr[index].children))

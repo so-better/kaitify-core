@@ -1126,7 +1126,10 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange(true, false)
+			const result = this.getElementsByRange(true, false).filter(item => {
+				//批量删除时需要过滤掉那些不显示的元素
+				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
+			})
 			//起点所在的内部块元素
 			const anchorInblock = this.range.anchor.element.getInblock()
 			//终点所在的内部块元素
