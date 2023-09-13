@@ -2226,12 +2226,13 @@ class AlexEditor {
 		//通过上述代码获取到在选区内的元素，下面通过一段代码剔除子元素不是全部在数组里的元素
 		const resLength = result.length
 		let newResult = []
-		for (let i = 0; i < resLength; i++) {
+		//因为扁平化数据从左到右父元素在子元素前面，这里需要先检查子元素，所以倒序循环
+		for (let i = resLength - 1; i >= 0; i--) {
 			//如果存在子元素
 			if (result[i].element.hasChildren()) {
 				//判断该元素的每个子元素是否都在数组里
 				let allIn = result[i].element.children.every(child => {
-					return result.some(item => {
+					return newResult.some(item => {
 						return item.element.isEqual(child) && !item.offset
 					})
 				})
@@ -2243,7 +2244,6 @@ class AlexEditor {
 				newResult.push(result[i])
 			}
 		}
-
 		//以上代码生成newResult
 		//返回扁平化处理的结果
 		if (flat) {

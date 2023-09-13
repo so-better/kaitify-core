@@ -5,7 +5,7 @@
 			<button style="margin-left: 10px" @click="setTextStyle">设置样式</button>
 			<button style="margin-left: 10px" @click="removeTextStyle">移除样式</button>
 		</div>
-		<div style="width: 300px; height: 300px; border: 1px solid #ddd" contenteditable="true" @beforeinput="e => e.preventDefault()" @compositionstart="e => e.preventDefault()" @compositionupdate="e => e.preventDefault()" @compositionend="e => e.preventDefault()"></div>
+		<div style="width: 300px; height: 300px; border: 1px solid #ddd" contenteditable="true" @beforeinput="beforeinput" @compositionstart="beforeinput" @compositionupdate="beforeinput" @compositionend="beforeinput" @keydown="beforeinput"></div>
 		<div class="editor-content"></div>
 	</div>
 </template>
@@ -56,6 +56,9 @@ export default {
 		this.editor.domRender()
 	},
 	methods: {
+		beforeinput(e) {
+			e.preventDefault()
+		},
 		queryTextStyle() {
 			const flag = this.editor.queryTextStyle('color', '#87f390')
 			console.log(flag)
