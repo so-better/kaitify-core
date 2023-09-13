@@ -60,8 +60,10 @@ export default {
 			e.preventDefault()
 		},
 		queryTextStyle() {
-			const flag = this.editor.queryTextStyle('color', '#87f390')
-			console.log(flag)
+			const p = document.createElement('p')
+			const span = document.createElement('span')
+			p.appendChild(span)
+			document.querySelector('.editor-content').appendChild(p)
 		},
 		setTextStyle() {
 			this.editor.setTextStyle({
