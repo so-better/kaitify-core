@@ -811,6 +811,9 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
+		if (this.__isInputChinese) {
+			return
+		}
 		//撤销
 		if (Keyboard.Undo(e)) {
 			e.preventDefault()
