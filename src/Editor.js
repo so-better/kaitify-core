@@ -179,7 +179,7 @@ class AlexEditor {
 					return el.isBreak()
 				})
 				//如果全是换行符则只保留第一个
-				if (allIsBreak) {
+				if (allIsBreak && children.length) {
 					//第一个换行符
 					const breakEl = children[0]
 					//如果起点在该元素里，则移动到第一个换行符上
