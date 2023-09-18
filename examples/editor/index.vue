@@ -13,7 +13,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<ol><li>333</li></ol>`,
+			value: `<ol><li>333<span style="color:#f30;">4444</span></li></ol>`,
 			editor: null
 		}
 	},

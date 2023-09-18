@@ -2153,10 +2153,10 @@ class AlexEditor {
 				})
 				//如果子元素全部在数组里
 				if (allIn) {
-					newResult.push(result[i])
+					newResult.unshift(result[i])
 				}
 			} else {
-				newResult.push(result[i])
+				newResult.unshift(result[i])
 			}
 		}
 		//以上代码生成newResult
