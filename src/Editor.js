@@ -1772,7 +1772,7 @@ class AlexEditor {
 		//设置新值
 		this.value = this.$el.innerHTML
 		//根据值是否变化来决定
-		if (this.__oldValue != this.value) {
+		if (oldValue != this.value) {
 			//更新旧值
 			this.__oldValue = oldValue
 			//触发change事件
