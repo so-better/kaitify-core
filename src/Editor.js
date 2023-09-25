@@ -570,10 +570,6 @@ class AlexEditor {
 	}
 	//监听selection改变
 	__handleSelectionChange() {
-		//如果编辑器禁用则不更新range
-		if (this.disabled) {
-			return
-		}
 		//如果是中文输入则不更新range
 		if (this.__isInputChinese) {
 			return
