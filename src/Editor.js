@@ -736,6 +736,11 @@ class AlexEditor {
 			}
 		}
 	}
+	//监听编辑器复制
+	async __handleCopy(e) {
+		e.preventDefault()
+		await this.copy()
+	}
 	//监听编辑器剪切
 	async __handleCut(e) {
 		e.preventDefault()
@@ -749,15 +754,13 @@ class AlexEditor {
 	//监听编辑器粘贴
 	async __handlePaste(e) {
 		e.preventDefault()
+		if (this.disabled) {
+			return
+		}
 		await this.paste()
 		this.formatElementStack()
 		this.domRender()
 		this.rangeRender()
-	}
-	//监听编辑器复制
-	async __handleCopy(e) {
-		e.preventDefault()
-		await this.copy()
 	}
 	//监听编辑器拖拽和拖放
 	__handleDragDrop(e) {
@@ -765,14 +768,23 @@ class AlexEditor {
 	}
 	//监听编辑器获取焦点
 	__handleFocus(e) {
+		if (this.disabled) {
+			return
+		}
 		this.emit('focus', this.value)
 	}
 	//监听编辑器失去焦点
 	__handleBlur(e) {
+		if (this.disabled) {
+			return
+		}
 		this.emit('blur', this.value)
 	}
 	//根据光标进行粘贴操作
 	async paste() {
+		if (this.disabled) {
+			return
+		}
 		if (!this.useClipboard) {
 			return false
 		}
@@ -907,6 +919,9 @@ class AlexEditor {
 	}
 	//根据光标进行删除操作
 	delete() {
+		if (this.disabled) {
+			return
+		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//前一个可设置光标的元素
@@ -1276,6 +1291,9 @@ class AlexEditor {
 	}
 	//根据光标位置向编辑器内插入文本
 	insertText(data) {
+		if (this.disabled) {
+			return
+		}
 		if (!data || typeof data != 'string') {
 			throw new Error('The argument must be a string')
 		}
@@ -1316,6 +1334,9 @@ class AlexEditor {
 	}
 	//在光标处换行
 	insertParagraph() {
+		if (this.disabled) {
+			return
+		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//前一个可设置光标的元素
@@ -1445,6 +1466,9 @@ class AlexEditor {
 	}
 	//根据光标插入元素
 	insertElement(ele, cover = true) {
+		if (this.disabled) {
+			return
+		}
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -2338,6 +2362,9 @@ class AlexEditor {
 	}
 	//设置文本元素的样式
 	setTextStyle(styles) {
+		if (this.disabled) {
+			return
+		}
 		if (!Dap.common.isObject(styles)) {
 			throw new Error('The argument must be an object')
 		}
@@ -2390,6 +2417,9 @@ class AlexEditor {
 	}
 	//移除文本元素的样式
 	removeTextStyle(styleNames) {
+		if (this.disabled) {
+			return
+		}
 		//移除样式的方法
 		const removeFn = el => {
 			//如果参数是数组，表示删除指定的样式
@@ -2481,6 +2511,9 @@ class AlexEditor {
 	}
 	//设置文本元素的标记
 	setTextMark(marks) {
+		if (this.disabled) {
+			return
+		}
 		if (!Dap.common.isObject(marks)) {
 			throw new Error('The argument must be an object')
 		}
@@ -2533,6 +2566,9 @@ class AlexEditor {
 	}
 	//移除文本元素的标记
 	removeTextMark(markNames) {
+		if (this.disabled) {
+			return
+		}
 		//移除标记的方法
 		const removeFn = el => {
 			//如果参数是数组，表示删除指定的标记

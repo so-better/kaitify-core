@@ -21,6 +21,7 @@ export default {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
 			htmlPaste: true,
+			disabled: true,
 			renderRules: element => {
 				//console.log(element)
 			}
