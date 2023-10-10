@@ -745,7 +745,7 @@ class AlexEditor {
 	async __handleCut(e) {
 		e.preventDefault()
 		const result = await this.cut()
-		if (result) {
+		if (result && !this.disabled) {
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
@@ -881,7 +881,9 @@ class AlexEditor {
 		}
 		const result = await this.copy(true)
 		if (result) {
-			this.delete()
+			if (!this.disabled) {
+				this.delete()
+			}
 			this.emit('cut')
 		}
 		return result
