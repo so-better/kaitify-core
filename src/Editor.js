@@ -32,9 +32,17 @@ class AlexEditor {
 		//编辑器的值
 		this.value = options.value
 		//自定义编辑器元素的格式化规则
-		this.renderRules = options.renderRules
+		this.__renderRules = options.renderRules
 		//粘贴是否携带样式
-		this.htmlPaste = options.htmlPaste
+		this.allowPasteHtml = options.allowPasteHtml
+		//自定义粘贴文本的处理方法
+		this.customTextPaste = options.customTextPaste
+		//自定义粘贴html的处理方法
+		this.customHtmlPaste = options.customHtmlPaste
+		//自定义粘贴图片的处理方法
+		this.customImagePaste = options.customImagePaste
+		//自定义粘贴视频的处理方法
+		this.customVideoPaste = options.customVideoPaste
 		//编辑的range
 		this.range = null
 		//复制粘贴语法是否能够使用
@@ -87,8 +95,12 @@ class AlexEditor {
 		let opts = {
 			disabled: false,
 			renderRules: [],
-			htmlPaste: false,
-			value: ''
+			allowPasteHtml: false,
+			value: '',
+			customTextPaste: null,
+			customHtmlPaste: null,
+			customImagePaste: null,
+			customVideoPaste: null
 		}
 		if (Dap.common.isObject(options)) {
 			if (typeof options.disabled == 'boolean') {
@@ -100,8 +112,20 @@ class AlexEditor {
 			if (typeof options.value == 'string' && options.value) {
 				opts.value = options.value
 			}
-			if (typeof options.htmlPaste == 'boolean') {
-				opts.htmlPaste = options.htmlPaste
+			if (typeof options.allowPasteHtml == 'boolean') {
+				opts.allowPasteHtml = options.allowPasteHtml
+			}
+			if (typeof options.customTextPaste == 'function') {
+				opts.customTextPaste = options.customTextPaste
+			}
+			if (typeof options.customHtmlPaste == 'function') {
+				opts.customHtmlPaste = options.customHtmlPaste
+			}
+			if (typeof options.customImagePaste == 'function') {
+				opts.customImagePaste = options.customImagePaste
+			}
+			if (typeof options.customVideoPaste == 'function') {
+				opts.customVideoPaste = options.customVideoPaste
 			}
 		}
 		return opts
@@ -749,23 +773,27 @@ class AlexEditor {
 			for (let i = 0; i < length; i++) {
 				const blob = blobs[i]
 				//纯文本粘贴
-				if (blob.type == 'text/plain' && !this.htmlPaste) {
+				if (blob.type == 'text/plain' && !this.allowPasteHtml) {
 					const data = await blob.text()
 					if (data) {
-						if (!this.emit('customTextPaste', data)) {
+						if (typeof this.customTextPaste == 'function') {
+							this.customTextPaste.apply(this, [data])
+						} else {
 							this.insertText(data)
 							this.emit('pasteText', data)
 						}
 					}
 				}
 				//携带样式粘贴
-				else if (blob.type == 'text/html' && this.htmlPaste) {
+				else if (blob.type == 'text/html' && this.allowPasteHtml) {
 					const data = await blob.text()
 					if (data) {
 						const elements = this.parseHtml(data).filter(el => {
 							return !el.isEmpty()
 						})
-						if (!this.emit('customHtmlPaste', data, elements)) {
+						if (typeof this.customHtmlPaste == 'function') {
+							this.customHtmlPaste.apply(this, [data, elements])
+						} else {
 							for (let i = 0; i < elements.length; i++) {
 								this.insertElement(elements[i], false)
 							}
@@ -782,7 +810,9 @@ class AlexEditor {
 				//图片粘贴
 				if (blob.type.startsWith('image/')) {
 					const url = await Util.blobToBase64(blob)
-					if (!this.emit('customImagePaste', url)) {
+					if (typeof this.customImagePaste == 'function') {
+						this.customImagePaste.apply(this, [url])
+					} else {
 						const image = new AlexElement(
 							'closed',
 							'img',
@@ -799,7 +829,9 @@ class AlexEditor {
 				//视频粘贴
 				else if (blob.type.startsWith('video/')) {
 					const url = await Util.blobToBase64(blob)
-					if (!this.emit('customVideoPaste', url)) {
+					if (typeof this.customVideoPaste == 'function') {
+						this.customVideoPaste.apply(this, [url])
+					} else {
 						const video = new AlexElement(
 							'closed',
 							'video',
@@ -817,7 +849,9 @@ class AlexEditor {
 				else if (blob.type == 'text/plain') {
 					const data = await blob.text()
 					if (data) {
-						if (!this.emit('customTextPaste', data)) {
+						if (typeof this.customTextPaste == 'function') {
+							this.customTextPaste.apply(this, [data])
+						} else {
 							this.insertText(data)
 							this.emit('pasteText', data)
 						}
@@ -1641,7 +1675,7 @@ class AlexEditor {
 	//格式化stack
 	formatElementStack() {
 		//获取自定义的格式化规则
-		let renderRules = this.renderRules.filter(fn => {
+		let renderRules = this.__renderRules.filter(fn => {
 			return typeof fn == 'function'
 		})
 		//格式化函数

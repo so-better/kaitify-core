@@ -92,10 +92,11 @@ export default {
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
-			htmlPaste: true,
 			disabled: false,
-			renderRules: element => {
-				//console.log(element)
+			allowPasteHtml: true,
+			customHtmlPaste: function (data) {
+				console.log(data)
+				this.insertText(data)
 			}
 		})
 		this.editor.on('copy', val => {
