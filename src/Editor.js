@@ -1727,12 +1727,17 @@ class AlexEditor {
 	domRender(unPushHistory = false) {
 		//触发事件
 		this.emit('beforeRender')
-		//更新dom值
-		this.$el.innerHTML = ''
+		//创建fragment
+		const fragment = document.createDocumentFragment()
+		//生成新的dom
 		this.stack.forEach(element => {
 			element.__renderElement()
-			this.$el.appendChild(element._elm)
+			fragment.appendChild(element._elm)
 		})
+		//更新dom值
+		this.$el.innerHTML = ''
+		this.$el.appendChild(fragment)
+
 		//记录旧值
 		const oldValue = this.value
 		//设置新值
