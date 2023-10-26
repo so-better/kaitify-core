@@ -464,27 +464,6 @@ class AlexEditor {
 			})
 		}
 	}
-	//解决safari下在a标签末尾输入中文导致a标签消失的bug
-	__safariLinkHandle() {
-		//判断是否在safari下
-		const { Safari } = Dap.platform.browser()
-		//获取焦点所在的a标签
-		const linkEle = this.range.anchor.element.__getLink()
-		//如果在safari下并且焦点在a标签中
-		if (Safari && linkEle) {
-			//移除a标签下的所有dom
-			if (linkEle.hasChildren()) {
-				const elements = AlexElement.flatElements(linkEle.children)
-				for (let i = elements.length - 1; i >= 0; i--) {
-					elements[i]._elm.remove()
-				}
-			}
-			//移除a标签本身
-			linkEle._elm.remove()
-			//重新插入链接的dom
-			this.__insertNewDom(linkEle)
-		}
-	}
 	//判断焦点是否在可视范围内，如果不在则进行设置
 	__setRangeInVisible() {
 		const fn = async root => {
@@ -532,40 +511,6 @@ class AlexEditor {
 		while (Dap.element.isElement(root) && root != document.documentElement) {
 			fn(root)
 			root = root.parentNode
-		}
-	}
-	//将元素的真实dom插入新的位置，如果该元素之前没有渲染则reRender需要为true
-	__insertNewDom(el, reRender = true) {
-		if (reRender) {
-			//渲染元素
-			el.__renderElement()
-		}
-		//获取前一个兄弟元素
-		const previousElement = this.getPreviousElement(el)
-		//如果前一个兄弟元素存在
-		if (previousElement) {
-			//在前一个兄弟元素的真实dom后插入此元素的dom
-			previousElement._elm.parentNode.insertBefore(el._elm, previousElement._elm.nextSibling)
-		}
-		//前一个兄弟元素不存在
-		else {
-			//如果是根级块级元素
-			if (el.isBlock()) {
-				if (this.$el.firstElementChild) {
-					this.$el.insertBefore(el._elm, this.$el.firstElementChild)
-				} else {
-					this.$el.appendChild(el._elm)
-				}
-			}
-			//不是根级块
-			else {
-				const parent = el.parent._elm
-				if (parent.firstElementChild) {
-					parent.insertBefore(el._elm, parent.firstElementChild)
-				} else {
-					parent.appendChild(el._elm)
-				}
-			}
 		}
 	}
 	//监听selection改变
@@ -693,7 +638,6 @@ class AlexEditor {
 			if (e.data) {
 				this.insertText(e.data)
 				this.formatElementStack()
-				this.__safariLinkHandle()
 				this.domRender()
 				this.rangeRender()
 			}
