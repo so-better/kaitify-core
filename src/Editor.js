@@ -33,6 +33,12 @@ class AlexEditor {
 		this.value = options.value
 		//自定义编辑器元素的格式化规则
 		this.__renderRules = options.renderRules
+		//是否允许复制
+		this.allowCopy = options.allowCopy
+		//是否允许粘贴
+		this.allowPaste = options.allowPaste
+		//是否允许剪切
+		this.allowCut = options.allowCut
 		//粘贴是否携带样式
 		this.allowPasteHtml = options.allowPasteHtml
 		//自定义粘贴文本的处理方法
@@ -95,8 +101,11 @@ class AlexEditor {
 		let opts = {
 			disabled: false,
 			renderRules: [],
-			allowPasteHtml: false,
 			value: '',
+			allowCopy: true,
+			allowPaste: true,
+			allowCut: true,
+			allowPasteHtml: false,
 			customTextPaste: null,
 			customHtmlPaste: null,
 			customImagePaste: null,
@@ -111,6 +120,15 @@ class AlexEditor {
 			}
 			if (typeof options.value == 'string' && options.value) {
 				opts.value = options.value
+			}
+			if (typeof options.allowCopy == 'boolean') {
+				opts.allowCopy = options.allowCopy
+			}
+			if (typeof options.allowPaste == 'boolean') {
+				opts.allowPaste = options.allowPaste
+			}
+			if (typeof options.allowCut == 'boolean') {
+				opts.allowCut = options.allowCut
 			}
 			if (typeof options.allowPasteHtml == 'boolean') {
 				opts.allowPasteHtml = options.allowPasteHtml
@@ -756,6 +774,9 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return
 		}
+		if (!this.allowPaste) {
+			return
+		}
 		const clipboardItems = await navigator.clipboard.read()
 		const clipboardItem = clipboardItems[0]
 		const getTypeFunctions = []
@@ -865,6 +886,9 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return false
 		}
+		if (!this.allowCut) {
+			return false
+		}
 		const result = await this.copy(true)
 		if (result) {
 			if (!this.disabled) {
@@ -877,6 +901,9 @@ class AlexEditor {
 	//根据光标执行复制操作
 	async copy(isCut = false) {
 		if (!this.useClipboard) {
+			return false
+		}
+		if (!this.allowCopy) {
 			return false
 		}
 		let result = this.getElementsByRange(true, false)
