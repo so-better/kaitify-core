@@ -730,7 +730,7 @@ class AlexEditor {
 			return
 		}
 		if (!this.useClipboard) {
-			return false
+			return
 		}
 		const clipboardItems = await navigator.clipboard.read()
 		const clipboardItem = clipboardItems[0]
@@ -752,8 +752,10 @@ class AlexEditor {
 				if (blob.type == 'text/plain' && !this.htmlPaste) {
 					const data = await blob.text()
 					if (data) {
-						this.insertText(data)
-						this.emit('pasteText', data)
+						if (!this.emit('customTextPaste', data)) {
+							this.insertText(data)
+							this.emit('pasteText', data)
+						}
 					}
 				}
 				//携带样式粘贴
@@ -763,10 +765,12 @@ class AlexEditor {
 						const elements = this.parseHtml(data).filter(el => {
 							return !el.isEmpty()
 						})
-						for (let i = 0; i < elements.length; i++) {
-							this.insertElement(elements[i], false)
+						if (!this.emit('customHtmlPaste', data, elements)) {
+							for (let i = 0; i < elements.length; i++) {
+								this.insertElement(elements[i], false)
+							}
+							this.emit('pasteHtml', data, elements)
 						}
-						this.emit('pasteHtml', data, elements)
 					}
 				}
 			}
@@ -778,7 +782,7 @@ class AlexEditor {
 				//图片粘贴
 				if (blob.type.startsWith('image/')) {
 					const url = await Util.blobToBase64(blob)
-					if (!this.emit('pasteImage', url)) {
+					if (!this.emit('customImagePaste', url)) {
 						const image = new AlexElement(
 							'closed',
 							'img',
@@ -789,12 +793,13 @@ class AlexEditor {
 							null
 						)
 						this.insertElement(image)
+						this.emit('pasteImage', url)
 					}
 				}
 				//视频粘贴
 				else if (blob.type.startsWith('video/')) {
 					const url = await Util.blobToBase64(blob)
-					if (!this.emit('pasteVideo', url)) {
+					if (!this.emit('customVideoPaste', url)) {
 						const video = new AlexElement(
 							'closed',
 							'video',
@@ -805,14 +810,17 @@ class AlexEditor {
 							null
 						)
 						this.insertElement(video)
+						this.emit('pasteVideo', url)
 					}
 				}
 				//文字粘贴
 				else if (blob.type == 'text/plain') {
 					const data = await blob.text()
 					if (data) {
-						this.insertText(data)
-						this.emit('pasteText', data)
+						if (!this.emit('customTextPaste', data)) {
+							this.insertText(data)
+							this.emit('pasteText', data)
+						}
 					}
 				}
 			}
