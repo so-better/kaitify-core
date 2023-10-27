@@ -7,32 +7,102 @@ import AlexHistory from './History'
 import Keyboard from './Keyboard'
 import defaultConfig from './default'
 
+//判断是否可以使用Clipboard
+const canUseClipboard = () => {
+	if (!window.ClipboardItem) {
+		console.warn("window.ClipboardItem must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
+		return false
+	}
+	if (!navigator.clipboard) {
+		console.warn("navigator.clipboard must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
+		return false
+	}
+	return true
+}
+
+//初始化编辑器dom
+const initDom = el => {
+	//判断是否字符串，如果是字符串按照选择器来寻找元素
+	if (typeof el == 'string' && el) {
+		el = document.body.querySelector(el)
+	}
+	//如何el不是元素则抛出异常
+	if (!Dap.element.isElement(el)) {
+		throw new Error('You must specify a dom container to initialize the editor')
+	}
+	//如果已经初始化过了则抛出异常
+	if (Dap.data.get(el, 'data-alex-editor-init')) {
+		throw new Error('The element node has been initialized to the editor')
+	}
+	//添加初始化的标记
+	Dap.data.set(el, 'data-alex-editor-init', true)
+
+	return el
+}
+
+//格式化options参数
+const initOptions = options => {
+	let opts = {
+		disabled: false,
+		renderRules: [],
+		value: '',
+		allowCopy: true,
+		allowPaste: true,
+		allowCut: true,
+		allowPasteHtml: false,
+		customTextPaste: null,
+		customHtmlPaste: null,
+		customImagePaste: null,
+		customVideoPaste: null
+	}
+	if (Dap.common.isObject(options)) {
+		if (typeof options.disabled == 'boolean') {
+			opts.disabled = options.disabled
+		}
+		if (Array.isArray(options.renderRules)) {
+			opts.renderRules = options.renderRules
+		}
+		if (typeof options.value == 'string' && options.value) {
+			opts.value = options.value
+		}
+		if (typeof options.allowCopy == 'boolean') {
+			opts.allowCopy = options.allowCopy
+		}
+		if (typeof options.allowPaste == 'boolean') {
+			opts.allowPaste = options.allowPaste
+		}
+		if (typeof options.allowCut == 'boolean') {
+			opts.allowCut = options.allowCut
+		}
+		if (typeof options.allowPasteHtml == 'boolean') {
+			opts.allowPasteHtml = options.allowPasteHtml
+		}
+		if (typeof options.customTextPaste == 'function') {
+			opts.customTextPaste = options.customTextPaste
+		}
+		if (typeof options.customHtmlPaste == 'function') {
+			opts.customHtmlPaste = options.customHtmlPaste
+		}
+		if (typeof options.customImagePaste == 'function') {
+			opts.customImagePaste = options.customImagePaste
+		}
+		if (typeof options.customVideoPaste == 'function') {
+			opts.customVideoPaste = options.customVideoPaste
+		}
+	}
+	return opts
+}
+
 class AlexEditor {
-	constructor(el, options) {
-		//支持选择器
-		if (typeof el == 'string' && el) {
-			el = document.body.querySelector(el)
-		}
-		//校验el是否元素
-		if (!Dap.element.isElement(el)) {
-			throw new Error('You must specify a dom container to initialize the editor')
-		}
-		//校验是否已经初始化过
-		if (Dap.data.get(el, 'data-alex-editor-init')) {
-			throw new Error('The element node has been initialized to the editor')
-		}
-		//设置初始化后的标记
-		Dap.data.set(el, 'data-alex-editor-init', true)
-		//格式化options参数
-		options = this.__formatOptions(options)
+	constructor(el, opts) {
 		//编辑器容器
-		this.$el = el
+		this.$el = initDom(el)
+		//初始化opts参数
+		const options = initOptions(opts)
 		//是否禁用
 		this.disabled = options.disabled
 		//编辑器的值
 		this.value = options.value
-		//自定义编辑器元素的格式化规则
-		this.__renderRules = options.renderRules
 		//是否允许复制
 		this.allowCopy = options.allowCopy
 		//是否允许粘贴
@@ -52,11 +122,13 @@ class AlexEditor {
 		//编辑的range
 		this.range = null
 		//复制粘贴语法是否能够使用
-		this.useClipboard = true
+		this.useClipboard = canUseClipboard()
 		//创建历史记录
 		this.history = new AlexHistory()
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
+		//自定义编辑器元素的格式化规则
+		this.__renderRules = options.renderRules
 		//编辑器唯一id
 		this.__guid = Util.createGuid()
 		//事件集合
@@ -73,8 +145,6 @@ class AlexEditor {
 		this.__initRange()
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
-		//判断复制粘贴语法是否能够使用
-		this.__judgeUseClipboard()
 		//设置selection的监听更新range
 		Dap.event.on(document, `selectionchange.alex_editor_${this.__guid}`, this.__handleSelectionChange.bind(this))
 		//监听内容输入
@@ -95,58 +165,6 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'focus.alex_editor', this.__handleFocus.bind(this))
 		//监听编辑器失去焦点
 		Dap.event.on(this.$el, 'blur.alex_editor', this.__handleBlur.bind(this))
-	}
-	//格式化options参数
-	__formatOptions(options) {
-		let opts = {
-			disabled: false,
-			renderRules: [],
-			value: '',
-			allowCopy: true,
-			allowPaste: true,
-			allowCut: true,
-			allowPasteHtml: false,
-			customTextPaste: null,
-			customHtmlPaste: null,
-			customImagePaste: null,
-			customVideoPaste: null
-		}
-		if (Dap.common.isObject(options)) {
-			if (typeof options.disabled == 'boolean') {
-				opts.disabled = options.disabled
-			}
-			if (Array.isArray(options.renderRules)) {
-				opts.renderRules = options.renderRules
-			}
-			if (typeof options.value == 'string' && options.value) {
-				opts.value = options.value
-			}
-			if (typeof options.allowCopy == 'boolean') {
-				opts.allowCopy = options.allowCopy
-			}
-			if (typeof options.allowPaste == 'boolean') {
-				opts.allowPaste = options.allowPaste
-			}
-			if (typeof options.allowCut == 'boolean') {
-				opts.allowCut = options.allowCut
-			}
-			if (typeof options.allowPasteHtml == 'boolean') {
-				opts.allowPasteHtml = options.allowPasteHtml
-			}
-			if (typeof options.customTextPaste == 'function') {
-				opts.customTextPaste = options.customTextPaste
-			}
-			if (typeof options.customHtmlPaste == 'function') {
-				opts.customHtmlPaste = options.customHtmlPaste
-			}
-			if (typeof options.customImagePaste == 'function') {
-				opts.customImagePaste = options.customImagePaste
-			}
-			if (typeof options.customVideoPaste == 'function') {
-				opts.customVideoPaste = options.customVideoPaste
-			}
-		}
-		return opts
 	}
 	//默认的格式化规则数组
 	__formatUnchangeableRules = [
@@ -471,17 +489,6 @@ class AlexEditor {
 			point.moveToEnd(previousElement)
 		} else if (nextElement) {
 			point.moveToStart(nextElement)
-		}
-	}
-	//判断是否可以使用Clipboard
-	__judgeUseClipboard() {
-		if (!window.ClipboardItem) {
-			this.useClipboard = false
-			console.warn("window.ClipboardItem must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
-		}
-		if (!navigator.clipboard) {
-			this.useClipboard = false
-			console.warn("navigator.clipboard must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
 		}
 	}
 	//清空默认行为的内部块元素
