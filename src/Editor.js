@@ -133,8 +133,8 @@ class AlexEditor {
 		this.__guid = Util.createGuid()
 		//事件集合
 		this.__events = {}
-		//旧的文本内容
-		this.__oldValue = null
+		//是否第一次渲染
+		this.__firstRender = true
 		//是否正在输入中文
 		this.__isInputChinese = false
 		//是否内部修改真实光标引起selctionChange事件
@@ -1801,6 +1801,8 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
+		//暂记旧值
+		const oldValue = this.$el.innerHTML
 		//触发事件
 		this.emit('beforeRender')
 		//创建fragment
@@ -1813,17 +1815,14 @@ class AlexEditor {
 		//更新dom值
 		this.$el.innerHTML = ''
 		this.$el.appendChild(fragment)
-
-		//记录旧值
-		const oldValue = this.value
 		//设置新值
 		this.value = this.$el.innerHTML
 		//根据值是否变化来决定
 		if (oldValue != this.value) {
-			//更新旧值
-			this.__oldValue = oldValue
-			//触发change事件
-			this.emit('change', this.value, this.__oldValue)
+			//如果不是第一次渲染，则触发change事件
+			if (!this.__firstRender) {
+				this.emit('change', this.value, oldValue)
+			}
 			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
 				//将本次的stack和range推入历史栈中
@@ -1832,6 +1831,10 @@ class AlexEditor {
 		}
 		//触发事件
 		this.emit('afterRender')
+		//修改是否第一次渲染的标记
+		if (this.__firstRender) {
+			this.__firstRender = false
+		}
 	}
 	//根据anchor和focus来设置真实的光标
 	rangeRender() {
