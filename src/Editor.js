@@ -1829,12 +1829,12 @@ class AlexEditor {
 				this.history.push(this.stack, this.range)
 			}
 		}
-		//触发事件
-		this.emit('afterRender')
 		//修改是否第一次渲染的标记
 		if (this.__firstRender) {
 			this.__firstRender = false
 		}
+		//触发事件
+		this.emit('afterRender')
 	}
 	//根据anchor和focus来设置真实的光标
 	rangeRender() {
