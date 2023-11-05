@@ -1801,8 +1801,6 @@ class AlexEditor {
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
-		//暂记旧值
-		const oldValue = this.$el.innerHTML
 		//触发事件
 		this.emit('beforeRender')
 		//创建fragment
@@ -1815,10 +1813,12 @@ class AlexEditor {
 		//更新dom值
 		this.$el.innerHTML = ''
 		this.$el.appendChild(fragment)
+		//暂记旧值
+		const oldValue = this.value
 		//设置新值
 		this.value = this.$el.innerHTML
-		//根据值是否变化来决定
-		if (oldValue != this.value) {
+		//如果是第一次渲染或者值发生变化
+		if (this.__firstRender || oldValue != this.value) {
 			//如果不是第一次渲染，则触发change事件
 			if (!this.__firstRender) {
 				this.emit('change', this.value, oldValue)
