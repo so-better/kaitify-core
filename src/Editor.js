@@ -2186,7 +2186,6 @@ class AlexEditor {
 				})
 			}
 		}
-
 		//以上代码生成result
 		//通过上述代码获取到在选区内的元素，下面通过一段代码剔除子元素不是全部在数组里的元素
 		const resLength = result.length
@@ -2207,6 +2206,31 @@ class AlexEditor {
 				}
 			} else {
 				newResult.unshift(result[i])
+			}
+		}
+		//通过下述代码将子元素全部在数组内，但是父元素不在数组内的元素加入进来
+		for (let i = 0; i < newResult.length; i++) {
+			const element = newResult[i].element
+			//如果该元素全部在选区内，并且有父元素
+			if (!element.offset && element.parent) {
+				//父元素是否在数组内
+				const selfIn = newResult.some(item => {
+					return item.element.isEqual(element.parent)
+				})
+				//父元素的所有子元素是否都在数组内
+				const allIn = element.parent.children.every(child => {
+					return newResult.some(item => {
+						return item.element.isEqual(child) && !item.offset
+					})
+				})
+				//如果子元素都在并且自身不在
+				if (allIn && !selfIn) {
+					newResult.splice(i, 0, {
+						element: element.parent,
+						offset: false
+					})
+					i++
+				}
 			}
 		}
 		//以上代码生成newResult
