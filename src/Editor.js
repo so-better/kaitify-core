@@ -1731,7 +1731,7 @@ class AlexEditor {
 		//格式化函数
 		const format = element => {
 			//将自定义的格式化规则加入到默认规则之前，对该元素进行格式化
-			;[...renderRules, ...this.__formatUnchangeableRules].forEach(fn => {
+			;[...this.__formatUnchangeableRules, ...renderRules].forEach(fn => {
 				fn.apply(this, [element])
 			})
 			//判断是否有子元素
