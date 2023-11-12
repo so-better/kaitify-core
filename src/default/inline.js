@@ -67,5 +67,9 @@ export default [
 	{
 		parsedom: 'bdo',
 		parse: true
+	},
+	{
+		parsedom: 'font',
+		parse: true
 	}
 ]

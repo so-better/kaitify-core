@@ -562,6 +562,20 @@ class AlexEditor {
 			root = root.parentNode
 		}
 	}
+	//判断stack是否为空，进行初始化
+	__handleStackEmpty() {
+		const isEmpty = this.stack.every(el => {
+			return el.isEmpty()
+		})
+		if (this.stack.length == 0 || isEmpty) {
+			const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
+			const breakEle = new AlexElement('closed', 'br', null, null, null)
+			this.addElementTo(breakEle, ele)
+			this.stack = [ele]
+			this.range.anchor.moveToStart(breakEle)
+			this.range.focus.moveToStart(breakEle)
+		}
+	}
 	//监听selection改变
 	__handleSelectionChange() {
 		//如果是中文输入则不更新range
@@ -1310,6 +1324,8 @@ class AlexEditor {
 		//合并起点和终点
 		this.range.focus.element = this.range.anchor.element
 		this.range.focus.offset = this.range.anchor.offset
+		//为空判断进行初始化
+		this.__handleStackEmpty()
 	}
 	//根据光标位置向编辑器内插入文本
 	insertText(data) {
@@ -1789,15 +1805,8 @@ class AlexEditor {
 			//序列+1
 			index++
 		}
-		//如果元素数组为空则说明给的初始值不符合要求，此时初始化stack
-		if (this.stack.length == 0) {
-			const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
-			const breakEle = new AlexElement('closed', 'br', null, null, null)
-			this.addElementTo(breakEle, ele)
-			this.stack = [ele]
-			this.range.anchor.moveToStart(breakEle)
-			this.range.focus.moveToStart(breakEle)
-		}
+		//判断stack是否为空进行初始化
+		this.__handleStackEmpty()
 	}
 	//渲染编辑器dom内容
 	domRender(unPushHistory = false) {
