@@ -1969,8 +1969,8 @@ class AlexEditor {
 		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
 		//设置行为值
 		element.behavior = config.behavior
-		//如果是根部块元素或者内部块元素或者行内元素，则设置子元素
-		if (block || inblock || inline) {
+		//如果不是自闭合元素则设置子元素
+		if (!closed) {
 			Array.from(node.childNodes).forEach(childNode => {
 				if (childNode.nodeType == 1 || childNode.nodeType == 3) {
 					const childEle = this.parseNode(childNode)
