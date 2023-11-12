@@ -1954,7 +1954,13 @@ class AlexEditor {
 			if (inline.parse) {
 				config.parsedom = AlexElement.TEXT_NODE
 				if (Dap.common.isObject(inline.parse)) {
-					Object.assign(config.styles, Util.clone(inline.parse))
+					for (let key in inline.parse) {
+						if (typeof inline.parse[key] == 'function') {
+							config.styles[key] = inline.parse[key].apply(this, [node])
+						} else {
+							config.styles[key] = inline.parse[key]
+						}
+					}
 				}
 			}
 		}

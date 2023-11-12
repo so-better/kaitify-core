@@ -282,7 +282,7 @@ class AlexElement {
 		//设置属性
 		if (this.hasMarks()) {
 			Object.keys(this.marks).forEach(key => {
-				if (!/(^on)|(^style$)|(^contenteditable$)/g.test(key)) {
+				if (!/(^on)|(^style$)|(^contenteditable$)|(^face$)/g.test(key)) {
 					el.setAttribute(key, this.marks[key])
 				}
 			})

@@ -7,7 +7,7 @@ export default {
 		for (let i = 0; i < length; i++) {
 			const attribute = el.attributes[i]
 			//匹配事件、样式外的属性
-			if (!/(^on)|(^style$)|(^contenteditable$)/g.test(attribute.nodeName)) {
+			if (!/(^on)|(^style$)|(^contenteditable$)|(^face$)/g.test(attribute.nodeName)) {
 				o[attribute.nodeName] = attribute.nodeValue
 			}
 		}

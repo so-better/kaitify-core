@@ -70,6 +70,11 @@ export default [
 	},
 	{
 		parsedom: 'font',
-		parse: true
+		parse: true,
+		parse: {
+			'font-family': function (node) {
+				return node.getAttribute('face') || ''
+			}
+		}
 	}
 ]
