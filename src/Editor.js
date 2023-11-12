@@ -826,7 +826,7 @@ class AlexEditor {
 						}
 					}
 				}
-				//携带样式粘贴
+				//粘贴html
 				else if (blob.type == 'text/html' && this.allowPasteHtml) {
 					const data = await blob.text()
 					if (data) {
@@ -837,6 +837,7 @@ class AlexEditor {
 							this.customHtmlPaste.apply(this, [data, elements])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
+								this.formatElement(elements[i])
 								this.insertElement(elements[i], false)
 							}
 							this.emit('pasteHtml', data, elements)
@@ -1722,54 +1723,54 @@ class AlexEditor {
 			this.insertElement(ele, cover)
 		}
 	}
-	//格式化stack
-	formatElementStack() {
+	//格式化某个元素
+	formatElement(element) {
 		//获取自定义的格式化规则
 		let renderRules = this.__renderRules.filter(fn => {
 			return typeof fn == 'function'
 		})
-		//格式化函数
-		const format = element => {
-			//将自定义的格式化规则加入到默认规则之前，对该元素进行格式化
-			;[...this.__formatUnchangeableRules, ...renderRules].forEach(fn => {
-				fn.apply(this, [element])
-			})
-			//判断是否有子元素
-			if (element.hasChildren()) {
-				//遍历子元素
-				let index = 0
-				while (index < element.children.length) {
-					//获取子元素
-					const ele = element.children[index]
-					//如果是空元素则删除
-					if (ele.isEmpty()) {
-						if (ele.isContains(this.range.anchor.element)) {
-							this.__setRecentlyPoint(this.range.anchor)
-						}
-						if (ele.isContains(this.range.focus.element)) {
-							this.__setRecentlyPoint(this.range.focus)
-						}
-						element.children.splice(index, 1)
-						continue
+		//将自定义的格式化规则加入到默认规则之前，对该元素进行格式化
+		;[...this.__formatUnchangeableRules, ...renderRules].forEach(fn => {
+			fn.apply(this, [element])
+		})
+		//判断是否有子元素
+		if (element.hasChildren()) {
+			//遍历子元素
+			let index = 0
+			while (index < element.children.length) {
+				//获取子元素
+				const ele = element.children[index]
+				//如果是空元素则删除
+				if (ele.isEmpty()) {
+					if (ele.isContains(this.range.anchor.element)) {
+						this.__setRecentlyPoint(this.range.anchor)
 					}
-					//对该子元素进行格式化处理
-					format(ele)
-					//如果在经过格式化后是空元素，则需要删除该元素
-					if (ele.isEmpty()) {
-						if (ele.isContains(this.range.anchor.element)) {
-							this.__setRecentlyPoint(this.range.anchor)
-						}
-						if (ele.isContains(this.range.focus.element)) {
-							this.__setRecentlyPoint(this.range.focus)
-						}
-						element.children.splice(index, 1)
-						continue
+					if (ele.isContains(this.range.focus.element)) {
+						this.__setRecentlyPoint(this.range.focus)
 					}
-					//序列+1
-					index++
+					element.children.splice(index, 1)
+					continue
 				}
+				//对该子元素进行格式化处理
+				this.formatElement(ele)
+				//如果在经过格式化后是空元素，则需要删除该元素
+				if (ele.isEmpty()) {
+					if (ele.isContains(this.range.anchor.element)) {
+						this.__setRecentlyPoint(this.range.anchor)
+					}
+					if (ele.isContains(this.range.focus.element)) {
+						this.__setRecentlyPoint(this.range.focus)
+					}
+					element.children.splice(index, 1)
+					continue
+				}
+				//序列+1
+				index++
 			}
 		}
+	}
+	//格式化stack
+	formatElementStack() {
 		//遍历stack
 		let index = 0
 		while (index < this.stack.length) {
@@ -1790,7 +1791,7 @@ class AlexEditor {
 				ele.convertToBlock()
 			}
 			//格式化根级块元素
-			format(ele)
+			this.formatElement(ele)
 			//如果在经过格式化后是空元素，则需要删除该元素
 			if (ele.isEmpty()) {
 				if (ele.isContains(this.range.anchor.element)) {
