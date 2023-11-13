@@ -44,26 +44,27 @@ class AlexHistory {
 
 	//撤销
 	get(type) {
+		let current = this.current
 		//撤销
 		if (type == -1) {
 			//已经是第一个了，无法再撤销
-			if (this.current <= 0) {
+			if (current <= 0) {
 				return null
 			}
 			//回退1
-			this.current -= 1
+			current -= 1
 		}
 		//重做
 		else if (type == 1) {
 			//如果是最后一个了，无法重做
-			if (this.current >= this.records.length - 1) {
+			if (current >= this.records.length - 1) {
 				return null
 			}
 			//前进1
-			this.current += 1
+			current += 1
 		}
 		//获取栈中的stack和range
-		const { stack, range } = this.records[this.current]
+		const { stack, range } = this.records[current]
 		//创建新的stack
 		const newStack = stack.map(ele => {
 			return ele.__fullClone()
@@ -84,6 +85,7 @@ class AlexHistory {
 		const newRange = new AlexRange(anchor, focus)
 		//返回给编辑器
 		return {
+			current: current,
 			stack: newStack,
 			range: newRange
 		}

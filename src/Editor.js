@@ -723,6 +723,7 @@ class AlexEditor {
 			e.preventDefault()
 			const historyRecord = this.history.get(-1)
 			if (historyRecord) {
+				this.history.current = historyRecord.current
 				this.stack = historyRecord.stack
 				this.range = historyRecord.range
 				this.formatElementStack()
@@ -735,6 +736,7 @@ class AlexEditor {
 			e.preventDefault()
 			const historyRecord = this.history.get(1)
 			if (historyRecord) {
+				this.history.current = historyRecord.current
 				this.stack = historyRecord.stack
 				this.range = historyRecord.range
 				this.formatElementStack()
