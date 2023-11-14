@@ -10,7 +10,9 @@ class AlexHistory {
 		this.current = -1
 	}
 
-	//入栈
+	/**
+	 * 入栈
+	 */
 	push(stack, range) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.current < this.records.length - 1) {
@@ -42,7 +44,9 @@ class AlexHistory {
 		this.current += 1
 	}
 
-	//撤销
+	/**
+	 * 获取
+	 */
 	get(type) {
 		let current = this.current
 		//撤销

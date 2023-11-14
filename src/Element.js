@@ -1,10 +1,12 @@
 import Dap from 'dap-util'
-import Util from './Util'
-
+import { createUniqueKey, isSpaceText, cloneData } from './core/tool'
+/**
+ * 编辑器元素对象
+ */
 class AlexElement {
 	constructor(type, parsedom, marks, styles, textContent) {
 		//key值
-		this.key = Util.createUniqueKey()
+		this.key = createUniqueKey()
 		//类型 block/inblock/inline/text/closed
 		this.type = type
 		//真实节点名称
@@ -21,34 +23,55 @@ class AlexElement {
 		this.parent = null
 		//定义内部块元素的行为 default/block
 		this.behavior = 'default'
-		//真实dom
-		this._elm = null
+		//真实node
+		this.elm = null
 	}
-	//是否根级块元素
+
+	/**
+	 * 是否根级块元素
+	 */
 	isBlock() {
 		return this.type == 'block'
 	}
-	//是否内部块元素
+
+	/**
+	 * 是否内部块元素
+	 */
 	isInblock() {
 		return this.type == 'inblock'
 	}
-	//是否行内元素
+
+	/**
+	 * 是否行内元素
+	 */
 	isInline() {
 		return this.type == 'inline'
 	}
-	//是否闭合
+
+	/**
+	 * 是否自闭合元素
+	 */
 	isClosed() {
 		return this.type == 'closed'
 	}
-	//是否文本
+
+	/**
+	 * 是否文本元素
+	 */
 	isText() {
 		return this.type == 'text'
 	}
-	//是否换行符
+
+	/**
+	 * 是否换行符
+	 */
 	isBreak() {
 		return this.isClosed() && this.parsedom == 'br'
 	}
-	//是否空元素
+
+	/**
+	 * 是否空元素
+	 */
 	isEmpty() {
 		//文本元素
 		if (this.isText()) {
@@ -66,18 +89,27 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否零宽度无断空白元素
+
+	/**
+	 * 是否零宽度无断空白元素
+	 */
 	isSpaceText() {
-		return this.isText() && !this.isEmpty() && Util.isSpaceText(this.textContent)
+		return this.isText() && !this.isEmpty() && isSpaceText(this.textContent)
 	}
-	//判断两个Element是否相等
+
+	/**
+	 * 比较当前元素和另一个元素是否相等
+	 */
 	isEqual(element) {
 		if (!AlexElement.isElement(element)) {
 			return false
 		}
 		return this.key == element.key
 	}
-	//是否包含指定元素
+
+	/**
+	 * 判断当前元素是否包含另一个元素
+	 */
 	isContains(element) {
 		if (this.isEqual(element)) {
 			return true
@@ -87,7 +119,10 @@ class AlexElement {
 		}
 		return this.isContains(element.parent)
 	}
-	//判断是否只包含换行符
+
+	/**
+	 * 判断当前元素的子元素数组是否只包含换行符
+	 */
 	isOnlyHasBreak() {
 		if (this.hasChildren()) {
 			return this.children.every(item => {
@@ -96,7 +131,10 @@ class AlexElement {
 		}
 		return false
 	}
-	//判断元素是否在拥有代码块样式的块内
+
+	/**
+	 * 判断当前元素是否在拥有代码块样式的块内（包括自身）
+	 */
 	isPreStyle() {
 		const block = this.getBlock()
 		const inblock = this.getInblock()
@@ -121,7 +159,10 @@ class AlexElement {
 			return false
 		}
 	}
-	//是否含有标记
+
+	/**
+	 * 是否含有标记
+	 */
 	hasMarks() {
 		if (!this.marks) {
 			return false
@@ -131,7 +172,10 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否含有样式
+
+	/**
+	 * 是否含有样式
+	 */
 	hasStyles() {
 		if (!this.styles) {
 			return false
@@ -141,7 +185,10 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否有子元素
+
+	/**
+	 * 是否有子元素
+	 */
 	hasChildren() {
 		if (this.isClosed() || this.isText()) {
 			return false
@@ -151,16 +198,23 @@ class AlexElement {
 		}
 		return false
 	}
-	//是否包含嵌套关系
+
+	/**
+	 * 判断当前元素与另一个元素是否有包含关系
+	 */
 	hasContains(element) {
 		return this.isContains(element) || element.isContains(this)
 	}
-	//克隆当前元素,deep为true表示深度克隆
+
+	/**
+	 * 克隆当前元素
+	 * deep为true表示深度克隆，即克隆子元素，否则只会克隆自身
+	 */
 	clone(deep = true) {
 		if (typeof deep != 'boolean') {
 			throw new Error('The parameter must be a Boolean')
 		}
-		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
 		if (deep && this.hasChildren()) {
 			this.children.forEach(child => {
@@ -175,10 +229,13 @@ class AlexElement {
 		}
 		return el
 	}
-	//转换成根级块元素
+
+	/**
+	 * 将当前元素转换成根级块元素
+	 */
 	convertToBlock() {
 		if (this.isBlock()) {
-			throw new Error('This element is already of type "block"')
+			return
 		}
 		let element = this.clone()
 		this.type = 'block'
@@ -189,7 +246,11 @@ class AlexElement {
 		this.children = [element]
 		element.parent = this
 	}
-	//设置为空元素
+
+	/**
+	 * 设置为空元素
+	 * @returns
+	 */
 	toEmpty() {
 		if (this.isEmpty()) {
 			return
@@ -198,28 +259,38 @@ class AlexElement {
 			this.marks = null
 			this.styles = null
 			this.textContent = null
-			this._elm = null
-		} else if (this.isClosed()) {
+			this.elm = null
+			return
+		}
+		if (this.isClosed()) {
 			this.type = 'text'
 			this.parsedom = null
 			this.marks = null
 			this.styles = null
 			this.textContent = null
-			this._elm = null
-		} else if (this.hasChildren()) {
+			this.elm = null
+			return
+		}
+		if (this.hasChildren()) {
 			this.children.forEach(el => {
 				el.toEmpty()
 			})
 		}
 	}
-	//获取所在根级块元素
+
+	/**
+	 * 获取所在根级块元素
+	 */
 	getBlock() {
 		if (this.isBlock()) {
 			return this
 		}
 		return this.parent.getBlock()
 	}
-	//获取所在内部块元素
+
+	/**
+	 * 获取所在内部块元素
+	 */
 	getInblock() {
 		if (this.isInblock()) {
 			return this
@@ -229,7 +300,10 @@ class AlexElement {
 		}
 		return this.parent.getInblock()
 	}
-	//获取所在行内元素
+
+	/**
+	 * 获取所在行内元素
+	 */
 	getInline() {
 		if (this.isInline()) {
 			return this
@@ -239,7 +313,10 @@ class AlexElement {
 		}
 		return this.parent.getInline()
 	}
-	//比较两个元素样式是否一致
+
+	/**
+	 * 比较当前元素和另一个元素的styles是否一致
+	 */
 	isEqualStyles(element) {
 		if (!this.hasStyles() && !element.hasStyles()) {
 			return true
@@ -249,7 +326,10 @@ class AlexElement {
 		}
 		return false
 	}
-	//比较两个元素属性是否一致
+
+	/**
+	 * 比较当前元素和另一个元素的marks是否一致
+	 */
 	isEqualMarks(element) {
 		if (!this.hasMarks() && !element.hasMarks()) {
 			return true
@@ -259,8 +339,11 @@ class AlexElement {
 		}
 		return false
 	}
-	//渲染成真实dom
-	__renderElement() {
+
+	/**
+	 * 将元素渲染成真实的node并挂载在元素的elm属性上
+	 */
+	__render() {
 		let el = null
 		//文本元素
 		if (this.isText()) {
@@ -274,8 +357,8 @@ class AlexElement {
 			//渲染子元素
 			if (this.hasChildren()) {
 				this.children.forEach(child => {
-					child.__renderElement()
-					el.appendChild(child._elm)
+					child.__render()
+					el.appendChild(child.elm)
 				})
 			}
 		}
@@ -296,14 +379,17 @@ class AlexElement {
 		//设置唯一key标记
 		Dap.data.set(el, 'data-alex-editor-key', this.key)
 		//更新挂载的真实dom
-		this._elm = el
+		this.elm = el
 	}
-	//完全复制元素，包括key也复制
+
+	/**
+	 * 完全复制元素，包括key也复制
+	 */
 	__fullClone() {
-		let el = new AlexElement(this.type, this.parsedom, Util.clone(this.marks), Util.clone(this.styles), this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.key = this.key
-		el._elm = this._elm
+		el.elm = this.elm
 		if (this.hasChildren()) {
 			this.children.forEach(child => {
 				let clonedChild = child.__fullClone()
@@ -317,11 +403,17 @@ class AlexElement {
 		}
 		return el
 	}
-	//判断是否该类型数据
+
+	/**
+	 * 判断参数是否为AlexElement元素
+	 */
 	static isElement(val) {
 		return val instanceof AlexElement
 	}
-	//扁平化处理元素数组
+
+	/**
+	 * 扁平化处理元素数组
+	 */
 	static flatElements(elements) {
 		const fn = arr => {
 			let result = []
@@ -338,15 +430,27 @@ class AlexElement {
 		}
 		return fn(elements)
 	}
-	//获取一个空白文本元素
+
+	/**
+	 * 创建一个空白文本元素并返回
+	 */
 	static getSpaceElement() {
 		return new AlexElement('text', null, null, null, '\uFEFF')
 	}
-	//定义默认的根级块元素标签
+
+	/**
+	 * 定义默认的根级块元素标签
+	 */
 	static BLOCK_NODE = 'p'
-	//定义默认的文本元素标签
+
+	/**
+	 * 定义默认的文本元素标签
+	 */
 	static TEXT_NODE = 'span'
-	//定义不显示的元素标签
+
+	/**
+	 * 定义不显示的元素标签
+	 */
 	static VOID_NODES = ['colgroup', 'col']
 }
 

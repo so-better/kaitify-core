@@ -1,13 +1,11 @@
 import AlexElement from './Element'
 class AlexPoint {
 	constructor(element, offset) {
+		//虚拟光标对应的元素
 		this.element = element
+		//虚拟光标在元素中的偏移值
 		this.offset = offset
-		this.__init()
-	}
-
-	//初始化
-	__init() {
+		//初始设置
 		if (this.element.isText() || this.element.isClosed()) {
 			if (AlexElement.VOID_NODES.includes(this.element.parsedom)) {
 				throw new Error('Invisible element cannot be set as focal point')
@@ -22,12 +20,16 @@ class AlexPoint {
 		}
 	}
 
-	//是否Point类型数据
+	/**
+	 * 是否Point类型数据
+	 */
 	static isPoint(val) {
 		return val instanceof AlexPoint
 	}
 
-	//两个点是否相等
+	/**
+	 * 两个点是否相等
+	 */
 	isEqual(point) {
 		if (!AlexPoint.isPoint(point)) {
 			return false
@@ -35,7 +37,9 @@ class AlexPoint {
 		return this.element.isEqual(point.element) && this.offset == point.offset
 	}
 
-	//移动到到指定元素最后
+	/**
+	 * 移动到到指定元素最后
+	 */
 	moveToEnd(element) {
 		if (!AlexElement.isElement(element)) {
 			throw new Error('The argument must be an AlexElement instance')
@@ -66,7 +70,9 @@ class AlexPoint {
 		}
 	}
 
-	//移动到指定元素最前
+	/**
+	 * 移动到指定元素最前
+	 */
 	moveToStart(element) {
 		if (!AlexElement.isElement(element)) {
 			throw new Error('The argument must be an AlexElement instance')
