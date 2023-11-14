@@ -134,7 +134,7 @@ class AlexEditor {
 							return !el.isEmpty()
 						})
 						if (typeof this.customHtmlPaste == 'function') {
-							this.customHtmlPaste.apply(this, [data, elements])
+							this.customHtmlPaste.apply(this, [elements, data])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
 								this.formatElement(elements[i])
