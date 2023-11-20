@@ -51,7 +51,7 @@ export const emptyDefaultBehaviorInblock = function (element) {
 	if (element.hasChildren()) {
 		element.children.forEach(item => {
 			if (item.isInblock()) {
-				emptyDefaultBehaviorInblock(item)
+				emptyDefaultBehaviorInblock.apply(this, [item])
 			} else {
 				item.toEmpty()
 				if (item.parent.isEmpty()) {
