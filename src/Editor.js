@@ -58,6 +58,8 @@ class AlexEditor {
 		this.__innerSelectionChange = false
 		//取消中文输入标识的延时器
 		this.__chineseInputTimer = null
+		//数据缓存，用于提升性能
+		this.__dataCaches = {}
 
 		/**  ------以下是内部的一些初始化逻辑------  */
 
@@ -1930,7 +1932,7 @@ class AlexEditor {
 	/**
 	 * 查询虚拟光标包含的文本元素是否具有某个样式
 	 */
-	queryTextStyle(name, value) {
+	queryTextStyle(name, value, useCache) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
@@ -1950,9 +1952,19 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		const result = this.getElementsByRange(true, true).filter(item => {
-			return item.element.isText()
-		})
+		let result = null
+		//如果使用缓存数据
+		if (useCache) {
+			result = this.__dataCaches['queryTextStyle'] || []
+		} else {
+			result = this.getElementsByRange(true, true).filter(item => {
+				return item.element.isText()
+			})
+		}
+		//在不使用缓存的情况下将数据缓存
+		if (!useCache) {
+			this.__dataCaches['queryTextStyle'] = result
+		}
 		//如果不包含文本元素直接返回false
 		if (result.length == 0) {
 			return false
@@ -2088,7 +2100,7 @@ class AlexEditor {
 	/**
 	 * 查询选区内的文本元素是否具有某个标记
 	 */
-	queryTextMark(name, value) {
+	queryTextMark(name, value, useCache) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
@@ -2107,9 +2119,18 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		const result = this.getElementsByRange(true, true).filter(item => {
-			return item.element.isText()
-		})
+		let result = null
+		if (useCache) {
+			result = this.__dataCaches['queryTextMark'] || []
+		} else {
+			result = this.getElementsByRange(true, true).filter(item => {
+				return item.element.isText()
+			})
+		}
+		//在不使用缓存的情况下将数据缓存
+		if (!useCache) {
+			this.__dataCaches['queryTextMark'] = result
+		}
 		//如果不包含文本元素直接返回false
 		if (result.length == 0) {
 			return false
