@@ -13,7 +13,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<p><br></p>`,
+			value: `<p><br></p><p style="background:#000;color:#fff;" contenteditable="false">不可编辑的段落</p><ul><li>3</li><li>333<span contenteditable="false" style="color:#f30;">4444</span>3</li></ul>`,
 			editor: null
 		}
 	},
@@ -31,6 +31,8 @@ export default {
 		})
 		this.editor.formatElementStack()
 		this.editor.domRender()
+		this.editor.collapseToEnd()
+		this.editor.rangeRender()
 	},
 	methods: {
 		queryTextStyle() {},

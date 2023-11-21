@@ -200,10 +200,17 @@ export const handleSelectionChange = function () {
 			const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
 			const anchorEle = this.getElementByKey(anchorKey)
 			const focusEle = this.getElementByKey(focusKey)
-			const anchor = new AlexPoint(anchorEle, anchorOffset)
-			const focus = new AlexPoint(focusEle, focusOffset)
-			this.range = new AlexRange(anchor, focus)
-			this.emit('rangeUpdate', this.range)
+			if (!anchorEle.getUneditableElement()) {
+				const anchor = new AlexPoint(anchorEle, anchorOffset)
+				this.range.anchor = anchor
+			}
+			if (!focusEle.getUneditableElement()) {
+				const focus = new AlexPoint(focusEle, focusOffset)
+				this.range.focus = focus
+			}
+			if (!anchorEle.getUneditableElement() || !focusEle.getUneditableElement()) {
+				this.emit('rangeUpdate', this.range)
+			}
 		}
 	}
 }

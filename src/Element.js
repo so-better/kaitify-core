@@ -98,6 +98,19 @@ class AlexElement {
 	}
 
 	/**
+	 * 获取设置不可编辑的元素，如果是null，说明元素是可编辑的
+	 */
+	getUneditableElement() {
+		if (this.hasMarks() && this.marks['contenteditable'] == 'false') {
+			return this
+		}
+		if (this.isBlock()) {
+			return null
+		}
+		return this.parent.getUneditableElement()
+	}
+
+	/**
 	 * 比较当前元素和另一个元素是否相等
 	 */
 	isEqual(element) {
@@ -365,7 +378,7 @@ class AlexElement {
 		//设置属性
 		if (this.hasMarks()) {
 			Object.keys(this.marks).forEach(key => {
-				if (!/(^on)|(^style$)|(^contenteditable$)|(^face$)/g.test(key)) {
+				if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
 					el.setAttribute(key, this.marks[key])
 				}
 			})

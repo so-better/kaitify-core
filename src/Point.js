@@ -10,6 +10,9 @@ class AlexPoint {
 			if (AlexElement.VOID_NODES.includes(this.element.parsedom)) {
 				throw new Error('Invisible element cannot be set as focal point')
 			}
+			if (this.element.getUneditableElement()) {
+				throw new Error('Uneditable element cannot be set as focal point')
+			}
 			return
 		}
 		//如果是根级块元素或者内部块元素或者行内元素
@@ -47,6 +50,9 @@ class AlexPoint {
 		if (element.isEmpty()) {
 			throw new Error('The argument cannot be an empty element')
 		}
+		if (element.getUneditableElement()) {
+			throw new Error('Uneditable element cannot be set as focal point')
+		}
 		//如果是文本元素
 		if (element.isText()) {
 			this.element = element
@@ -63,9 +69,12 @@ class AlexPoint {
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
 			})
 			const length = flatElements.length
+			if (length == 0) {
+				throw new Error('Child elements are uneditable elements and cannot be set as focal point')
+			}
 			this.moveToEnd(flatElements[length - 1])
 		}
 	}
@@ -79,6 +88,9 @@ class AlexPoint {
 		}
 		if (element.isEmpty()) {
 			throw new Error('The argument cannot be an empty element')
+		}
+		if (element.getUneditableElement()) {
+			throw new Error('Uneditable element cannot be set as focal point')
 		}
 		//文本元素
 		if (element.isText()) {
@@ -96,8 +108,11 @@ class AlexPoint {
 		//如果含有子元素
 		else if (element.hasChildren()) {
 			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
 			})
+			if (flatElements.length == 0) {
+				throw new Error('Child elements are uneditable elements and cannot be set as focal point')
+			}
 			this.moveToStart(flatElements[0])
 		}
 	}

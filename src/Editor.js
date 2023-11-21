@@ -333,28 +333,37 @@ class AlexEditor {
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
-						//文本元素的值
-						const val = this.range.anchor.element.textContent
-						//起点向前一位
-						this.range.anchor.offset -= 1
-						//要删除的字符是否空白文本
-						const isSpace = isSpaceText(val[this.range.anchor.offset])
-						//进行删除
-						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
-						//重新设置终点位置
-						this.range.focus.offset = this.range.anchor.offset
-						//如果删除的字符是空白文本，则再执行一次删除操作
-						if (isSpace) {
-							this.delete()
-							return
+						//判断是否不可编辑的元素
+						const uneditableElement = this.range.anchor.element.getUneditableElement()
+						//如果在不可编辑的元素内直接删除整个元素
+						if (uneditableElement) {
+							uneditableElement.toEmpty()
 						}
-						//如果内部块元素为空
-						if (inblock.isEmpty()) {
-							//建一个换行符元素作为占位元素
-							const breakEl = new AlexElement('closed', 'br', null, null, null)
-							this.addElementTo(breakEl, inblock)
-							this.range.anchor.moveToStart(breakEl)
-							this.range.focus.moveToStart(breakEl)
+						//正常删除
+						else {
+							//文本元素的值
+							const val = this.range.anchor.element.textContent
+							//起点向前一位
+							this.range.anchor.offset -= 1
+							//要删除的字符是否空白文本
+							const isSpace = isSpaceText(val[this.range.anchor.offset])
+							//进行删除
+							this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
+							//重新设置终点位置
+							this.range.focus.offset = this.range.anchor.offset
+							//如果删除的字符是空白文本，则再执行一次删除操作
+							if (isSpace) {
+								this.delete()
+								return
+							}
+							//如果内部块元素为空
+							if (inblock.isEmpty()) {
+								//建一个换行符元素作为占位元素
+								const breakEl = new AlexElement('closed', 'br', null, null, null)
+								this.addElementTo(breakEl, inblock)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
+							}
 						}
 					}
 					//如果光标在自闭合元素内
@@ -439,28 +448,37 @@ class AlexEditor {
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
-						//文本元素的值
-						const val = this.range.anchor.element.textContent
-						//起点向前一位
-						this.range.anchor.offset -= 1
-						//要删除的字符是否空白文本
-						const isSpace = isSpaceText(val[this.range.anchor.offset])
-						//进行删除
-						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
-						//重新设置终点位置
-						this.range.focus.offset = this.range.anchor.offset
-						//如果删除的字符是空白文本，则再执行一次删除操作
-						if (isSpace) {
-							this.delete()
-							return
+						//判断是否不可编辑的元素
+						const uneditableElement = this.range.anchor.element.getUneditableElement()
+						//如果在不可编辑的元素内直接删除整个元素
+						if (uneditableElement) {
+							uneditableElement.toEmpty()
 						}
-						//如果根级块元素为空
-						if (block.isEmpty()) {
-							//建一个换行符元素作为占位元素
-							const breakEl = new AlexElement('closed', 'br', null, null, null)
-							this.addElementTo(breakEl, block)
-							this.range.anchor.moveToStart(breakEl)
-							this.range.focus.moveToStart(breakEl)
+						//正常删除
+						else {
+							//文本元素的值
+							const val = this.range.anchor.element.textContent
+							//起点向前一位
+							this.range.anchor.offset -= 1
+							//要删除的字符是否空白文本
+							const isSpace = isSpaceText(val[this.range.anchor.offset])
+							//进行删除
+							this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
+							//重新设置终点位置
+							this.range.focus.offset = this.range.anchor.offset
+							//如果删除的字符是空白文本，则再执行一次删除操作
+							if (isSpace) {
+								this.delete()
+								return
+							}
+							//如果根级块元素为空
+							if (block.isEmpty()) {
+								//建一个换行符元素作为占位元素
+								const breakEl = new AlexElement('closed', 'br', null, null, null)
+								this.addElementTo(breakEl, block)
+								this.range.anchor.moveToStart(breakEl)
+								this.range.focus.moveToStart(breakEl)
+							}
 						}
 					}
 					//如果光标在自闭合元素内
