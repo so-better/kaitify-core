@@ -29,17 +29,17 @@ export const setRecentlyPoint = function (point) {
 	const nextElement = this.getNextElementOfPoint(point)
 	const block = point.element.getBlock()
 	const inblock = point.element.getInblock()
-	if (previousElement && inblock && inblock.isContains(previousElement)) {
+	if (previousElement && inblock && inblock.isContains(previousElement) && !previousElement.getUneditableElement()) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && inblock && inblock.isContains(nextElement)) {
+	} else if (nextElement && inblock && inblock.isContains(nextElement) && !nextElement.getUneditableElement()) {
 		point.moveToStart(nextElement)
-	} else if (previousElement && block.isContains(previousElement)) {
+	} else if (previousElement && block.isContains(previousElement) && !previousElement.getUneditableElement()) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && block.isContains(nextElement)) {
+	} else if (nextElement && block.isContains(nextElement) && !nextElement.getUneditableElement()) {
 		point.moveToStart(nextElement)
-	} else if (previousElement) {
+	} else if (previousElement && !previousElement.getUneditableElement()) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement) {
+	} else if (nextElement && !nextElement.getUneditableElement()) {
 		point.moveToStart(nextElement)
 	}
 }
