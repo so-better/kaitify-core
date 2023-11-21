@@ -25,10 +25,6 @@ class AlexElement {
 		this.behavior = 'default'
 		//真实node
 		this.elm = null
-		//块级元素不可以设置不可编辑的
-		if (this.isBlock() && this.getUneditableElement()) {
-			throw new Error('Block element cannot be set uneditable')
-		}
 	}
 
 	/**

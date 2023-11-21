@@ -4,7 +4,7 @@ import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
-import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
+import { handleUneditableBlock, handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 class AlexEditor {
@@ -1094,7 +1094,7 @@ class AlexEditor {
 		let renderRules = this.renderRules.filter(fn => {
 			return typeof fn == 'function'
 		})
-		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
+		;[handleUneditableBlock, handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
 			fn.apply(this, [element])
 		})
 		//判断是否有子元素

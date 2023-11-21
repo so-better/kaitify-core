@@ -1,5 +1,21 @@
 import AlexElement from '../Element'
 import { cloneData } from './tool'
+
+/**
+ * 根级块元素不能有不可编辑的属性
+ */
+export const handleUneditableBlock = function (element) {
+	if (element.isBlock() && element.getUneditableElement()) {
+		let marks = []
+		for (let key in element.marks) {
+			if (key != 'contenteditable') {
+				marks[key] = element.marks[key]
+			}
+		}
+		element.marks = marks
+	}
+}
+
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
  */
