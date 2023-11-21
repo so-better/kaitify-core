@@ -641,6 +641,12 @@ class AlexEditor {
 		this.range.focus.offset = this.range.anchor.offset
 		//为空判断进行初始化
 		handleStackEmpty.apply(this)
+
+		//判断光标是否在不可编辑的元素上
+		const uneditable = this.range.anchor.element.getUneditableElement()
+		if (uneditable) {
+			this.emit('deleteCompleteInUneditable', uneditable)
+		}
 	}
 
 	/**
