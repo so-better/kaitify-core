@@ -4,7 +4,7 @@ import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
-import { handleUneditableBlock, handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
+import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 class AlexEditor {
@@ -289,15 +289,10 @@ class AlexEditor {
 					if (previousElement) {
 						//如果光标不在内部块元素的开始处
 						if (inblock.isContains(previousElement)) {
-							const uneditable = previousElement.getUneditableElement()
-							if (uneditable) {
-								uneditable.toEmpty()
-							} else {
-								this.range.anchor.moveToEnd(previousElement)
-								this.range.focus.moveToEnd(previousElement)
-								this.delete()
-								return
-							}
+							this.range.anchor.moveToEnd(previousElement)
+							this.range.focus.moveToEnd(previousElement)
+							this.delete()
+							return
 						}
 						//如果光标在内部块元素的开始处并且行为值为block
 						else if (inblock.behavior == 'block') {
@@ -306,22 +301,12 @@ class AlexEditor {
 							//前一个可获取焦点的元素在内部块内部，并且它的行为值是block，则进行合并操作
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
-									const uneditable = previousInblock.getUneditableElement()
-									if (uneditable) {
-										uneditable.toEmpty()
-									} else {
-										this.mergeBlockElement(inblock, previousInblock)
-									}
+									this.mergeBlockElement(inblock, previousInblock)
 								}
 							}
 							//不在内部块内部则合并根级块元素
 							else {
-								const uneditable = previousBlock.getUneditableElement()
-								if (uneditable) {
-									uneditable.toEmpty()
-								} else {
-									this.mergeBlockElement(inblock, previousBlock)
-								}
+								this.mergeBlockElement(inblock, previousBlock)
 							}
 						}
 					}
@@ -409,15 +394,10 @@ class AlexEditor {
 					if (previousElement) {
 						//如果光标不在根级块元素的开始处
 						if (block.isContains(previousElement)) {
-							const uneditable = previousElement.getUneditableElement()
-							if (uneditable) {
-								uneditable.toEmpty()
-							} else {
-								this.range.anchor.moveToEnd(previousElement)
-								this.range.focus.moveToEnd(previousElement)
-								this.delete()
-								return
-							}
+							this.range.anchor.moveToEnd(previousElement)
+							this.range.focus.moveToEnd(previousElement)
+							this.delete()
+							return
 						}
 						//如果光标在根级块元素的开始处
 						else {
@@ -426,23 +406,13 @@ class AlexEditor {
 							//如果前一个可设置光标的元素在内部块内并且它的行为值是block，则进行合并
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
-									const uneditable = previousInblock.getUneditableElement()
-									if (uneditable) {
-										uneditable.toEmpty()
-									} else {
-										//将根级块元素与内部块元素进行合并
-										this.mergeBlockElement(block, previousInblock)
-									}
+									//将根级块元素与内部块元素进行合并
+									this.mergeBlockElement(block, previousInblock)
 								}
 							}
 							//如果前一个可设置光标的元素不在内部块内，则进行根级块元素的合并操作
 							else {
-								const uneditable = previousBlock.getUneditableElement()
-								if (uneditable) {
-									uneditable.toEmpty()
-								} else {
-									this.mergeBlockElement(block, previousBlock)
-								}
+								this.mergeBlockElement(block, previousBlock)
 							}
 						}
 					}
@@ -1070,16 +1040,8 @@ class AlexEditor {
 				}
 			}
 			//重置光标
-			const uneditable = ele.getUneditableElement()
-			if (uneditable) {
-				const text = AlexElement.getSpaceElement()
-				this.addElementAfter(text, uneditable)
-				this.range.anchor.moveToEnd(text)
-				this.range.focus.moveToEnd(text)
-			} else {
-				this.range.anchor.moveToEnd(ele)
-				this.range.focus.moveToEnd(ele)
-			}
+			this.range.anchor.moveToEnd(ele)
+			this.range.focus.moveToEnd(ele)
 		} else {
 			this.delete()
 			this.insertElement(ele, cover)
@@ -1094,7 +1056,7 @@ class AlexEditor {
 		let renderRules = this.renderRules.filter(fn => {
 			return typeof fn == 'function'
 		})
-		;[handleUneditableBlock, handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
+		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
 			fn.apply(this, [element])
 		})
 		//判断是否有子元素
@@ -1814,7 +1776,7 @@ class AlexEditor {
 		//文档最前面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 			})
 			if (flatElements.length == 0) {
 				throw new Error('There is no element to set the focus')
@@ -1839,7 +1801,7 @@ class AlexEditor {
 		//文档最后面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 			})
 			const length = flatElements.length
 			if (length == 0) {

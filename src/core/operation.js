@@ -10,7 +10,7 @@ import { isUndo, isRedo } from './keyboard'
  */
 export const checkStack = function () {
 	const elements = AlexElement.flatElements(this.stack).filter(el => {
-		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 	})
 	if (elements.length == 0) {
 		throw new Error('There are no editable elements in the editor, please check that the initial value is correct')
@@ -30,59 +30,17 @@ export const setRecentlyPoint = function (point) {
 	const block = point.element.getBlock()
 	const inblock = point.element.getInblock()
 	if (previousElement && inblock && inblock.isContains(previousElement)) {
-		const uneditable = previousElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementAfter(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToEnd(previousElement)
-		}
+		point.moveToEnd(previousElement)
 	} else if (nextElement && inblock && inblock.isContains(nextElement)) {
-		const uneditable = nextElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementBefore(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToStart(nextElement)
-		}
+		point.moveToStart(nextElement)
 	} else if (previousElement && block.isContains(previousElement)) {
-		const uneditable = previousElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementAfter(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToEnd(previousElement)
-		}
+		point.moveToEnd(previousElement)
 	} else if (nextElement && block.isContains(nextElement)) {
-		const uneditable = nextElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementBefore(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToStart(nextElement)
-		}
+		point.moveToStart(nextElement)
 	} else if (previousElement) {
-		const uneditable = previousElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementAfter(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToEnd(previousElement)
-		}
+		point.moveToEnd(previousElement)
 	} else if (nextElement) {
-		const uneditable = nextElement.getUneditableElement()
-		if (uneditable) {
-			const text = AlexElement.getSpaceElement()
-			this.addElementBefore(text, uneditable)
-			point.moveToStart(text)
-		} else {
-			point.moveToStart(nextElement)
-		}
+		point.moveToStart(nextElement)
 	}
 }
 
@@ -248,17 +206,11 @@ export const handleSelectionChange = function () {
 			const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
 			const anchorEle = this.getElementByKey(anchorKey)
 			const focusEle = this.getElementByKey(focusKey)
-			if (!anchorEle.getUneditableElement()) {
-				const anchor = new AlexPoint(anchorEle, anchorOffset)
-				this.range.anchor = anchor
-			}
-			if (!focusEle.getUneditableElement()) {
-				const focus = new AlexPoint(focusEle, focusOffset)
-				this.range.focus = focus
-			}
-			if (!anchorEle.getUneditableElement() || !focusEle.getUneditableElement()) {
-				this.emit('rangeUpdate', this.range)
-			}
+			const anchor = new AlexPoint(anchorEle, anchorOffset)
+			const focus = new AlexPoint(focusEle, focusOffset)
+			this.range.anchor = anchor
+			this.range.focus = focus
+			this.emit('rangeUpdate', this.range)
 		}
 	}
 }
