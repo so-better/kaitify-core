@@ -6,13 +6,19 @@ import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
 
 /**
- * 初始化编辑器的Range
+ * 初始化校验stack并初始化赋值给range
  */
-export const initRange = function () {
-	const firstElement = this.stack[0]
+export const checkStack = function () {
+	const elements = AlexElement.flatElements(this.stack).filter(el => {
+		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+	})
+	if (elements.length == 0) {
+		throw new Error('There are no editable elements in the editor, please check that the initial value is correct')
+	}
+	const firstElement = elements[0]
 	const anchor = new AlexPoint(firstElement, 0)
 	const focus = new AlexPoint(firstElement, 0)
-	return new AlexRange(anchor, focus)
+	this.range = new AlexRange(anchor, focus)
 }
 
 /**

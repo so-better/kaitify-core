@@ -73,7 +73,7 @@ class AlexPoint {
 			})
 			const length = flatElements.length
 			if (length == 0) {
-				throw new Error('Child elements are uneditable elements and cannot be set as focal point')
+				throw new Error('There is no element to set the focus')
 			}
 			this.moveToEnd(flatElements[length - 1])
 		}
@@ -111,7 +111,7 @@ class AlexPoint {
 				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
 			})
 			if (flatElements.length == 0) {
-				throw new Error('Child elements are uneditable elements and cannot be set as focal point')
+				throw new Error('There is no element to set the focus')
 			}
 			this.moveToStart(flatElements[0])
 		}

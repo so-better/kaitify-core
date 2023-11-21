@@ -5,7 +5,7 @@ import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
-import { initRange, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 class AlexEditor {
 	constructor(node, opts) {
@@ -42,7 +42,9 @@ class AlexEditor {
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
 		//编辑的range
-		this.range = initRange.apply(this)
+		this.range = null
+		//初始化校验stack并初始化给range赋值
+		checkStack.apply(this)
 
 		/**  ------以下是内部属性，不对外展示------  */
 
@@ -1801,9 +1803,14 @@ class AlexEditor {
 			this.range.anchor.moveToStart(element)
 			this.range.focus.moveToStart(element)
 		}
-		//文档最后面
+		//文档最前面
 		else {
-			const flatElements = AlexElement.flatElements(this.stack)
+			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+			})
+			if (flatElements.length == 0) {
+				throw new Error('There is no element to set the focus')
+			}
 			this.range.anchor.moveToStart(flatElements[0])
 			this.range.focus.moveToStart(flatElements[0])
 		}
@@ -1823,8 +1830,13 @@ class AlexEditor {
 		}
 		//文档最后面
 		else {
-			const flatElements = AlexElement.flatElements(this.stack)
+			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom) && !el.getUneditableElement()
+			})
 			const length = flatElements.length
+			if (length == 0) {
+				throw new Error('There is no element to set the focus')
+			}
 			this.range.anchor.moveToEnd(flatElements[length - 1])
 			this.range.focus.moveToEnd(flatElements[length - 1])
 		}
