@@ -1070,8 +1070,16 @@ class AlexEditor {
 				}
 			}
 			//重置光标
-			this.range.anchor.moveToEnd(ele)
-			this.range.focus.moveToEnd(ele)
+			const uneditable = ele.getUneditableElement()
+			if (uneditable) {
+				const text = AlexElement.getSpaceElement()
+				this.addElementAfter(text, uneditable)
+				this.range.anchor.moveToEnd(text)
+				this.range.focus.moveToEnd(text)
+			} else {
+				this.range.anchor.moveToEnd(ele)
+				this.range.focus.moveToEnd(ele)
+			}
 		} else {
 			this.delete()
 			this.insertElement(ele, cover)
