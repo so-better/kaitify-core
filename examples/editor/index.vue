@@ -21,7 +21,10 @@ export default {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
 			disabled: false,
-			allowPasteHtml: true
+			allowPasteHtml: true,
+			customDeleteUneditable: function (element) {
+				element.toEmpty()
+			}
 		})
 		this.editor.on('change', val => {
 			console.log('复制触发', val)
@@ -35,7 +38,12 @@ export default {
 		this.editor.rangeRender()
 	},
 	methods: {
-		queryTextStyle() {},
+		queryTextStyle() {
+			this.editor.delete()
+			this.editor.formatElementStack()
+			this.editor.domRender()
+			this.editor.rangeRender()
+		},
 		setTextStyle() {
 			this.editor.setTextStyle({
 				color: '#87f390'
