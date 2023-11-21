@@ -21,10 +21,7 @@ export default {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
 			disabled: false,
-			allowPasteHtml: true,
-			customDeleteUneditable: function (element) {
-				element.toEmpty()
-			}
+			allowPasteHtml: true
 		})
 		this.editor.on('change', val => {
 			console.log('复制触发', val)
