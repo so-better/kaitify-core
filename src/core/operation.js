@@ -29,18 +29,60 @@ export const setRecentlyPoint = function (point) {
 	const nextElement = this.getNextElementOfPoint(point)
 	const block = point.element.getBlock()
 	const inblock = point.element.getInblock()
-	if (previousElement && inblock && inblock.isContains(previousElement) && !previousElement.getUneditableElement()) {
-		point.moveToEnd(previousElement)
-	} else if (nextElement && inblock && inblock.isContains(nextElement) && !nextElement.getUneditableElement()) {
-		point.moveToStart(nextElement)
-	} else if (previousElement && block.isContains(previousElement) && !previousElement.getUneditableElement()) {
-		point.moveToEnd(previousElement)
-	} else if (nextElement && block.isContains(nextElement) && !nextElement.getUneditableElement()) {
-		point.moveToStart(nextElement)
-	} else if (previousElement && !previousElement.getUneditableElement()) {
-		point.moveToEnd(previousElement)
-	} else if (nextElement && !nextElement.getUneditableElement()) {
-		point.moveToStart(nextElement)
+	if (previousElement && inblock && inblock.isContains(previousElement)) {
+		const uneditable = previousElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementAfter(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToEnd(previousElement)
+		}
+	} else if (nextElement && inblock && inblock.isContains(nextElement)) {
+		const uneditable = nextElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementBefore(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToStart(nextElement)
+		}
+	} else if (previousElement && block.isContains(previousElement)) {
+		const uneditable = previousElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementAfter(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToEnd(previousElement)
+		}
+	} else if (nextElement && block.isContains(nextElement)) {
+		const uneditable = nextElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementBefore(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToStart(nextElement)
+		}
+	} else if (previousElement) {
+		const uneditable = previousElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementAfter(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToEnd(previousElement)
+		}
+	} else if (nextElement) {
+		const uneditable = nextElement.getUneditableElement()
+		if (uneditable) {
+			const text = AlexElement.getSpaceElement()
+			this.addElementBefore(text, uneditable)
+			point.moveToStart(text)
+		} else {
+			point.moveToStart(nextElement)
+		}
 	}
 }
 
