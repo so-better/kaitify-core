@@ -13,7 +13,7 @@ export const checkStack = function () {
 		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 	})
 	if (elements.length == 0) {
-		throw new Error('There are no editable elements in the editor, please check that the initial value is correct')
+		throw new Error('There are no elements in the editor, please check that the initial value is correct')
 	}
 	const firstElement = elements[0]
 	const anchor = new AlexPoint(firstElement, 0)
