@@ -287,10 +287,15 @@ class AlexEditor {
 					if (previousElement) {
 						//如果光标不在内部块元素的开始处
 						if (inblock.isContains(previousElement)) {
-							this.range.anchor.moveToEnd(previousElement)
-							this.range.focus.moveToEnd(previousElement)
-							this.delete()
-							return
+							const uneditable = previousElement.getUneditableElement()
+							if (uneditable) {
+								uneditable.toEmpty()
+							} else {
+								this.range.anchor.moveToEnd(previousElement)
+								this.range.focus.moveToEnd(previousElement)
+								this.delete()
+								return
+							}
 						}
 						//如果光标在内部块元素的开始处并且行为值为block
 						else if (inblock.behavior == 'block') {
@@ -299,12 +304,22 @@ class AlexEditor {
 							//前一个可获取焦点的元素在内部块内部，并且它的行为值是block，则进行合并操作
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
-									this.mergeBlockElement(inblock, previousInblock)
+									const uneditable = previousInblock.getUneditableElement()
+									if (uneditable) {
+										uneditable.toEmpty()
+									} else {
+										this.mergeBlockElement(inblock, previousInblock)
+									}
 								}
 							}
 							//不在内部块内部则合并根级块元素
 							else {
-								this.mergeBlockElement(inblock, previousBlock)
+								const uneditable = previousBlock.getUneditableElement()
+								if (uneditable) {
+									uneditable.toEmpty()
+								} else {
+									this.mergeBlockElement(inblock, previousBlock)
+								}
 							}
 						}
 					}
@@ -333,37 +348,28 @@ class AlexEditor {
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
-						//判断是否不可编辑的元素
-						const uneditableElement = this.range.anchor.element.getUneditableElement()
-						//如果在不可编辑的元素内直接删除整个元素
-						if (uneditableElement) {
-							uneditableElement.toEmpty()
+						//文本元素的值
+						const val = this.range.anchor.element.textContent
+						//起点向前一位
+						this.range.anchor.offset -= 1
+						//要删除的字符是否空白文本
+						const isSpace = isSpaceText(val[this.range.anchor.offset])
+						//进行删除
+						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
+						//重新设置终点位置
+						this.range.focus.offset = this.range.anchor.offset
+						//如果删除的字符是空白文本，则再执行一次删除操作
+						if (isSpace) {
+							this.delete()
+							return
 						}
-						//正常删除
-						else {
-							//文本元素的值
-							const val = this.range.anchor.element.textContent
-							//起点向前一位
-							this.range.anchor.offset -= 1
-							//要删除的字符是否空白文本
-							const isSpace = isSpaceText(val[this.range.anchor.offset])
-							//进行删除
-							this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
-							//重新设置终点位置
-							this.range.focus.offset = this.range.anchor.offset
-							//如果删除的字符是空白文本，则再执行一次删除操作
-							if (isSpace) {
-								this.delete()
-								return
-							}
-							//如果内部块元素为空
-							if (inblock.isEmpty()) {
-								//建一个换行符元素作为占位元素
-								const breakEl = new AlexElement('closed', 'br', null, null, null)
-								this.addElementTo(breakEl, inblock)
-								this.range.anchor.moveToStart(breakEl)
-								this.range.focus.moveToStart(breakEl)
-							}
+						//如果内部块元素为空
+						if (inblock.isEmpty()) {
+							//建一个换行符元素作为占位元素
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, inblock)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
 						}
 					}
 					//如果光标在自闭合元素内
@@ -401,10 +407,15 @@ class AlexEditor {
 					if (previousElement) {
 						//如果光标不在根级块元素的开始处
 						if (block.isContains(previousElement)) {
-							this.range.anchor.moveToEnd(previousElement)
-							this.range.focus.moveToEnd(previousElement)
-							this.delete()
-							return
+							const uneditable = previousElement.getUneditableElement()
+							if (uneditable) {
+								uneditable.toEmpty()
+							} else {
+								this.range.anchor.moveToEnd(previousElement)
+								this.range.focus.moveToEnd(previousElement)
+								this.delete()
+								return
+							}
 						}
 						//如果光标在根级块元素的开始处
 						else {
@@ -413,13 +424,23 @@ class AlexEditor {
 							//如果前一个可设置光标的元素在内部块内并且它的行为值是block，则进行合并
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
-									//将根级块元素与内部块元素进行合并
-									this.mergeBlockElement(block, previousInblock)
+									const uneditable = previousInblock.getUneditableElement()
+									if (uneditable) {
+										uneditable.toEmpty()
+									} else {
+										//将根级块元素与内部块元素进行合并
+										this.mergeBlockElement(block, previousInblock)
+									}
 								}
 							}
 							//如果前一个可设置光标的元素不在内部块内，则进行根级块元素的合并操作
 							else {
-								this.mergeBlockElement(block, previousBlock)
+								const uneditable = previousBlock.getUneditableElement()
+								if (uneditable) {
+									uneditable.toEmpty()
+								} else {
+									this.mergeBlockElement(block, previousBlock)
+								}
 							}
 						}
 					}
@@ -448,37 +469,28 @@ class AlexEditor {
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
-						//判断是否不可编辑的元素
-						const uneditableElement = this.range.anchor.element.getUneditableElement()
-						//如果在不可编辑的元素内直接删除整个元素
-						if (uneditableElement) {
-							uneditableElement.toEmpty()
+						//文本元素的值
+						const val = this.range.anchor.element.textContent
+						//起点向前一位
+						this.range.anchor.offset -= 1
+						//要删除的字符是否空白文本
+						const isSpace = isSpaceText(val[this.range.anchor.offset])
+						//进行删除
+						this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
+						//重新设置终点位置
+						this.range.focus.offset = this.range.anchor.offset
+						//如果删除的字符是空白文本，则再执行一次删除操作
+						if (isSpace) {
+							this.delete()
+							return
 						}
-						//正常删除
-						else {
-							//文本元素的值
-							const val = this.range.anchor.element.textContent
-							//起点向前一位
-							this.range.anchor.offset -= 1
-							//要删除的字符是否空白文本
-							const isSpace = isSpaceText(val[this.range.anchor.offset])
-							//进行删除
-							this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + val.substring(this.range.focus.offset)
-							//重新设置终点位置
-							this.range.focus.offset = this.range.anchor.offset
-							//如果删除的字符是空白文本，则再执行一次删除操作
-							if (isSpace) {
-								this.delete()
-								return
-							}
-							//如果根级块元素为空
-							if (block.isEmpty()) {
-								//建一个换行符元素作为占位元素
-								const breakEl = new AlexElement('closed', 'br', null, null, null)
-								this.addElementTo(breakEl, block)
-								this.range.anchor.moveToStart(breakEl)
-								this.range.focus.moveToStart(breakEl)
-							}
+						//如果根级块元素为空
+						if (block.isEmpty()) {
+							//建一个换行符元素作为占位元素
+							const breakEl = new AlexElement('closed', 'br', null, null, null)
+							this.addElementTo(breakEl, block)
+							this.range.anchor.moveToStart(breakEl)
+							this.range.focus.moveToStart(breakEl)
 						}
 					}
 					//如果光标在自闭合元素内
