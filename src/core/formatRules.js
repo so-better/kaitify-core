@@ -14,6 +14,16 @@ export const handleUneditableBlock = function (element) {
 		}
 		element.marks = marks
 	}
+	if (element.isBlock() && element.hasChildren()) {
+		const isAllUneditable = AlexElement.flatElements(element.children).every(el => {
+			return !!el.getUneditableElement()
+		})
+		//如果都是不可编辑的则在前后各新增一个空白文本
+		if (isAllUneditable) {
+			this.addElementTo(AlexElement.getSpaceElement(), element, element.children.length)
+			this.addElementTo(AlexElement.getSpaceElement(), element, 0)
+		}
+	}
 }
 
 /**
