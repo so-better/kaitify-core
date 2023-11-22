@@ -21,7 +21,19 @@ export default {
 		this.editor = new AlexEditor('.editor-content', {
 			value: this.value,
 			disabled: false,
-			allowPasteHtml: true
+			allowPasteHtml: true,
+			customMerge: function (ele, preEle) {
+				const uneditable = preEle.getUneditableElement()
+				if (uneditable) {
+					uneditable.toEmpty()
+				} else {
+					preEle.children.push(...ele.children)
+					preEle.children.forEach(item => {
+						item.parent = preEle
+					})
+					ele.children = null
+				}
+			}
 		})
 		this.editor.on('change', val => {
 			console.log('复制触发', val)
@@ -30,10 +42,10 @@ export default {
 			console.log('剪切触发', val)
 		})
 		this.editor.on('deleteComplete', () => {
-			// const uneditable = this.editor.range.anchor.element.getUneditableElement()
-			// if (uneditable) {
-			// 	uneditable.toEmpty()
-			// }
+			const uneditable = this.editor.range.anchor.element.getUneditableElement()
+			if (uneditable) {
+				uneditable.toEmpty()
+			}
 		})
 		this.editor.formatElementStack()
 		this.editor.domRender()
