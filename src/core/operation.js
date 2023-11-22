@@ -13,12 +13,19 @@ export const checkStack = function () {
 		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 	})
 	if (elements.length == 0) {
-		throw new Error('There are no elements in the editor, please check that the initial value is correct')
+		const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
+		const breakEle = new AlexElement('closed', 'br', null, null, null)
+		this.addElementTo(breakEle, ele)
+		this.stack = [ele]
+		const anchor = new AlexPoint(breakEle, 0)
+		const focus = new AlexPoint(breakEle, 0)
+		this.range = new AlexRange(anchor, focus)
+	} else {
+		const firstElement = elements[0]
+		const anchor = new AlexPoint(firstElement, 0)
+		const focus = new AlexPoint(firstElement, 0)
+		this.range = new AlexRange(anchor, focus)
 	}
-	const firstElement = elements[0]
-	const anchor = new AlexPoint(firstElement, 0)
-	const focus = new AlexPoint(firstElement, 0)
-	this.range = new AlexRange(anchor, focus)
 }
 
 /**
@@ -125,10 +132,10 @@ export const setRangeInVisible = function () {
  * 判断stack是否为空，为空则进行初始化
  */
 export const handleStackEmpty = function () {
-	const isEmpty = this.stack.every(el => {
-		return el.isEmpty()
+	const elements = AlexElement.flatElements(this.stack).filter(el => {
+		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
 	})
-	if (this.stack.length == 0 || isEmpty) {
+	if (elements.length == 0) {
 		const ele = new AlexElement('block', AlexElement.BLOCK_NODE, null, null, null)
 		const breakEle = new AlexElement('closed', 'br', null, null, null)
 		this.addElementTo(breakEle, ele)
