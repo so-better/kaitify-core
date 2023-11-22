@@ -172,7 +172,9 @@ export const initEditorOptions = options => {
 		//自定义图片粘贴方法
 		customImagePaste: null,
 		//自定义视频粘贴方法
-		customVideoPaste: null
+		customVideoPaste: null,
+		//自定义处理不可编辑元素合并的逻辑
+		customMerge: null
 	}
 	if (Dap.common.isObject(options)) {
 		if (typeof options.disabled == 'boolean') {
@@ -207,6 +209,9 @@ export const initEditorOptions = options => {
 		}
 		if (typeof options.customVideoPaste == 'function') {
 			opts.customVideoPaste = options.customVideoPaste
+		}
+		if (typeof options.customMerge == 'function') {
+			opts.customMerge = options.customMerge
 		}
 	}
 	return opts

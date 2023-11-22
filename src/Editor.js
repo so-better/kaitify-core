@@ -35,6 +35,8 @@ class AlexEditor {
 		this.customImagePaste = options.customImagePaste
 		//自定义粘贴视频的处理方法
 		this.customVideoPaste = options.customVideoPaste
+		//自定义合并元素的方法
+		this.customMerge = options.customMerge
 		//复制粘贴语法是否能够使用
 		this.useClipboard = canUseClipboard()
 		//创建历史记录
@@ -301,12 +303,12 @@ class AlexEditor {
 							//前一个可获取焦点的元素在内部块内部，并且它的行为值是block，则进行合并操作
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
-									this.mergeBlockElement(inblock, previousInblock)
+									this.merge(inblock, previousInblock)
 								}
 							}
 							//不在内部块内部则合并根级块元素
 							else {
-								this.mergeBlockElement(inblock, previousBlock)
+								this.merge(inblock, previousBlock)
 							}
 						}
 					}
@@ -407,12 +409,12 @@ class AlexEditor {
 							if (previousInblock) {
 								if (previousInblock.behavior == 'block') {
 									//将根级块元素与内部块元素进行合并
-									this.mergeBlockElement(block, previousInblock)
+									this.merge(block, previousInblock)
 								}
 							}
 							//如果前一个可设置光标的元素不在内部块内，则进行根级块元素的合并操作
 							else {
-								this.mergeBlockElement(block, previousBlock)
+								this.merge(block, previousBlock)
 							}
 						}
 					}
@@ -539,7 +541,7 @@ class AlexEditor {
 				})
 				//如果两个内部块的行为值都是block，则合并
 				if (anchorInblock.behavior == 'block' && focusInblock.behavior == 'block') {
-					this.mergeBlockElement(focusInblock, anchorInblock)
+					this.merge(focusInblock, anchorInblock)
 				}
 			}
 			//起点在内部块中，终点不在内部块中
@@ -564,7 +566,7 @@ class AlexEditor {
 				})
 				//如果起点所在内部块的行为值是block则合并
 				if (anchorInblock.behavior == 'block') {
-					this.mergeBlockElement(focusBlock, anchorInblock)
+					this.merge(focusBlock, anchorInblock)
 				}
 			}
 			//终点在内部块中，起点不在内部块中
@@ -589,7 +591,7 @@ class AlexEditor {
 				})
 				//如果终点所在内部块的行为值是block则合并
 				if (focusInblock.behavior == 'block') {
-					this.mergeBlockElement(focusInblock, anchorBlock)
+					this.merge(focusInblock, anchorBlock)
 				}
 			}
 			//起点和终点在同一个根级块元素中
@@ -629,7 +631,7 @@ class AlexEditor {
 						}
 					}
 				})
-				this.mergeBlockElement(focusBlock, anchorBlock)
+				this.merge(focusBlock, anchorBlock)
 			}
 		}
 		//如果起点所在元素是空元素则更新起点
@@ -934,7 +936,7 @@ class AlexEditor {
 					//在新的内部块最前面插入元素
 					this.addElementTo(ele, newInblock)
 					//合并内部块
-					this.mergeBlockElement(newInblock, inblock)
+					this.merge(newInblock, inblock)
 				}
 			}
 			//如果插入的元素是内部块，但是光标不在内部块中
@@ -976,7 +978,7 @@ class AlexEditor {
 					//在新的根级块最前面插入元素
 					this.addElementTo(ele, newBlock)
 					//合并根级块
-					this.mergeBlockElement(newBlock, block)
+					this.merge(newBlock, block)
 				}
 			}
 			//如果插入的元素是根级块
@@ -1340,7 +1342,7 @@ class AlexEditor {
 	/**
 	 * 将指定元素与另一个元素进行合并（仅限内部块元素和根级块元素）
 	 */
-	mergeBlockElement(ele, previousEle) {
+	merge(ele, previousEle) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}
@@ -1350,11 +1352,16 @@ class AlexEditor {
 		if ((!ele.isBlock() && !ele.isInblock()) || (!previousEle.isBlock() && !previousEle.isInblock())) {
 			throw new Error('Elements that are not "block" or "inblock" cannot be merged')
 		}
-		previousEle.children.push(...ele.children)
-		previousEle.children.forEach(item => {
-			item.parent = previousEle
-		})
-		ele.children = null
+		//如果自定义merge，则不走正常merge逻辑
+		if (typeof this.customMerge == 'function') {
+			this.customMerge.apply(this, [ele, previousEle])
+		} else {
+			previousEle.children.push(...ele.children)
+			previousEle.children.forEach(item => {
+				item.parent = previousEle
+			})
+			ele.children = null
+		}
 	}
 
 	/**
