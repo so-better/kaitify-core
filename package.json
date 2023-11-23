@@ -1,9 +1,9 @@
 {
 	"name": "alex-editor",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"private": false,
 	"type": "module",
-	"author": "lingkai",
+	"author": "ling0523",
 	"main": "lib/alex-editor.umd.js",
 	"module": "lib/alex-editor.es.js",
 	"license": "MIT",
@@ -30,6 +30,6 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/lovelin0523/alex-editor"
+		"url": "https://github.com/ling0523/alex-editor"
 	}
 }
