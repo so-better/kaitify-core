@@ -1,11 +1,12 @@
 import Dap from 'dap-util'
 import AlexElement from './Element'
+import AlexRange from './Range'
 import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
-import { checkStack, initRange, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 class AlexEditor {
 	constructor(node, opts) {
@@ -89,6 +90,19 @@ class AlexEditor {
 		Dap.event.on(this.$el, 'focus.alex_editor', handleFocus.bind(this))
 		//监听编辑器失去焦点
 		Dap.event.on(this.$el, 'blur.alex_editor', handleBlur.bind(this))
+	}
+
+	/**
+	 * 初始化range
+	 */
+	initRange() {
+		const elements = AlexElement.flatElements(this.stack).filter(el => {
+			return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+		})
+		const firstElement = elements[0]
+		const anchor = new AlexPoint(firstElement, 0)
+		const focus = new AlexPoint(firstElement, 0)
+		this.range = new AlexRange(anchor, focus)
 	}
 
 	/**
@@ -1813,7 +1827,7 @@ class AlexEditor {
 		let rangeIsNull = false
 		if (!this.range) {
 			//初始化设置range
-			initRange.apply(this)
+			this.initRange()
 			//记录range是null的标识
 			rangeIsNull = true
 		}
@@ -1851,7 +1865,7 @@ class AlexEditor {
 		//如果range为null
 		if (!this.range) {
 			//初始化设置range
-			initRange.apply(this)
+			this.initRange()
 			//记录range是null的标识
 			rangeIsNull = true
 		}

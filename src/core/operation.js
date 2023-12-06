@@ -21,19 +21,6 @@ export const checkStack = function () {
 }
 
 /**
- * 初始化设置range
- */
-export const initRange = function () {
-	const elements = AlexElement.flatElements(this.stack).filter(el => {
-		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
-	})
-	const firstElement = elements[0]
-	const anchor = new AlexPoint(firstElement, 0)
-	const focus = new AlexPoint(firstElement, 0)
-	this.range = new AlexRange(anchor, focus)
-}
-
-/**
  * 更新焦点的元素为最近的可设置光标的元素
  */
 export const setRecentlyPoint = function (point) {
