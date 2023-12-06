@@ -2021,7 +2021,7 @@ class AlexEditor {
 			throw new Error('The first argument cannot be null')
 		}
 		if (!this.range) {
-			return
+			return false
 		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
@@ -2197,7 +2197,7 @@ class AlexEditor {
 			throw new Error('The first argument cannot be null')
 		}
 		if (!this.range) {
-			return
+			return false
 		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
