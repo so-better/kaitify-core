@@ -41,12 +41,12 @@ export default {
 		this.editor.on('cut', val => {
 			console.log('剪切触发', val)
 		})
-		this.editor.on('deleteComplete', () => {
-			const uneditable = this.editor.range.anchor.element.getUneditableElement()
-			if (uneditable) {
-				uneditable.toEmpty()
-			}
-		})
+		// this.editor.on('deleteComplete', () => {
+		// 	const uneditable = this.editor.range.anchor.element.getUneditableElement()
+		// 	if (uneditable) {
+		// 		uneditable.toEmpty()
+		// 	}
+		// })
 		this.editor.formatElementStack()
 		this.editor.domRender()
 		this.editor.collapseToEnd()
@@ -103,7 +103,7 @@ export default {
 	.editor-content {
 		border: 1px solid #ddd;
 		padding: 6px 10px;
-		height: 2000px;
+		height: 200px;
 		overflow: auto;
 		border-radius: 4px;
 

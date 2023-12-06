@@ -87,11 +87,11 @@ export const breakFormat = function (element) {
 			//第一个换行符
 			const breakEl = children[0]
 			//如果起点在该元素里，则移动到第一个换行符上
-			if (element.isContains(this.range.anchor.element)) {
+			if (this.range && element.isContains(this.range.anchor.element)) {
 				this.range.anchor.moveToStart(breakEl)
 			}
 			//如果终点在该元素里，则移动到第一个换行符上
-			if (element.isContains(this.range.focus.element)) {
+			if (this.range && element.isContains(this.range.focus.element)) {
 				this.range.focus.moveToStart(breakEl)
 			}
 			element.children = [breakEl]
@@ -131,7 +131,7 @@ export const mergeWithBrotherElement = function (element) {
 			//后一个元素是空元素
 			if (nel.isEmpty()) {
 				//起点在后一个元素上，则直接将起点设置到前一个元素上
-				if (nel.isContains(this.range.anchor.element)) {
+				if (this.range && nel.isContains(this.range.anchor.element)) {
 					if (pel.isEmpty()) {
 						this.range.anchor.element = pel
 						this.range.anchor.offset = 0
@@ -140,7 +140,7 @@ export const mergeWithBrotherElement = function (element) {
 					}
 				}
 				//终点在后一个元素上，则直接将终点设置到前一个元素上
-				if (nel.isContains(this.range.focus.element)) {
+				if (this.range && nel.isContains(this.range.focus.element)) {
 					if (pel.isEmpty()) {
 						this.range.focus.element = pel
 						this.range.focus.offset = 0
@@ -157,7 +157,7 @@ export const mergeWithBrotherElement = function (element) {
 			//前一个元素是空元素
 			else if (pel.isEmpty()) {
 				//起点在前一个元素上，则直接将起点设置到后一个元素上
-				if (pel.isContains(this.range.anchor.element)) {
+				if (this.range && pel.isContains(this.range.anchor.element)) {
 					if (nel.isEmpty()) {
 						this.range.anchor.element = nel
 						this.range.anchor.offset = 0
@@ -166,7 +166,7 @@ export const mergeWithBrotherElement = function (element) {
 					}
 				}
 				//终点在前一个元素上，则直接将终点设置到后一个元素上
-				if (pel.isContains(this.range.focus.element)) {
+				if (this.range && pel.isContains(this.range.focus.element)) {
 					if (nel.isEmpty()) {
 						this.range.focus.element = nel
 						this.range.focus.offset = 0
@@ -184,12 +184,12 @@ export const mergeWithBrotherElement = function (element) {
 		//文本元素合并
 		else if (pel.isText()) {
 			//起点在后一个元素上，则将起点设置到前一个元素上
-			if (nel.isEqual(this.range.anchor.element)) {
+			if (this.range && nel.isEqual(this.range.anchor.element)) {
 				this.range.anchor.element = pel
 				this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
 			}
 			//终点在后一个元素上，则将终点设置到前一个元素上
-			if (nel.isEqual(this.range.focus.element)) {
+			if (this.range && nel.isEqual(this.range.focus.element)) {
 				this.range.focus.element = pel
 				this.range.focus.offset = pel.textContent.length + this.range.focus.offset
 			}
@@ -274,11 +274,11 @@ export const mergeWithParentElement = function (element) {
 			parent.textContent = child.textContent
 			parent.children = null
 			//如果起点在子元素上则更新到父元素上
-			if (child.isContains(this.range.anchor.element)) {
+			if (this.range && child.isContains(this.range.anchor.element)) {
 				this.range.anchor.element = parent
 			}
 			//如果终点在子元素上则更新到父元素上
-			if (child.isContains(this.range.focus.element)) {
+			if (this.range && child.isContains(this.range.focus.element)) {
 				this.range.focus.element = parent
 			}
 		}

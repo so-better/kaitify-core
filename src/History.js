@@ -22,20 +22,8 @@ class AlexHistory {
 		const newStack = stack.map(ele => {
 			return ele.__fullClone()
 		})
-		//查找新stack中anchor对应的元素
-		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
-			return ele.key == range.anchor.element.key
-		})
-		//查找新stack中focus对应的元素
-		const focusElement = AlexElement.flatElements(newStack).find(ele => {
-			return ele.key == range.focus.element.key
-		})
-		//创建新的anchor
-		const anchor = new AlexPoint(anchorElement, range.anchor.offset)
-		//创建新的focus
-		const focus = new AlexPoint(focusElement, range.focus.offset)
-		//创建新的range
-		const newRange = new AlexRange(anchor, focus)
+		//生成一个新的range
+		const newRange = this.__cloneRange(newStack, range)
 		//推入栈中
 		this.records.push({
 			stack: newStack,
@@ -73,26 +61,47 @@ class AlexHistory {
 		const newStack = stack.map(ele => {
 			return ele.__fullClone()
 		})
-		//查找新stack中anchor对应的元素
-		const anchorElement = AlexElement.flatElements(newStack).find(ele => {
-			return ele.key == range.anchor.element.key
-		})
-		//查找新stack中focus对应的元素
-		const focusElement = AlexElement.flatElements(newStack).find(ele => {
-			return ele.key == range.focus.element.key
-		})
-		//创建新的anchor
-		const anchor = new AlexPoint(anchorElement, range.anchor.offset)
-		//创建新的focus
-		const focus = new AlexPoint(focusElement, range.focus.offset)
 		//创建新的range
-		const newRange = new AlexRange(anchor, focus)
+		const newRange = this.__cloneRange(newStack, range)
 		//返回给编辑器
 		return {
 			current: current,
 			stack: newStack,
 			range: newRange
 		}
+	}
+
+	/**
+	 * 更新当前历史记录的range
+	 */
+	updateCurrentRange(range) {
+		const records = this.records[this.current]
+		const newRange = this.__cloneRange(records.stack, range)
+		this.records[this.current].range = newRange
+	}
+
+	/**
+	 * 克隆range
+	 */
+	__cloneRange(newStack, range) {
+		//如果range存在
+		if (range) {
+			//查找新stack中anchor对应的元素
+			const anchorElement = AlexElement.flatElements(newStack).find(ele => {
+				return ele.key == range.anchor.element.key
+			})
+			//查找新stack中focus对应的元素
+			const focusElement = AlexElement.flatElements(newStack).find(ele => {
+				return ele.key == range.focus.element.key
+			})
+			//创建新的anchor
+			const anchor = new AlexPoint(anchorElement, range.anchor.offset)
+			//创建新的focus
+			const focus = new AlexPoint(focusElement, range.focus.offset)
+			//创建新的range
+			return new AlexRange(anchor, focus)
+		}
+		return null
 	}
 }
 

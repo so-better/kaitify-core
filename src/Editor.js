@@ -5,7 +5,7 @@ import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, initRange, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 class AlexEditor {
 	constructor(node, opts) {
@@ -45,7 +45,7 @@ class AlexEditor {
 		this.stack = this.parseHtml(this.value)
 		//编辑的range
 		this.range = null
-		//初始化校验stack并初始化给range赋值
+		//初始化校验stack
 		checkStack.apply(this)
 
 		/**  ------以下是内部属性，不对外展示------  */
@@ -96,6 +96,9 @@ class AlexEditor {
 	 */
 	async paste() {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!this.useClipboard) {
@@ -217,6 +220,9 @@ class AlexEditor {
 		if (!this.useClipboard) {
 			return
 		}
+		if (!this.range) {
+			return
+		}
 		if (!this.allowCut) {
 			return
 		}
@@ -236,6 +242,9 @@ class AlexEditor {
 	 */
 	async copy(isCut = false) {
 		if (!this.useClipboard) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!this.allowCopy) {
@@ -273,6 +282,9 @@ class AlexEditor {
 	 */
 	delete() {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -657,6 +669,9 @@ class AlexEditor {
 		if (!data || typeof data != 'string') {
 			throw new Error('The argument must be a string')
 		}
+		if (!this.range) {
+			return
+		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//不是代码块内则对空格进行处理
@@ -698,6 +713,9 @@ class AlexEditor {
 	 */
 	insertParagraph() {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -834,6 +852,9 @@ class AlexEditor {
 	 */
 	insertElement(ele, cover = true) {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!AlexElement.isElement(ele)) {
@@ -1072,10 +1093,10 @@ class AlexEditor {
 				const ele = element.children[index]
 				//如果是空元素则删除
 				if (ele.isEmpty()) {
-					if (ele.isContains(this.range.anchor.element)) {
+					if (this.range && ele.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (ele.isContains(this.range.focus.element)) {
+					if (this.range && ele.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
 					element.children.splice(index, 1)
@@ -1110,10 +1131,10 @@ class AlexEditor {
 			const ele = this.stack[index]
 			//空元素则删除
 			if (ele.isEmpty()) {
-				if (ele.isContains(this.range.anchor.element)) {
+				if (this.range && ele.isContains(this.range.anchor.element)) {
 					setRecentlyPoint.apply(this, [this.range.anchor])
 				}
-				if (ele.isContains(this.range.focus.element)) {
+				if (this.range && ele.isContains(this.range.focus.element)) {
 					setRecentlyPoint.apply(this, [this.range.focus])
 				}
 				this.stack.splice(index, 1)
@@ -1127,10 +1148,10 @@ class AlexEditor {
 			this.formatElement(ele)
 			//如果在经过格式化后是空元素，则需要删除该元素
 			if (ele.isEmpty()) {
-				if (ele.isContains(this.range.anchor.element)) {
+				if (this.range && ele.isContains(this.range.anchor.element)) {
 					setRecentlyPoint.apply(this, [this.range.anchor])
 				}
-				if (ele.isContains(this.range.focus.element)) {
+				if (this.range && ele.isContains(this.range.focus.element)) {
 					setRecentlyPoint.apply(this, [this.range.focus])
 				}
 				this.stack.splice(index, 1)
@@ -1190,6 +1211,11 @@ class AlexEditor {
 	rangeRender() {
 		//如果编辑器被禁用则无法设置真实光标
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
+			const selection = window.getSelection()
+			selection.removeAllRanges()
 			return
 		}
 		//将虚拟光标位置转为真实光标位置
@@ -1510,6 +1536,9 @@ class AlexEditor {
 	 * 获取选区之间的元素
 	 */
 	getElementsByRange(includes = false, flat = false) {
+		if (!this.range) {
+			return
+		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			return []
@@ -1650,6 +1679,9 @@ class AlexEditor {
 	 * 分割选区选中的元素，会更新光标位置
 	 */
 	splitElementsByRange(includes = false, flat = false) {
+		if (!this.range) {
+			return
+		}
 		const result = this.getElementsByRange(includes, flat)
 		let elements = []
 		result.forEach((item, index) => {
@@ -1777,6 +1809,14 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
+		//range是否为null
+		let rangeIsNull = false
+		if (!this.range) {
+			//初始化设置range
+			initRange.apply(this)
+			//记录range是null的标识
+			rangeIsNull = true
+		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
 			this.range.anchor.moveToStart(element)
@@ -1793,6 +1833,10 @@ class AlexEditor {
 			this.range.anchor.moveToStart(flatElements[0])
 			this.range.focus.moveToStart(flatElements[0])
 		}
+		//如果一开始range是null的话，则更新当前history的range
+		if (rangeIsNull) {
+			this.history.updateCurrentRange(this.range)
+		}
 	}
 
 	/**
@@ -1801,6 +1845,15 @@ class AlexEditor {
 	collapseToEnd(element) {
 		if (this.disabled) {
 			return
+		}
+		//range是否为null
+		let rangeIsNull = false
+		//如果range为null
+		if (!this.range) {
+			//初始化设置range
+			initRange.apply(this)
+			//记录range是null的标识
+			rangeIsNull = true
 		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
@@ -1818,6 +1871,10 @@ class AlexEditor {
 			}
 			this.range.anchor.moveToEnd(flatElements[length - 1])
 			this.range.focus.moveToEnd(flatElements[length - 1])
+		}
+		//如果一开始range是null的话，则更新当前history的range
+		if (rangeIsNull) {
+			this.history.updateCurrentRange(this.range)
 		}
 	}
 
@@ -1842,6 +1899,9 @@ class AlexEditor {
 	 */
 	setTextStyle(styles) {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!Dap.common.isObject(styles)) {
@@ -1902,6 +1962,9 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
+		if (!this.range) {
+			return
+		}
 		//移除样式的方法
 		const removeFn = el => {
 			//如果参数是数组，表示删除指定的样式
@@ -1957,7 +2020,9 @@ class AlexEditor {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
-
+		if (!this.range) {
+			return
+		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//如果是文本元素并且具有样式
@@ -2010,6 +2075,9 @@ class AlexEditor {
 	 */
 	setTextMark(marks) {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!Dap.common.isObject(marks)) {
@@ -2070,6 +2138,9 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
+		if (!this.range) {
+			return
+		}
 		//移除标记的方法
 		const removeFn = el => {
 			//如果参数是数组，表示删除指定的标记
@@ -2124,6 +2195,9 @@ class AlexEditor {
 	queryTextMark(name, value, useCache) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
+		}
+		if (!this.range) {
+			return
 		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {

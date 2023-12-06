@@ -17,15 +17,20 @@ export const checkStack = function () {
 		const breakEle = new AlexElement('closed', 'br', null, null, null)
 		this.addElementTo(breakEle, ele)
 		this.stack = [ele]
-		const anchor = new AlexPoint(breakEle, 0)
-		const focus = new AlexPoint(breakEle, 0)
-		this.range = new AlexRange(anchor, focus)
-	} else {
-		const firstElement = elements[0]
-		const anchor = new AlexPoint(firstElement, 0)
-		const focus = new AlexPoint(firstElement, 0)
-		this.range = new AlexRange(anchor, focus)
 	}
+}
+
+/**
+ * 初始化设置range
+ */
+export const initRange = function () {
+	const elements = AlexElement.flatElements(this.stack).filter(el => {
+		return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+	})
+	const firstElement = elements[0]
+	const anchor = new AlexPoint(firstElement, 0)
+	const focus = new AlexPoint(firstElement, 0)
+	this.range = new AlexRange(anchor, focus)
 }
 
 /**
@@ -96,7 +101,7 @@ export const setRangeInVisible = function () {
 			}
 			const childRect = target.getBoundingClientRect()
 			const parentRect = root.getBoundingClientRect()
-			if (childRect.top < parentRect.top && parentRect.top >= childRect.bottom) {
+			if (childRect.top < parentRect.top) {
 				await Dap.element.setScrollTop({
 					el: root,
 					number: 0
@@ -107,7 +112,7 @@ export const setRangeInVisible = function () {
 					el: root,
 					number: tempChildRect.top - tempParentRect.top - tempChildRect.height * 2
 				})
-			} else if (childRect.bottom > parentRect.bottom && parentRect.bottom <= childRect.top) {
+			} else if (childRect.bottom > parentRect.bottom) {
 				await Dap.element.setScrollTop({
 					el: root,
 					number: 0
@@ -215,8 +220,12 @@ export const handleSelectionChange = function () {
 			const focusEle = this.getElementByKey(focusKey)
 			const anchor = new AlexPoint(anchorEle, anchorOffset)
 			const focus = new AlexPoint(focusEle, focusOffset)
-			this.range.anchor = anchor
-			this.range.focus = focus
+			if (this.range) {
+				this.range.anchor = anchor
+				this.range.focus = focus
+			} else {
+				this.range = new AlexRange(anchor, focus)
+			}
 			this.emit('rangeUpdate', this.range)
 		}
 	}
