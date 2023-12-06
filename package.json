@@ -1,6 +1,6 @@
 {
 	"name": "alex-editor",
-	"version": "1.0.71",
+	"version": "1.0.72",
 	"private": false,
 	"type": "module",
 	"author": "ling0523",
@@ -13,7 +13,7 @@
 		"lib": "vite build"
 	},
 	"dependencies": {
-		"dap-util": "^1.4.1",
+		"dap-util": "^1.4.2",
 		"vue": "^3.2.47"
 	},
 	"devDependencies": {
