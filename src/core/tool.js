@@ -225,15 +225,27 @@ export const queryHasValue = (obj, name, value) => {
 	if (value == null || value == undefined) {
 		return obj.hasOwnProperty(name)
 	}
+	//固有的值
+	let ownValue = obj[name]
+	//如果ownValue不存在则直接返回false
+	if (ownValue == null || ownValue == undefined) {
+		return false
+	}
 	//如果value是字符串，则先将值转为小写
 	if (typeof value == 'string') {
 		value = value.toLocaleLowerCase()
 	}
-	//固有的值
-	let ownValue = obj[name]
-	//如果是字符串则转为小写
+	//如果ownValue是字符串，则先将值转为小写
 	if (typeof ownValue == 'string') {
 		ownValue = ownValue.toLocaleLowerCase()
+	}
+	//如果value是rgb或者rgba格式，则去除空格
+	if (typeof value == 'string' && value && (Dap.common.matchingText(value, 'rgb') || Dap.common.matchingText(value, 'rgba'))) {
+		value = Dap.string.trim(value, true)
+	}
+	//如果ownValue是rgb或者rgba格式，则去除空格
+	if (typeof ownValue == 'string' && ownValue && (Dap.common.matchingText(ownValue, 'rgb') || Dap.common.matchingText(ownValue, 'rgba'))) {
+		ownValue = Dap.string.trim(ownValue, true)
 	}
 	//如果是十六进制值，转为rgb值
 	if (typeof value == 'string' && value && Dap.common.matchingText(value, 'hex')) {
@@ -245,5 +257,6 @@ export const queryHasValue = (obj, name, value) => {
 		const arr = Dap.color.hex2rgb(ownValue)
 		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
+	console.log(ownValue, value)
 	return ownValue == value
 }
