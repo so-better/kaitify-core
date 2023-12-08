@@ -236,12 +236,12 @@ export const queryHasValue = (obj, name, value) => {
 		ownValue = ownValue.toLocaleLowerCase()
 	}
 	//如果是十六进制值，转为rgb值
-	if (typeof value == 'string' && Dap.common.matchingText(value, 'hex')) {
+	if (typeof value == 'string' && value && Dap.common.matchingText(value, 'hex')) {
 		const arr = Dap.color.hex2rgb(value)
 		value = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
 	//如果是十六进制值，转为rgb值
-	if (typeof ownValue == 'string' && Dap.common.matchingText(ownValue, 'hex')) {
+	if (typeof ownValue == 'string' && ownValue && Dap.common.matchingText(ownValue, 'hex')) {
 		const arr = Dap.color.hex2rgb(ownValue)
 		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
