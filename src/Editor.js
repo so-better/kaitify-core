@@ -142,7 +142,7 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							this.customTextPaste.apply(this, [data])
+							await this.customTextPaste.apply(this, [data])
 						} else {
 							this.insertText(data)
 							this.emit('pasteText', data)
@@ -157,7 +157,7 @@ class AlexEditor {
 							return !el.isEmpty()
 						})
 						if (typeof this.customHtmlPaste == 'function') {
-							this.customHtmlPaste.apply(this, [elements, data])
+							await this.customHtmlPaste.apply(this, [elements, data])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
 								this.formatElement(elements[i])
@@ -177,7 +177,7 @@ class AlexEditor {
 				if (blob.type.startsWith('image/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customImagePaste == 'function') {
-						this.customImagePaste.apply(this, [url])
+						await this.customImagePaste.apply(this, [url])
 					} else {
 						const image = new AlexElement(
 							'closed',
@@ -196,7 +196,7 @@ class AlexEditor {
 				else if (blob.type.startsWith('video/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customVideoPaste == 'function') {
-						this.customVideoPaste.apply(this, [url])
+						await this.customVideoPaste.apply(this, [url])
 					} else {
 						const video = new AlexElement(
 							'closed',
@@ -216,7 +216,7 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							this.customTextPaste.apply(this, [data])
+							await this.customTextPaste.apply(this, [data])
 						} else {
 							this.insertText(data)
 							this.emit('pasteText', data)
