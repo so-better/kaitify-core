@@ -221,20 +221,27 @@ export const initEditorOptions = options => {
  * 判断对象是否含有某个属性或者属性值是否一致
  */
 export const queryHasValue = (obj, name, value) => {
+	//如果value不存在则判断是否拥有属性name
 	if (value == null || value == undefined) {
 		return obj.hasOwnProperty(name)
 	}
-	//先将值转为小写
-	value = value.toLocaleLowerCase()
+	//如果value是字符串，则先将值转为小写
+	if (typeof value == 'string') {
+		value = value.toLocaleLowerCase()
+	}
 	//固有的值
 	let ownValue = obj[name]
+	//如果是字符串则转为小写
+	if (typeof ownValue == 'string') {
+		ownValue = ownValue.toLocaleLowerCase()
+	}
 	//如果是十六进制值，转为rgb值
-	if (Dap.common.matchingText(value, 'hex')) {
+	if (typeof value == 'string' && Dap.common.matchingText(value, 'hex')) {
 		const arr = Dap.color.hex2rgb(value)
 		value = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
 	//如果是十六进制值，转为rgb值
-	if (Dap.common.matchingText(ownValue, 'hex')) {
+	if (typeof ownValue == 'string' && Dap.common.matchingText(ownValue, 'hex')) {
 		const arr = Dap.color.hex2rgb(ownValue)
 		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
