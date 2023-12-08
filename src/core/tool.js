@@ -257,6 +257,5 @@ export const queryHasValue = (obj, name, value) => {
 		const arr = Dap.color.hex2rgb(ownValue)
 		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
 	}
-	console.log(ownValue, value)
 	return ownValue == value
 }
