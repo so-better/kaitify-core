@@ -13,7 +13,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<p><br></p><p style="background:#000;color:#fff;" contenteditable="false">不可编辑的段落</p><p style="background:#000;color:#fff;" contenteditable="false">不可编辑的段落</p><ul><li>3</li><li>333<span style="background:#000;color:#fff;" contenteditable="false">4444</span>3</li></ul><p style="background:#000;color:#fff;" contenteditable="false" >3333344</p><h3>333<span style="background:#000;color:#fff;" contenteditable="false">4444</span>3</h3>`,
+			value: `<p><br></p><p style="background:#000;color:#fff;" contenteditable="false">不可编辑的段落</p><p style="background:#000;color:#fff;" contenteditable="false">不可编辑的段落</p><ul><li>3</li><li>333<span style="background:#000;color:#fff;" contenteditable="false">4444</span>3</li></ul><p style="background:#000;color:#fff;" contenteditable="false" >3333344</p><h3>333<span style="background:#000;color:#fff;" data-index="rgb(255,255,255)" >4444</span>3</h3>`,
 			editor: null
 		}
 	},
@@ -54,10 +54,7 @@ export default {
 	},
 	methods: {
 		queryTextStyle() {
-			this.editor.delete()
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
+			console.log(this.editor.queryTextMark('data-index', '#fff'))
 		},
 		setTextStyle() {
 			this.editor.setTextStyle({

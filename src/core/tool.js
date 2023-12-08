@@ -216,3 +216,27 @@ export const initEditorOptions = options => {
 	}
 	return opts
 }
+
+/**
+ * 判断对象是否含有某个属性或者属性值是否一致
+ */
+export const queryHasValue = (obj, name, value) => {
+	if (value == null || value == undefined) {
+		return obj.hasOwnProperty(name)
+	}
+	//先将值转为小写
+	value = value.toLocaleLowerCase()
+	//固有的值
+	let ownValue = obj[name]
+	//如果是十六进制值，转为rgb值
+	if (Dap.common.matchingText(value, 'hex')) {
+		const arr = Dap.color.hex2rgb(value)
+		value = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+	}
+	//如果是十六进制值，转为rgb值
+	if (Dap.common.matchingText(ownValue, 'hex')) {
+		const arr = Dap.color.hex2rgb(ownValue)
+		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+	}
+	return ownValue == value
+}

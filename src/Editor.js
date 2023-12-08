@@ -4,7 +4,7 @@ import AlexRange from './Range'
 import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -2041,12 +2041,7 @@ class AlexEditor {
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//如果是文本元素并且具有样式
 			if (this.range.anchor.element.isText() && this.range.anchor.element.hasStyles()) {
-				//表示只查询是否具有样式名称
-				if (value == null || value == undefined) {
-					return this.range.anchor.element.styles.hasOwnProperty(name)
-				}
-				//查询是否具有某个样式值
-				return this.range.anchor.element.styles[name] == value
+				return queryHasValue(this.range.anchor.element.styles, name, value)
 			}
 			//不是文本元素或者没有样式直接返回
 			return false
@@ -2073,10 +2068,7 @@ class AlexEditor {
 		let flag = result.every(item => {
 			//文本元素含有样式进一步判断
 			if (item.element.hasStyles()) {
-				if (value == null || value == undefined) {
-					return item.element.styles.hasOwnProperty(name)
-				}
-				return item.element.styles[name] == value
+				return queryHasValue(item.element.styles, name, value)
 			}
 			//文本元素没有样式直接返回false
 			return false
@@ -2217,12 +2209,7 @@ class AlexEditor {
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//如果是文本元素并且具有标记
 			if (this.range.anchor.element.isText() && this.range.anchor.element.hasMarks()) {
-				//表示只查询是否具有标记名称
-				if (value == null || value == undefined) {
-					return this.range.anchor.element.marks.hasOwnProperty(name)
-				}
-				//查询是否具有某个标记值
-				return this.range.anchor.element.marks[name] == value
+				return queryHasValue(this.range.anchor.element.marks, name, value)
 			}
 			//不是文本元素或者没有样式直接返回
 			return false
@@ -2248,10 +2235,7 @@ class AlexEditor {
 		let flag = result.every(item => {
 			//文本元素含有样式进一步判断
 			if (item.element.hasMarks()) {
-				if (value == null || value == undefined) {
-					return item.element.marks.hasOwnProperty(name)
-				}
-				return item.element.marks[name] == value
+				return queryHasValue(item.element.marks, name, value)
 			}
 			//文本元素没有样式直接返回false
 			return false
