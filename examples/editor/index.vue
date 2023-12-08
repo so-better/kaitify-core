@@ -5,6 +5,7 @@
 			<button style="margin-left: 10px" @click="setTextStyle">设置样式</button>
 			<button style="margin-left: 10px" @click="removeTextStyle">移除样式</button>
 		</div>
+		{{ value.length }}
 		<div class="editor-content"></div>
 	</div>
 </template>
@@ -13,3847 +14,1117 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><h5><span>关于工具条</span></h5><p><br></p><div data-editify-list="ul"><span>工具条是编辑器编辑区域浮动展示的一个方便我们操作的栏目，具体分为表格工具条、链接工具条、图片工具条、视频工具条、代码块工具条和文本工具条</span></div><div data-editify-list="ul"><span>工具条配置参数toolbar对象配置采用平替的方法，即只会对你配置的属性进行使用，未配置属性使用默认属性</span></div><p><br></p><h5><span>具体配置</span></h5><p><br></p><table data-editify-element="25"><colgroup><col width="13.55%"><col width="10.32%"><col width="57.74%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>use</span></td><td><span>boolean</span></td><td><span>是否使用工具条</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>style</span></td><td><span>object</span></td><td><span>工具条样式设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>tooltip</span></td><td><span>boolean</span></td><td><span>是否使用工具提示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>codeBlock</span></td><td><span>object</span></td><td><span>代码块工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>text</span></td><td><span>object</span></td><td><span>文本工具条配置，具体见下述文档</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>extraDisabled</span></td><td><span>function</span></td><td><span>该方法会在每次工具条显示时生效，用于添加额外的按钮禁用判定，回调参数为按钮名称name，this指向组件实例（只对文本工具条中的按钮生效），该方法必须返回一个布尔值用于判断是否禁用指定name的按钮</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><h5><span>codeBlock代码块工具条配置</span></h5><p><br></p><p><span>codeBlock是一个对象值，主要是针对代码块工具条的部分配置</span></p><table data-editify-element="157"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>languages</span></td><td><span>object</span></td><td><span>语言列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>languages按钮属性如下：</span></p><table data-editify-element="202"><colgroup><col width="10.32%"><col width="8.17%"><col width="64.3%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示语言列表按钮，如果为false则不显示此按钮并且代码块不会进行高亮处理</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>语言列表配置，数组中每个元素是一个对象，包含label和value两个属性，value表示语言的值，label是显示在列表上的名称，目前支持的语言值有：'plaintext'、'javascript'、&nbsp;'html'、'css'、&nbsp;'less'、&nbsp;'scss'、&nbsp;'java'、&nbsp;'markdown'、&nbsp;'swift'、'objectivec'、&nbsp;'typescript'、&nbsp;'dart'、&nbsp;'nginx'、&nbsp;'php'、&nbsp;'python'</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>180</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="322"><span class="editify-hljs-comment">// languages options默认配置如下</span><span>
-[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'自动识别'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>:</span><span class="editify-hljs-string">''</span><span>    
-    },
-    </span><span class="editify-hljs-string">'plaintext'</span><span>,
-    </span><span class="editify-hljs-string">'json'</span><span>,
-    </span><span class="editify-hljs-string">'javascript'</span><span>, 
-    </span><span class="editify-hljs-string">'html'</span><span>, 
-    </span><span class="editify-hljs-string">'css'</span><span>, 
-    </span><span class="editify-hljs-string">'less'</span><span>, 
-    </span><span class="editify-hljs-string">'scss'</span><span>, 
-    </span><span class="editify-hljs-string">'java'</span><span>, 
-    </span><span class="editify-hljs-string">'markdown'</span><span>, 
-    </span><span class="editify-hljs-string">'swift'</span><span>, 
-    </span><span class="editify-hljs-string">'objectivec'</span><span>, 
-    </span><span class="editify-hljs-string">'typescript'</span><span>, 
-    </span><span class="editify-hljs-string">'dart'</span><span>, 
-    </span><span class="editify-hljs-string">'nginx'</span><span>, 
-    </span><span class="editify-hljs-string">'php'</span><span>, 
-    </span><span class="editify-hljs-string">'python'</span><span>
-]</span></pre><blockquote><span>关于按钮的options配置，默认都是包含label和value属性，如果options的某一项是一个字符串或者数值，表示label和value一样，都是这个字符串或者数值。另外有的配置按钮的options配置项除了label和value以外，还有其他的属性</span></blockquote><p><br></p><h5><span>text文本工具条配置</span></h5><p><br></p><p><span>text是一个对象值，主要是用于自定义配置文本工具条中的按钮</span></p><table data-editify-element="334"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>heading</span></td><td><span>object</span></td><td><span>标题按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>align</span></td><td><span>object</span></td><td><span>对齐方式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>orderList</span></td><td><span>object</span></td><td><span>有序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>unorderList</span></td><td><span>object</span></td><td><span>无序列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>task</span></td><td><span>object</span></td><td><span>任务列表按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>bold</span></td><td><span>object</span></td><td><span>加粗按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>italic</span></td><td><span>object</span></td><td><span>斜体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>strikethrough</span></td><td><span>object</span></td><td><span>删除线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>underline</span></td><td><span>object</span></td><td><span>下划线按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>code</span></td><td><span>object</span></td><td><span>行内代码按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>super</span></td><td><span>object</span></td><td><span>上标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>sub</span></td><td><span>object</span></td><td><span>下标按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontSize</span></td><td><span>object</span></td><td><span>字号按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>fontFamily</span></td><td><span>object</span></td><td><span>字体按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>lineHeight</span></td><td><span>object</span></td><td><span>行高按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>foreColor</span></td><td><span>object</span></td><td><span>前景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>backColor</span></td><td><span>object</span></td><td><span>背景色按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>formatClear</span></td><td><span>object</span></td><td><span>清除格式按钮配置</span></td><td><span>-</span></td><td><span>-</span></td></tr></tbody></table><p><br></p><p><span>heading按钮属性如下：</span></p><table data-editify-element="651"><colgroup><col width="11.61%"><col width="13.23%"><col width="58.49%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>标题选项列表配置，数组中每个元素是一个对象，包含label、value、style三个属性，label表示显示的名称，value表示具体的标签值，style表示选项自定义样式的对象</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>"p"</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>120</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr></tbody></table><pre data-editify-element="729" data-editify-hljs="javascript"><span class="editify-hljs-comment">//heading options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'正文'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'p'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'一级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h1'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'22px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'二级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h2'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'三级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h3'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'四级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h4'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'五级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h5'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'15px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'六级标题'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'h6'</span><span>,
-        </span><span class="editify-hljs-attr">style</span><span>: {
-            </span><span class="editify-hljs-attr">fontSize</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-            </span><span class="editify-hljs-attr">fontWeight</span><span>: </span><span class="editify-hljs-string">'bold'</span><span>
-        }
-    }
-﻿]</span></pre><p><br></p><p><span>align按钮属性如下：</span></p><table data-editify-element="811239"><colgroup><col width="10.43%"><col width="8.06%"><col width="65.16%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>对齐方式选项列表配置，数组中每个元素是一个对象，包含label、value、icon三个属性，label表示显示的名称，value表示具体的样式值，icon表示选项显示在选项中的对齐方式图标</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设为空字符串，则表示不设置</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示左侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮是否显示右侧边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="811307"><span class="editify-hljs-comment">//align options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'左对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'left'</span><span>,
-﻿        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-left'</span><span>
-    },
-    ﻿{
-        </span><span class="editify-hljs-attr">label</span><span>:</span><span class="editify-hljs-string">'右对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'right'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-right'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'居中对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'center'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-center'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'两端对齐'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'justify'</span><span>,
-        </span><span class="editify-hljs-attr">icon</span><span>: </span><span class="editify-hljs-string">'align-justify'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>orderList、unorderList、task、underline、super、sub按钮属性如下：</span></p><table data-editify-element="2052093"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><span>bold、italic、strikethrough、code按钮属性如下：</span></p><table data-editify-element="2524895"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧是否显示边框</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p><p><br></p><p><span>fontSize按钮属性如下：</span></p><table data-editify-element="3005572"><colgroup><col width="13.44%"><col width="13.23%"><col width="56.45%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字号值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="3939942"><span class="editify-hljs-comment">//fontSize options默认配置如下</span><span>
-﻿[
-﻿    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字号'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'12px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'14px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'16px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'18px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'20px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'24px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'28px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'32px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'36px'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'40px'</span><span>
-    }
-﻿]</span></pre><p><br></p><p><span>fontFamily按钮属性如下：</span></p><table data-editify-element="4643121"><colgroup><col width="11.18%"><col width="13.55%"><col width="59.25%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮字号列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的字体值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度</span></td><td><span>-</span></td><td><span>100</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>200</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="4643189" data-editify-hljs="javascript"><span class="editify-hljs-comment">//fontFamily options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认字体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-     },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'黑体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'黑体,黑体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文仿宋'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'楷体,楷体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'华文楷体'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'宋体'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'宋体,宋体-简'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Arial'</span><span>
-    },
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'Consolas'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">'Consolas,monospace'</span><span>
-    }
-]</span></pre><p><br></p><p><span>lineHeight属性如下：</span></p><table data-editify-element="5880070"><colgroup><col width="13.01%"><col width="13.12%"><col width="56.77%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的行高值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>defaultValue</span></td><td><span>string&nbsp;|&nbsp;number</span></td><td><span>如果选项列表的值都不符合的情况下默认显示的值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>width</span></td><td><span>number</span></td><td><span>按钮浮层宽度，单位px</span></td><td><span>-</span></td><td><span>90</span></td></tr><tr><td><span>maxHeight</span></td><td><span>number</span></td><td><span>按钮浮层最大高度，单位px，如果设置为空字符串，则表示不限制最大高度</span></td><td><span>-</span></td><td><span>''</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7113944"><span class="editify-hljs-comment">//lineHeight options默认配置如下</span><span>
-﻿[
-    {
-        </span><span class="editify-hljs-attr">label</span><span>: </span><span class="editify-hljs-string">'默认行高'</span><span>,
-        </span><span class="editify-hljs-attr">value</span><span>: </span><span class="editify-hljs-string">''</span><span>
-    },
-    </span><span class="editify-hljs-number">1</span><span>,
-    </span><span class="editify-hljs-number">1.15</span><span>,
-    </span><span class="editify-hljs-number">1.5</span><span>
-    </span><span class="editify-hljs-number">2</span><span>
-    </span><span class="editify-hljs-number">2.5</span><span>         ,
-    </span><span class="editify-hljs-number">3</span><span>
-]</span></pre><p><br></p><p><span>foreColor按钮属性如下：</span></p><table data-editify-element="7434552"><colgroup><col width="10.65%"><col width="9.78%"><col width="63.23%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="7434609" data-editify-hljs="javascript"><span class="editify-hljs-comment">// foreColor options默认配置如下</span><span>
-﻿[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></pre><p><br></p><p><span>backColor按钮属性如下：</span></p><table data-editify-element="10224311"><colgroup><col width="10.54%"><col width="87"><col width="62.15%"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>options</span></td><td><span>array</span></td><td><span>按钮列表配置，数组中每个元素是一个对象，包含label、value两个属性，label表示显示的名称，value表示具体的颜色值</span></td><td><span>-</span></td><td><span>-</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><pre data-editify-element="10224368"><span class="editify-hljs-comment">// backColor options默认配置如下</span><span>
-﻿</span><span class="editify-hljs-selector-attr"><span>[</span><span class="editify-hljs-string">'#000000'</span><span>, </span><span class="editify-hljs-string">'#505050'</span><span>, </span><span class="editify-hljs-string">'#808080'</span><span>, </span><span class="editify-hljs-string">'#BBBBBB'</span><span>, </span><span class="editify-hljs-string">'#CCCCCC'</span><span>, </span><span class="editify-hljs-string">'#EEEEEE'</span><span>, </span><span class="editify-hljs-string">'#F7F7F7'</span><span>, </span><span class="editify-hljs-string">'#FFFFFF'</span><span>, </span><span class="editify-hljs-string">'#EC1A0A'</span><span>, </span><span class="editify-hljs-string">'#FF9900'</span><span>, </span><span class="editify-hljs-string">'#FFFF00'</span><span>, </span><span class="editify-hljs-string">'#07C160'</span><span>, </span><span class="editify-hljs-string">'#00FFFF'</span><span>, </span><span class="editify-hljs-string">'#0B73DE'</span><span>, </span><span class="editify-hljs-string">'#9C00FF'</span><span>, </span><span class="editify-hljs-string">'#FF00FF'</span><span>, </span><span class="editify-hljs-string">'#F7C6CE'</span><span>, </span><span class="editify-hljs-string">'#FFE7CE'</span><span>, </span><span class="editify-hljs-string">'#FFEFC6'</span><span>, </span><span class="editify-hljs-string">'#D6EFD6'</span><span>, </span><span class="editify-hljs-string">'#CEDEE7'</span><span>, </span><span class="editify-hljs-string">'#CEE7F7'</span><span>, </span><span class="editify-hljs-string">'#D6D6E7'</span><span>, </span><span class="editify-hljs-string">'#E7D6DE'</span><span>, </span><span class="editify-hljs-string">'#E79C9C'</span><span>, </span><span class="editify-hljs-string">'#FFC69C'</span><span>, </span><span class="editify-hljs-string">'#FFE79C'</span><span>, </span><span class="editify-hljs-string">'#B5D6A5'</span><span>, </span><span class="editify-hljs-string">'#A5C6CE'</span><span>, </span><span class="editify-hljs-string">'#9CC6EF'</span><span>, </span><span class="editify-hljs-string">'#B5A5D6'</span><span>, </span><span class="editify-hljs-string">'#D6A5BD'</span><span>, </span><span class="editify-hljs-string">'#e45649'</span><span>, </span><span class="editify-hljs-string">'#F7AD6B'</span><span>, </span><span class="editify-hljs-string">'#FFD663'</span><span>, </span><span class="editify-hljs-string">'#94BD7B'</span><span>, </span><span class="editify-hljs-string">'#73A5AD'</span><span>, </span><span class="editify-hljs-string">'#6BADDE'</span><span>, </span><span class="editify-hljs-string">'#8C7BC6'</span><span>, </span><span class="editify-hljs-string">'#C67BA5'</span><span>, </span><span class="editify-hljs-string">'#CE0000'</span><span>, </span><span class="editify-hljs-string">'#E79439'</span><span>, </span><span class="editify-hljs-string">'#EFC631'</span><span>, </span><span class="editify-hljs-string">'#50a14f'</span><span>, </span><span class="editify-hljs-string">'#4A7B8C'</span><span>, </span><span class="editify-hljs-string">'#03A8F3'</span><span>, </span><span class="editify-hljs-string">'#634AA5'</span><span>, </span><span class="editify-hljs-string">'#A54A7B'</span><span>, </span><span class="editify-hljs-string">'#9C0000'</span><span>, </span><span class="editify-hljs-string">'#B56308'</span><span>, </span><span class="editify-hljs-string">'#BD9400'</span><span>, </span><span class="editify-hljs-string">'#397B21'</span><span>, </span><span class="editify-hljs-string">'#104A5A'</span><span>, </span><span class="editify-hljs-string">'#085294'</span><span>, </span><span class="editify-hljs-string">'#311873'</span><span>, </span><span class="editify-hljs-string">'#731842'</span><span>, </span><span class="editify-hljs-string">'#630000'</span><span>, </span><span class="editify-hljs-string">'#7B3900'</span><span>, </span><span class="editify-hljs-string">'#986801'</span><span>, </span><span class="editify-hljs-string">'#295218'</span><span>, </span><span class="editify-hljs-string">'#083139'</span><span>, </span><span class="editify-hljs-string">'#003163'</span><span>, </span><span class="editify-hljs-string">'#21104A'</span><span>, </span><span class="editify-hljs-string">'#4A1031'</span><span>]</span></span></pre><p><br></p><p><span>formatClear按钮属性如下：</span></p><table data-editify-element="10979804"><colgroup><col width="auto"><col width="auto"><col width="auto"><col width="auto"><col width="auto"></colgroup><tbody><tr><td><span>参数</span></td><td><span>类型</span></td><td><span>说明</span></td><td><span>可取值</span></td><td><span>默认值</span></td></tr><tr><td><span>show</span></td><td><span>boolean</span></td><td><span>是否显示按钮</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>leftBorder</span></td><td><span>boolean</span></td><td><span>按钮左侧边框是否显示</span></td><td><span>true/false</span></td><td><span>true</span></td></tr><tr><td><span>rightBorder</span></td><td><span>boolean</span></td><td><span>按钮右侧边框是否显示</span></td><td><span>true/false</span></td><td><span>false</span></td></tr></tbody></table><p><br></p>`,
+			value: `水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+水浒传简介
+全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。
+《水浒传》是中国古典四大名著之一，问世后，在社会上产生了巨大的影响，成了后世中国小说创作的典范。《水浒传》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。
+`,
 			editor: null
 		}
 	},
@@ -3875,12 +1146,8 @@ export default {
 				}
 			}
 		})
-		this.editor.on('change', val => {
-			console.log('复制触发', val)
-		})
-		this.editor.on('cut', val => {
-			console.log('剪切触发', val)
-		})
+		this.editor.on('change', val => {})
+		this.editor.on('cut', val => {})
 		// this.editor.on('deleteComplete', () => {
 		// 	const uneditable = this.editor.range.anchor.element.getUneditableElement()
 		// 	if (uneditable) {
