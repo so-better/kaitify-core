@@ -1551,7 +1551,7 @@ class AlexEditor {
 	 */
 	getElementsByRange(includes = false, flat = false) {
 		if (!this.range) {
-			return
+			return []
 		}
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
@@ -1694,7 +1694,7 @@ class AlexEditor {
 	 */
 	splitElementsByRange(includes = false, flat = false) {
 		if (!this.range) {
-			return
+			return []
 		}
 		const result = this.getElementsByRange(includes, flat)
 		let elements = []
