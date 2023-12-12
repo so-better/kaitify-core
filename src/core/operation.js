@@ -74,8 +74,9 @@ export const emptyDefaultBehaviorInblock = function (element) {
 export const setRangeInVisible = function () {
 	const fn = async root => {
 		const scrollHeight = Dap.element.getScrollHeight(root)
-		//存在滚动条
-		if (root.clientHeight < scrollHeight) {
+		const scrollWidth = Dap.element.getScrollWidth(root)
+		//存在横向或者垂直滚动条
+		if (root.clientHeight < scrollHeight || root.clientWidth < scrollWidth) {
 			const selection = window.getSelection()
 			if (selection.rangeCount == 0) {
 				return
@@ -88,35 +89,67 @@ export const setRangeInVisible = function () {
 			}
 			const childRect = target.getBoundingClientRect()
 			const parentRect = root.getBoundingClientRect()
-			if (childRect.top < parentRect.top) {
-				await Dap.element.setScrollTop({
-					el: root,
-					number: 0
-				})
-				const tempChildRect = target.getBoundingClientRect()
-				const tempParentRect = root.getBoundingClientRect()
-				Dap.element.setScrollTop({
-					el: root,
-					number: tempChildRect.top - tempParentRect.top - tempChildRect.height * 2
-				})
-			} else if (childRect.bottom > parentRect.bottom) {
-				await Dap.element.setScrollTop({
-					el: root,
-					number: 0
-				})
-				const tempChildRect = target.getBoundingClientRect()
-				const tempParentRect = root.getBoundingClientRect()
-				Dap.element.setScrollTop({
-					el: root,
-					number: tempChildRect.bottom - tempParentRect.bottom + tempChildRect.height * 2
-				})
+
+			//存在垂直滚动条
+			if (root.clientHeight < scrollHeight) {
+				if (childRect.top < parentRect.top) {
+					await Dap.element.setScrollTop({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollTop({
+						el: root,
+						number: tempChildRect.top - tempParentRect.top - tempChildRect.height * 2
+					})
+				} else if (childRect.bottom > parentRect.bottom) {
+					await Dap.element.setScrollTop({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollTop({
+						el: root,
+						number: tempChildRect.bottom - tempParentRect.bottom + tempChildRect.height * 2
+					})
+				}
+			}
+			//存在横向滚动条
+			if (root.clientWidth < scrollWidth) {
+				if (childRect.left < parentRect.left) {
+					await Dap.element.setScrollLeft({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollLeft({
+						el: root,
+						number: tempChildRect.left - tempParentRect.left - tempChildRect.width * 2 - (tempChildRect.width * 2 > 20 ? 0 : 20)
+					})
+				} else if (childRect.right > parentRect.right) {
+					await Dap.element.setScrollLeft({
+						el: root,
+						number: 0
+					})
+					const tempChildRect = target.getBoundingClientRect()
+					const tempParentRect = root.getBoundingClientRect()
+					Dap.element.setScrollLeft({
+						el: root,
+						number: tempChildRect.right - tempParentRect.right + tempChildRect.width * 2 + (tempChildRect.width * 2 > 20 ? 0 : 20)
+					})
+				}
 			}
 		}
 	}
-	let root = this.$el
-	while (Dap.element.isElement(root) && root != document.documentElement) {
-		fn(root)
-		root = root.parentNode
+	if (this.range?.focus.element.elm) {
+		let root = this.range.focus.element.elm
+		while (Dap.element.isElement(root) && root != document.documentElement) {
+			fn(root)
+			root = root.parentNode
+		}
 	}
 }
 
@@ -213,6 +246,7 @@ export const handleSelectionChange = function () {
 			} else {
 				this.range = new AlexRange(anchor, focus)
 			}
+			this.history.updateCurrentRange(this.range)
 			this.emit('rangeUpdate', this.range)
 		}
 	}

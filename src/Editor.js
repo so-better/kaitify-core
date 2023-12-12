@@ -1264,6 +1264,7 @@ class AlexEditor {
 		setTimeout(() => {
 			setRangeInVisible.apply(this)
 			this.__innerSelectionChange = false
+			this.history.updateCurrentRange(this.range)
 			this.emit('rangeUpdate', this.range)
 		}, 0)
 	}
