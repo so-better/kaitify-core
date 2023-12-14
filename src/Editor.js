@@ -2124,7 +2124,7 @@ class AlexEditor {
 			//如果是自闭合元素
 			else {
 				const el = AlexElement.getSpaceElement()
-				el.marks = UcloneData(marks)
+				el.marks = cloneData(marks)
 				this.insertElement(el)
 			}
 		}

@@ -94,12 +94,14 @@ class AlexHistory {
 			const focusElement = AlexElement.flatElements(newStack).find(ele => {
 				return ele.key == range.focus.element.key
 			})
-			//创建新的anchor
-			const anchor = new AlexPoint(anchorElement, range.anchor.offset)
-			//创建新的focus
-			const focus = new AlexPoint(focusElement, range.focus.offset)
-			//创建新的range
-			return new AlexRange(anchor, focus)
+			if (anchorElement && focusElement) {
+				//创建新的anchor
+				const anchor = new AlexPoint(anchorElement, range.anchor.offset)
+				//创建新的focus
+				const focus = new AlexPoint(focusElement, range.focus.offset)
+				//创建新的range
+				return new AlexRange(anchor, focus)
+			}
 		}
 		return null
 	}
