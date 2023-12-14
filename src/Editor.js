@@ -38,6 +38,8 @@ class AlexEditor {
 		this.customVideoPaste = options.customVideoPaste
 		//自定义合并元素的方法
 		this.customMerge = options.customMerge
+		//自定义node转为元素的后续处理逻辑
+		this.customParseNode = options.customParseNode
 		//复制粘贴语法是否能够使用
 		this.useClipboard = canUseClipboard()
 		//创建历史记录
@@ -1376,6 +1378,9 @@ class AlexEditor {
 					}
 				}
 			})
+		}
+		if (typeof this.customParseNode == 'function') {
+			element = this.customParseNode.apply(this, [element])
 		}
 		return element
 	}

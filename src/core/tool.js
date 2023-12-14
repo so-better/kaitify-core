@@ -174,7 +174,9 @@ export const initEditorOptions = options => {
 		//自定义视频粘贴方法
 		customVideoPaste: null,
 		//自定义处理不可编辑元素合并的逻辑
-		customMerge: null
+		customMerge: null,
+		//自定义dom转为非文本元素的后续处理逻辑
+		customParseNode: null
 	}
 	if (Dap.common.isObject(options)) {
 		if (typeof options.disabled == 'boolean') {
@@ -212,6 +214,9 @@ export const initEditorOptions = options => {
 		}
 		if (typeof options.customMerge == 'function') {
 			opts.customMerge = options.customMerge
+		}
+		if (typeof options.customParseNode == 'function') {
+			opts.customParseNode = options.customParseNode
 		}
 	}
 	return opts
