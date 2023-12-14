@@ -2036,7 +2036,7 @@ class AlexEditor {
 	/**
 	 * 查询虚拟光标包含的文本元素是否具有某个样式
 	 */
-	queryTextStyle(name, value, useCache) {
+	queryTextStyle(name, value, useCache = false) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
@@ -2204,7 +2204,7 @@ class AlexEditor {
 	/**
 	 * 查询选区内的文本元素是否具有某个标记
 	 */
-	queryTextMark(name, value, useCache) {
+	queryTextMark(name, value, useCache = false) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
