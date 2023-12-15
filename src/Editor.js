@@ -843,13 +843,15 @@ class AlexEditor {
 						const index = elements.findIndex(item => {
 							return this.range.anchor.element.isEqual(item)
 						})
+						//记录起点的偏移值
+						const offset = this.range.anchor.offset
 						//将终点移动到根级块元素的末尾
 						this.range.focus.moveToEnd(block)
 						this.delete()
 						//将终点移动到新的根级块元素
 						const newElements = AlexElement.flatElements(newBlock.children)
 						this.range.focus.element = newElements[index]
-						this.range.focus.offset = this.range.anchor.offset
+						this.range.focus.offset = offset
 						this.range.anchor.moveToStart(newBlock)
 						this.delete()
 						this.emit('insertParagraph', newBlock, block)
