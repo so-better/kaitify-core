@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"dap-util": "^1.4.21",
-		"vue": "^3.2.47"
+		"vue": "^3.3.11"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^4.1.0",
