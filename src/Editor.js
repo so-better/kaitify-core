@@ -2016,7 +2016,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的样式
 	 */
-	removeTextStyle(styleNames, useCache) {
+	removeTextStyle(styleNames, useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -2113,7 +2113,7 @@ class AlexEditor {
 	/**
 	 * 设置文本元素的标记
 	 */
-	setTextMark(marks, useCache) {
+	setTextMark(marks, useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -2174,7 +2174,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的标记
 	 */
-	removeTextMark(markNames, useCache) {
+	removeTextMark(markNames, useCache = false) {
 		if (this.disabled) {
 			return
 		}
