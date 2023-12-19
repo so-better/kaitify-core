@@ -92,7 +92,8 @@ export const setRangeInVisible = function () {
 
 			//存在垂直滚动条
 			if (root.clientHeight < scrollHeight) {
-				if (childRect.top < parentRect.top) {
+				//如果光标所在元素不在视图内则滚动到视图内
+				if (childRect.bottom < parentRect.top) {
 					await Dap.element.setScrollTop({
 						el: root,
 						number: 0
@@ -101,9 +102,9 @@ export const setRangeInVisible = function () {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollTop({
 						el: root,
-						number: tempChildRect.top - tempParentRect.top - tempChildRect.height * 2
+						number: tempChildRect.top - tempParentRect.top
 					})
-				} else if (childRect.bottom > parentRect.bottom) {
+				} else if (childRect.top > parentRect.bottom) {
 					await Dap.element.setScrollTop({
 						el: root,
 						number: 0
@@ -112,13 +113,14 @@ export const setRangeInVisible = function () {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollTop({
 						el: root,
-						number: tempChildRect.bottom - tempParentRect.bottom + tempChildRect.height * 2
+						number: tempChildRect.bottom - tempParentRect.bottom
 					})
 				}
 			}
 			//存在横向滚动条
 			if (root.clientWidth < scrollWidth) {
-				if (childRect.left < parentRect.left) {
+				//如果光标所在元素不在视图内则滚动到视图内
+				if (childRect.right < parentRect.left) {
 					await Dap.element.setScrollLeft({
 						el: root,
 						number: 0
@@ -127,9 +129,9 @@ export const setRangeInVisible = function () {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollLeft({
 						el: root,
-						number: tempChildRect.left - tempParentRect.left - tempChildRect.width * 2 - (tempChildRect.width * 2 > 20 ? 0 : 20)
+						number: tempChildRect.left - tempParentRect.left + 20
 					})
-				} else if (childRect.right > parentRect.right) {
+				} else if (childRect.left > parentRect.right) {
 					await Dap.element.setScrollLeft({
 						el: root,
 						number: 0
@@ -138,7 +140,7 @@ export const setRangeInVisible = function () {
 					const tempParentRect = root.getBoundingClientRect()
 					Dap.element.setScrollLeft({
 						el: root,
-						number: tempChildRect.right - tempParentRect.right + tempChildRect.width * 2 + (tempChildRect.width * 2 > 20 ? 0 : 20)
+						number: tempChildRect.right - tempParentRect.right + 20
 					})
 				}
 			}
