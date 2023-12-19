@@ -264,3 +264,124 @@ export const queryHasValue = (obj, name, value) => {
 	}
 	return ownValue == value
 }
+
+/**
+ * 该方法用于getElementsByRange内部对扁平化的数据进行整理
+ * 剔除子元素不是全部在数组里的元素
+ * 将子元素全部在数组内，但是父元素不在数组内的元素加入进来
+ */
+export const getNewFlatData = arr => {
+	const length = arr.length
+	let newArr = []
+	//剔除子元素不是全部在数组里的元素
+	//因为扁平化数据从左到右父元素在子元素前面，这里需要先检查子元素，所以倒序循环
+	for (let i = length - 1; i >= 0; i--) {
+		//如果存在子元素
+		if (arr[i].element.hasChildren()) {
+			//判断该元素的每个子元素是否都在数组里
+			let allIn = arr[i].element.children.every(child => {
+				return newArr.some(item => {
+					return item.element.isEqual(child) && !item.offset
+				})
+			})
+			//如果子元素全部在数组里
+			if (allIn) {
+				newArr.unshift(arr[i])
+			}
+		} else {
+			newArr.unshift(arr[i])
+		}
+	}
+	//将子元素全部在数组内，但是父元素不在数组内的元素加入进来
+	for (let i = 0; i < newArr.length; i++) {
+		const element = newArr[i].element
+		//如果该元素全部在选区内，并且有父元素
+		if (!element.offset && element.parent) {
+			//父元素是否在数组内
+			const selfIn = newArr.some(item => {
+				return item.element.isEqual(element.parent)
+			})
+			//父元素的所有子元素是否都在数组内
+			const allIn = element.parent.children.every(child => {
+				return newArr.some(item => {
+					return item.element.isEqual(child) && !item.offset
+				})
+			})
+			//如果子元素都在并且自身不在
+			if (allIn && !selfIn) {
+				newArr.splice(i, 0, {
+					element: element.parent,
+					offset: false
+				})
+				i++
+			}
+		}
+	}
+	return newArr
+}
+
+/**
+ * 该方法用于getElementsByRange内部根据整理好的扁平化数组返回正常结构的数据
+ */
+export const getNoFlatData = arr => {
+	let noFlat = []
+	const length = arr.length
+	for (let i = 0; i < length; i++) {
+		if (arr[i].element.isBlock()) {
+			noFlat.push(arr[i])
+		} else {
+			//父元素是否在扁平化数组里
+			const isIn = arr.some(item => item.element.isEqual(arr[i].element.parent))
+			//父元素不在
+			if (!isIn) {
+				noFlat.push(arr[i])
+			}
+		}
+	}
+	return noFlat
+}
+
+/**
+ * 该方法用于splitElementsByRange内部对元素进行分割并可能会更新虚拟光标
+ * 返回分割后的元素数组
+ */
+export const splitElements = arr => {
+	let elements = []
+	arr.forEach((item, index) => {
+		if (item.offset) {
+			let selectEl = null
+			if (item.offset[0] == 0) {
+				const el = item.element.clone()
+				item.element.textContent = item.element.textContent.substring(0, item.offset[1])
+				el.textContent = el.textContent.substring(item.offset[1])
+				this.addElementAfter(el, item.element)
+				selectEl = item.element
+			} else if (item.offset[1] == item.element.textContent.length) {
+				const el = item.element.clone()
+				item.element.textContent = item.element.textContent.substring(0, item.offset[0])
+				el.textContent = el.textContent.substring(item.offset[0])
+				this.addElementAfter(el, item.element)
+				selectEl = el
+			} else {
+				const el = item.element.clone()
+				const el2 = item.element.clone()
+				item.element.textContent = item.element.textContent.substring(0, item.offset[0])
+				el.textContent = el.textContent.substring(item.offset[0], item.offset[1])
+				el2.textContent = el2.textContent.substring(item.offset[1])
+				this.addElementAfter(el, item.element)
+				this.addElementAfter(el2, el)
+				selectEl = el
+			}
+			if (index == 0) {
+				this.range.anchor.moveToStart(selectEl)
+			}
+			if (index == arr.length - 1) {
+				this.range.focus.moveToEnd(selectEl)
+			}
+			elements.push(selectEl)
+		} else {
+			elements.push(item.element)
+		}
+	})
+	return elements
+}

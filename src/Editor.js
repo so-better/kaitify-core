@@ -4,7 +4,7 @@ import AlexRange from './Range'
 import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue, getNewFlatData, getNoFlatData, splitElements } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -67,14 +67,14 @@ class AlexEditor {
 		this.__chineseInputTimer = null
 		//getElementsByRange的数据缓存
 		this.__rangeElementsCache = {
-			//includes和flat都是true
-			all: [],
-			//includes为true
+			//起点和终点范围内的元素，但是不包含起点和终点所在的元素
+			default: [],
+			//起点和终点范围内的元素，但是包含起点和终点所在的元素
 			includes: [],
-			//flat为true
+			//起点和终点范围内的元素扁平化处理结果，不包含起点和终点所在的元素
 			flat: [],
-			//includes和flat都是false
-			none: []
+			//起点和终点范围内的元素扁平化处理结果，包含起点和终点所在的元素
+			flatIncludes: []
 		}
 
 		/**  ------以下是内部的一些初始化逻辑------  */
@@ -275,7 +275,7 @@ class AlexEditor {
 		if (!this.allowCopy) {
 			return
 		}
-		let result = this.getElementsByRange(true, false)
+		let result = this.getElementsByRange().includes
 		if (result.length == 0) {
 			return
 		}
@@ -527,7 +527,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange(true, false).filter(item => {
+			const result = this.getElementsByRange().includes.filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
 			})
@@ -1566,219 +1566,128 @@ class AlexEditor {
 	/**
 	 * 获取选区之间的元素
 	 */
-	getElementsByRange(includes = false, flat = false, useCache = false) {
-		if (!this.range) {
-			return []
-		}
-		//起点和终点在一起
-		if (this.range.anchor.isEqual(this.range.focus)) {
-			return []
-		}
+	getElementsByRange(useCache = false) {
+		//如果使用缓存，则直接返回缓存的数据
 		if (useCache) {
-			if (includes && flat) {
-				return this.__rangeElementsCache.all || []
-			}
-			if (includes) {
-				return this.__rangeElementsCache.includes || []
-			}
-			if (flat) {
-				return this.__rangeElementsCache.flat || []
-			}
-			return this.__rangeElementsCache.none || []
+			return this.__rangeElementsCache
 		}
 
-		//设置元素缓存
-		const setRangeElementsCache = (result = []) => {
-			if (includes && flat) {
-				this.__rangeElementsCache.all = result
-			} else if (includes) {
-				this.__rangeElementsCache.includes = result
-			} else if (flat) {
-				this.__rangeElementsCache.flat = result
-			} else {
-				this.__rangeElementsCache.none = result
-			}
+		/** 以下是不使用缓存的情况 */
+
+		const result = {
+			//起点和终点范围内的元素，但是不包含起点和终点所在的元素
+			default: [],
+			//起点和终点范围内的元素，但是包含起点和终点所在的元素
+			includes: [],
+			//起点和终点范围内的元素扁平化处理结果，不包含起点和终点所在的元素
+			flat: [],
+			//起点和终点范围内的元素扁平化处理结果，包含起点和终点所在的元素
+			flatIncludes: []
+		}
+
+		//虚拟光标不存在
+		if (!this.range) {
+			this.__rangeElementsCache = result
+			return result
+		}
+
+		//起点和终点在一起
+		if (this.range.anchor.isEqual(this.range.focus)) {
+			this.__rangeElementsCache = result
 			return result
 		}
 
 		//起点和终点在一个元素里
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-			//如果返回结果包含起点和终点
-			if (includes) {
-				const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
-				return setRangeElementsCache([
-					{
-						element: this.range.anchor.element,
-						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-					}
-				])
-			}
-			//不包含返回空数组
-			return setRangeElementsCache()
-		}
-		//起点和终点不在一个元素里
-		let result = []
-		//如果包含起点
-		if (includes) {
-			//如果起点在元素开始处，则将起点所在元素推入数组
-			if (this.range.anchor.offset == 0) {
-				result.push({
+			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
+			//设置包含起点和终点的数据
+			result.includes = [
+				{
 					element: this.range.anchor.element,
-					offset: false
-				})
-			}
-			//如果起点不在元素的末尾处
-			else if (this.range.anchor.offset < (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)) {
-				result.push({
+					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
+				}
+			]
+			//扁平化的结果与非扁平化的结果一致
+			result.flatIncludes = [
+				{
 					element: this.range.anchor.element,
-					offset: [this.range.anchor.offset, this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1]
-				})
-			}
+					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
+				}
+			]
+			this.__rangeElementsCache = result
+			return result
 		}
+
+		/** 以下是起点和终点不在一个元素的情况，只会将数据塞入flatIncludes和flat数组里 */
+
+		//如果起点在元素开始处，则将起点所在元素推入数组
+		if (this.range.anchor.offset == 0) {
+			result.flatIncludes.push({
+				element: this.range.anchor.element,
+				offset: false
+			})
+		}
+		//如果起点不在元素的末尾处
+		else if (this.range.anchor.offset < (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)) {
+			result.flatIncludes.push({
+				element: this.range.anchor.element,
+				offset: [this.range.anchor.offset, this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1]
+			})
+		}
+
 		const elements = AlexElement.flatElements(this.stack)
 		const anchorIndex = elements.findIndex(el => el.isEqual(this.range.anchor.element))
 		const focusIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
 		for (let i = anchorIndex + 1; i < focusIndex; i++) {
-			result.push({
+			result.flatIncludes.push({
+				element: elements[i],
+				offset: false
+			})
+			result.flat.push({
 				element: elements[i],
 				offset: false
 			})
 		}
-		//如果包含终点
-		if (includes) {
-			//如果终点在元素结尾处
-			if (this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)) {
-				result.push({
-					element: this.range.focus.element,
-					offset: false
-				})
-			}
-			//如果终点不在元素起点处
-			else if (this.range.focus.offset > 0) {
-				result.push({
-					element: this.range.focus.element,
-					offset: [0, this.range.focus.offset]
-				})
-			}
+		//如果终点在元素结尾处
+		if (this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)) {
+			result.flatIncludes.push({
+				element: this.range.focus.element,
+				offset: false
+			})
 		}
-		//以上代码生成result
-		//通过上述代码获取到在选区内的元素，下面通过一段代码剔除子元素不是全部在数组里的元素
-		const resLength = result.length
-		let newResult = []
-		//因为扁平化数据从左到右父元素在子元素前面，这里需要先检查子元素，所以倒序循环
-		for (let i = resLength - 1; i >= 0; i--) {
-			//如果存在子元素
-			if (result[i].element.hasChildren()) {
-				//判断该元素的每个子元素是否都在数组里
-				let allIn = result[i].element.children.every(child => {
-					return newResult.some(item => {
-						return item.element.isEqual(child) && !item.offset
-					})
-				})
-				//如果子元素全部在数组里
-				if (allIn) {
-					newResult.unshift(result[i])
-				}
-			} else {
-				newResult.unshift(result[i])
-			}
-		}
-		//通过下述代码将子元素全部在数组内，但是父元素不在数组内的元素加入进来
-		for (let i = 0; i < newResult.length; i++) {
-			const element = newResult[i].element
-			//如果该元素全部在选区内，并且有父元素
-			if (!element.offset && element.parent) {
-				//父元素是否在数组内
-				const selfIn = newResult.some(item => {
-					return item.element.isEqual(element.parent)
-				})
-				//父元素的所有子元素是否都在数组内
-				const allIn = element.parent.children.every(child => {
-					return newResult.some(item => {
-						return item.element.isEqual(child) && !item.offset
-					})
-				})
-				//如果子元素都在并且自身不在
-				if (allIn && !selfIn) {
-					newResult.splice(i, 0, {
-						element: element.parent,
-						offset: false
-					})
-					i++
-				}
-			}
-		}
-		//以上代码生成newResult
-		//返回扁平化处理的结果
-		if (flat) {
-			return setRangeElementsCache(newResult)
-		}
-		//返回正常树状结构
-		let notFlatResult = []
-		const length = newResult.length
-		for (let i = 0; i < length; i++) {
-			if (newResult[i].element.isBlock()) {
-				notFlatResult.push(newResult[i])
-			} else {
-				//父元素是否在扁平化数组里
-				const isIn = newResult.some(item => item.element.isEqual(newResult[i].element.parent))
-				//父元素不在
-				if (!isIn) {
-					notFlatResult.push(newResult[i])
-				}
-			}
+		//如果终点不在元素起点处
+		else if (this.range.focus.offset > 0) {
+			result.flatIncludes.push({
+				element: this.range.focus.element,
+				offset: [0, this.range.focus.offset]
+			})
 		}
 
-		//以上代码生成notFlagResult
-		return setRangeElementsCache(notFlatResult)
+		//整理数据
+		result.flat = getNewFlatData.apply(this, [result.flat])
+		result.flatIncludes = getNewFlatData.apply(this, [result.flatIncludes])
+		result.default = getNoFlatData.apply(this, [result.flat])
+		result.includes = getNoFlatData.apply(this, [result.flatIncludes])
+		//缓存数据
+		this.__rangeElementsCache = result
+		//返回数据
+		return result
 	}
 
 	/**
 	 * 分割选区选中的元素，会更新光标位置
 	 */
-	splitElementsByRange(includes = false, flat = false, useCache = false) {
+	splitElementsByRange(useCache = false) {
 		if (!this.range) {
 			return []
 		}
-		const result = this.getElementsByRange(includes, flat, useCache)
-		let elements = []
-		result.forEach((item, index) => {
-			if (item.offset) {
-				let selectEl = null
-				if (item.offset[0] == 0) {
-					const el = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[1])
-					el.textContent = el.textContent.substring(item.offset[1])
-					this.addElementAfter(el, item.element)
-					selectEl = item.element
-				} else if (item.offset[1] == item.element.textContent.length) {
-					const el = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-					el.textContent = el.textContent.substring(item.offset[0])
-					this.addElementAfter(el, item.element)
-					selectEl = el
-				} else {
-					const el = item.element.clone()
-					const el2 = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-					el.textContent = el.textContent.substring(item.offset[0], item.offset[1])
-					el2.textContent = el2.textContent.substring(item.offset[1])
-					this.addElementAfter(el, item.element)
-					this.addElementAfter(el2, el)
-					selectEl = el
-				}
-				if (index == 0) {
-					this.range.anchor.moveToStart(selectEl)
-				}
-				if (index == result.length - 1) {
-					this.range.focus.moveToEnd(selectEl)
-				}
-				elements.push(selectEl)
-			} else {
-				elements.push(item.element)
-			}
-		})
-		return elements
+		const result = this.getElementsByRange(useCache)
+		return {
+			default: splitElements(result.default),
+			includes: splitElements(result.includes),
+			flat: splitElements(result.flat),
+			flatIncludes: splitElements(result.flatIncludes)
+		}
 	}
 
 	/**
@@ -2000,7 +1909,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(useCache).flatIncludes
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasStyles()) {
@@ -2062,7 +1971,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(useCache).flatIncludes
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2091,7 +2000,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true, true, useCache).filter(item => {
+		let result = this.getElementsByRange(useCache).flatIncludes.filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false
@@ -2158,7 +2067,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(useCache).flatIncludes
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasMarks()) {
@@ -2220,7 +2129,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(useCache).flatIncludes
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2249,7 +2158,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true, true, useCache).filter(item => {
+		let result = this.getElementsByRange(useCache).flatIncludes.filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false
