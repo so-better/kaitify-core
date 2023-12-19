@@ -65,8 +65,17 @@ class AlexEditor {
 		this.__innerSelectionChange = false
 		//取消中文输入标识的延时器
 		this.__chineseInputTimer = null
-		//数据缓存，用于提升性能
-		this.__dataCaches = {}
+		//getElementsByRange的数据缓存
+		this.__rangeElementsCache = {
+			//includes和flat都是true
+			all: [],
+			//includes为true
+			includes: [],
+			//flat为true
+			flat: [],
+			//includes和flat都是false
+			none: []
+		}
 
 		/**  ------以下是内部的一些初始化逻辑------  */
 
@@ -1557,7 +1566,7 @@ class AlexEditor {
 	/**
 	 * 获取选区之间的元素
 	 */
-	getElementsByRange(includes = false, flat = false) {
+	getElementsByRange(includes = false, flat = false, useCache = false) {
 		if (!this.range) {
 			return []
 		}
@@ -1565,20 +1574,47 @@ class AlexEditor {
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			return []
 		}
+		if (useCache) {
+			if (includes && flat) {
+				return this.__rangeElementsCache.all || []
+			}
+			if (includes) {
+				return this.__rangeElementsCache.includes || []
+			}
+			if (flat) {
+				return this.__rangeElementsCache.flat || []
+			}
+			return this.__rangeElementsCache.none || []
+		}
+
+		//设置元素缓存
+		const setRangeElementsCache = (result = []) => {
+			if (includes && flat) {
+				this.__rangeElementsCache.all = result
+			} else if (includes) {
+				this.__rangeElementsCache.includes = result
+			} else if (flat) {
+				this.__rangeElementsCache.flat = result
+			} else {
+				this.__rangeElementsCache.none = result
+			}
+			return result
+		}
+
 		//起点和终点在一个元素里
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
 			//如果返回结果包含起点和终点
 			if (includes) {
 				const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
-				return [
+				return setRangeElementsCache([
 					{
 						element: this.range.anchor.element,
 						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
 					}
-				]
+				])
 			}
 			//不包含返回空数组
-			return []
+			return setRangeElementsCache()
 		}
 		//起点和终点不在一个元素里
 		let result = []
@@ -1675,7 +1711,7 @@ class AlexEditor {
 		//以上代码生成newResult
 		//返回扁平化处理的结果
 		if (flat) {
-			return newResult
+			return setRangeElementsCache(newResult)
 		}
 		//返回正常树状结构
 		let notFlatResult = []
@@ -1694,17 +1730,17 @@ class AlexEditor {
 		}
 
 		//以上代码生成notFlagResult
-		return notFlatResult
+		return setRangeElementsCache(notFlatResult)
 	}
 
 	/**
 	 * 分割选区选中的元素，会更新光标位置
 	 */
-	splitElementsByRange(includes = false, flat = false) {
+	splitElementsByRange(includes = false, flat = false, useCache = false) {
 		if (!this.range) {
 			return []
 		}
-		const result = this.getElementsByRange(includes, flat)
+		const result = this.getElementsByRange(includes, flat, useCache)
 		let elements = []
 		result.forEach((item, index) => {
 			if (item.offset) {
@@ -1919,7 +1955,7 @@ class AlexEditor {
 	/**
 	 * 设置文本元素的样式
 	 */
-	setTextStyle(styles) {
+	setTextStyle(styles, useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -1964,7 +2000,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasStyles()) {
@@ -1980,7 +2016,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的样式
 	 */
-	removeTextStyle(styleNames) {
+	removeTextStyle(styleNames, useCache) {
 		if (this.disabled) {
 			return
 		}
@@ -2026,7 +2062,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2055,19 +2091,9 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = null
-		//如果使用缓存数据
-		if (useCache) {
-			result = this.__dataCaches['queryTextStyle'] || []
-		} else {
-			result = this.getElementsByRange(true, true).filter(item => {
-				return item.element.isText()
-			})
-		}
-		//在不使用缓存的情况下将数据缓存
-		if (!useCache) {
-			this.__dataCaches['queryTextStyle'] = result
-		}
+		let result = this.getElementsByRange(true, true, useCache).filter(item => {
+			return item.element.isText()
+		})
 		//如果不包含文本元素直接返回false
 		if (result.length == 0) {
 			return false
@@ -2087,7 +2113,7 @@ class AlexEditor {
 	/**
 	 * 设置文本元素的标记
 	 */
-	setTextMark(marks) {
+	setTextMark(marks, useCache) {
 		if (this.disabled) {
 			return
 		}
@@ -2132,7 +2158,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasMarks()) {
@@ -2148,7 +2174,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的标记
 	 */
-	removeTextMark(markNames) {
+	removeTextMark(markNames, useCache) {
 		if (this.disabled) {
 			return
 		}
@@ -2194,7 +2220,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2223,18 +2249,9 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = null
-		if (useCache) {
-			result = this.__dataCaches['queryTextMark'] || []
-		} else {
-			result = this.getElementsByRange(true, true).filter(item => {
-				return item.element.isText()
-			})
-		}
-		//在不使用缓存的情况下将数据缓存
-		if (!useCache) {
-			this.__dataCaches['queryTextMark'] = result
-		}
+		let result = this.getElementsByRange(true, true, useCache).filter(item => {
+			return item.element.isText()
+		})
 		//如果不包含文本元素直接返回false
 		if (result.length == 0) {
 			return false
