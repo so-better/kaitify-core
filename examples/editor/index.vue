@@ -49,7 +49,17 @@ export default {
 	},
 	methods: {
 		queryTextStyle() {
-			console.log(this.editor.getElementsByRange())
+			const t = Date.now()
+			this.editor.getElementsByRange()
+			this.editor.delete(true)
+			this.editor.formatElementStack()
+			this.editor.range.anchor.moveToStart(this.editor.stack[0])
+			this.editor.range.focus.moveToEnd(this.editor.stack[this.editor.stack.length - 1])
+			this.editor.setTextStyle({ color: '#f30' })
+			this.editor.formatElementStack()
+			this.editor.domRender()
+			this.editor.rangeRender()
+			console.log('用时', Date.now() - t + 'ms')
 		},
 		setTextStyle() {
 			this.editor.setTextStyle({
