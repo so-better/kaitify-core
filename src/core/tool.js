@@ -2,7 +2,7 @@ import Dap from 'dap-util'
 /**
  * 获取node元素的属性集合
  */
-export const getAttributes = node => {
+export const getAttributes = function (node) {
 	let o = {}
 	const length = node.attributes.length
 	for (let i = 0; i < length; i++) {
@@ -19,7 +19,7 @@ export const getAttributes = node => {
 /**
  * 获取node元素的样式集合
  */
-export const getStyles = node => {
+export const getStyles = function (node) {
 	let o = {}
 	if (node.getAttribute('style')) {
 		const styles = node.getAttribute('style')
@@ -50,7 +50,7 @@ export const getStyles = node => {
 /**
  * 生成唯一的key
  */
-export const createUniqueKey = () => {
+export const createUniqueKey = function () {
 	//获取唯一id
 	let key = Dap.data.get(window, 'data-alex-editor-key') || 0
 	key++
@@ -61,7 +61,7 @@ export const createUniqueKey = () => {
 /**
  * 生成唯一的guid
  */
-export const createGuid = () => {
+export const createGuid = function () {
 	//获取唯一id
 	let key = Dap.data.get(window, 'data-alex-editor-guid') || 0
 	key++
@@ -72,14 +72,14 @@ export const createGuid = () => {
 /**
  * 判断字符串是否零宽度无断空白字符
  */
-export const isSpaceText = val => {
+export const isSpaceText = function (val) {
 	return /^[\uFEFF]+$/g.test(val)
 }
 
 /**
  * 深拷贝函数
  */
-export const cloneData = data => {
+export const cloneData = function (data) {
 	if (Dap.common.isObject(data) || Array.isArray(data)) {
 		return JSON.parse(JSON.stringify(data))
 	}
@@ -89,7 +89,7 @@ export const cloneData = data => {
 /**
  * 判断某个node是否包含另一个node
  */
-export const isContains = (parentNode, childNode) => {
+export const isContains = function (parentNode, childNode) {
 	if (childNode.nodeType == 3) {
 		return Dap.element.isContains(parentNode, childNode.parentNode)
 	}
@@ -99,7 +99,7 @@ export const isContains = (parentNode, childNode) => {
 /**
  * blob对象转base64字符串
  */
-export const blobToBase64 = blob => {
+export const blobToBase64 = function (blob) {
 	return new Promise(resolve => {
 		const fileReader = new FileReader()
 		fileReader.onload = e => {
@@ -112,7 +112,7 @@ export const blobToBase64 = blob => {
 /**
  * 判断是否可以使用Clipboard
  */
-export const canUseClipboard = () => {
+export const canUseClipboard = function () {
 	if (!window.ClipboardItem) {
 		console.warn("window.ClipboardItem must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
 		return false
@@ -127,7 +127,7 @@ export const canUseClipboard = () => {
 /**
  * 初始化编辑器dom
  */
-export const initEditorNode = node => {
+export const initEditorNode = function (node) {
 	//判断是否字符串，如果是字符串按照选择器来寻找元素
 	if (typeof node == 'string' && node) {
 		node = document.body.querySelector(node)
@@ -149,7 +149,7 @@ export const initEditorNode = node => {
 /**
  * 格式化编辑器的options参数
  */
-export const initEditorOptions = options => {
+export const initEditorOptions = function (options) {
 	let opts = {
 		//是否禁用
 		disabled: false,
@@ -225,7 +225,7 @@ export const initEditorOptions = options => {
 /**
  * 判断对象是否含有某个属性或者属性值是否一致
  */
-export const queryHasValue = (obj, name, value) => {
+export const queryHasValue = function (obj, name, value) {
 	//如果value不存在则判断是否拥有属性name
 	if (value == null || value == undefined) {
 		return obj.hasOwnProperty(name)
@@ -270,7 +270,7 @@ export const queryHasValue = (obj, name, value) => {
  * 剔除子元素不是全部在数组里的元素
  * 将子元素全部在数组内，但是父元素不在数组内的元素加入进来
  */
-export const getNewFlatData = arr => {
+export const getNewFlatData = function (arr) {
 	const length = arr.length
 	let newArr = []
 	//剔除子元素不是全部在数组里的元素
@@ -323,7 +323,7 @@ export const getNewFlatData = arr => {
 /**
  * 该方法用于getElementsByRange内部根据整理好的扁平化数组返回正常结构的数据
  */
-export const getNoFlatData = arr => {
+export const getNoFlatData = function (arr) {
 	let noFlat = []
 	const length = arr.length
 	for (let i = 0; i < length; i++) {
@@ -339,49 +339,4 @@ export const getNoFlatData = arr => {
 		}
 	}
 	return noFlat
-}
-
-/**
- * 该方法用于splitElementsByRange内部对元素进行分割并可能会更新虚拟光标
- * 返回分割后的元素数组
- */
-export const splitElements = arr => {
-	let elements = []
-	arr.forEach((item, index) => {
-		if (item.offset) {
-			let selectEl = null
-			if (item.offset[0] == 0) {
-				const el = item.element.clone()
-				item.element.textContent = item.element.textContent.substring(0, item.offset[1])
-				el.textContent = el.textContent.substring(item.offset[1])
-				this.addElementAfter(el, item.element)
-				selectEl = item.element
-			} else if (item.offset[1] == item.element.textContent.length) {
-				const el = item.element.clone()
-				item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-				el.textContent = el.textContent.substring(item.offset[0])
-				this.addElementAfter(el, item.element)
-				selectEl = el
-			} else {
-				const el = item.element.clone()
-				const el2 = item.element.clone()
-				item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-				el.textContent = el.textContent.substring(item.offset[0], item.offset[1])
-				el2.textContent = el2.textContent.substring(item.offset[1])
-				this.addElementAfter(el, item.element)
-				this.addElementAfter(el2, el)
-				selectEl = el
-			}
-			if (index == 0) {
-				this.range.anchor.moveToStart(selectEl)
-			}
-			if (index == arr.length - 1) {
-				this.range.focus.moveToEnd(selectEl)
-			}
-			elements.push(selectEl)
-		} else {
-			elements.push(item.element)
-		}
-	})
-	return elements
 }

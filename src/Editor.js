@@ -4,7 +4,7 @@ import AlexRange from './Range'
 import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue, getNewFlatData, getNoFlatData, splitElements } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue, getNewFlatData, getNoFlatData } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -66,7 +66,7 @@ class AlexEditor {
 		//取消中文输入标识的延时器
 		this.__chineseInputTimer = null
 		//getElementsByRange的数据缓存
-		this.__rangeElementsCache = {
+		this.__getElementsByRangeData = {
 			//起点和终点范围内的元素，但是不包含起点和终点所在的元素
 			default: [],
 			//起点和终点范围内的元素，但是包含起点和终点所在的元素
@@ -254,7 +254,7 @@ class AlexEditor {
 		const result = await this.copy(true)
 		if (result) {
 			if (!this.disabled) {
-				this.delete()
+				this.delete(true)
 			}
 			this.emit('cut', result.text, result.html)
 		}
@@ -305,7 +305,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行删除操作
 	 */
-	delete() {
+	delete(useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -527,7 +527,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange().includes.filter(item => {
+			const result = this.getElementsByRange(useCache).includes.filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
 			})
@@ -1569,7 +1569,7 @@ class AlexEditor {
 	getElementsByRange(useCache = false) {
 		//如果使用缓存，则直接返回缓存的数据
 		if (useCache) {
-			return this.__rangeElementsCache
+			return this.__getElementsByRangeData
 		}
 
 		/** 以下是不使用缓存的情况 */
@@ -1587,13 +1587,13 @@ class AlexEditor {
 
 		//虚拟光标不存在
 		if (!this.range) {
-			this.__rangeElementsCache = result
+			this.__getElementsByRangeData = result
 			return result
 		}
 
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			this.__rangeElementsCache = result
+			this.__getElementsByRangeData = result
 			return result
 		}
 
@@ -1614,7 +1614,7 @@ class AlexEditor {
 					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
 				}
 			]
-			this.__rangeElementsCache = result
+			this.__getElementsByRangeData = result
 			return result
 		}
 
@@ -1669,7 +1669,7 @@ class AlexEditor {
 		result.default = getNoFlatData.apply(this, [result.flat])
 		result.includes = getNoFlatData.apply(this, [result.flatIncludes])
 		//缓存数据
-		this.__rangeElementsCache = result
+		this.__getElementsByRangeData = result
 		//返回数据
 		return result
 	}
@@ -1677,17 +1677,50 @@ class AlexEditor {
 	/**
 	 * 分割选区选中的元素，会更新光标位置
 	 */
-	splitElementsByRange(useCache = false) {
+	splitElementsByRange(includes = false, flat = false, useCache = false) {
 		if (!this.range) {
 			return []
 		}
-		const result = this.getElementsByRange(useCache)
-		return {
-			default: splitElements(result.default),
-			includes: splitElements(result.includes),
-			flat: splitElements(result.flat),
-			flatIncludes: splitElements(result.flatIncludes)
-		}
+		const key = includes && flat ? 'flatIncludes' : includes ? 'includes' : flat ? 'flat' : 'default'
+		const result = this.getElementsByRange(useCache)[key]
+		let elements = []
+		result.forEach((item, index) => {
+			if (item.offset) {
+				let selectEl = null
+				if (item.offset[0] == 0) {
+					const el = item.element.clone()
+					item.element.textContent = item.element.textContent.substring(0, item.offset[1])
+					el.textContent = el.textContent.substring(item.offset[1])
+					this.addElementAfter(el, item.element)
+					selectEl = item.element
+				} else if (item.offset[1] == item.element.textContent.length) {
+					const el = item.element.clone()
+					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
+					el.textContent = el.textContent.substring(item.offset[0])
+					this.addElementAfter(el, item.element)
+					selectEl = el
+				} else {
+					const el = item.element.clone()
+					const el2 = item.element.clone()
+					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
+					el.textContent = el.textContent.substring(item.offset[0], item.offset[1])
+					el2.textContent = el2.textContent.substring(item.offset[1])
+					this.addElementAfter(el, item.element)
+					this.addElementAfter(el2, el)
+					selectEl = el
+				}
+				if (index == 0) {
+					this.range.anchor.moveToStart(selectEl)
+				}
+				if (index == result.length - 1) {
+					this.range.focus.moveToEnd(selectEl)
+				}
+				elements.push(selectEl)
+			} else {
+				elements.push(item.element)
+			}
+		})
+		return elements
 	}
 
 	/**
@@ -1909,7 +1942,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(useCache).flatIncludes
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasStyles()) {
@@ -1971,7 +2004,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(useCache).flatIncludes
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2067,7 +2100,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(useCache).flatIncludes
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasMarks()) {
@@ -2129,7 +2162,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(useCache).flatIncludes
+			const elements = this.splitElementsByRange(true, true, useCache)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
