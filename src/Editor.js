@@ -687,7 +687,7 @@ class AlexEditor {
 	/**
 	 * 根据光标位置向编辑器内插入文本
 	 */
-	insertText(data) {
+	insertText(data, useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -728,7 +728,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一个位置，即存在选区
 		else {
-			this.delete()
+			this.delete(useCache)
 			this.insertText(data)
 		}
 	}
@@ -736,7 +736,7 @@ class AlexEditor {
 	/**
 	 * 在光标处换行
 	 */
-	insertParagraph() {
+	insertParagraph(useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -868,7 +868,7 @@ class AlexEditor {
 				}
 			}
 		} else {
-			this.delete()
+			this.delete(useCache)
 			this.insertParagraph()
 		}
 	}
@@ -877,7 +877,7 @@ class AlexEditor {
 	 * 根据光标插入元素
 	 * cover表示所在根级块或者内部块元素只有换行符时是否覆盖此元素
 	 */
-	insertElement(ele, cover = true) {
+	insertElement(ele, cover = true, useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -1095,7 +1095,7 @@ class AlexEditor {
 			this.range.anchor.moveToEnd(ele)
 			this.range.focus.moveToEnd(ele)
 		} else {
-			this.delete()
+			this.delete(useCache)
 			this.insertElement(ele, cover)
 		}
 	}
