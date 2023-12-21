@@ -273,8 +273,7 @@ export const queryHasValue = function (obj, name, value) {
 export const getNewFlatData = function (arr) {
 	const length = arr.length
 	let newArr = []
-	//剔除子元素不是全部在数组里的元素
-	//因为扁平化数据从左到右父元素在子元素前面，这里需要先检查子元素，所以倒序循环
+	//剔除子元素不是全部在数组里的元素，因为扁平化数据从左到右父元素在子元素前面，这里需要先检查子元素，所以倒序循环
 	for (let i = length - 1; i >= 0; i--) {
 		//如果存在子元素
 		if (arr[i].element.hasChildren()) {
@@ -292,9 +291,15 @@ export const getNewFlatData = function (arr) {
 			newArr.unshift(arr[i])
 		}
 	}
+	let newLength = newArr.length
+	let handledElementKeys = []
 	//将子元素全部在数组内，但是父元素不在数组内的元素加入进来
-	for (let i = 0; i < newArr.length; i++) {
+	for (let i = 0; i < newLength; i++) {
 		const element = newArr[i].element
+		//如果该元素是已经处理过的元素，则跳过
+		if (handledElementKeys.includes(element.key)) {
+			continue
+		}
 		//如果该元素全部在选区内，并且有父元素
 		if (!element.offset && element.parent) {
 			//父元素是否在数组内
@@ -313,7 +318,9 @@ export const getNewFlatData = function (arr) {
 					element: element.parent,
 					offset: false
 				})
-				i++
+				newLength += 1
+				handledElementKeys.push(element.key)
+				i--
 			}
 		}
 	}

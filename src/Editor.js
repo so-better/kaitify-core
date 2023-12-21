@@ -241,7 +241,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行剪切操作
 	 */
-	async cut() {
+	async cut(useCache = false) {
 		if (!this.useClipboard) {
 			return
 		}
@@ -251,7 +251,7 @@ class AlexEditor {
 		if (!this.allowCut) {
 			return
 		}
-		const result = await this.copy(true)
+		const result = await this.copy(useCache, true)
 		if (result) {
 			if (!this.disabled) {
 				this.delete(true)
@@ -265,7 +265,7 @@ class AlexEditor {
 	 * 根据光标执行复制操作
 	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
 	 */
-	async copy(isCut = false) {
+	async copy(useCache = false, isCut = false) {
 		if (!this.useClipboard) {
 			return
 		}
@@ -275,7 +275,7 @@ class AlexEditor {
 		if (!this.allowCopy) {
 			return
 		}
-		let result = this.getElementsByRange().includes
+		let result = this.getElementsByRange(useCache).includes
 		if (result.length == 0) {
 			return
 		}
