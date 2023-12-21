@@ -119,7 +119,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行粘贴操作
 	 */
-	async paste() {
+	async paste(useCache = false) {
 		if (this.disabled) {
 			return
 		}
@@ -153,9 +153,9 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data])
+							await this.customTextPaste.apply(this, [data, useCache])
 						} else {
-							this.insertText(data)
+							this.insertText(data, useCache)
 							this.emit('pasteText', data)
 						}
 					}
@@ -168,11 +168,11 @@ class AlexEditor {
 							return !el.isEmpty()
 						})
 						if (typeof this.customHtmlPaste == 'function') {
-							await this.customHtmlPaste.apply(this, [elements, data])
+							await this.customHtmlPaste.apply(this, [elements, data, useCache])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
 								this.formatElement(elements[i])
-								this.insertElement(elements[i], false)
+								this.insertElement(elements[i], false, i == 0 ? useCache : false)
 							}
 							this.emit('pasteHtml', elements, data)
 						}
@@ -188,7 +188,7 @@ class AlexEditor {
 				if (blob.type.startsWith('image/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customImagePaste == 'function') {
-						await this.customImagePaste.apply(this, [url])
+						await this.customImagePaste.apply(this, [url, useCache])
 					} else {
 						const image = new AlexElement(
 							'closed',
@@ -199,7 +199,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(image)
+						this.insertElement(image, true, useCache)
 						this.emit('pasteImage', url)
 					}
 				}
@@ -207,7 +207,7 @@ class AlexEditor {
 				else if (blob.type.startsWith('video/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customVideoPaste == 'function') {
-						await this.customVideoPaste.apply(this, [url])
+						await this.customVideoPaste.apply(this, [url, useCache])
 					} else {
 						const video = new AlexElement(
 							'closed',
@@ -218,7 +218,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(video)
+						this.insertElement(video, true, useCache)
 						this.emit('pasteVideo', url)
 					}
 				}
@@ -227,9 +227,9 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data])
+							await this.customTextPaste.apply(this, [data, useCache])
 						} else {
-							this.insertText(data)
+							this.insertText(data, useCache)
 							this.emit('pasteText', data)
 						}
 					}
@@ -1664,10 +1664,19 @@ class AlexEditor {
 		}
 
 		//整理数据
+		const t = Date.now()
 		result.flat = getNewFlatData.apply(this, [result.flat])
+		const t1 = Date.now()
+		console.log('getNewFlatData,flat', t1 - t + 'ms')
 		result.flatIncludes = getNewFlatData.apply(this, [result.flatIncludes])
+		const t2 = Date.now()
+		console.log('getNewFlatData,flatIncludes', t2 - t1 + 'ms')
 		result.default = getNoFlatData.apply(this, [result.flat])
+		const t3 = Date.now()
+		console.log('getNoFlatData,flat', t3 - t2 + 'ms')
 		result.includes = getNoFlatData.apply(this, [result.flatIncludes])
+		const t4 = Date.now()
+		console.log('getNoFlatData,flatIncludes', t4 - t3 + 'ms')
 		//缓存数据
 		this.__getElementsByRangeData = result
 		//返回数据
