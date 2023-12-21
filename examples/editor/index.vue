@@ -5598,12 +5598,12 @@ export default {
 		// })
 		this.editor.formatElementStack()
 		this.editor.domRender()
-		console.log(AlexElement.flatElements(this.editor.stack))
 	},
 	methods: {
 		queryTextStyle() {
 			const t = Date.now()
-			AlexElement.flatElements(this.editor.stack)
+			const result = this.editor.getElementsByRange()
+			console.log('获取数据', result)
 			console.log('用时', Date.now() - t + 'ms')
 		},
 		async setTextStyle() {
