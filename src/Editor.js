@@ -1664,15 +1664,10 @@ class AlexEditor {
 		}
 
 		//整理数据
-		const t = Date.now()
 		result.flat = getNewFlatData.apply(this, [result.flat])
-		const t1 = Date.now()
 		result.flatIncludes = getNewFlatData.apply(this, [result.flatIncludes])
-		const t2 = Date.now()
 		result.default = getNoFlatData.apply(this, [result.flat])
-		const t3 = Date.now()
 		result.includes = getNoFlatData.apply(this, [result.flatIncludes])
-		const t4 = Date.now()
 		//缓存数据
 		this.__getElementsByRangeData = result
 		//返回数据
