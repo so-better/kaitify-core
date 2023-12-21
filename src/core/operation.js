@@ -364,7 +364,6 @@ export const handleKeydown = function (e) {
  */
 export const handleCopy = async function (e) {
 	e.preventDefault()
-	await this.copy()
 }
 
 /**
@@ -372,12 +371,6 @@ export const handleCopy = async function (e) {
  */
 export const handleCut = async function (e) {
 	e.preventDefault()
-	const result = await this.cut()
-	if (result && !this.disabled) {
-		this.formatElementStack()
-		this.domRender()
-		this.rangeRender()
-	}
 }
 
 /**
@@ -385,13 +378,6 @@ export const handleCut = async function (e) {
  */
 export const handlePaste = async function (e) {
 	e.preventDefault()
-	if (this.disabled) {
-		return
-	}
-	await this.paste()
-	this.formatElementStack()
-	this.domRender()
-	this.rangeRender()
 }
 
 /**

@@ -61,13 +61,19 @@ export default {
 			this.editor.rangeRender()
 			console.log('用时', Date.now() - t + 'ms')
 		},
-		setTextStyle() {
-			this.editor.setTextStyle({
-				color: '#87f390'
-			})
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
+		async setTextStyle() {
+			const result = await this.editor.cut()
+			if (result && !this.editor.disabled) {
+				this.editor.formatElementStack()
+				this.editor.domRender()
+				this.editor.rangeRender()
+			}
+			// this.editor.setTextStyle({
+			// 	color: '#87f390'
+			// })
+			// this.editor.formatElementStack()
+			// this.editor.domRender()
+			// this.editor.rangeRender()
 		},
 		removeTextStyle() {
 			this.editor.removeTextStyle()
