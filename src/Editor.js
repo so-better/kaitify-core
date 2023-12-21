@@ -1240,40 +1240,40 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
-		if (!this.range) {
+		if (this.range) {
+			//将虚拟光标位置转为真实光标位置
+			const handler = point => {
+				let node = null
+				let offset = null
+				//如果是文本元素
+				if (point.element.isText()) {
+					node = point.element.elm.childNodes[0]
+					offset = point.offset
+				}
+				//自闭合元素
+				else {
+					node = point.element.parent.elm
+					const index = point.element.parent.children.findIndex(item => {
+						return point.element.isEqual(item)
+					})
+					offset = point.offset + index
+				}
+				return { node, offset }
+			}
+			this.__innerSelectionChange = true
+			const anchorResult = handler(this.range.anchor)
+			const focusResult = handler(this.range.focus)
+			//设置光标
 			const selection = window.getSelection()
 			selection.removeAllRanges()
-			return
+			const range = document.createRange()
+			range.setStart(anchorResult.node, anchorResult.offset)
+			range.setEnd(focusResult.node, focusResult.offset)
+			selection.addRange(range)
+		} else {
+			const selection = window.getSelection()
+			selection.removeAllRanges()
 		}
-		//将虚拟光标位置转为真实光标位置
-		const handler = point => {
-			let node = null
-			let offset = null
-			//如果是文本元素
-			if (point.element.isText()) {
-				node = point.element.elm.childNodes[0]
-				offset = point.offset
-			}
-			//自闭合元素
-			else {
-				node = point.element.parent.elm
-				const index = point.element.parent.children.findIndex(item => {
-					return point.element.isEqual(item)
-				})
-				offset = point.offset + index
-			}
-			return { node, offset }
-		}
-		this.__innerSelectionChange = true
-		const anchorResult = handler(this.range.anchor)
-		const focusResult = handler(this.range.focus)
-		//设置光标
-		const selection = window.getSelection()
-		selection.removeAllRanges()
-		const range = document.createRange()
-		range.setStart(anchorResult.node, anchorResult.offset)
-		range.setEnd(focusResult.node, focusResult.offset)
-		selection.addRange(range)
 		setTimeout(() => {
 			setRangeInVisible.apply(this)
 			this.__innerSelectionChange = false
