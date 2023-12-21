@@ -65,17 +65,6 @@ class AlexEditor {
 		this.__innerSelectionChange = false
 		//取消中文输入标识的延时器
 		this.__chineseInputTimer = null
-		//getElementsByRange的数据缓存
-		this.__getElementsByRangeData = {
-			//起点和终点范围内的元素，但是不包含起点和终点所在的元素
-			default: [],
-			//起点和终点范围内的元素，但是包含起点和终点所在的元素
-			includes: [],
-			//起点和终点范围内的元素扁平化处理结果，不包含起点和终点所在的元素
-			flat: [],
-			//起点和终点范围内的元素扁平化处理结果，包含起点和终点所在的元素
-			flatIncludes: []
-		}
 
 		/**  ------以下是内部的一些初始化逻辑------  */
 
@@ -119,7 +108,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行粘贴操作
 	 */
-	async paste(useCache = false) {
+	async paste() {
 		if (this.disabled) {
 			return
 		}
@@ -153,9 +142,9 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data, useCache])
+							await this.customTextPaste.apply(this, [data])
 						} else {
-							this.insertText(data, useCache)
+							this.insertText(data)
 							this.emit('pasteText', data)
 						}
 					}
@@ -168,11 +157,11 @@ class AlexEditor {
 							return !el.isEmpty()
 						})
 						if (typeof this.customHtmlPaste == 'function') {
-							await this.customHtmlPaste.apply(this, [elements, data, useCache])
+							await this.customHtmlPaste.apply(this, [elements, data])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
 								this.formatElement(elements[i])
-								this.insertElement(elements[i], false, i == 0 ? useCache : false)
+								this.insertElement(elements[i], false)
 							}
 							this.emit('pasteHtml', elements, data)
 						}
@@ -188,7 +177,7 @@ class AlexEditor {
 				if (blob.type.startsWith('image/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customImagePaste == 'function') {
-						await this.customImagePaste.apply(this, [url, useCache])
+						await this.customImagePaste.apply(this, [url])
 					} else {
 						const image = new AlexElement(
 							'closed',
@@ -199,7 +188,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(image, true, useCache)
+						this.insertElement(image, true)
 						this.emit('pasteImage', url)
 					}
 				}
@@ -207,7 +196,7 @@ class AlexEditor {
 				else if (blob.type.startsWith('video/')) {
 					const url = await blobToBase64(blob)
 					if (typeof this.customVideoPaste == 'function') {
-						await this.customVideoPaste.apply(this, [url, useCache])
+						await this.customVideoPaste.apply(this, [url])
 					} else {
 						const video = new AlexElement(
 							'closed',
@@ -218,7 +207,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(video, true, useCache)
+						this.insertElement(video, true)
 						this.emit('pasteVideo', url)
 					}
 				}
@@ -227,9 +216,9 @@ class AlexEditor {
 					const data = await blob.text()
 					if (data) {
 						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data, useCache])
+							await this.customTextPaste.apply(this, [data])
 						} else {
-							this.insertText(data, useCache)
+							this.insertText(data)
 							this.emit('pasteText', data)
 						}
 					}
@@ -241,7 +230,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行剪切操作
 	 */
-	async cut(useCache = false) {
+	async cut() {
 		if (!this.useClipboard) {
 			return
 		}
@@ -251,10 +240,10 @@ class AlexEditor {
 		if (!this.allowCut) {
 			return
 		}
-		const result = await this.copy(useCache, true)
+		const result = await this.copy(true)
 		if (result) {
 			if (!this.disabled) {
-				this.delete(true)
+				this.delete()
 			}
 			this.emit('cut', result.text, result.html)
 		}
@@ -265,7 +254,7 @@ class AlexEditor {
 	 * 根据光标执行复制操作
 	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
 	 */
-	async copy(useCache = false, isCut = false) {
+	async copy(isCut = false) {
 		if (!this.useClipboard) {
 			return
 		}
@@ -275,7 +264,7 @@ class AlexEditor {
 		if (!this.allowCopy) {
 			return
 		}
-		let result = this.getElementsByRange(useCache).includes
+		let result = this.getElementsByRange(true, false)
 		if (result.length == 0) {
 			return
 		}
@@ -305,7 +294,7 @@ class AlexEditor {
 	/**
 	 * 根据光标进行删除操作
 	 */
-	delete(useCache = false) {
+	delete() {
 		if (this.disabled) {
 			return
 		}
@@ -527,7 +516,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange(useCache).includes.filter(item => {
+			const result = this.getElementsByRange(true, false).filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
 			})
@@ -687,15 +676,15 @@ class AlexEditor {
 	/**
 	 * 根据光标位置向编辑器内插入文本
 	 */
-	insertText(data, useCache = false) {
+	insertText(data) {
 		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
 			return
 		}
 		if (!data || typeof data != 'string') {
 			throw new Error('The argument must be a string')
-		}
-		if (!this.range) {
-			return
 		}
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
@@ -728,7 +717,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一个位置，即存在选区
 		else {
-			this.delete(useCache)
+			this.delete()
 			this.insertText(data)
 		}
 	}
@@ -736,7 +725,7 @@ class AlexEditor {
 	/**
 	 * 在光标处换行
 	 */
-	insertParagraph(useCache = false) {
+	insertParagraph() {
 		if (this.disabled) {
 			return
 		}
@@ -868,7 +857,7 @@ class AlexEditor {
 				}
 			}
 		} else {
-			this.delete(useCache)
+			this.delete()
 			this.insertParagraph()
 		}
 	}
@@ -877,7 +866,7 @@ class AlexEditor {
 	 * 根据光标插入元素
 	 * cover表示所在根级块或者内部块元素只有换行符时是否覆盖此元素
 	 */
-	insertElement(ele, cover = true, useCache = false) {
+	insertElement(ele, cover = true) {
 		if (this.disabled) {
 			return
 		}
@@ -1095,7 +1084,7 @@ class AlexEditor {
 			this.range.anchor.moveToEnd(ele)
 			this.range.focus.moveToEnd(ele)
 		} else {
-			this.delete(useCache)
+			this.delete()
 			this.insertElement(ele, cover)
 		}
 	}
@@ -1430,10 +1419,9 @@ class AlexEditor {
 		}
 		const fn = elements => {
 			let element = null
-			let i = 0
-			let length = elements.length
-			while (i < length) {
-				if (elements[i].key == key) {
+			const length = elements.length
+			for (let i = 0; i < length; i++) {
+				if (elements[i].key === key) {
 					element = elements[i]
 					break
 				}
@@ -1444,7 +1432,6 @@ class AlexEditor {
 						break
 					}
 				}
-				i++
 			}
 			return element
 		}
@@ -1452,7 +1439,7 @@ class AlexEditor {
 	}
 
 	/**
-	 * 获取指定元素的前一个兄弟元素（会过滤空元素）
+	 * 获取指定元素的前一个兄弟元素（会跳过空元素）
 	 */
 	getPreviousElement(ele) {
 		if (!AlexElement.isElement(ele)) {
@@ -1484,7 +1471,7 @@ class AlexEditor {
 	}
 
 	/**
-	 * 获取指定元素的后一个兄弟元素（会过滤空元素）
+	 * 获取指定元素的后一个兄弟元素（会跳过空元素）
 	 */
 	getNextElement(ele) {
 		if (!AlexElement.isElement(ele)) {
@@ -1516,7 +1503,7 @@ class AlexEditor {
 	}
 
 	/**
-	 * 向上查询可以设置焦点的元素（会过滤空元素）
+	 * 向上查询可以设置焦点的元素（会跳过空元素）
 	 */
 	getPreviousElementOfPoint(point) {
 		if (!AlexPoint.isPoint(point)) {
@@ -1540,7 +1527,7 @@ class AlexEditor {
 	}
 
 	/**
-	 * 向下查找可以设置焦点的元素（会过滤空元素）
+	 * 向下查找可以设置焦点的元素（会跳过空元素）
 	 */
 	getNextElementOfPoint(point) {
 		if (!AlexPoint.isPoint(point)) {
@@ -1566,123 +1553,42 @@ class AlexEditor {
 	/**
 	 * 获取选区之间的元素
 	 */
-	getElementsByRange(useCache = false) {
-		//如果使用缓存，则直接返回缓存的数据
-		if (useCache) {
-			return this.__getElementsByRangeData
-		}
-
-		/** 以下是不使用缓存的情况 */
-
-		const result = {
-			//起点和终点范围内的元素，但是不包含起点和终点所在的元素
-			default: [],
-			//起点和终点范围内的元素，但是包含起点和终点所在的元素
-			includes: [],
-			//起点和终点范围内的元素扁平化处理结果，不包含起点和终点所在的元素
-			flat: [],
-			//起点和终点范围内的元素扁平化处理结果，包含起点和终点所在的元素
-			flatIncludes: []
-		}
-
+	getElementsByRange(includes = false, flat = false) {
 		//虚拟光标不存在
 		if (!this.range) {
-			this.__getElementsByRangeData = result
-			return result
+			return []
 		}
 
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			this.__getElementsByRangeData = result
-			return result
+			return []
 		}
 
 		//起点和终点在一个元素里
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
-			//设置包含起点和终点的数据
-			result.includes = [
-				{
-					element: this.range.anchor.element,
-					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-				}
-			]
-			//扁平化的结果与非扁平化的结果一致
-			result.flatIncludes = [
-				{
-					element: this.range.anchor.element,
-					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-				}
-			]
-			this.__getElementsByRangeData = result
-			return result
+			if (includes) {
+				const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
+				return [
+					{
+						element: this.range.anchor.element,
+						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
+					}
+				]
+			}
+			return []
 		}
 
-		/** 以下是起点和终点不在一个元素的情况，只会将数据塞入flatIncludes和flat数组里 */
-
-		//如果起点在元素开始处，则将起点所在元素推入数组
-		if (this.range.anchor.offset == 0) {
-			result.flatIncludes.push({
-				element: this.range.anchor.element,
-				offset: false
-			})
-		}
-		//如果起点不在元素的末尾处
-		else if (this.range.anchor.offset < (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)) {
-			result.flatIncludes.push({
-				element: this.range.anchor.element,
-				offset: [this.range.anchor.offset, this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1]
-			})
-		}
-
-		const elements = AlexElement.flatElements(this.stack)
-		const anchorIndex = elements.findIndex(el => el.isEqual(this.range.anchor.element))
-		const focusIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
-		for (let i = anchorIndex + 1; i < focusIndex; i++) {
-			result.flatIncludes.push({
-				element: elements[i],
-				offset: false
-			})
-			result.flat.push({
-				element: elements[i],
-				offset: false
-			})
-		}
-		//如果终点在元素结尾处
-		if (this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)) {
-			result.flatIncludes.push({
-				element: this.range.focus.element,
-				offset: false
-			})
-		}
-		//如果终点不在元素起点处
-		else if (this.range.focus.offset > 0) {
-			result.flatIncludes.push({
-				element: this.range.focus.element,
-				offset: [0, this.range.focus.offset]
-			})
-		}
-
-		//整理数据
-		result.flat = getNewFlatData.apply(this, [result.flat])
-		result.flatIncludes = getNewFlatData.apply(this, [result.flatIncludes])
-		result.default = getNoFlatData.apply(this, [result.flat])
-		result.includes = getNoFlatData.apply(this, [result.flatIncludes])
-		//缓存数据
-		this.__getElementsByRangeData = result
-		//返回数据
-		return result
+		/** 以下是起点和终点不在一个元素里的情况 */
 	}
 
 	/**
-	 * 分割选区选中的元素，会更新光标位置
+	 * 分割选区选中的元素，可能会更新光标位置
 	 */
-	splitElementsByRange(includes = false, flat = false, useCache = false) {
+	splitElementsByRange(includes = false, flat = false) {
 		if (!this.range) {
 			return []
 		}
-		const key = includes && flat ? 'flatIncludes' : includes ? 'includes' : flat ? 'flat' : 'default'
-		const result = this.getElementsByRange(useCache)[key]
+		const result = this.getElementsByRange(includes, flat)
 		let elements = []
 		result.forEach((item, index) => {
 			if (item.offset) {
@@ -1809,12 +1715,13 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
-		//range是否为null
+		//range是否为null的标识
 		let rangeIsNull = false
+		//如果range为null
 		if (!this.range) {
 			//初始化设置range
 			this.initRange()
-			//记录range是null的标识
+			//记录range是null
 			rangeIsNull = true
 		}
 		//指定了某个元素
@@ -1846,13 +1753,13 @@ class AlexEditor {
 		if (this.disabled) {
 			return
 		}
-		//range是否为null
+		//range是否为null的标识
 		let rangeIsNull = false
 		//如果range为null
 		if (!this.range) {
 			//初始化设置range
 			this.initRange()
-			//记录range是null的标识
+			//记录range是null
 			rangeIsNull = true
 		}
 		//指定了某个元素
@@ -1897,7 +1804,7 @@ class AlexEditor {
 	/**
 	 * 设置文本元素的样式
 	 */
-	setTextStyle(styles, useCache = false) {
+	setTextStyle(styles) {
 		if (this.disabled) {
 			return
 		}
@@ -1942,7 +1849,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(true, true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasStyles()) {
@@ -1958,7 +1865,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的样式
 	 */
-	removeTextStyle(styleNames, useCache = false) {
+	removeTextStyle(styleNames) {
 		if (this.disabled) {
 			return
 		}
@@ -2004,7 +1911,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(true, true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2016,7 +1923,7 @@ class AlexEditor {
 	/**
 	 * 查询虚拟光标包含的文本元素是否具有某个样式
 	 */
-	queryTextStyle(name, value, useCache = false) {
+	queryTextStyle(name, value) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
@@ -2033,7 +1940,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(useCache).flatIncludes.filter(item => {
+		let result = this.getElementsByRange(true, true).filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false
@@ -2055,7 +1962,7 @@ class AlexEditor {
 	/**
 	 * 设置文本元素的标记
 	 */
-	setTextMark(marks, useCache = false) {
+	setTextMark(marks) {
 		if (this.disabled) {
 			return
 		}
@@ -2100,7 +2007,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(true, true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasMarks()) {
@@ -2116,7 +2023,7 @@ class AlexEditor {
 	/**
 	 * 移除文本元素的标记
 	 */
-	removeTextMark(markNames, useCache = false) {
+	removeTextMark(markNames) {
 		if (this.disabled) {
 			return
 		}
@@ -2154,7 +2061,7 @@ class AlexEditor {
 				//继承文本元素的样式和标记
 				el.styles = cloneData(this.range.anchor.element.styles)
 				el.marks = cloneData(this.range.anchor.element.marks)
-				//移除样式
+				//移除标记
 				removeFn(el)
 				//插入
 				this.insertElement(el)
@@ -2162,7 +2069,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true, useCache)
+			const elements = this.splitElementsByRange(true, true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2174,7 +2081,7 @@ class AlexEditor {
 	/**
 	 * 查询选区内的文本元素是否具有某个标记
 	 */
-	queryTextMark(name, value, useCache = false) {
+	queryTextMark(name, value) {
 		if (!name) {
 			throw new Error('The first argument cannot be null')
 		}
@@ -2191,7 +2098,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(useCache).flatIncludes.filter(item => {
+		let result = this.getElementsByRange(true, true).filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false

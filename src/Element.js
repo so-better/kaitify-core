@@ -430,14 +430,13 @@ class AlexElement {
 	static flatElements(elements) {
 		const fn = arr => {
 			let result = []
-			let index = 0
 			const length = arr.length
-			while (index < length) {
-				result.push(arr[index])
-				if (arr[index].hasChildren()) {
-					result.push(...fn(arr[index].children))
+			for (let i = 0; i < length; i++) {
+				result.push(arr[i])
+				if (arr[i].hasChildren()) {
+					const childResult = fn(arr[i].children)
+					result.push(...childResult)
 				}
-				index++
 			}
 			return result
 		}

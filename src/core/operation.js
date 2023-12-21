@@ -6,7 +6,7 @@ import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
 
 /**
- * 初始化校验stack并初始化赋值给range
+ * 初始化校验stack
  */
 export const checkStack = function () {
 	const elements = AlexElement.flatElements(this.stack).filter(el => {
