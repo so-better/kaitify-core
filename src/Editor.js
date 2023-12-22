@@ -264,7 +264,7 @@ class AlexEditor {
 		if (!this.allowCopy) {
 			return
 		}
-		let result = this.getElementsByRange(true, false)
+		let result = this.getElementsByRange()
 		if (result.length == 0) {
 			return
 		}
@@ -516,7 +516,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange(true, false).filter(item => {
+			const result = this.getElementsByRange().filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
 			})
@@ -1719,50 +1719,62 @@ class AlexEditor {
 	}
 
 	/**
-	 * 分割选区选中的元素，可能会更新光标位置
+	 * 获取选区直接的元素，对于部分文本元素没有全选的情况会分割元素，同时可能会更新光标位置
 	 */
-	splitElementsByRange(includes = false, flat = false) {
+	splitElementsByRange(flat = false) {
 		if (!this.range) {
 			return []
 		}
-		const result = this.getElementsByRange(includes, flat)
+		const result = this.getElementsByRange(flat)
+		let length = result.length
 		let elements = []
-		result.forEach((item, index) => {
-			if (item.offset) {
+		for (let i = 0; i < length; i++) {
+			//如果存在offset那么一定是文本元素
+			if (result[i].offset) {
 				let selectEl = null
-				if (item.offset[0] == 0) {
-					const el = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[1])
-					el.textContent = el.textContent.substring(item.offset[1])
-					this.addElementAfter(el, item.element)
-					selectEl = item.element
-				} else if (item.offset[1] == item.element.textContent.length) {
-					const el = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-					el.textContent = el.textContent.substring(item.offset[0])
-					this.addElementAfter(el, item.element)
+				//文本元素前面一部分在光标范围内
+				if (result[i].offset[0] == 0 && result[i].offset[1] < result[i].element.textContent.length) {
+					const el = result[i].element.clone()
+					result[i].element.textContent = result[i].element.textContent.substring(0, result[i].offset[1])
+					el.textContent = el.textContent.substring(result[i].offset[1])
+					this.addElementAfter(el, result[i].element)
+					selectEl = result[i].element
+				}
+				//文本元素后面一部分在光标范围内
+				else if (result[i].offset[1] == result[i].element.textContent.length && result[i].offset[0] > 0) {
+					const el = result[i].element.clone()
+					result[i].element.textContent = result[i].element.textContent.substring(0, result[i].offset[0])
+					el.textContent = el.textContent.substring(result[i].offset[0])
+					this.addElementAfter(el, result[i].element)
 					selectEl = el
-				} else {
-					const el = item.element.clone()
-					const el2 = item.element.clone()
-					item.element.textContent = item.element.textContent.substring(0, item.offset[0])
-					el.textContent = el.textContent.substring(item.offset[0], item.offset[1])
-					el2.textContent = el2.textContent.substring(item.offset[1])
-					this.addElementAfter(el, item.element)
+				}
+				//文本元素的中间一部分在光标范围内
+				else if (result[i].offset[0] > 0 && result[i].offset[1] < result[i].element.textContent.length) {
+					const el = result[i].element.clone()
+					const el2 = result[i].element.clone()
+					result[i].element.textContent = result[i].element.textContent.substring(0, result[i].offset[0])
+					el.textContent = el.textContent.substring(result[i].offset[0], result[i].offset[1])
+					el2.textContent = el2.textContent.substring(result[i].offset[1])
+					this.addElementAfter(el, result[i].element)
 					this.addElementAfter(el2, el)
 					selectEl = el
 				}
-				if (index == 0) {
-					this.range.anchor.moveToStart(selectEl)
+				//如果selectEl存在证明文本元素被分割了
+				if (selectEl) {
+					//如果i为0的话肯定是起点
+					if (i == 0) {
+						this.range.anchor.moveToStart(selectEl)
+					}
+					//如果i是最后一个序列的话肯定是终点
+					if (i == length - 1) {
+						this.range.focus.moveToEnd(selectEl)
+					}
+					elements.push(selectEl)
 				}
-				if (index == result.length - 1) {
-					this.range.focus.moveToEnd(selectEl)
-				}
-				elements.push(selectEl)
 			} else {
-				elements.push(item.element)
+				elements.push(result[i].element)
 			}
-		})
+		}
 		return elements
 	}
 
@@ -1986,7 +1998,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasStyles()) {
@@ -2048,7 +2060,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2077,7 +2089,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true, true).filter(item => {
+		let result = this.getElementsByRange(true).filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false
@@ -2144,7 +2156,7 @@ class AlexEditor {
 		}
 		//不在同一个点
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					if (ele.hasMarks()) {
@@ -2206,7 +2218,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const elements = this.splitElementsByRange(true, true)
+			const elements = this.splitElementsByRange(true)
 			elements.forEach(ele => {
 				if (ele.isText()) {
 					removeFn(ele)
@@ -2235,7 +2247,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true, true).filter(item => {
+		let result = this.getElementsByRange(true).filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false

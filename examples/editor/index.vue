@@ -5602,7 +5602,7 @@ export default {
 	methods: {
 		queryTextStyle() {
 			const t = Date.now()
-			this.editor.getElementsByRange()
+			const result = this.editor.splitElementsByRange()
 			console.log('用时', Date.now() - t + 'ms')
 		},
 		async setTextStyle() {
