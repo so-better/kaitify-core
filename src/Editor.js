@@ -1510,21 +1510,19 @@ class AlexEditor {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
-		const flatElements = AlexElement.flatElements(this.stack)
-		const fn = element => {
-			const index = flatElements.findIndex(item => {
-				return element.isEqual(item)
-			})
-			if (index <= 0) {
-				return null
-			}
-			let ele = flatElements[index - 1]
-			if ((ele.isText() || ele.isClosed()) && !ele.isEmpty()) {
-				return ele
-			}
-			return fn(ele)
+		const flatElements = AlexElement.flatElements(this.stack).filter(el => {
+			return !el.isEmpty() && (el.isText() || el.isClosed())
+		})
+		//获取虚拟光标所在的元素在数组中的序列
+		const index = flatElements.findIndex(item => {
+			return point.element.isEqual(item)
+		})
+		//如果当前光标所在的元素已经是第一个了则返回null
+		if (index <= 0) {
+			return null
 		}
-		return fn(point.element)
+		//返回上一个文本元素或者自闭合元素
+		return flatElements[index - 1]
 	}
 
 	/**
@@ -1534,21 +1532,19 @@ class AlexEditor {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
-		const flatElements = AlexElement.flatElements(this.stack)
-		const fn = element => {
-			const index = flatElements.findIndex(item => {
-				return element.isEqual(item)
-			})
-			if (index == flatElements.length - 1) {
-				return null
-			}
-			let ele = flatElements[index + 1]
-			if ((ele.isText() || ele.isClosed()) && !ele.isEmpty()) {
-				return ele
-			}
-			return fn(ele)
+		const flatElements = AlexElement.flatElements(this.stack).filter(el => {
+			return !el.isEmpty() && (el.isText() || el.isClosed())
+		})
+		//获取虚拟光标所在的元素在数组中的序列
+		const index = flatElements.findIndex(item => {
+			return point.element.isEqual(item)
+		})
+		//如果当前光标所在的元素已经是最后一个了则返回null
+		if (index == flatElements.length - 1) {
+			return null
 		}
-		return fn(point.element)
+		//返回下一个文本元素或者自闭合元素
+		return flatElements[index + 1]
 	}
 
 	/**
