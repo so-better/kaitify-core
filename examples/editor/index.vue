@@ -2,9 +2,13 @@
 	<div class="editor">
 		<div style="display: none" ref="bigData">
 			<h1 id="w-e-element-0" data-slate-node="element">
-				<span id="w-e-text-1" data-slate-node="text"
-					><span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span></span
-				>
+				<span id="w-e-text-1" data-slate-node="text">
+					<span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span>
+					<span data-slate-leaf="2"><span data-slate-string="true">水浒传简介</span></span>
+					<span data-slate-leaf="3"><span data-slate-string="true">水浒传简介</span></span>
+					<span data-slate-leaf="4"><span data-slate-string="true">水浒传简介</span></span>
+					<span data-slate-leaf="5"><span data-slate-string="true">水浒传简介</span></span>
+				</span>
 			</h1>
 			<p id="w-e-element-2" data-slate-node="element">
 				<span id="w-e-text-3" data-slate-node="text"
@@ -5572,7 +5576,7 @@ export default {
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
-			value: this.$refs.bigData.innerHTML,
+			value: this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML,
 			disabled: false,
 			allowPasteHtml: true,
 			customMerge: function (ele, preEle) {

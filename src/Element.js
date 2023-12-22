@@ -354,6 +354,51 @@ class AlexElement {
 	}
 
 	/**
+	 * 如果当前元素是文本元素或者自闭合元素，判断它是不是指定元素的后代所有文本元素和自闭合元素中的第一个
+	 */
+	isFirst(element) {
+		//如果不是自闭合元素和文本元素返回false
+		if (!this.isText() && !this.isClosed()) {
+			return false
+		}
+		//如果是同一个元素返回false
+		if (element.isEqual(this)) {
+			return false
+		}
+		//如果目标元素包含当前元素
+		if (element.isContains(this)) {
+			const elements = AlexElement.flatElements(element.children).filter(el => {
+				return el.isText() || el.isClosed()
+			})
+			return this.isEqual(elements[0])
+		}
+		return false
+	}
+
+	/**
+	 * 如果当前元素是文本元素或者自闭合元素，判断它是不是指定元素的后代所有文本元素和自闭合元素中的最后一个
+	 */
+	isLast(element) {
+		//如果不是自闭合元素和文本元素返回false
+		if (!this.isText() && !this.isClosed()) {
+			return false
+		}
+		//如果是同一个元素返回false
+		if (element.isEqual(this)) {
+			return false
+		}
+		//如果目标元素包含当前元素
+		if (element.isContains(this)) {
+			const elements = AlexElement.flatElements(element.children).filter(el => {
+				return el.isText() || el.isClosed()
+			})
+			const length = elements.length
+			return this.isEqual(elements[length - 1])
+		}
+		return false
+	}
+
+	/**
 	 * 将元素渲染成真实的node并挂载在元素的elm属性上
 	 */
 	__render() {
