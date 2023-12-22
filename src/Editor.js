@@ -1529,6 +1529,7 @@ class AlexEditor {
 				}
 				//如果是其他元素
 				el = fnChild(child.children)
+				//这里如果在子元素中找到了可以设置焦点的元素，一定要break直接终止for循环的执行
 				if (el) {
 					break
 				}
@@ -1588,6 +1589,7 @@ class AlexEditor {
 				}
 				//如果是其他元素
 				el = fnChild(child.children)
+				//这里如果在子元素中找到了可以设置焦点的元素，一定要break直接终止for循环的执行
 				if (el) {
 					break
 				}
