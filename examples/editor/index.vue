@@ -17,9 +17,11 @@
 			</p>
 			<p id="w-e-element-4" data-slate-node="element"></p>
 			<h1 id="w-e-element-6" data-slate-node="element">
-				<span id="w-e-text-7" data-slate-node="text"
-					><span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span></span
-				>
+				<span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span>
+				<span data-slate-leaf="2"><span data-slate-string="true">水浒传简介</span></span>
+				<span data-slate-leaf="3"><span data-slate-string="true">水浒传简介</span></span>
+				<span data-slate-leaf="4"><span data-slate-string="true">水浒传简介</span></span>
+				<span data-slate-leaf="5"><span data-slate-string="true">水浒传简介</span></span>
 			</h1>
 			<p id="w-e-element-8" data-slate-node="element">
 				<span id="w-e-text-9" data-slate-node="text"
@@ -5598,13 +5600,13 @@ export default {
 		// })
 		this.editor.formatElementStack()
 		this.editor.domRender()
-		console.log(this.editor.stack)
 	},
 	methods: {
 		queryTextStyle() {
-			const e1 = this.editor.getNextElementOfPoint(this.editor.range.anchor)
-			const e2 = this.editor.getPreviousElementOfPoint(this.editor.range.anchor)
-			console.log(e1, e2)
+			const t = Date.now()
+			const e1 = this.editor.getElementsByRange()
+			console.log(e1)
+			console.log('耗时', Date.now() - t + 'ms')
 		},
 		async setTextStyle() {
 			const result = await this.editor.cut()

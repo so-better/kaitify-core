@@ -264,3 +264,19 @@ export const queryHasValue = function (obj, name, value) {
 	}
 	return ownValue == value
 }
+
+/**
+ * 获取以目标元素为子孙元素中文本元素或者自闭合元素排列第一的元素的最高级元素
+ */
+export const getHighestByFirst = function (point) {
+	//element一定是文本元素或者自闭合元素
+	let temp = point.element
+	while (temp.parent) {
+		const isFirst = point.element.isFirst(temp.parent)
+		if (!isFirst) {
+			break
+		}
+		temp = temp.parent
+	}
+	return temp
+}

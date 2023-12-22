@@ -4,7 +4,7 @@ import AlexRange from './Range'
 import AlexPoint from './Point'
 import AlexHistory from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, cloneData, queryHasValue, getHighestByFirst } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -1654,11 +1654,25 @@ class AlexEditor {
 		const focusInEnd = this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)
 
 		let result = []
+
+		//获取起点和终点所在的根级块
+		const anchorBlock = this.range.anchor.element.getBlock()
+		const focusBlock = this.range.focus.element.getBlock()
 		//获取起点和终点所在根级块的序列
-		const anchorBlockIndex = this.stack.findIndex(el => this.range.anchor.element.getBlock().isEqual(el))
-		const focusBlockIndex = this.stack.findIndex(el => this.range.focus.element.getBlock().isEqual(el))
+		const anchorBlockIndex = this.stack.findIndex(el => anchorBlock.isEqual(el))
+		const focusBlockIndex = this.stack.findIndex(el => focusBlock.isEqual(el))
 		//获取这两个块元素之间所有元素，包括起点和终点
-		const elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
+		let elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
+		//获取以起点所在元素为第一个文本元素或者自闭合元素的最高级元素
+		const firstElement = getHighestByFirst(this.range.anchor)
+		//因为数组中以起点所在根级块元素为第一个元素，到起点之间，可能有些元素不属于选区范围内，因此通过firstElement或者this.range.anchor.element的序列来截取
+		const startIndex = elements.findIndex(el => el.isEqual(firstElement ? firstElement : this.range.anchor.element))
+		//因为在数组中终点所在元素的祖先元素肯定在它前面，所以在它后面的都不是选区范围内的元素
+		const endIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
+		//截取
+		if (startIndex > 0 || endIndex < elements.length - 1) {
+			elements = elements.slice(startIndex, endIndex + 1)
+		}
 		//遍历获取的元素数组
 		const length = elements.length
 		for (let i = 0; i < length; i++) {
