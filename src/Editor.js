@@ -264,7 +264,7 @@ class AlexEditor {
 		if (!this.allowCopy) {
 			return
 		}
-		let result = this.getElementsByRange()
+		let result = this.getElementsByRange().list
 		if (result.length == 0) {
 			return
 		}
@@ -516,7 +516,7 @@ class AlexEditor {
 		}
 		//起点和终点不在一起
 		else {
-			const result = this.getElementsByRange().filter(item => {
+			const result = this.getElementsByRange().list.filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
 				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
 			})
@@ -1626,155 +1626,171 @@ class AlexEditor {
 	/**
 	 * 获取选区之间的元素，flat参数表示是否返回扁平化的数据
 	 */
-	getElementsByRange(flat = false) {
+	getElementsByRange() {
 		//虚拟光标不存在
 		if (!this.range) {
-			return []
+			return {
+				list: [],
+				flatList: []
+			}
 		}
 
 		//起点和终点在一起
 		if (this.range.anchor.isEqual(this.range.focus)) {
-			return []
+			return {
+				list: [],
+				flatList: []
+			}
 		}
 
 		//起点和终点在一个元素里
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
 			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
-			return [
-				{
-					element: this.range.anchor.element,
-					offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-				}
-			]
+			return {
+				list: [
+					{
+						element: this.range.anchor.element,
+						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
+					}
+				],
+				flatList: [
+					{
+						element: this.range.anchor.element,
+						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
+					}
+				]
+			}
 		}
 
 		/** 以下是起点和终点不在一个元素里的情况 */
 
-		//起点是不是在元素开始处
-		const anchorInStart = this.range.anchor.offset == 0
-		//终点是不是在元素末尾处
-		const focusInEnd = this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)
-
-		let result = []
-
-		//获取起点和终点所在的根级块
-		const anchorBlock = this.range.anchor.element.getBlock()
-		const focusBlock = this.range.focus.element.getBlock()
-		//获取起点和终点所在根级块的序列
-		const anchorBlockIndex = this.stack.findIndex(el => anchorBlock.isEqual(el))
-		const focusBlockIndex = this.stack.findIndex(el => focusBlock.isEqual(el))
-		//获取这两个块元素之间所有元素，包括起点和终点
-		let elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
-		//获取以起点所在元素为第一个文本元素或者自闭合元素的最高级元素
-		const firstElement = getHighestByFirst(this.range.anchor)
-		//因为数组中以起点所在根级块元素为第一个元素，到起点之间，可能有些元素不属于选区范围内，因此通过firstElement或者this.range.anchor.element的序列来截取
-		const startIndex = elements.findIndex(el => el.isEqual(firstElement ? firstElement : this.range.anchor.element))
-		//因为在数组中终点所在元素的祖先元素肯定在它前面，所以在它后面的都不是选区范围内的元素
-		const endIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
-		//截取
-		if (startIndex > 0 || endIndex < elements.length - 1) {
-			elements = elements.slice(startIndex, endIndex + 1)
+		//获取扁平化的数据
+		const getFlatList = () => {
+			let flatList = []
+			//起点是不是在元素开始处
+			const anchorInStart = this.range.anchor.offset == 0
+			//终点是不是在元素末尾处
+			const focusInEnd = this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)
+			//获取起点和终点所在的根级块
+			const anchorBlock = this.range.anchor.element.getBlock()
+			const focusBlock = this.range.focus.element.getBlock()
+			//获取起点和终点所在根级块的序列
+			const anchorBlockIndex = this.stack.findIndex(el => anchorBlock.isEqual(el))
+			const focusBlockIndex = this.stack.findIndex(el => focusBlock.isEqual(el))
+			//获取这两个块元素之间所有元素，包括起点和终点
+			let elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
+			//获取以起点所在元素为第一个文本元素或者自闭合元素的最高级元素
+			const firstElement = getHighestByFirst(this.range.anchor)
+			//因为数组中以起点所在根级块元素为第一个元素，到起点之间，可能有些元素不属于选区范围内，因此通过firstElement或者this.range.anchor.element的序列来截取
+			const startIndex = elements.findIndex(el => el.isEqual(firstElement ? firstElement : this.range.anchor.element))
+			//因为在数组中终点所在元素的祖先元素肯定在它前面，所以在它后面的都不是选区范围内的元素
+			const endIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
+			//截取
+			if (startIndex > 0 || endIndex < elements.length - 1) {
+				elements = elements.slice(startIndex, endIndex + 1)
+			}
+			//遍历获取的元素数组
+			const length = elements.length
+			for (let i = 0; i < length; i++) {
+				//起点元素
+				if (this.range.anchor.element.isEqual(elements[i])) {
+					//如果起点在元素开始处，则将起点所在元素推入数组
+					if (anchorInStart) {
+						flatList.push({
+							element: this.range.anchor.element,
+							offset: false
+						})
+					}
+					//如果起点不在元素的末尾处，此时起点元素必然是文本元素
+					else if (this.range.anchor.element.isText() && this.range.anchor.offset < this.range.anchor.element.textContent.length) {
+						flatList.push({
+							element: this.range.anchor.element,
+							offset: [this.range.anchor.offset, this.range.anchor.element.textContent.length]
+						})
+					}
+				}
+				//包含起点的元素
+				else if (elements[i].isContains(this.range.anchor.element)) {
+					//起点是不是它后代文本元素或者自闭合元素中的第一个
+					const isFirst = this.range.anchor.element.isFirst(elements[i])
+					//该元素是否包含终点
+					const hasFocus = elements[i].isContains(this.range.focus.element)
+					//终点元素是否它后代文本元素或者自闭合元素中的最后一个
+					const isLast = this.range.focus.element.isLast(elements[i])
+					//该元素都在选区内，并且终点也在该元素内
+					if (anchorInStart && isFirst && hasFocus && isLast && focusInEnd) {
+						flatList.push({
+							element: elements[i],
+							offset: false
+						})
+					}
+					//该元素都在选区内，但是终点不在该元素内
+					else if (anchorInStart && isFirst && !hasFocus) {
+						flatList.push({
+							element: elements[i],
+							offset: false
+						})
+					}
+				}
+				//终点元素
+				else if (this.range.focus.element.isEqual(elements[i])) {
+					//如果终点在元素结尾处
+					if (focusInEnd) {
+						flatList.push({
+							element: this.range.focus.element,
+							offset: false
+						})
+					}
+					//如果终点不在元素起点处，则终点所在元素必然是文本元素
+					else if (this.range.focus.offset > 0) {
+						flatList.push({
+							element: this.range.focus.element,
+							offset: [0, this.range.focus.offset]
+						})
+					}
+				}
+				//包含终点的元素
+				else if (elements[i].isContains(this.range.focus.element)) {
+					//终点元素是否它后代文本元素或者自闭合元素中的最后一个
+					const isLast = this.range.focus.element.isLast(elements[i])
+					//该元素都在选区内
+					if (isLast && focusInEnd) {
+						flatList.push({
+							element: elements[i],
+							offset: false
+						})
+					}
+				}
+				//起点和终点之间的元素
+				else {
+					flatList.push({
+						element: elements[i],
+						offset: false
+					})
+				}
+			}
+			return flatList
 		}
-		//遍历获取的元素数组
-		const length = elements.length
-		for (let i = 0; i < length; i++) {
-			//起点元素
-			if (this.range.anchor.element.isEqual(elements[i])) {
-				//如果起点在元素开始处，则将起点所在元素推入数组
-				if (anchorInStart) {
-					result.push({
-						element: this.range.anchor.element,
-						offset: false
-					})
-				}
-				//如果起点不在元素的末尾处，此时起点元素必然是文本元素
-				else if (this.range.anchor.element.isText() && this.range.anchor.offset < this.range.anchor.element.textContent.length) {
-					result.push({
-						element: this.range.anchor.element,
-						offset: [this.range.anchor.offset, this.range.anchor.element.textContent.length]
-					})
-				}
-			}
-			//包含起点的元素
-			else if (elements[i].isContains(this.range.anchor.element)) {
-				//起点是不是它后代文本元素或者自闭合元素中的第一个
-				const isFirst = this.range.anchor.element.isFirst(elements[i])
-				//该元素是否包含终点
-				const hasFocus = elements[i].isContains(this.range.focus.element)
-				//终点元素是否它后代文本元素或者自闭合元素中的最后一个
-				const isLast = this.range.focus.element.isLast(elements[i])
-				//该元素都在选区内，并且终点也在该元素内
-				if (anchorInStart && isFirst && hasFocus && isLast && focusInEnd) {
-					result.push({
-						element: elements[i],
-						offset: false
-					})
-				}
-				//该元素都在选区内，但是终点不在该元素内
-				else if (anchorInStart && isFirst && !hasFocus) {
-					result.push({
-						element: elements[i],
-						offset: false
-					})
-				}
-			}
-			//终点元素
-			else if (this.range.focus.element.isEqual(elements[i])) {
-				//如果终点在元素结尾处
-				if (focusInEnd) {
-					result.push({
-						element: this.range.focus.element,
-						offset: false
-					})
-				}
-				//如果终点不在元素起点处，则终点所在元素必然是文本元素
-				else if (this.range.focus.offset > 0) {
-					result.push({
-						element: this.range.focus.element,
-						offset: [0, this.range.focus.offset]
-					})
-				}
-			}
-			//包含终点的元素
-			else if (elements[i].isContains(this.range.focus.element)) {
-				//终点元素是否它后代文本元素或者自闭合元素中的最后一个
-				const isLast = this.range.focus.element.isLast(elements[i])
-				//该元素都在选区内
-				if (isLast && focusInEnd) {
-					result.push({
-						element: elements[i],
-						offset: false
-					})
-				}
-			}
-			//起点和终点之间的元素
-			else {
-				result.push({
-					element: elements[i],
-					offset: false
-				})
-			}
-		}
-		//如果返回树形结构的数据
-		if (!flat) {
+		//根据扁平化的数据获取非扁平化的数组
+		const getList = flatList => {
 			//返回的树结构数组
-			let treeData = []
+			let list = []
 			//返回的树结构数组中的根级块元素数组
 			let blockElements = []
 			//返回的树结构数组中的行内元素、内部块元素
 			let notBlockElements = []
 			//遍历扁平化的数据结果
-			const length = result.length
+			const length = flatList.length
 			for (let i = 0; i < length; i++) {
-				//如果是根级块元素则直接加入treeData
-				if (result[i].element.isBlock()) {
-					treeData.push(result[i])
+				//如果是根级块元素则直接加入list
+				if (flatList[i].element.isBlock()) {
+					list.push(flatList[i])
 					//更新根级块元素数组
-					blockElements.push(result[i].element)
+					blockElements.push(flatList[i].element)
 				} else {
 					//获取元素所在的根级块元素
-					const block = result[i].element.getBlock()
-					//判断该根级块元素是否存在于treeData数组里，这里使用blockElements来判断，提升性能
+					const block = flatList[i].element.getBlock()
+					//判断该根级块元素是否存在于list数组里，这里使用blockElements来判断，提升性能
 					let hasBlock = false
 					const blockLength = blockElements.length
 					//因为当前元素的根级块元素相比于其他元素一定更靠近当前元素，所以采用反向查询
@@ -1784,24 +1800,31 @@ class AlexEditor {
 							break
 						}
 					}
-					//如果根级块元素不存在于treeData里才进行下一步判断
+					//如果根级块元素不存在于list里才进行下一步判断
 					if (!hasBlock) {
-						//判断treeData里的元素是否包含当前元素
-						const isInclude = notBlockElements.some(el => el.isContains(result[i].element))
+						//判断list里的元素是否包含当前元素
+						const isInclude = notBlockElements.some(el => el.isContains(flatList[i].element))
 						//不包含当前元素则加入
 						if (!isInclude) {
-							treeData.push(result[i])
+							list.push(flatList[i])
 							//如果加入的是行内元素和内部块元素则更新行内元素和内部块元素数组
-							if (result[i].element.isInblock() || result[i].element.isInline()) {
-								notBlockElements.push(result[i].element)
+							if (flatList[i].element.isInblock() || flatList[i].element.isInline()) {
+								notBlockElements.push(flatList[i].element)
 							}
 						}
 					}
 				}
 			}
-			return treeData
+			return list
 		}
-		return result
+
+		const flatListArr = getFlatList()
+		const listArr = getList(flatListArr)
+
+		return {
+			list: listArr,
+			flatList: flatListArr
+		}
 	}
 
 	/**
@@ -1811,7 +1834,7 @@ class AlexEditor {
 		if (!this.range) {
 			return []
 		}
-		const result = this.getElementsByRange(flat)
+		const result = this.getElementsByRange()[flat ? 'flatList' : 'list']
 		let length = result.length
 		let elements = []
 		for (let i = 0; i < length; i++) {
@@ -2175,7 +2198,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true).filter(item => {
+		let result = this.getElementsByRange().flatList.filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false
@@ -2333,7 +2356,7 @@ class AlexEditor {
 			return false
 		}
 		//起点和终点不在一起获取选区中的文本元素
-		let result = this.getElementsByRange(true).filter(item => {
+		let result = this.getElementsByRange().flatList.filter(item => {
 			return item.element.isText()
 		})
 		//如果不包含文本元素直接返回false

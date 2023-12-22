@@ -5604,8 +5604,12 @@ export default {
 	methods: {
 		queryTextStyle() {
 			const t = Date.now()
-			const e1 = this.editor.getElementsByRange()
-			console.log(e1)
+			this.editor.setTextStyle({
+				color: 'red'
+			})
+			this.editor.formatElementStack()
+			this.editor.domRender()
+			this.editor.rangeRender()
 			console.log('耗时', Date.now() - t + 'ms')
 		},
 		async setTextStyle() {
