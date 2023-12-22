@@ -1156,6 +1156,7 @@ class AlexEditor {
 				this.stack.splice(i, 1)
 				i -= 1
 				length -= 1
+				continue
 			}
 			//不是根级块元素则转为根级块元素
 			if (!element.isBlock()) {
