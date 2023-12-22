@@ -5598,12 +5598,13 @@ export default {
 		// })
 		this.editor.formatElementStack()
 		this.editor.domRender()
+		console.log(this.editor.stack)
 	},
 	methods: {
 		queryTextStyle() {
-			const t = Date.now()
-			const result = this.editor.splitElementsByRange()
-			console.log('用时', Date.now() - t + 'ms')
+			const e1 = this.editor.getNextElementOfPoint(this.editor.range.anchor)
+			const e2 = this.editor.getPreviousElementOfPoint(this.editor.range.anchor)
+			console.log(e1, e2)
 		},
 		async setTextStyle() {
 			const result = await this.editor.cut()

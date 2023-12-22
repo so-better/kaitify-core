@@ -1511,19 +1511,55 @@ class AlexEditor {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
-		const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-			return !el.isEmpty() && (el.isText() || el.isClosed())
-		})
-		//获取虚拟光标所在的元素在数组中的序列
-		const index = flatElements.findIndex(item => {
-			return point.element.isEqual(item)
-		})
-		//如果当前光标所在的元素已经是第一个了则返回null
-		if (index <= 0) {
+		//查找子元素中的可设为焦点的元素
+		const fnChild = children => {
+			let el = null
+			//遍历子元素
+			const length = children.length
+			for (let i = length - 1; i >= 0; i--) {
+				const child = children[i]
+				//如果子元素是空元素跳过
+				if (child.isEmpty()) {
+					continue
+				}
+				//如果子元素是文本元素或者自闭合元素
+				if (child.isText() || child.isClosed()) {
+					el = child
+					break
+				}
+				//如果是其他元素
+				el = fnChild(child.children)
+				if (el) {
+					break
+				}
+			}
+			return el
+		}
+
+		const fn = element => {
+			//获取上一个兄弟元素
+			const previousElement = this.getPreviousElement(element)
+			//如果兄弟元素存在
+			if (previousElement) {
+				//如果兄弟元素是空元素，直接上一个
+				if (previousElement.isEmpty()) {
+					return fn(previousElement)
+				}
+				//如果是文本元素或者自闭合元素
+				if (previousElement.isText() || previousElement.isClosed()) {
+					return previousElement
+				}
+				/** 其他元素的情况下 */
+				return fnChild(previousElement.children)
+			}
+			//如果兄弟元素不存在，表示当前焦点所在元素是子元素数组中最后一个，则查找父元素的下个兄弟节点
+			if (element.parent) {
+				return fn(element.parent)
+			}
 			return null
 		}
-		//返回上一个文本元素或者自闭合元素
-		return flatElements[index - 1]
+
+		return fn(point.element)
 	}
 
 	/**
@@ -1533,19 +1569,56 @@ class AlexEditor {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
-		const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-			return !el.isEmpty() && (el.isText() || el.isClosed())
-		})
-		//获取虚拟光标所在的元素在数组中的序列
-		const index = flatElements.findIndex(item => {
-			return point.element.isEqual(item)
-		})
-		//如果当前光标所在的元素已经是最后一个了则返回null
-		if (index == flatElements.length - 1) {
+
+		//查找子元素中的可设为焦点的元素
+		const fnChild = children => {
+			let el = null
+			//遍历子元素
+			const length = children.length
+			for (let i = 0; i < length; i++) {
+				const child = children[i]
+				//如果子元素是空元素跳过
+				if (child.isEmpty()) {
+					continue
+				}
+				//如果子元素是文本元素或者自闭合元素
+				if (child.isText() || child.isClosed()) {
+					el = child
+					break
+				}
+				//如果是其他元素
+				el = fnChild(child.children)
+				if (el) {
+					break
+				}
+			}
+			return el
+		}
+
+		const fn = element => {
+			//获取下一个兄弟元素
+			const nextElement = this.getNextElement(element)
+			//如果兄弟元素存在
+			if (nextElement) {
+				//如果兄弟元素是空元素，直接下一个
+				if (nextElement.isEmpty()) {
+					return fn(nextElement)
+				}
+				//如果是文本元素或者自闭合元素
+				if (nextElement.isText() || nextElement.isClosed()) {
+					return nextElement
+				}
+				/** 其他元素的情况下 */
+				return fnChild(nextElement.children)
+			}
+			//如果兄弟元素不存在，表示当前焦点所在元素是子元素数组中最后一个，则查找父元素的下个兄弟节点
+			if (element.parent) {
+				return fn(element.parent)
+			}
 			return null
 		}
-		//返回下一个文本元素或者自闭合元素
-		return flatElements[index + 1]
+
+		return fn(point.element)
 	}
 
 	/**
