@@ -223,49 +223,6 @@ export const initEditorOptions = function (options) {
 }
 
 /**
- * 判断对象是否含有某个属性或者属性值是否一致
- */
-export const queryHasValue = function (obj, name, value) {
-	//如果value不存在则判断是否拥有属性name
-	if (value == null || value == undefined) {
-		return obj.hasOwnProperty(name)
-	}
-	//固有的值
-	let ownValue = obj[name]
-	//如果ownValue不存在则直接返回false
-	if (ownValue == null || ownValue == undefined) {
-		return false
-	}
-	//如果value是字符串，则先将值转为小写
-	if (typeof value == 'string') {
-		value = value.toLocaleLowerCase()
-	}
-	//如果ownValue是字符串，则先将值转为小写
-	if (typeof ownValue == 'string') {
-		ownValue = ownValue.toLocaleLowerCase()
-	}
-	//如果value是rgb或者rgba格式，则去除空格
-	if (typeof value == 'string' && value && (Dap.common.matchingText(value, 'rgb') || Dap.common.matchingText(value, 'rgba'))) {
-		value = Dap.string.trim(value, true)
-	}
-	//如果ownValue是rgb或者rgba格式，则去除空格
-	if (typeof ownValue == 'string' && ownValue && (Dap.common.matchingText(ownValue, 'rgb') || Dap.common.matchingText(ownValue, 'rgba'))) {
-		ownValue = Dap.string.trim(ownValue, true)
-	}
-	//如果是十六进制值，转为rgb值
-	if (typeof value == 'string' && value && Dap.common.matchingText(value, 'hex')) {
-		const arr = Dap.color.hex2rgb(value)
-		value = `rgb(${arr[0]},${arr[1]},${arr[2]})`
-	}
-	//如果是十六进制值，转为rgb值
-	if (typeof ownValue == 'string' && ownValue && Dap.common.matchingText(ownValue, 'hex')) {
-		const arr = Dap.color.hex2rgb(ownValue)
-		ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
-	}
-	return ownValue == value
-}
-
-/**
  * 获取以目标元素为子孙元素中文本元素或者自闭合元素排列第一的元素的最高级元素
  */
 export const getHighestByFirst = function (point) {

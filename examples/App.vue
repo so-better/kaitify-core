@@ -12,18 +12,6 @@ export default {
 }
 </script>
 <style lang="less">
-::-webkit-scrollbar {
-	width: 12px;
-	height: 12px;
-}
-::-webkit-scrollbar-thumb {
-	background: #e8e8e8;
-	border-radius: 4px;
-}
-::-webkit-scrollbar-track {
-	background: #fff;
-	border-radius: 4px;
-}
 html {
 	height: 100%;
 }

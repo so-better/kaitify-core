@@ -5555,9 +5555,7 @@
 			</p>
 		</div>
 		<div style="margin-bottom: 20px">
-			<button @click="queryTextStyle">查询样式</button>
-			<button style="margin-left: 10px" @click="setTextStyle">设置样式</button>
-			<button style="margin-left: 10px" @click="removeTextStyle">移除样式</button>
+			<button @click="handler">方法</button>
 		</div>
 		{{ value.length }}
 		<div class="editor-content"></div>
@@ -5592,50 +5590,11 @@ export default {
 		})
 		this.editor.on('change', val => {})
 		this.editor.on('cut', val => {})
-		// this.editor.on('deleteComplete', () => {
-		// 	const uneditable = this.editor.range.anchor.element.getUneditableElement()
-		// 	if (uneditable) {
-		// 		uneditable.toEmpty()
-		// 	}
-		// })
 		this.editor.formatElementStack()
 		this.editor.domRender()
 	},
 	methods: {
-		queryTextStyle() {
-			const t = Date.now()
-			this.editor.queryTextStyle('font-weight', 'bold')
-			this.editor.queryTextStyle('font-style', 'italic')
-			this.editor.queryTextStyle('font-weight', 'bold')
-			this.editor.queryTextStyle('font-style', 'italic')
-			this.editor.queryTextStyle('font-weight', 'bold')
-			this.editor.queryTextStyle('font-style', 'italic')
-			this.editor.queryTextStyle('font-weight', 'bold')
-			this.editor.queryTextStyle('font-style', 'italic')
-			this.editor.queryTextStyle('font-weight', 'bold')
-			this.editor.queryTextStyle('font-style', 'italic')
-			console.log('耗时', Date.now() - t + 'ms')
-		},
-		async setTextStyle() {
-			const result = await this.editor.cut()
-			if (result && !this.editor.disabled) {
-				this.editor.formatElementStack()
-				this.editor.domRender()
-				this.editor.rangeRender()
-			}
-			// this.editor.setTextStyle({
-			// 	color: '#87f390'
-			// })
-			// this.editor.formatElementStack()
-			// this.editor.domRender()
-			// this.editor.rangeRender()
-		},
-		removeTextStyle() {
-			this.editor.removeTextStyle()
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
-		}
+		handler() {}
 	}
 }
 </script>
