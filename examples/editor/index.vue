@@ -5604,12 +5604,16 @@ export default {
 	methods: {
 		queryTextStyle() {
 			const t = Date.now()
-			this.editor.setTextStyle({
-				color: 'red'
-			})
-			this.editor.formatElementStack()
-			this.editor.domRender()
-			this.editor.rangeRender()
+			this.editor.queryTextStyle('font-weight', 'bold')
+			this.editor.queryTextStyle('font-style', 'italic')
+			this.editor.queryTextStyle('font-weight', 'bold')
+			this.editor.queryTextStyle('font-style', 'italic')
+			this.editor.queryTextStyle('font-weight', 'bold')
+			this.editor.queryTextStyle('font-style', 'italic')
+			this.editor.queryTextStyle('font-weight', 'bold')
+			this.editor.queryTextStyle('font-style', 'italic')
+			this.editor.queryTextStyle('font-weight', 'bold')
+			this.editor.queryTextStyle('font-style', 'italic')
 			console.log('耗时', Date.now() - t + 'ms')
 		},
 		async setTextStyle() {
