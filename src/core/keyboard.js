@@ -1,6 +1,6 @@
-import Dap from 'dap-util'
+import { platform } from 'dap-util'
 //是否mac系统
-const { Mac } = Dap.platform.os()
+const { Mac } = platform.os()
 
 /**
  * 键盘是否执行撤销操作

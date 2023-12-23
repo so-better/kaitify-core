@@ -1,7 +1,7 @@
 import AlexElement from '../Element'
 import AlexRange from '../Range'
 import AlexPoint from '../Point'
-import Dap from 'dap-util'
+import { element as DapElement, data as DapData } from 'dap-util'
 import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
 
@@ -73,8 +73,8 @@ export const emptyDefaultBehaviorInblock = function (element) {
  */
 export const setRangeInVisible = function () {
 	const fn = async root => {
-		const scrollHeight = Dap.element.getScrollHeight(root)
-		const scrollWidth = Dap.element.getScrollWidth(root)
+		const scrollHeight = DapElement.getScrollHeight(root)
+		const scrollWidth = DapElement.getScrollWidth(root)
 		//存在横向或者垂直滚动条
 		if (root.clientHeight < scrollHeight || root.clientWidth < scrollWidth) {
 			const selection = window.getSelection()
@@ -94,24 +94,24 @@ export const setRangeInVisible = function () {
 			if (root.clientHeight < scrollHeight) {
 				//如果光标所在元素不在视图内则滚动到视图内
 				if (childRect.bottom < parentRect.top) {
-					await Dap.element.setScrollTop({
+					await DapElement.setScrollTop({
 						el: root,
 						number: 0
 					})
 					const tempChildRect = target.getBoundingClientRect()
 					const tempParentRect = root.getBoundingClientRect()
-					Dap.element.setScrollTop({
+					DapElement.setScrollTop({
 						el: root,
 						number: tempChildRect.top - tempParentRect.top
 					})
 				} else if (childRect.top > parentRect.bottom) {
-					await Dap.element.setScrollTop({
+					await DapElement.setScrollTop({
 						el: root,
 						number: 0
 					})
 					const tempChildRect = target.getBoundingClientRect()
 					const tempParentRect = root.getBoundingClientRect()
-					Dap.element.setScrollTop({
+					DapElement.setScrollTop({
 						el: root,
 						number: tempChildRect.bottom - tempParentRect.bottom
 					})
@@ -121,24 +121,24 @@ export const setRangeInVisible = function () {
 			if (root.clientWidth < scrollWidth) {
 				//如果光标所在元素不在视图内则滚动到视图内
 				if (childRect.right < parentRect.left) {
-					await Dap.element.setScrollLeft({
+					await DapElement.setScrollLeft({
 						el: root,
 						number: 0
 					})
 					const tempChildRect = target.getBoundingClientRect()
 					const tempParentRect = root.getBoundingClientRect()
-					Dap.element.setScrollLeft({
+					DapElement.setScrollLeft({
 						el: root,
 						number: tempChildRect.left - tempParentRect.left + 20
 					})
 				} else if (childRect.left > parentRect.right) {
-					await Dap.element.setScrollLeft({
+					await DapElement.setScrollLeft({
 						el: root,
 						number: 0
 					})
 					const tempChildRect = target.getBoundingClientRect()
 					const tempParentRect = root.getBoundingClientRect()
-					Dap.element.setScrollLeft({
+					DapElement.setScrollLeft({
 						el: root,
 						number: tempChildRect.right - tempParentRect.right + 20
 					})
@@ -148,7 +148,7 @@ export const setRangeInVisible = function () {
 	}
 	if (this.range?.focus.element.elm) {
 		let root = this.range.focus.element.elm
-		while (Dap.element.isElement(root) && root != document.documentElement) {
+		while (DapElement.isElement(root) && root != document.documentElement) {
 			fn(root)
 			root = root.parentNode
 		}
@@ -236,8 +236,8 @@ export const handleSelectionChange = function () {
 					focusOffset = 1
 				}
 			}
-			const anchorKey = Dap.data.get(anchorNode, 'data-alex-editor-key')
-			const focusKey = Dap.data.get(focusNode, 'data-alex-editor-key')
+			const anchorKey = DapData.get(anchorNode, 'data-alex-editor-key')
+			const focusKey = DapData.get(focusNode, 'data-alex-editor-key')
 			const anchorEle = this.getElementByKey(anchorKey)
 			const focusEle = this.getElementByKey(focusKey)
 			const anchor = new AlexPoint(anchorEle, anchorOffset)

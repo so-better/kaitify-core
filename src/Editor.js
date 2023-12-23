@@ -1,4 +1,4 @@
-import Dap from 'dap-util'
+import { event as DapEvent, common as DapCommon } from 'dap-util'
 import AlexElement from './Element'
 import AlexRange from './Range'
 import AlexPoint from './Point'
@@ -71,25 +71,25 @@ class AlexEditor {
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
 		//设置selection的监听更新range
-		Dap.event.on(document, `selectionchange.alex_editor_${this.__guid}`, handleSelectionChange.bind(this))
+		DapEvent.on(document, `selectionchange.alex_editor_${this.__guid}`, handleSelectionChange.bind(this))
 		//监听内容输入
-		Dap.event.on(this.$el, 'beforeinput.alex_editor', handleBeforeInput.bind(this))
+		DapEvent.on(this.$el, 'beforeinput.alex_editor', handleBeforeInput.bind(this))
 		//监听中文输入
-		Dap.event.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', handleChineseInput.bind(this))
+		DapEvent.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', handleChineseInput.bind(this))
 		//监听键盘按下
-		Dap.event.on(this.$el, 'keydown.alex_editor', handleKeydown.bind(this))
+		DapEvent.on(this.$el, 'keydown.alex_editor', handleKeydown.bind(this))
 		//监听编辑器剪切
-		Dap.event.on(this.$el, 'cut.alex_editor', handleCut.bind(this))
+		DapEvent.on(this.$el, 'cut.alex_editor', handleCut.bind(this))
 		//监听编辑器粘贴
-		Dap.event.on(this.$el, 'paste.alex_editor', handlePaste.bind(this))
+		DapEvent.on(this.$el, 'paste.alex_editor', handlePaste.bind(this))
 		//监听编辑器复制
-		Dap.event.on(this.$el, 'copy.alex_editor', handleCopy.bind(this))
+		DapEvent.on(this.$el, 'copy.alex_editor', handleCopy.bind(this))
 		//禁用编辑器拖拽和拖放
-		Dap.event.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', handleDragDrop.bind(this))
+		DapEvent.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', handleDragDrop.bind(this))
 		//监听编辑器获取焦点
-		Dap.event.on(this.$el, 'focus.alex_editor', handleFocus.bind(this))
+		DapEvent.on(this.$el, 'focus.alex_editor', handleFocus.bind(this))
 		//监听编辑器失去焦点
-		Dap.event.on(this.$el, 'blur.alex_editor', handleBlur.bind(this))
+		DapEvent.on(this.$el, 'blur.alex_editor', handleBlur.bind(this))
 	}
 
 	/**
@@ -1344,7 +1344,7 @@ class AlexEditor {
 			config.type = 'inline'
 			if (inline.parse) {
 				config.parsedom = AlexElement.TEXT_NODE
-				if (Dap.common.isObject(inline.parse)) {
+				if (DapCommon.isObject(inline.parse)) {
 					for (let key in inline.parse) {
 						if (typeof inline.parse[key] == 'function') {
 							config.styles[key] = inline.parse[key].apply(this, [node])
@@ -2028,8 +2028,8 @@ class AlexEditor {
 		//去除可编辑效果
 		this.setDisabled()
 		//移除相关监听事件
-		Dap.event.off(document, `selectionchange.alex_editor_${this.__guid}`)
-		Dap.event.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
+		DapEvent.off(document, `selectionchange.alex_editor_${this.__guid}`)
+		DapEvent.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
 	}
 }
 export default AlexEditor

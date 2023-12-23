@@ -1,4 +1,4 @@
-import Dap from 'dap-util'
+import { data as DapData, element as DapElement, common as DapCommon } from 'dap-util'
 /**
  * 获取node元素的属性集合
  */
@@ -52,9 +52,9 @@ export const getStyles = function (node) {
  */
 export const createUniqueKey = function () {
 	//获取唯一id
-	let key = Dap.data.get(window, 'data-alex-editor-key') || 0
+	let key = DapData.get(window, 'data-alex-editor-key') || 0
 	key++
-	Dap.data.set(window, 'data-alex-editor-key', key)
+	DapData.set(window, 'data-alex-editor-key', key)
 	return key
 }
 
@@ -63,9 +63,9 @@ export const createUniqueKey = function () {
  */
 export const createGuid = function () {
 	//获取唯一id
-	let key = Dap.data.get(window, 'data-alex-editor-guid') || 0
+	let key = DapData.get(window, 'data-alex-editor-guid') || 0
 	key++
-	Dap.data.set(window, 'data-alex-editor-guid', key)
+	DapData.set(window, 'data-alex-editor-guid', key)
 	return key
 }
 
@@ -80,7 +80,7 @@ export const isSpaceText = function (val) {
  * 深拷贝函数
  */
 export const cloneData = function (data) {
-	if (Dap.common.isObject(data) || Array.isArray(data)) {
+	if (DapCommon.isObject(data) || Array.isArray(data)) {
 		return JSON.parse(JSON.stringify(data))
 	}
 	return data
@@ -91,9 +91,9 @@ export const cloneData = function (data) {
  */
 export const isContains = function (parentNode, childNode) {
 	if (childNode.nodeType == 3) {
-		return Dap.element.isContains(parentNode, childNode.parentNode)
+		return DapElement.isContains(parentNode, childNode.parentNode)
 	}
-	return Dap.element.isContains(parentNode, childNode)
+	return DapElement.isContains(parentNode, childNode)
 }
 
 /**
@@ -133,15 +133,15 @@ export const initEditorNode = function (node) {
 		node = document.body.querySelector(node)
 	}
 	//如何node不是元素则抛出异常
-	if (!Dap.element.isElement(node)) {
+	if (!DapElement.isElement(node)) {
 		throw new Error('You must specify a dom container to initialize the editor')
 	}
 	//如果已经初始化过了则抛出异常
-	if (Dap.data.get(node, 'data-alex-editor-init')) {
+	if (DapData.get(node, 'data-alex-editor-init')) {
 		throw new Error('The element node has been initialized to the editor')
 	}
 	//添加初始化的标记
-	Dap.data.set(node, 'data-alex-editor-init', true)
+	DapData.set(node, 'data-alex-editor-init', true)
 
 	return node
 }
@@ -178,7 +178,7 @@ export const initEditorOptions = function (options) {
 		//自定义dom转为非文本元素的后续处理逻辑
 		customParseNode: null
 	}
-	if (Dap.common.isObject(options)) {
+	if (DapCommon.isObject(options)) {
 		if (typeof options.disabled == 'boolean') {
 			opts.disabled = options.disabled
 		}

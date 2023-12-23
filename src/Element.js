@@ -1,4 +1,4 @@
-import Dap from 'dap-util'
+import { common as DapCommon, data as DapData } from 'dap-util'
 import { createUniqueKey, isSpaceText, cloneData } from './core/tool'
 /**
  * 编辑器元素对象
@@ -180,8 +180,8 @@ class AlexElement {
 		if (!this.marks) {
 			return false
 		}
-		if (Dap.common.isObject) {
-			return !Dap.common.isEmptyObject(this.marks)
+		if (DapCommon.isObject) {
+			return !DapCommon.isEmptyObject(this.marks)
 		}
 		return false
 	}
@@ -193,8 +193,8 @@ class AlexElement {
 		if (!this.styles) {
 			return false
 		}
-		if (Dap.common.isObject(this.styles)) {
-			return !Dap.common.isEmptyObject(this.styles)
+		if (DapCommon.isObject(this.styles)) {
+			return !DapCommon.isEmptyObject(this.styles)
 		}
 		return false
 	}
@@ -334,7 +334,7 @@ class AlexElement {
 		if (!this.hasStyles() && !element.hasStyles()) {
 			return true
 		}
-		if (this.hasStyles() && element.hasStyles() && Dap.common.equal(this.styles, element.styles)) {
+		if (this.hasStyles() && element.hasStyles() && DapCommon.equal(this.styles, element.styles)) {
 			return true
 		}
 		return false
@@ -347,7 +347,7 @@ class AlexElement {
 		if (!this.hasMarks() && !element.hasMarks()) {
 			return true
 		}
-		if (this.hasMarks() && element.hasMarks() && Dap.common.equal(this.marks, element.marks)) {
+		if (this.hasMarks() && element.hasMarks() && DapCommon.equal(this.marks, element.marks)) {
 			return true
 		}
 		return false
@@ -435,7 +435,7 @@ class AlexElement {
 			})
 		}
 		//设置唯一key标记
-		Dap.data.set(el, 'data-alex-editor-key', this.key)
+		DapData.set(el, 'data-alex-editor-key', this.key)
 		//更新挂载的真实dom
 		this.elm = el
 	}
