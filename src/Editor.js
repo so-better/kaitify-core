@@ -188,7 +188,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(image, true)
+						this.insertElement(image)
 						this.emit('pasteImage', url)
 					}
 				}
@@ -207,7 +207,7 @@ class AlexEditor {
 							null,
 							null
 						)
-						this.insertElement(video, true)
+						this.insertElement(video)
 						this.emit('pasteVideo', url)
 					}
 				}
