@@ -1122,10 +1122,10 @@ class AlexEditor {
 				this.formatElement(ele)
 				//如果在经过格式化后是空元素，则需要删除该元素
 				if (ele.isEmpty()) {
-					if (ele.isContains(this.range.anchor.element)) {
+					if (this.range && ele.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (ele.isContains(this.range.focus.element)) {
+					if (this.range && ele.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
 					element.children.splice(index, 1)
