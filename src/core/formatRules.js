@@ -18,6 +18,10 @@ export const handleNotStackBlock = function (element) {
 		blocks.forEach(el => {
 			//如果元素自身是inline，那么子元素转为inline，否则转为内部块元素
 			el.type = element.type == 'inline' ? 'inline' : 'inblock'
+			//对于根级块转为内部块的元素，设置行为值为'block'
+			if (el.type == 'inblock') {
+				el.behavior = 'block'
+			}
 		})
 	}
 }

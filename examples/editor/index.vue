@@ -1,15 +1,12 @@
 <template>
 	<div class="editor">
 		<div style="display: none" ref="bigData">
-			<h1 id="w-e-element-0" data-slate-node="element">
-				<span id="w-e-text-1" data-slate-node="text">
-					<span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span>
-					<span data-slate-leaf="2"><span data-slate-string="true">水浒传简介</span></span>
-					<span data-slate-leaf="3"><span data-slate-string="true">水浒传简介</span></span>
-					<span data-slate-leaf="4"><span data-slate-string="true">水浒传简介</span></span>
-					<span data-slate-leaf="5"><span data-slate-string="true">水浒传简介</span></span>
-				</span>
-			</h1>
+			333
+			<div>
+				<h1 id="w-e-element-0" data-slate-node="element">
+					<br />
+				</h1>
+			</div>
 			<p id="w-e-element-2" data-slate-node="element">
 				<span id="w-e-text-3" data-slate-node="text"
 					><span data-slate-leaf="true"><span data-slate-string="true">全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。</span></span></span
