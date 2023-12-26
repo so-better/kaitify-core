@@ -1102,38 +1102,37 @@ class AlexEditor {
 		})
 		//判断是否有子元素
 		if (element.hasChildren()) {
-			let length = element.children.length
-			for (let i = 0; i < length; i++) {
+			//遍历子元素
+			let index = 0
+			while (index < element.children.length) {
 				//获取子元素
-				const childElement = element.children[i]
+				const ele = element.children[index]
 				//如果是空元素则删除
-				if (childElement.isEmpty()) {
-					if (this.range && childElement.isContains(this.range.anchor.element)) {
+				if (ele.isEmpty()) {
+					if (this.range && ele.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && childElement.isContains(this.range.focus.element)) {
+					if (this.range && ele.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
-					element.children.splice(i, 1)
-					i -= 1
-					length -= 1
+					element.children.splice(index, 1)
 					continue
 				}
 				//对该子元素进行格式化处理
-				this.formatElement(childElement)
+				this.formatElement(ele)
 				//如果在经过格式化后是空元素，则需要删除该元素
-				if (childElement.isEmpty()) {
-					if (this.range && childElement.isContains(this.range.anchor.element)) {
+				if (ele.isEmpty()) {
+					if (ele.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && childElement.isContains(this.range.focus.element)) {
+					if (ele.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
-					element.children.splice(i, 1)
-					i -= 1
-					length -= 1
+					element.children.splice(index, 1)
 					continue
 				}
+				//序列+1
+				index++
 			}
 		}
 	}
@@ -1142,41 +1141,40 @@ class AlexEditor {
 	 * 格式化stack
 	 */
 	formatElementStack() {
-		let length = this.stack.length
-		for (let i = 0; i < length; i++) {
-			const element = this.stack[i]
+		//遍历stack
+		let index = 0
+		while (index < this.stack.length) {
+			const ele = this.stack[index]
 			//空元素则删除
-			if (element.isEmpty()) {
-				if (this.range && element.isContains(this.range.anchor.element)) {
+			if (ele.isEmpty()) {
+				if (this.range && ele.isContains(this.range.anchor.element)) {
 					setRecentlyPoint.apply(this, [this.range.anchor])
 				}
-				if (this.range && element.isContains(this.range.focus.element)) {
+				if (this.range && ele.isContains(this.range.focus.element)) {
 					setRecentlyPoint.apply(this, [this.range.focus])
 				}
-				this.stack.splice(i, 1)
-				i -= 1
-				length -= 1
+				this.stack.splice(index, 1)
 				continue
 			}
 			//不是根级块元素则转为根级块元素
-			if (!element.isBlock()) {
-				element.convertToBlock()
+			if (!ele.isBlock()) {
+				ele.convertToBlock()
 			}
 			//格式化根级块元素
-			this.formatElement(element)
+			this.formatElement(ele)
 			//如果在经过格式化后是空元素，则需要删除该元素
-			if (element.isEmpty()) {
-				if (this.range && element.isContains(this.range.anchor.element)) {
+			if (ele.isEmpty()) {
+				if (this.range && ele.isContains(this.range.anchor.element)) {
 					setRecentlyPoint.apply(this, [this.range.anchor])
 				}
-				if (this.range && element.isContains(this.range.focus.element)) {
+				if (this.range && ele.isContains(this.range.focus.element)) {
 					setRecentlyPoint.apply(this, [this.range.focus])
 				}
-				this.stack.splice(i, 1)
-				i -= 1
-				length -= 1
+				this.stack.splice(index, 1)
 				continue
 			}
+			//序列+1
+			index++
 		}
 		//判断stack是否为空进行初始化
 		handleStackEmpty.apply(this)
