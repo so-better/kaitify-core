@@ -6,13 +6,9 @@ import { cloneData } from './tool'
  */
 export const handleNotStackBlock = function (element) {
 	if (element.hasChildren()) {
-		//子元素数组中过滤掉空元素
-		const children = element.children.filter(el => {
-			return !el.isEmpty()
-		})
 		//获取子元素中的根级块元素
-		const blocks = children.filter(el => {
-			return el.isBlock()
+		const blocks = element.children.filter(el => {
+			return !el.isEmpty() && el.isBlock()
 		})
 		//对子元素中的根级块元素进行转换
 		blocks.forEach(el => {
@@ -31,20 +27,18 @@ export const handleNotStackBlock = function (element) {
  */
 export const handleInblockWithOther = function (element) {
 	if (element.hasChildren()) {
-		//子元素数组中过滤掉空元素
+		//子元素数组中非空元素
 		const children = element.children.filter(el => {
 			return !el.isEmpty()
 		})
-		//是否全部都是内部块元素
-		let allIsBlock = children.every(el => {
+		//子元素中的内部块元素
+		const inblocks = children.filter(el => {
 			return el.isInblock()
 		})
-		//不全部是内部块元素，则内部块元素转为行内元素
-		if (!allIsBlock) {
-			children.forEach(el => {
-				if (el.isInblock()) {
-					el.type = 'inline'
-				}
+		//子元素中存在内部块元素但不全部是内部块元素，则内部块元素转为行内元素
+		if (inblocks.length && inblocks.length != children.length) {
+			inblocks.forEach(el => {
+				el.type = 'inline'
 			})
 		}
 	}
@@ -56,19 +50,13 @@ export const handleInblockWithOther = function (element) {
 export const handleInlineChildrenNotInblock = function (element) {
 	//如果行内元素有子元素
 	if (element.isInline() && element.hasChildren()) {
-		//子元素数组中过滤掉空元素
-		const children = element.children.filter(el => {
-			return !el.isEmpty()
-		})
-		//子元素中的内部块元素
-		const inblocks = children.filter(el => {
-			return el.isInblock()
+		//元素中的内部块元素
+		const inblocks = element.children.filter(el => {
+			return !el.isEmpty() && el.isInblock()
 		})
 		//对子元素中的内部块元素进行转换为行内元素
 		inblocks.forEach(el => {
-			if (el.isInblock()) {
-				el.type = 'inline'
-			}
+			el.type = 'inline'
 		})
 	}
 }
@@ -77,35 +65,32 @@ export const handleInlineChildrenNotInblock = function (element) {
  * 换行符清除规则（虚拟光标可能更新）
  */
 export const breakFormat = function (element) {
+	//如果元素有子元素
 	if (element.hasChildren()) {
 		//子元素数组中过滤掉空元素
 		const children = element.children.filter(el => {
 			return !el.isEmpty()
 		})
-		//是否全是换行符
-		const allIsBreak = children.every(el => {
+		//子元素数组中的换行符元素
+		const breaks = children.filter(el => {
 			return el.isBreak()
 		})
 		//如果全是换行符则只保留第一个
-		if (allIsBreak && children.length) {
-			//第一个换行符
-			const breakEl = children[0]
+		if (breaks.length && breaks.length == children.length) {
 			//如果起点在该元素里，则移动到第一个换行符上
 			if (this.range && element.isContains(this.range.anchor.element)) {
-				this.range.anchor.moveToStart(breakEl)
+				this.range.anchor.moveToStart(breaks[0])
 			}
 			//如果终点在该元素里，则移动到第一个换行符上
 			if (this.range && element.isContains(this.range.focus.element)) {
-				this.range.focus.moveToStart(breakEl)
+				this.range.focus.moveToStart(breaks[0])
 			}
-			element.children = [breakEl]
+			element.children = [breaks[0]]
 		}
-		//既有换行符也有其他元素则把换行符元素都置为空元素
-		else {
-			element.children.forEach(el => {
-				if (el.isBreak()) {
-					el.toEmpty()
-				}
+		//有换行符也有其他元素则把换行符元素都置为空元素
+		else if (breaks.length) {
+			breaks.forEach(el => {
+				el.toEmpty()
 			})
 		}
 	}
@@ -117,12 +102,15 @@ export const breakFormat = function (element) {
 export const mergeWithBrotherElement = function (element) {
 	//判断两个元素是否可以合并
 	const canMerge = (pel, nel) => {
+		//都是空元素，可以合并
 		if (pel.isEmpty() || nel.isEmpty()) {
 			return true
 		}
+		//都是文本元素的话如果样式和标记相同则可以合并
 		if (pel.isText() && nel.isText()) {
 			return pel.isEqualStyles(nel) && pel.isEqualMarks(nel)
 		}
+		//都是行内元素的话，如果标签相同，并且样式和标记相同则可以合并
 		if (pel.isInline() && nel.isInline()) {
 			return pel.parsedom == nel.parsedom && pel.isEqualMarks(nel) && pel.isEqualStyles(nel)
 		}
@@ -304,16 +292,22 @@ export const mergeWithParentElement = function (element) {
 					parent.styles = cloneData(child.styles)
 				}
 			}
+			//如果子元素也有子元素
 			if (child.hasChildren()) {
 				parent.children = [...child.children]
 				parent.children.forEach(item => {
 					item.parent = parent
 				})
 			}
+			//子元素与父元素合并和再对父元素进行处理
+			mergeElement(parent)
 		}
 	}
-	//存在子元素并且子元素只有一个且父子元素可以合并
-	if (element.hasChildren() && element.children.length == 1 && canMerge(element, element.children[0])) {
-		merge(element, element.children[0])
+	const mergeElement = ele => {
+		//存在子元素并且子元素只有一个且父子元素可以合并
+		if (ele.hasChildren() && ele.children.length == 1 && canMerge(ele, ele.children[0])) {
+			merge(ele, ele.children[0])
+		}
 	}
+	mergeElement(element)
 }

@@ -106,6 +106,70 @@ class AlexEditor {
 	}
 
 	/**
+	 * 根据光标执行复制操作
+	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
+	 */
+	async copy(isCut = false) {
+		if (!this.useClipboard) {
+			return
+		}
+		if (!this.range) {
+			return
+		}
+		if (!this.allowCopy) {
+			return
+		}
+		let result = this.getElementsByRange().list
+		if (result.length == 0) {
+			return
+		}
+		let html = ''
+		let text = ''
+		result.forEach(item => {
+			const newEl = item.element.clone()
+			//offset存在值则说明该元素不是全部在选区内
+			if (item.offset) {
+				newEl.textContent = newEl.textContent.substring(item.offset[0], item.offset[1])
+			}
+			newEl.__render()
+			html += newEl.elm.outerHTML
+			text += newEl.elm.innerText
+		})
+		const clipboardItem = new window.ClipboardItem({
+			'text/html': new Blob([html], { type: 'text/html' }),
+			'text/plain': new Blob([text], { type: 'text/plain' })
+		})
+		await navigator.clipboard.write([clipboardItem])
+		if (!isCut) {
+			this.emit('copy', text, html)
+		}
+		return { text, html }
+	}
+
+	/**
+	 * 根据光标进行剪切操作
+	 */
+	async cut() {
+		if (!this.useClipboard) {
+			return
+		}
+		if (!this.range) {
+			return
+		}
+		if (!this.allowCut) {
+			return
+		}
+		const result = await this.copy(true)
+		if (result) {
+			if (!this.disabled) {
+				this.delete()
+			}
+			this.emit('cut', result.text, result.html)
+		}
+		return result
+	}
+
+	/**
 	 * 根据光标进行粘贴操作
 	 */
 	async paste() {
@@ -160,7 +224,6 @@ class AlexEditor {
 							await this.customHtmlPaste.apply(this, [elements, data])
 						} else {
 							for (let i = 0; i < elements.length; i++) {
-								this.formatElement(elements[i])
 								this.insertElement(elements[i], false)
 							}
 							this.emit('pasteHtml', elements, data)
@@ -225,70 +288,6 @@ class AlexEditor {
 				}
 			}
 		}
-	}
-
-	/**
-	 * 根据光标进行剪切操作
-	 */
-	async cut() {
-		if (!this.useClipboard) {
-			return
-		}
-		if (!this.range) {
-			return
-		}
-		if (!this.allowCut) {
-			return
-		}
-		const result = await this.copy(true)
-		if (result) {
-			if (!this.disabled) {
-				this.delete()
-			}
-			this.emit('cut', result.text, result.html)
-		}
-		return result
-	}
-
-	/**
-	 * 根据光标执行复制操作
-	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
-	 */
-	async copy(isCut = false) {
-		if (!this.useClipboard) {
-			return
-		}
-		if (!this.range) {
-			return
-		}
-		if (!this.allowCopy) {
-			return
-		}
-		let result = this.getElementsByRange().list
-		if (result.length == 0) {
-			return
-		}
-		let html = ''
-		let text = ''
-		result.forEach(item => {
-			const newEl = item.element.clone()
-			//offset存在值则说明该元素不是全部在选区内
-			if (item.offset) {
-				newEl.textContent = newEl.textContent.substring(item.offset[0], item.offset[1])
-			}
-			newEl.__render()
-			html += newEl.elm.outerHTML
-			text += newEl.elm.innerText
-		})
-		const clipboardItem = new window.ClipboardItem({
-			'text/html': new Blob([html], { type: 'text/html' }),
-			'text/plain': new Blob([text], { type: 'text/plain' })
-		})
-		await navigator.clipboard.write([clipboardItem])
-		if (!isCut) {
-			this.emit('copy', text, html)
-		}
-		return { text, html }
 	}
 
 	/**
@@ -1090,94 +1089,60 @@ class AlexEditor {
 	}
 
 	/**
-	 * 格式化某个元素
+	 * 格式化stack
 	 */
-	formatElement(element) {
-		//获取自定义的格式化规则
-		let renderRules = this.renderRules.filter(fn => {
-			return typeof fn == 'function'
-		})
-		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
-			fn.apply(this, [element])
-		})
-		//判断是否有子元素
-		if (element.hasChildren()) {
-			//遍历子元素
+	formatElementStack() {
+		const t = Date.now()
+		//一种格式化方法对一组元素的格式化
+		const format = (elements, fn, isStack = false) => {
 			let index = 0
-			while (index < element.children.length) {
-				//获取子元素
-				const ele = element.children[index]
-				//如果是空元素则删除
-				if (ele.isEmpty()) {
-					if (this.range && ele.isContains(this.range.anchor.element)) {
+			while (index < elements.length) {
+				//空元素则删除
+				if (elements[index].isEmpty()) {
+					if (this.range && elements[index].isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && ele.isContains(this.range.focus.element)) {
+					if (this.range && elements[index].isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
-					element.children.splice(index, 1)
+					elements.splice(index, 1)
 					continue
 				}
-				//对该子元素进行格式化处理
-				this.formatElement(ele)
+				//对元素使用该方法进行格式化
+				fn.apply(this, [elements[index]])
 				//如果在经过格式化后是空元素，则需要删除该元素
-				if (ele.isEmpty()) {
-					if (this.range && ele.isContains(this.range.anchor.element)) {
+				if (elements[index].isEmpty()) {
+					if (this.range && elements[index].isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && ele.isContains(this.range.focus.element)) {
+					if (this.range && elements[index].isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
-					element.children.splice(index, 1)
+					elements.splice(index, 1)
 					continue
+				}
+				//不是根级块元素则转为根级块元素
+				if (!elements[index].isBlock() && isStack) {
+					elements[index].convertToBlock()
+				}
+				//格式化子元素
+				if (elements[index].hasChildren()) {
+					format(elements[index].children, fn)
 				}
 				//序列+1
 				index++
 			}
 		}
-	}
-
-	/**
-	 * 格式化stack
-	 */
-	formatElementStack() {
-		//遍历stack
-		let index = 0
-		while (index < this.stack.length) {
-			const ele = this.stack[index]
-			//空元素则删除
-			if (ele.isEmpty()) {
-				if (this.range && ele.isContains(this.range.anchor.element)) {
-					setRecentlyPoint.apply(this, [this.range.anchor])
-				}
-				if (this.range && ele.isContains(this.range.focus.element)) {
-					setRecentlyPoint.apply(this, [this.range.focus])
-				}
-				this.stack.splice(index, 1)
-				continue
-			}
-			//不是根级块元素则转为根级块元素
-			if (!ele.isBlock()) {
-				ele.convertToBlock()
-			}
-			//格式化根级块元素
-			this.formatElement(ele)
-			//如果在经过格式化后是空元素，则需要删除该元素
-			if (ele.isEmpty()) {
-				if (this.range && ele.isContains(this.range.anchor.element)) {
-					setRecentlyPoint.apply(this, [this.range.anchor])
-				}
-				if (this.range && ele.isContains(this.range.focus.element)) {
-					setRecentlyPoint.apply(this, [this.range.focus])
-				}
-				this.stack.splice(index, 1)
-				continue
-			}
-			//序列+1
-			index++
-		}
+		//获取自定义的格式化规则
+		let renderRules = this.renderRules.filter(fn => {
+			return typeof fn == 'function'
+		})
+		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
+			format(this.stack, fn, true)
+		})
 		//判断stack是否为空进行初始化
 		handleStackEmpty.apply(this)
+		console.log('format耗时', Date.now() - t + 'ms')
 	}
 
 	/**
