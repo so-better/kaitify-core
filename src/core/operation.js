@@ -93,7 +93,7 @@ export const setRangeInVisible = function () {
 			//存在垂直滚动条
 			if (root.clientHeight < scrollHeight) {
 				//如果光标所在元素不在视图内则滚动到视图内
-				if (childRect.bottom < parentRect.top) {
+				if (childRect.top < parentRect.top) {
 					await DapElement.setScrollTop({
 						el: root,
 						number: 0
@@ -104,7 +104,7 @@ export const setRangeInVisible = function () {
 						el: root,
 						number: tempChildRect.top - tempParentRect.top
 					})
-				} else if (childRect.top > parentRect.bottom) {
+				} else if (childRect.bottom > parentRect.bottom) {
 					await DapElement.setScrollTop({
 						el: root,
 						number: 0
@@ -120,7 +120,7 @@ export const setRangeInVisible = function () {
 			//存在横向滚动条
 			if (root.clientWidth < scrollWidth) {
 				//如果光标所在元素不在视图内则滚动到视图内
-				if (childRect.right < parentRect.left) {
+				if (childRect.left < parentRect.left) {
 					await DapElement.setScrollLeft({
 						el: root,
 						number: 0
@@ -131,7 +131,7 @@ export const setRangeInVisible = function () {
 						el: root,
 						number: tempChildRect.left - tempParentRect.left + 20
 					})
-				} else if (childRect.left > parentRect.right) {
+				} else if (childRect.right > parentRect.right) {
 					await DapElement.setScrollLeft({
 						el: root,
 						number: 0
