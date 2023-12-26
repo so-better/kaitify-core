@@ -1092,12 +1092,11 @@ class AlexEditor {
 	 * 格式化stack
 	 */
 	formatElementStack() {
-		const t = Date.now()
 		//一种格式化方法对一组元素的格式化
 		const format = (elements, fn, isStack = false) => {
 			let index = 0
 			while (index < elements.length) {
-				//空元素则删除
+				//如果是空元素则直接删除，跳过当前后续步骤
 				if (elements[index].isEmpty()) {
 					if (this.range && elements[index].isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
@@ -1110,7 +1109,7 @@ class AlexEditor {
 				}
 				//对元素使用该方法进行格式化
 				fn.apply(this, [elements[index]])
-				//如果在经过格式化后是空元素，则需要删除该元素
+				//如果在经过格式化后是空元素，则需要删除该元素，并且跳过当前后续步骤
 				if (elements[index].isEmpty()) {
 					if (this.range && elements[index].isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
@@ -1121,13 +1120,24 @@ class AlexEditor {
 					elements.splice(index, 1)
 					continue
 				}
-				//不是根级块元素则转为根级块元素
+				//如果当前元素是根级元素，但是不是根级块元素则转为根级块元素
 				if (!elements[index].isBlock() && isStack) {
 					elements[index].convertToBlock()
 				}
-				//格式化子元素
+				//对自身所有的子元素进行格式化
 				if (elements[index].hasChildren()) {
 					format(elements[index].children, fn)
+				}
+				//子元素格式化后，当前元素变成空元素，则需要删除该元素，并且跳过后续步骤
+				if (elements[index].isEmpty()) {
+					if (this.range && elements[index].isContains(this.range.anchor.element)) {
+						setRecentlyPoint.apply(this, [this.range.anchor])
+					}
+					if (this.range && elements[index].isContains(this.range.focus.element)) {
+						setRecentlyPoint.apply(this, [this.range.focus])
+					}
+					elements.splice(index, 1)
+					continue
 				}
 				//序列+1
 				index++
@@ -1142,7 +1152,6 @@ class AlexEditor {
 		})
 		//判断stack是否为空进行初始化
 		handleStackEmpty.apply(this)
-		console.log('format耗时', Date.now() - t + 'ms')
 	}
 
 	/**
