@@ -1,11 +1,11 @@
 <template>
 	<div class="editor">
 		<div style="display: none" ref="bigData">
-			<pre id="w-e-element-2" data-slate-node="element">
+			<p id="w-e-element-2" data-slate-node="element">
 				<span id="w-e-text-3" data-slate-node="text"
 					><span data-slate-leaf="true"><span data-slate-string="true">全书通过描写梁山好汉反抗欺压、水泊梁山壮大和受宋朝招安，以及受招安后为宋朝征战，最终消亡的宏大故事，艺术地反映了中国历史上宋江起义从发生、发展直至失败的全过程，深刻揭示了起义的社会根源，满腔热情地歌颂了起义英雄的反抗斗争和他们的社会理想，也具体揭示了起义失败的内在历史原因。</span></span></span
 				>
-			</pre>
+			</p>
 			<p id="w-e-element-4" data-slate-node="element"></p>
 			<h1 id="w-e-element-6" data-slate-node="element">
 				<span data-slate-leaf="true"><span data-slate-string="true">水浒传简介</span></span>
@@ -5548,39 +5548,31 @@
 		<div style="margin-bottom: 20px">
 			<button @click="handler">方法</button>
 		</div>
-		{{ value.length }}
+		<div style="margin-bottom: 20px">总字数：{{ length }}</div>
 		<div class="editor-content"></div>
 	</div>
 </template>
 <script>
+import Dap from 'dap-util'
 import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
 			value: `<p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p><p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p><p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p>`,
-			editor: null
+			editor: null,
+			length: 0
 		}
 	},
 	mounted() {
 		this.editor = new AlexEditor('.editor-content', {
-			value: this.$refs.bigData.innerHTML + this.$refs.bigData.innerHTML,
+			value: this.$refs.bigData.innerHTML,
 			disabled: false,
-			allowPasteHtml: true,
-			customMerge: function (ele, preEle) {
-				const uneditable = preEle.getUneditableElement()
-				if (uneditable) {
-					uneditable.toEmpty()
-				} else {
-					preEle.children.push(...ele.children)
-					preEle.children.forEach(item => {
-						item.parent = preEle
-					})
-					ele.children = null
-				}
-			}
+			allowPasteHtml: true
 		})
-		this.editor.on('change', val => {})
-		this.editor.on('cut', val => {})
+		this.length = Dap.element.string2dom(`<div>${this.editor.value}</div>`).innerText.length
+		this.editor.on('change', val => {
+			this.length = Dap.element.string2dom(`<div>${val}</div>`).innerText.length
+		})
 		this.editor.formatElementStack()
 		this.editor.domRender()
 	},
