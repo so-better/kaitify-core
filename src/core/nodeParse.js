@@ -54,7 +54,6 @@ export const blockParse = [
 		parsedom: 'aside',
 		parse: true
 	},
-
 	{
 		parsedom: 'nav',
 		parse: true
@@ -86,6 +85,9 @@ export const closedParse = [
 	},
 	{
 		parsedom: 'audio'
+	},
+	{
+		parsedom: 'svg'
 	}
 ]
 
