@@ -5558,7 +5558,7 @@ import { AlexEditor, AlexElement } from '../../src'
 export default {
 	data() {
 		return {
-			value: `<p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p><p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p><p><span>这是一个基于</span><code>Vue3 + alex-editor</code><span> 构建的一套</span><span style="font-weight: bold;">精美UI样式</span><span>的</span><span style="font-weight: bold;">开箱即用</span><span>的</span><span style="color: #ec1a0a;">富文本编辑器</span></p>`,
+			value: `<p><span>3333</span><span><span>11111</span></span></p>`,
 			editor: null,
 			length: 0
 		}
@@ -5573,11 +5573,13 @@ export default {
 		this.editor.on('change', val => {
 			this.length = Dap.element.string2dom(`<div>${val}</div>`).innerText.length
 		})
+		this.editor.on('afterRender', this.afterRender)
 		this.editor.formatElementStack()
 		this.editor.domRender()
 	},
 	methods: {
-		handler() {}
+		handler() {},
+		afterRender() {}
 	}
 }
 </script>
