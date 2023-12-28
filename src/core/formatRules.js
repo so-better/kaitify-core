@@ -97,6 +97,93 @@ export const breakFormat = function (element) {
 }
 
 /**
+ * 父子元素合并策略（虚拟光标可能更新）
+ */
+export const mergeWithParentElement = function (element) {
+	//判断两个元素是否可以合并
+	const canMerge = (parent, child) => {
+		//子元素是文本元素，父元素是标签等于文本标签的行内元素
+		if (child.isText() && parent.isInline()) {
+			return parent.parsedom == AlexElement.TEXT_NODE
+		}
+		//子元素和父元素的类型相同且标签名相同
+		if ((parent.isInline() && child.isInline()) || (parent.isInblock() && child.isInblock())) {
+			return parent.parsedom == child.parsedom
+		}
+		return false
+	}
+	//两个元素的合并方法
+	const merge = (parent, child) => {
+		//子元素是文本元素，父元素与之标签名相同
+		if (child.isText()) {
+			parent.type = 'text'
+			parent.parsedom = null
+			//如果子元素有标记
+			if (child.hasMarks()) {
+				if (parent.hasMarks()) {
+					Object.assign(parent.marks, cloneData(child.marks))
+				} else {
+					parent.marks = cloneData(child.marks)
+				}
+			}
+			//如果子元素有样式
+			if (child.hasStyles()) {
+				if (parent.hasStyles()) {
+					Object.assign(parent.styles, cloneData(child.styles))
+				} else {
+					parent.styles = cloneData(child.styles)
+				}
+			}
+			parent.textContent = child.textContent
+			parent.children = null
+			//如果起点在子元素上则更新到父元素上
+			if (this.range && child.isContains(this.range.anchor.element)) {
+				this.range.anchor.element = parent
+			}
+			//如果终点在子元素上则更新到父元素上
+			if (this.range && child.isContains(this.range.focus.element)) {
+				this.range.focus.element = parent
+			}
+		}
+		//子元素是行内元素或者内部块元素
+		else {
+			//如果子元素有标记
+			if (child.hasMarks()) {
+				if (parent.hasMarks()) {
+					Object.assign(parent.marks, cloneData(child.marks))
+				} else {
+					parent.marks = cloneData(child.marks)
+				}
+			}
+			//如果子元素有样式
+			if (child.hasStyles()) {
+				if (parent.hasStyles()) {
+					Object.assign(parent.styles, cloneData(child.styles))
+				} else {
+					parent.styles = cloneData(child.styles)
+				}
+			}
+			//如果子元素也有子元素
+			if (child.hasChildren()) {
+				parent.children = [...child.children]
+				parent.children.forEach(item => {
+					item.parent = parent
+				})
+			}
+			//子元素与父元素合并和再对父元素进行处理
+			mergeElement(parent)
+		}
+	}
+	const mergeElement = ele => {
+		//存在子元素并且子元素只有一个且父子元素可以合并
+		if (ele.hasChildren() && ele.children.length == 1 && canMerge(ele, ele.children[0])) {
+			merge(ele, ele.children[0])
+		}
+	}
+	mergeElement(element)
+}
+
+/**
  * 兄弟元素合并策略（虚拟光标可能更新）
  */
 export const mergeWithBrotherElement = function (element) {
@@ -220,93 +307,6 @@ export const mergeWithBrotherElement = function (element) {
 				}
 				index++
 			}
-		}
-	}
-	mergeElement(element)
-}
-
-/**
- * 父子元素合并策略（虚拟光标可能更新）
- */
-export const mergeWithParentElement = function (element) {
-	//判断两个元素是否可以合并
-	const canMerge = (parent, child) => {
-		//子元素是文本元素，父元素是标签等于文本标签的行内元素
-		if (child.isText() && parent.isInline()) {
-			return parent.parsedom == AlexElement.TEXT_NODE
-		}
-		//子元素和父元素的类型相同且标签名相同
-		if ((parent.isInline() && child.isInline()) || (parent.isInblock() && child.isInblock())) {
-			return parent.parsedom == child.parsedom
-		}
-		return false
-	}
-	//两个元素的合并方法
-	const merge = (parent, child) => {
-		//子元素是文本元素，父元素与之标签名相同
-		if (child.isText()) {
-			parent.type = 'text'
-			parent.parsedom = null
-			//如果子元素有标记
-			if (child.hasMarks()) {
-				if (parent.hasMarks()) {
-					Object.assign(parent.marks, cloneData(child.marks))
-				} else {
-					parent.marks = cloneData(child.marks)
-				}
-			}
-			//如果子元素有样式
-			if (child.hasStyles()) {
-				if (parent.hasStyles()) {
-					Object.assign(parent.styles, cloneData(child.styles))
-				} else {
-					parent.styles = cloneData(child.styles)
-				}
-			}
-			parent.textContent = child.textContent
-			parent.children = null
-			//如果起点在子元素上则更新到父元素上
-			if (this.range && child.isContains(this.range.anchor.element)) {
-				this.range.anchor.element = parent
-			}
-			//如果终点在子元素上则更新到父元素上
-			if (this.range && child.isContains(this.range.focus.element)) {
-				this.range.focus.element = parent
-			}
-		}
-		//子元素是行内元素或者内部块元素
-		else {
-			//如果子元素有标记
-			if (child.hasMarks()) {
-				if (parent.hasMarks()) {
-					Object.assign(parent.marks, cloneData(child.marks))
-				} else {
-					parent.marks = cloneData(child.marks)
-				}
-			}
-			//如果子元素有样式
-			if (child.hasStyles()) {
-				if (parent.hasStyles()) {
-					Object.assign(parent.styles, cloneData(child.styles))
-				} else {
-					parent.styles = cloneData(child.styles)
-				}
-			}
-			//如果子元素也有子元素
-			if (child.hasChildren()) {
-				parent.children = [...child.children]
-				parent.children.forEach(item => {
-					item.parent = parent
-				})
-			}
-			//子元素与父元素合并和再对父元素进行处理
-			mergeElement(parent)
-		}
-	}
-	const mergeElement = ele => {
-		//存在子元素并且子元素只有一个且父子元素可以合并
-		if (ele.hasChildren() && ele.children.length == 1 && canMerge(ele, ele.children[0])) {
-			merge(ele, ele.children[0])
 		}
 	}
 	mergeElement(element)

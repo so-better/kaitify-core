@@ -1147,7 +1147,8 @@ class AlexEditor {
 		let renderRules = this.renderRules.filter(fn => {
 			return typeof fn == 'function'
 		})
-		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
+		//这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
+		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
 			format(this.stack, fn, true)
 		})
 		//判断stack是否为空进行初始化

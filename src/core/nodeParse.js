@@ -88,6 +88,9 @@ export const closedParse = [
 	},
 	{
 		parsedom: 'svg'
+	},
+	{
+		parsedom: 'canvas'
 	}
 ]
 
