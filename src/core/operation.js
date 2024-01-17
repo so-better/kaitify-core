@@ -28,17 +28,17 @@ export const setRecentlyPoint = function (point) {
 	const nextElement = this.getNextElementOfPoint(point)
 	const block = point.element.getBlock()
 	const inblock = point.element.getInblock()
-	if (previousElement && inblock && inblock.isContains(previousElement)) {
+	if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom) && inblock && inblock.isContains(previousElement)) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && inblock && inblock.isContains(nextElement)) {
+	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom) && inblock && inblock.isContains(nextElement)) {
 		point.moveToStart(nextElement)
-	} else if (previousElement && block.isContains(previousElement)) {
+	} else if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom) && block.isContains(previousElement)) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && block.isContains(nextElement)) {
+	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom) && block.isContains(nextElement)) {
 		point.moveToStart(nextElement)
-	} else if (previousElement) {
+	} else if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom)) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement) {
+	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom)) {
 		point.moveToStart(nextElement)
 	}
 }
