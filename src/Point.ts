@@ -1,13 +1,17 @@
-import AlexElement from './Element'
-class AlexPoint {
-	constructor(element, offset) {
-		//虚拟光标对应的元素
+import { AlexElement } from './Element'
+
+export class AlexPoint {
+	//虚拟光标对应的元素
+	element: AlexElement
+	//虚拟光标在元素中的偏移值
+	offset: number
+
+	constructor(element: AlexElement, offset: number) {
 		this.element = element
-		//虚拟光标在元素中的偏移值
 		this.offset = offset
 		//初始设置
 		if (this.element.isText() || this.element.isClosed()) {
-			if (AlexElement.VOID_NODES.includes(this.element.parsedom)) {
+			if (AlexElement.VOID_NODES.includes(this.element.parsedom!)) {
 				throw new Error('Invisible element cannot be set as focal point')
 			}
 			return
@@ -23,14 +27,14 @@ class AlexPoint {
 	/**
 	 * 是否Point类型数据
 	 */
-	static isPoint(val) {
+	static isPoint(val: any) {
 		return val instanceof AlexPoint
 	}
 
 	/**
 	 * 两个点是否相等
 	 */
-	isEqual(point) {
+	isEqual(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
 			return false
 		}
@@ -40,7 +44,7 @@ class AlexPoint {
 	/**
 	 * 移动到到指定元素最后
 	 */
-	moveToEnd(element) {
+	moveToEnd(element: AlexElement) {
 		if (!AlexElement.isElement(element)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -50,11 +54,11 @@ class AlexPoint {
 		//如果是文本元素
 		if (element.isText()) {
 			this.element = element
-			this.offset = element.textContent.length
+			this.offset = element.textContent!.length
 		}
 		//如果是自闭合元素
 		else if (element.isClosed()) {
-			if (AlexElement.VOID_NODES.includes(element.parsedom)) {
+			if (AlexElement.VOID_NODES.includes(element.parsedom!)) {
 				throw new Error('Invisible element cannot be set as focal point')
 			}
 			this.element = element
@@ -62,8 +66,8 @@ class AlexPoint {
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+			const flatElements = AlexElement.flatElements(element.children!).filter(el => {
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom!)
 			})
 			const length = flatElements.length
 			if (length == 0) {
@@ -76,7 +80,7 @@ class AlexPoint {
 	/**
 	 * 移动到指定元素最前
 	 */
-	moveToStart(element) {
+	moveToStart(element: AlexElement) {
 		if (!AlexElement.isElement(element)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
@@ -90,7 +94,7 @@ class AlexPoint {
 		}
 		//自闭合元素
 		else if (element.isClosed()) {
-			if (AlexElement.VOID_NODES.includes(element.parsedom)) {
+			if (AlexElement.VOID_NODES.includes(element.parsedom!)) {
 				throw new Error('Invisible element cannot be set as focal point')
 			}
 			this.element = element
@@ -98,8 +102,8 @@ class AlexPoint {
 		}
 		//如果含有子元素
 		else if (element.hasChildren()) {
-			const flatElements = AlexElement.flatElements(element.children).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+			const flatElements = AlexElement.flatElements(element.children!).filter(el => {
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom!)
 			})
 			if (flatElements.length == 0) {
 				throw new Error('There is no element to set the focus')
@@ -108,5 +112,3 @@ class AlexPoint {
 		}
 	}
 }
-
-export default AlexPoint

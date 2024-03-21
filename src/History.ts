@@ -1,26 +1,40 @@
-import AlexElement from './Element'
-import AlexPoint from './Point'
-import AlexRange from './Range'
+import { AlexElement } from './Element'
+import { AlexPoint } from './Point'
+import { AlexRange } from './Range'
 
-class AlexHistory {
-	constructor() {
-		//存放历史记录的堆栈
-		this.records = []
-		//记录当前展示的stack的序列
-		this.current = -1
-	}
+export type AlexHistoryRecordsItemType = {
+	stack: (AlexElement | null)[]
+	range: AlexRange | null
+}
+
+export type AlexHistoryResultType = {
+	stack: (AlexElement | null)[]
+	range: AlexRange | null
+	current: number
+}
+
+export class AlexHistory {
+	//存放历史记录的堆栈
+	records: AlexHistoryRecordsItemType[] = []
+	//记录当前展示的stack的序列
+	current: number = -1
+
+	constructor() {}
 
 	/**
 	 * 入栈
 	 */
-	push(stack, range) {
+	push(stack: (AlexElement | null)[], range?: AlexRange | null) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.current < this.records.length - 1) {
 			this.records.length = this.current + 1
 		}
 		//生成一个新的stack
 		const newStack = stack.map(ele => {
-			return ele.__fullClone()
+			if (ele) {
+				return ele.__fullClone()
+			}
+			return null
 		})
 		//生成一个新的range
 		const newRange = this.__cloneRange(newStack, range)
@@ -35,7 +49,7 @@ class AlexHistory {
 	/**
 	 * 获取
 	 */
-	get(type) {
+	get(type: -1 | 1): AlexHistoryResultType | null {
 		let current = this.current
 		//撤销
 		if (type == -1) {
@@ -59,7 +73,10 @@ class AlexHistory {
 		const { stack, range } = this.records[current]
 		//创建新的stack
 		const newStack = stack.map(ele => {
-			return ele.__fullClone()
+			if (ele) {
+				return ele.__fullClone()
+			}
+			return null
 		})
 		//创建新的range
 		const newRange = this.__cloneRange(newStack, range)
@@ -74,7 +91,7 @@ class AlexHistory {
 	/**
 	 * 更新当前历史记录的range
 	 */
-	updateCurrentRange(range) {
+	updateCurrentRange(range: AlexRange) {
 		const records = this.records[this.current]
 		const newRange = this.__cloneRange(records.stack, range)
 		this.records[this.current].range = newRange
@@ -83,7 +100,7 @@ class AlexHistory {
 	/**
 	 * 克隆range
 	 */
-	__cloneRange(newStack, range) {
+	__cloneRange(newStack: (AlexElement | null)[], range?: AlexRange | null) {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素
@@ -106,5 +123,3 @@ class AlexHistory {
 		return null
 	}
 }
-
-export default AlexHistory

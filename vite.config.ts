@@ -1,15 +1,16 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import dts from 'vite-plugin-dts'
 import path from 'path'
 
 export default defineConfig({
-	plugins: [vue()],
+	plugins: [vue(), dts()],
 	build: {
 		//打包后的目录名称
 		outDir: 'lib',
 		minify: 'terser',
 		lib: {
-			entry: path.resolve(__dirname, 'src/index.js'),
+			entry: path.resolve(__dirname, 'src/index.ts'),
 			name: 'alex-editor',
 			fileName: format => `alex-editor.${format}.js`
 		},

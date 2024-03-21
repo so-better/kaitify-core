@@ -4,4 +4,4 @@ public/
 index.html
 
 # 忽略指定文件
-vite.config.js
+vite.config.ts

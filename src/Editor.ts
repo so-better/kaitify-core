@@ -1,72 +1,95 @@
 import { event as DapEvent, common as DapCommon } from 'dap-util'
-import AlexElement from './Element'
-import AlexRange from './Range'
-import AlexPoint from './Point'
-import AlexHistory from './History'
+import { AlexElement, AlexElementConfigType } from './Element'
+import { AlexRange } from './Range'
+import { AlexPoint } from './Point'
+import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, getHighestByFirst } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
-class AlexEditor {
-	constructor(node, opts) {
-		//编辑器容器
+export type ElementRangeType = {
+	element: AlexElement
+	offset: number[] | false
+}
+
+export type ElementsRangeType = {
+	list: ElementRangeType[]
+	flatList: ElementRangeType[]
+}
+
+export class AlexEditor {
+	//编辑器容器
+	$el: HTMLElement
+	//是否禁用
+	disabled: boolean
+	//编辑器的值
+	value: string
+	//自定义渲染规则
+	renderRules: ((element: AlexElement) => void)[]
+	//是否允许复制
+	allowCopy: boolean
+	//是否允许粘贴
+	allowPaste: boolean
+	//是否允许剪切
+	allowCut: boolean
+	//是否允许粘贴html
+	allowPasteHtml: boolean
+	//自定义纯文本粘贴方法
+	customTextPaste: ((text: string) => void | Promise<void>) | null
+	//自定义html粘贴方法
+	customHtmlPaste: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null
+	//自定义图片粘贴方法
+	customImagePaste: ((url: string) => void | Promise<void>) | null
+	//自定义视频粘贴方法
+	customVideoPaste: ((url: string) => void | Promise<void>) | null
+	//自定义处理不可编辑元素合并的逻辑
+	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
+	//自定义dom转为非文本元素的后续处理逻辑
+	customParseNode: ((el: AlexElement) => AlexElement) | null
+	//复制粘贴语法是否能够使用
+	useClipboard: boolean = canUseClipboard()
+	//创建历史记录
+	history: AlexHistory = new AlexHistory()
+	//存放元素的数组
+	stack: (AlexElement | null)[]
+	//光标虚拟对象
+	range: AlexRange | null = null
+
+	//编辑器唯一id
+	private __guid: number = createGuid()
+	//事件集合
+	private __events: ObjectType = {}
+	//是否第一次渲染
+	private __firstRender: boolean = true
+	//是否正在输入中文
+	__isInputChinese: boolean = false
+	//是否内部修改真实光标引起selctionChange事件
+	__innerSelectionChange: boolean = false
+	//取消中文输入标识的延时器
+	__chineseInputTimer: any = null
+
+	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
 		this.$el = initEditorNode(node)
-		//初始化opts参数
 		const options = initEditorOptions(opts)
-		//是否禁用
-		this.disabled = options.disabled
-		//编辑器的值
-		this.value = options.value
-		//自定义编辑器元素的格式化规则
-		this.renderRules = options.renderRules
-		//是否允许复制
-		this.allowCopy = options.allowCopy
-		//是否允许粘贴
-		this.allowPaste = options.allowPaste
-		//是否允许剪切
-		this.allowCut = options.allowCut
-		//粘贴是否携带样式
-		this.allowPasteHtml = options.allowPasteHtml
-		//自定义粘贴文本的处理方法
-		this.customTextPaste = options.customTextPaste
-		//自定义粘贴html的处理方法
-		this.customHtmlPaste = options.customHtmlPaste
-		//自定义粘贴图片的处理方法
-		this.customImagePaste = options.customImagePaste
-		//自定义粘贴视频的处理方法
-		this.customVideoPaste = options.customVideoPaste
-		//自定义合并元素的方法
-		this.customMerge = options.customMerge
-		//自定义node转为元素的后续处理逻辑
-		this.customParseNode = options.customParseNode
-		//复制粘贴语法是否能够使用
-		this.useClipboard = canUseClipboard()
-		//创建历史记录
-		this.history = new AlexHistory()
+		this.disabled = options.disabled!
+		this.value = options.value!
+		this.renderRules = options.renderRules!
+		this.allowCopy = options.allowCopy!
+		this.allowPaste = options.allowPaste!
+		this.allowCut = options.allowCut!
+		this.allowPasteHtml = options.allowPasteHtml!
+		this.customTextPaste = options.customTextPaste!
+		this.customHtmlPaste = options.customHtmlPaste!
+		this.customImagePaste = options.customImagePaste!
+		this.customVideoPaste = options.customVideoPaste!
+		this.customMerge = options.customMerge!
+		this.customParseNode = options.customParseNode!
+
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
-		//编辑的range
-		this.range = null
 		//初始化校验stack
 		checkStack.apply(this)
-
-		/**  ------以下是内部属性，不对外展示------  */
-
-		//编辑器唯一id
-		this.__guid = createGuid()
-		//事件集合
-		this.__events = {}
-		//是否第一次渲染
-		this.__firstRender = true
-		//是否正在输入中文
-		this.__isInputChinese = false
-		//是否内部修改真实光标引起selctionChange事件
-		this.__innerSelectionChange = false
-		//取消中文输入标识的延时器
-		this.__chineseInputTimer = null
-
-		/**  ------以下是内部的一些初始化逻辑------  */
 
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
@@ -97,7 +120,7 @@ class AlexEditor {
 	 */
 	initRange() {
 		const elements = AlexElement.flatElements(this.stack).filter(el => {
-			return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+			return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom!)
 		})
 		const firstElement = elements[0]
 		const anchor = new AlexPoint(firstElement, 0)
@@ -129,11 +152,11 @@ class AlexEditor {
 			const newEl = item.element.clone()
 			//offset存在值则说明该元素不是全部在选区内
 			if (item.offset) {
-				newEl.textContent = newEl.textContent.substring(item.offset[0], item.offset[1])
+				newEl.textContent = newEl.textContent!.substring(item.offset[0], item.offset[1])
 			}
 			newEl.__render()
-			html += newEl.elm.outerHTML
-			text += newEl.elm.innerText
+			html += newEl.elm!.outerHTML
+			text += newEl.elm!.innerText
 		})
 		const clipboardItem = new window.ClipboardItem({
 			'text/html': new Blob([html], { type: 'text/html' }),
@@ -187,7 +210,7 @@ class AlexEditor {
 		}
 		const clipboardItems = await navigator.clipboard.read()
 		const clipboardItem = clipboardItems[0]
-		const getTypeFunctions = []
+		const getTypeFunctions: Promise<Blob>[] = []
 		clipboardItem.types.forEach(type => {
 			getTypeFunctions.push(clipboardItem.getType(type))
 		})
@@ -363,7 +386,7 @@ class AlexEditor {
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
 						//文本元素的值
-						const val = this.range.anchor.element.textContent
+						const val = this.range.anchor.element.textContent!
 						//起点向前一位
 						this.range.anchor.offset -= 1
 						//要删除的字符是否空白文本
@@ -469,7 +492,7 @@ class AlexEditor {
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
 						//文本元素的值
-						const val = this.range.anchor.element.textContent
+						const val = this.range.anchor.element.textContent!
 						//起点向前一位
 						this.range.anchor.offset -= 1
 						//要删除的字符是否空白文本
@@ -517,7 +540,7 @@ class AlexEditor {
 		else {
 			const result = this.getElementsByRange().list.filter(item => {
 				//批量删除时需要过滤掉那些不显示的元素
-				return !AlexElement.VOID_NODES.includes(item.element.parsedom)
+				return !AlexElement.VOID_NODES.includes(item.element.parsedom!)
 			})
 			//起点所在的内部块元素
 			const anchorInblock = this.range.anchor.element.getInblock()
@@ -532,7 +555,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -549,7 +572,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -574,7 +597,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -599,7 +622,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -624,7 +647,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -641,7 +664,7 @@ class AlexEditor {
 				result.forEach(item => {
 					//如果存在offset说明不全是在选区内
 					if (item.offset) {
-						item.element.textContent = item.element.textContent.substring(0, item.offset[0]) + item.element.textContent.substring(item.offset[1])
+						item.element.textContent = item.element.textContent!.substring(0, item.offset[0]) + item.element.textContent!.substring(item.offset[1])
 					}
 					//不存在offset说明全在选区内
 					else {
@@ -675,7 +698,7 @@ class AlexEditor {
 	/**
 	 * 根据光标位置向编辑器内插入文本
 	 */
-	insertText(data) {
+	insertText(data: string) {
 		if (this.disabled) {
 			return
 		}
@@ -697,7 +720,7 @@ class AlexEditor {
 			}
 			//如果是文本
 			if (this.range.anchor.element.isText()) {
-				let val = this.range.anchor.element.textContent
+				let val = this.range.anchor.element.textContent!
 				this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset) + data + val.substring(this.range.anchor.offset)
 				this.range.anchor.offset = this.range.anchor.offset + data.length
 				this.range.focus.offset = this.range.anchor.offset
@@ -742,7 +765,7 @@ class AlexEditor {
 			//光标所在的内部块元素
 			const inblock = this.range.anchor.element.getInblock()
 			//终点位置
-			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent!.length : 1
 			//起点在内部块里
 			if (inblock) {
 				//在代码块样式中
@@ -781,15 +804,15 @@ class AlexEditor {
 						const newInblock = inblock.clone()
 						this.addElementAfter(newInblock, inblock)
 						//记录起点所在元素在内部块元素中的序列
-						const elements = AlexElement.flatElements(inblock.children)
+						const elements = AlexElement.flatElements(inblock.children!)
 						const index = elements.findIndex(item => {
-							return this.range.anchor.element.isEqual(item)
+							return this.range!.anchor.element.isEqual(item)
 						})
 						//将终点移动到内部块元素末尾
 						this.range.focus.moveToEnd(inblock)
 						this.delete()
 						//将终点移动到新的内部块元素
-						const newElements = AlexElement.flatElements(newInblock.children)
+						const newElements = AlexElement.flatElements(newInblock.children!)
 						this.range.focus.element = newElements[index]
 						this.range.focus.offset = this.range.anchor.offset
 						this.range.anchor.moveToStart(newInblock)
@@ -836,9 +859,9 @@ class AlexEditor {
 						const newBlock = block.clone()
 						this.addElementAfter(newBlock, block)
 						//记录起点所在元素在根级块元素中的序列
-						const elements = AlexElement.flatElements(block.children)
+						const elements = AlexElement.flatElements(block.children!)
 						const index = elements.findIndex(item => {
-							return this.range.anchor.element.isEqual(item)
+							return this.range!.anchor.element.isEqual(item)
 						})
 						//记录起点的偏移值
 						const offset = this.range.anchor.offset
@@ -846,7 +869,7 @@ class AlexEditor {
 						this.range.focus.moveToEnd(block)
 						this.delete()
 						//将终点移动到新的根级块元素
-						const newElements = AlexElement.flatElements(newBlock.children)
+						const newElements = AlexElement.flatElements(newBlock.children!)
 						this.range.focus.element = newElements[index]
 						this.range.focus.offset = offset
 						this.range.anchor.moveToStart(newBlock)
@@ -865,7 +888,7 @@ class AlexEditor {
 	 * 根据光标插入元素
 	 * cover表示所在根级块或者内部块元素只有换行符时是否覆盖此元素
 	 */
-	insertElement(ele, cover = true) {
+	insertElement(ele: AlexElement, cover: boolean | undefined = true) {
 		if (this.disabled) {
 			return
 		}
@@ -890,7 +913,7 @@ class AlexEditor {
 			//光标所在的内部块元素
 			const inblock = this.range.anchor.element.getInblock()
 			//终点位置
-			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1
+			const endOffset = this.range.anchor.element.isText() ? this.range.anchor.element.textContent!.length : 1
 			//如果插入的元素是内部块且行为值为block，同时光标在内部块里且所在内部块的行为值是block
 			if (ele.isInblock() && ele.behavior == 'block' && inblock && inblock.behavior == 'block') {
 				//光标所在内部块是一个只有换行符的块，则该块需要被覆盖
@@ -919,11 +942,11 @@ class AlexEditor {
 					//执行删除操作
 					this.delete()
 					//将终点移动到新内部块元素
-					const elements = AlexElement.flatElements(inblock.children)
+					const elements = AlexElement.flatElements(inblock.children!)
 					const index = elements.findIndex(item => {
-						return this.range.anchor.element.isEqual(item)
+						return this.range!.anchor.element.isEqual(item)
 					})
-					const newElements = AlexElement.flatElements(newInblock.children)
+					const newElements = AlexElement.flatElements(newInblock.children!)
 					this.range.focus.element = newElements[index]
 					this.range.focus.offset = this.range.anchor.offset
 					this.range.anchor.moveToStart(newInblock)
@@ -948,7 +971,7 @@ class AlexEditor {
 				//光标在当前内部块的终点位置
 				else if (this.range.anchor.offset == endOffset && !(nextElement && inblock.isContains(nextElement))) {
 					//插入到内部块里
-					this.addElementTo(ele, inblock, inblock.children.length)
+					this.addElementTo(ele, inblock, inblock.children!.length)
 				}
 				//光标在当前内部块的中间部分则需要切割
 				else {
@@ -959,11 +982,11 @@ class AlexEditor {
 					//执行删除操作
 					this.delete()
 					//将终点移动到新内部块元素
-					const elements = AlexElement.flatElements(inblock.children)
+					const elements = AlexElement.flatElements(inblock.children!)
 					const index = elements.findIndex(item => {
-						return this.range.anchor.element.isEqual(item)
+						return this.range!.anchor.element.isEqual(item)
 					})
-					const newElements = AlexElement.flatElements(newInblock.children)
+					const newElements = AlexElement.flatElements(newInblock.children!)
 					this.range.focus.element = newElements[index]
 					this.range.focus.offset = this.range.anchor.offset
 					this.range.anchor.moveToStart(newInblock)
@@ -990,7 +1013,7 @@ class AlexEditor {
 				//光标在当前根级块的终点位置
 				else if (this.range.anchor.offset == endOffset && !(nextElement && block.isContains(nextElement))) {
 					//插入到根级块里
-					this.addElementTo(ele, block, block.children.length)
+					this.addElementTo(ele, block, block.children!.length)
 				}
 				//光标在当前根级块的中间部分则需要切割
 				else {
@@ -1001,11 +1024,11 @@ class AlexEditor {
 					//执行删除操作
 					this.delete()
 					//将终点移动到新根级块元素
-					const elements = AlexElement.flatElements(block.children)
+					const elements = AlexElement.flatElements(block.children!)
 					const index = elements.findIndex(item => {
-						return this.range.anchor.element.isEqual(item)
+						return this.range!.anchor.element.isEqual(item)
 					})
-					const newElements = AlexElement.flatElements(newBlock.children)
+					const newElements = AlexElement.flatElements(newBlock.children!)
 					this.range.focus.element = newElements[index]
 					this.range.focus.offset = this.range.anchor.offset
 					this.range.anchor.moveToStart(newBlock)
@@ -1045,11 +1068,11 @@ class AlexEditor {
 					//执行删除操作
 					this.delete()
 					//将终点移动到新根级块元素
-					const elements = AlexElement.flatElements(block.children)
+					const elements = AlexElement.flatElements(block.children!)
 					const index = elements.findIndex(item => {
-						return this.range.anchor.element.isEqual(item)
+						return this.range!.anchor.element.isEqual(item)
 					})
-					const newElements = AlexElement.flatElements(newBlock.children)
+					const newElements = AlexElement.flatElements(newBlock.children!)
 					this.range.focus.element = newElements[index]
 					this.range.focus.offset = this.range.anchor.offset
 					this.range.anchor.moveToStart(newBlock)
@@ -1063,7 +1086,7 @@ class AlexEditor {
 			else {
 				//是文本
 				if (this.range.anchor.element.isText()) {
-					let val = this.range.anchor.element.textContent
+					let val = this.range.anchor.element.textContent!
 					let newText = this.range.anchor.element.clone()
 					this.range.anchor.element.textContent = val.substring(0, this.range.anchor.offset)
 					newText.textContent = val.substring(this.range.anchor.offset)
@@ -1093,47 +1116,55 @@ class AlexEditor {
 	 */
 	formatElementStack() {
 		//一种格式化方法对一组元素的格式化
-		const format = (elements, fn, isStack = false) => {
+		const format = (elements: (AlexElement | null)[], fn: (el: AlexElement) => void, isStack?: boolean) => {
+			if (typeof isStack != 'boolean') {
+				isStack = false
+			}
 			let index = 0
 			while (index < elements.length) {
+				//如果是null直接删除
+				if (!elements[index]) {
+					elements.splice(index, 1)
+					continue
+				}
 				//如果是空元素则直接删除，跳过当前后续步骤
-				if (elements[index].isEmpty()) {
-					if (this.range && elements[index].isContains(this.range.anchor.element)) {
+				if (elements[index]!.isEmpty()) {
+					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && elements[index].isContains(this.range.focus.element)) {
+					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
 					elements.splice(index, 1)
 					continue
 				}
 				//对元素使用该方法进行格式化
-				fn.apply(this, [elements[index]])
+				fn.apply(this, [elements[index]!])
 				//如果在经过格式化后是空元素，则需要删除该元素，并且跳过当前后续步骤
-				if (elements[index].isEmpty()) {
-					if (this.range && elements[index].isContains(this.range.anchor.element)) {
+				if (elements[index]!.isEmpty()) {
+					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && elements[index].isContains(this.range.focus.element)) {
+					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
 					elements.splice(index, 1)
 					continue
 				}
 				//如果当前元素是根级元素，但是不是根级块元素则转为根级块元素
-				if (!elements[index].isBlock() && isStack) {
-					elements[index].convertToBlock()
+				if (!elements[index]!.isBlock() && isStack) {
+					elements[index]!.convertToBlock()
 				}
 				//对自身所有的子元素进行格式化
-				if (elements[index].hasChildren()) {
-					format(elements[index].children, fn)
+				if (elements[index]!.hasChildren()) {
+					format(elements[index]!.children!, fn)
 				}
 				//子元素格式化后，当前元素变成空元素，则需要删除该元素，并且跳过后续步骤
-				if (elements[index].isEmpty()) {
-					if (this.range && elements[index].isContains(this.range.anchor.element)) {
+				if (elements[index]!.isEmpty()) {
+					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
 						setRecentlyPoint.apply(this, [this.range.anchor])
 					}
-					if (this.range && elements[index].isContains(this.range.focus.element)) {
+					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
 						setRecentlyPoint.apply(this, [this.range.focus])
 					}
 					elements.splice(index, 1)
@@ -1159,15 +1190,17 @@ class AlexEditor {
 	 * 渲染编辑器dom内容
 	 * unPushHistory为false表示加入历史记录
 	 */
-	domRender(unPushHistory = false) {
+	domRender(unPushHistory: boolean | undefined = false) {
 		//触发事件
 		this.emit('beforeRender')
 		//创建fragment
 		const fragment = document.createDocumentFragment()
 		//生成新的dom
 		this.stack.forEach(element => {
-			element.__render()
-			fragment.appendChild(element.elm)
+			if (element) {
+				element.__render()
+				fragment.appendChild(element.elm!)
+			}
 		})
 		//更新dom值
 		this.$el.innerHTML = ''
@@ -1206,19 +1239,19 @@ class AlexEditor {
 		}
 		if (this.range) {
 			//将虚拟光标位置转为真实光标位置
-			const handler = point => {
-				let node = null
-				let offset = null
+			const handler = (point: AlexPoint) => {
+				let node: HTMLElement | null = null
+				let offset: number | null = null
 				//如果是文本元素
 				if (point.element.isText()) {
-					node = point.element.elm.childNodes[0]
+					node = <HTMLElement>point.element.elm!.childNodes[0]
 					offset = point.offset
 				}
 				//自闭合元素
 				else {
-					node = point.element.parent.elm
-					const index = point.element.parent.children.findIndex(item => {
-						return point.element.isEqual(item)
+					node = point.element.parent!.elm
+					const index = point.element.parent!.children!.findIndex(item => {
+						return item && point.element.isEqual(item)
 					})
 					offset = point.offset + index
 				}
@@ -1228,20 +1261,20 @@ class AlexEditor {
 			const anchorResult = handler(this.range.anchor)
 			const focusResult = handler(this.range.focus)
 			//设置光标
-			const selection = window.getSelection()
+			const selection = window.getSelection()!
 			selection.removeAllRanges()
 			const range = document.createRange()
-			range.setStart(anchorResult.node, anchorResult.offset)
-			range.setEnd(focusResult.node, focusResult.offset)
+			range.setStart(anchorResult.node!, anchorResult.offset)
+			range.setEnd(focusResult.node!, focusResult.offset)
 			selection.addRange(range)
 		} else {
-			const selection = window.getSelection()
+			const selection = window.getSelection()!
 			selection.removeAllRanges()
 		}
 		setTimeout(() => {
 			setRangeInVisible.apply(this)
 			this.__innerSelectionChange = false
-			this.history.updateCurrentRange(this.range)
+			this.history.updateCurrentRange(this.range!)
 			this.emit('rangeUpdate', this.range)
 		}, 0)
 	}
@@ -1249,16 +1282,16 @@ class AlexEditor {
 	/**
 	 * 将html转为元素
 	 */
-	parseHtml(html) {
+	parseHtml(html: string) {
 		if (!html) {
 			throw new Error('You need to give an html content to convert')
 		}
 		const node = document.createElement('div')
 		node.innerHTML = html
-		let elements = []
+		let elements: AlexElement[] = []
 		Array.from(node.childNodes).forEach(el => {
 			if (el.nodeType == 1 || el.nodeType == 3) {
-				const element = this.parseNode(el)
+				const element = this.parseNode(<HTMLElement>el)
 				elements.push(element)
 			}
 		})
@@ -1268,7 +1301,7 @@ class AlexEditor {
 	/**
 	 * 将node转为元素
 	 */
-	parseNode(node) {
+	parseNode(node: HTMLElement) {
 		if (!(node instanceof Node)) {
 			throw new Error('The argument must be an node')
 		}
@@ -1289,9 +1322,9 @@ class AlexEditor {
 		const inline = inlineParse.find(item => item.parsedom == parsedom)
 		const closed = closedParse.find(item => item.parsedom == parsedom)
 		//创建的元素
-		let element = null
+		let element: AlexElement | null = null
 		//构造参数
-		let config = {
+		let config: AlexElementConfigType = {
 			type: 'inblock',
 			parsedom,
 			marks,
@@ -1318,11 +1351,11 @@ class AlexEditor {
 			if (inline.parse) {
 				config.parsedom = AlexElement.TEXT_NODE
 				if (DapCommon.isObject(inline.parse)) {
-					for (let key in inline.parse) {
-						if (typeof inline.parse[key] == 'function') {
-							config.styles[key] = inline.parse[key].apply(this, [node])
+					for (let key in <ObjectType>inline.parse) {
+						if (typeof (<ObjectType>inline.parse)[key] == 'function') {
+							config.styles[key] = (<ObjectType>inline.parse)[key].apply(this, [node])
 						} else {
-							config.styles[key] = inline.parse[key]
+							config.styles[key] = (<ObjectType>inline.parse)[key]
 						}
 					}
 				}
@@ -1344,12 +1377,12 @@ class AlexEditor {
 		if (!closed) {
 			Array.from(node.childNodes).forEach(childNode => {
 				if (childNode.nodeType == 1 || childNode.nodeType == 3) {
-					const childEle = this.parseNode(childNode)
+					const childEle = this.parseNode(<HTMLElement>childNode)
 					childEle.parent = element
-					if (element.hasChildren()) {
-						element.children.push(childEle)
+					if (element!.hasChildren()) {
+						element!.children!.push(childEle)
 					} else {
-						element.children = [childEle]
+						element!.children = [childEle]
 					}
 				}
 			})
@@ -1363,7 +1396,7 @@ class AlexEditor {
 	/**
 	 * 将指定元素与另一个元素进行合并（仅限内部块元素和根级块元素）
 	 */
-	merge(ele, previousEle) {
+	merge(ele: AlexElement, previousEle: AlexElement) {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}
@@ -1377,9 +1410,11 @@ class AlexEditor {
 		if (typeof this.customMerge == 'function') {
 			this.customMerge.apply(this, [ele, previousEle])
 		} else {
-			previousEle.children.push(...ele.children)
-			previousEle.children.forEach(item => {
-				item.parent = previousEle
+			previousEle.children!.push(...ele.children!)
+			previousEle.children!.forEach(item => {
+				if (item) {
+					item.parent = previousEle
+				}
 			})
 			ele.children = null
 		}
@@ -1388,20 +1423,21 @@ class AlexEditor {
 	/**
 	 * 根据key查询元素
 	 */
-	getElementByKey(key) {
+	getElementByKey(key: number) {
 		if (!key) {
 			throw new Error('You need to specify a key to do the query')
 		}
-		const fn = elements => {
-			let element = null
+		const fn = (elements: (AlexElement | null)[]): AlexElement | null => {
+			let element: AlexElement | null = null
 			const length = elements.length
 			for (let i = 0; i < length; i++) {
-				if (elements[i].key === key) {
-					element = elements[i]
+				const item = elements[i]
+				if (item && item.key === key) {
+					element = item
 					break
 				}
-				if (elements[i].hasChildren()) {
-					const el = fn(elements[i].children)
+				if (item && item.hasChildren()) {
+					const el = fn(item.children!)
 					if (el) {
 						element = el
 						break
@@ -1416,83 +1452,83 @@ class AlexEditor {
 	/**
 	 * 获取指定元素的前一个兄弟元素（会跳过空元素）
 	 */
-	getPreviousElement(ele) {
+	getPreviousElement(ele: AlexElement): AlexElement | null {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
 		if (ele.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return ele.isEqual(item)
+				return item && ele.isEqual(item)
 			})
 			if (index <= 0) {
 				return null
 			}
-			if (this.stack[index - 1].isEmpty()) {
-				return this.getPreviousElement(this.stack[index - 1])
+			if (this.stack[index - 1]!.isEmpty()) {
+				return this.getPreviousElement(this.stack[index - 1]!)
 			}
 			return this.stack[index - 1]
 		} else {
-			const index = ele.parent.children.findIndex(item => {
-				return ele.isEqual(item)
+			const index = ele.parent!.children!.findIndex(item => {
+				return item && ele.isEqual(item)
 			})
 			if (index <= 0) {
 				return null
 			}
-			if (ele.parent.children[index - 1].isEmpty()) {
-				return this.getPreviousElement(ele.parent.children[index - 1])
+			if (ele.parent!.children![index - 1]!.isEmpty()) {
+				return this.getPreviousElement(ele.parent!.children![index - 1]!)
 			}
-			return ele.parent.children[index - 1]
+			return ele.parent!.children![index - 1]
 		}
 	}
 
 	/**
 	 * 获取指定元素的后一个兄弟元素（会跳过空元素）
 	 */
-	getNextElement(ele) {
+	getNextElement(ele: AlexElement): AlexElement | null {
 		if (!AlexElement.isElement(ele)) {
 			throw new Error('The argument must be an AlexElement instance')
 		}
 		if (ele.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return ele.isEqual(item)
+				return item && ele.isEqual(item)
 			})
 			if (index >= this.stack.length - 1) {
 				return null
 			}
-			if (this.stack[index + 1].isEmpty()) {
-				return this.getNextElement(this.stack[index + 1])
+			if (this.stack[index + 1]!.isEmpty()) {
+				return this.getNextElement(this.stack[index + 1]!)
 			}
 			return this.stack[index + 1]
 		} else {
-			const index = ele.parent.children.findIndex(item => {
-				return ele.isEqual(item)
+			const index = ele.parent!.children!.findIndex(item => {
+				return item && ele.isEqual(item)
 			})
-			if (index >= ele.parent.children.length - 1) {
+			if (index >= ele.parent!.children!.length - 1) {
 				return null
 			}
-			if (ele.parent.children[index + 1].isEmpty()) {
-				return this.getNextElement(ele.parent.children[index + 1])
+			if (ele.parent!.children![index + 1]!.isEmpty()) {
+				return this.getNextElement(ele.parent!.children![index + 1]!)
 			}
-			return ele.parent.children[index + 1]
+			return ele.parent!.children![index + 1]
 		}
 	}
 
 	/**
 	 * 向上查询可以设置焦点的元素（会跳过空元素）
 	 */
-	getPreviousElementOfPoint(point) {
+	getPreviousElementOfPoint(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
 		//查找子元素中的可设为焦点的元素
-		const fnChild = children => {
+		const fnChild = (children: (AlexElement | null)[]): AlexElement | null => {
 			let el = null
 			//遍历子元素
 			const length = children.length
 			for (let i = length - 1; i >= 0; i--) {
 				const child = children[i]
 				//如果子元素是空元素跳过
-				if (child.isEmpty()) {
+				if (!child || child.isEmpty()) {
 					continue
 				}
 				//如果子元素是文本元素或者自闭合元素
@@ -1501,7 +1537,7 @@ class AlexEditor {
 					break
 				}
 				//如果是其他元素
-				el = fnChild(child.children)
+				el = fnChild(child.children!)
 				//这里如果在子元素中找到了可以设置焦点的元素，一定要break直接终止for循环的执行
 				if (el) {
 					break
@@ -1510,7 +1546,7 @@ class AlexEditor {
 			return el
 		}
 
-		const fn = element => {
+		const fn = (element: AlexElement): AlexElement | null => {
 			//获取上一个兄弟元素
 			const previousElement = this.getPreviousElement(element)
 			//如果兄弟元素存在
@@ -1524,7 +1560,7 @@ class AlexEditor {
 					return previousElement
 				}
 				/** 其他元素的情况下 */
-				return fnChild(previousElement.children)
+				return fnChild(previousElement.children!)
 			}
 			//如果兄弟元素不存在，表示当前焦点所在元素是子元素数组中最后一个，则查找父元素的下个兄弟节点
 			if (element.parent) {
@@ -1539,20 +1575,19 @@ class AlexEditor {
 	/**
 	 * 向下查找可以设置焦点的元素（会跳过空元素）
 	 */
-	getNextElementOfPoint(point) {
+	getNextElementOfPoint(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
-
 		//查找子元素中的可设为焦点的元素
-		const fnChild = children => {
-			let el = null
+		const fnChild = (children: (AlexElement | null)[]): AlexElement | null => {
+			let el: AlexElement | null = null
 			//遍历子元素
 			const length = children.length
 			for (let i = 0; i < length; i++) {
 				const child = children[i]
 				//如果子元素是空元素跳过
-				if (child.isEmpty()) {
+				if (!child || child.isEmpty()) {
 					continue
 				}
 				//如果子元素是文本元素或者自闭合元素
@@ -1561,7 +1596,7 @@ class AlexEditor {
 					break
 				}
 				//如果是其他元素
-				el = fnChild(child.children)
+				el = fnChild(child.children!)
 				//这里如果在子元素中找到了可以设置焦点的元素，一定要break直接终止for循环的执行
 				if (el) {
 					break
@@ -1570,7 +1605,7 @@ class AlexEditor {
 			return el
 		}
 
-		const fn = element => {
+		const fn = (element: AlexElement): AlexElement | null => {
 			//获取下一个兄弟元素
 			const nextElement = this.getNextElement(element)
 			//如果兄弟元素存在
@@ -1584,7 +1619,7 @@ class AlexEditor {
 					return nextElement
 				}
 				/** 其他元素的情况下 */
-				return fnChild(nextElement.children)
+				return fnChild(nextElement.children!)
 			}
 			//如果兄弟元素不存在，表示当前焦点所在元素是子元素数组中最后一个，则查找父元素的下个兄弟节点
 			if (element.parent) {
@@ -1599,7 +1634,7 @@ class AlexEditor {
 	/**
 	 * 获取选区之间的元素，flat参数表示是否返回扁平化的数据
 	 */
-	getElementsByRange() {
+	getElementsByRange(): ElementsRangeType {
 		//虚拟光标不存在
 		if (!this.range) {
 			return {
@@ -1618,7 +1653,7 @@ class AlexEditor {
 
 		//起点和终点在一个元素里
 		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent.length : 1)
+			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent!.length : 1)
 			return {
 				list: [
 					{
@@ -1639,25 +1674,25 @@ class AlexEditor {
 
 		//获取扁平化的数据
 		const getFlatList = () => {
-			let flatList = []
+			let flatList: ElementRangeType[] = []
 			//起点是不是在元素开始处
-			const anchorInStart = this.range.anchor.offset == 0
+			const anchorInStart = this.range!.anchor.offset == 0
 			//终点是不是在元素末尾处
-			const focusInEnd = this.range.focus.offset == (this.range.focus.element.isText() ? this.range.focus.element.textContent.length : 1)
+			const focusInEnd = this.range!.focus.offset == (this.range!.focus.element.isText() ? this.range!.focus.element.textContent!.length : 1)
 			//获取起点和终点所在的根级块
-			const anchorBlock = this.range.anchor.element.getBlock()
-			const focusBlock = this.range.focus.element.getBlock()
+			const anchorBlock = this.range!.anchor.element.getBlock()
+			const focusBlock = this.range!.focus.element.getBlock()
 			//获取起点和终点所在根级块的序列
-			const anchorBlockIndex = this.stack.findIndex(el => anchorBlock.isEqual(el))
-			const focusBlockIndex = this.stack.findIndex(el => focusBlock.isEqual(el))
+			const anchorBlockIndex = this.stack.findIndex(el => el && anchorBlock.isEqual(el))
+			const focusBlockIndex = this.stack.findIndex(el => el && focusBlock.isEqual(el))
 			//获取这两个块元素之间所有元素，包括起点和终点
 			let elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
 			//获取以起点所在元素为第一个文本元素或者自闭合元素的最高级元素
-			const firstElement = getHighestByFirst(this.range.anchor)
+			const firstElement = getHighestByFirst(this.range!.anchor)
 			//因为数组中以起点所在根级块元素为第一个元素，到起点之间，可能有些元素不属于选区范围内，因此通过firstElement或者this.range.anchor.element的序列来截取
-			const startIndex = elements.findIndex(el => el.isEqual(firstElement ? firstElement : this.range.anchor.element))
+			const startIndex = elements.findIndex(el => el.isEqual(firstElement ? firstElement : this.range!.anchor.element))
 			//因为在数组中终点所在元素的祖先元素肯定在它前面，所以在它后面的都不是选区范围内的元素
-			const endIndex = elements.findIndex(el => el.isEqual(this.range.focus.element))
+			const endIndex = elements.findIndex(el => el.isEqual(this.range!.focus.element))
 			//截取
 			if (startIndex > 0 || endIndex < elements.length - 1) {
 				elements = elements.slice(startIndex, endIndex + 1)
@@ -1666,30 +1701,30 @@ class AlexEditor {
 			const length = elements.length
 			for (let i = 0; i < length; i++) {
 				//起点元素
-				if (this.range.anchor.element.isEqual(elements[i])) {
+				if (this.range!.anchor.element.isEqual(elements[i])) {
 					//如果起点在元素开始处，则将起点所在元素推入数组
 					if (anchorInStart) {
 						flatList.push({
-							element: this.range.anchor.element,
+							element: this.range!.anchor.element,
 							offset: false
 						})
 					}
 					//如果起点不在元素的末尾处，此时起点元素必然是文本元素
-					else if (this.range.anchor.element.isText() && this.range.anchor.offset < this.range.anchor.element.textContent.length) {
+					else if (this.range!.anchor.element.isText() && this.range!.anchor.offset < this.range!.anchor.element.textContent!.length) {
 						flatList.push({
-							element: this.range.anchor.element,
-							offset: [this.range.anchor.offset, this.range.anchor.element.textContent.length]
+							element: this.range!.anchor.element,
+							offset: [this.range!.anchor.offset, this.range!.anchor.element.textContent!.length]
 						})
 					}
 				}
 				//包含起点的元素
-				else if (elements[i].isContains(this.range.anchor.element)) {
+				else if (elements[i].isContains(this.range!.anchor.element)) {
 					//起点是不是它后代文本元素或者自闭合元素中的第一个
-					const isFirst = this.range.anchor.element.isFirst(elements[i])
+					const isFirst = this.range!.anchor.element.isFirst(elements[i])
 					//该元素是否包含终点
-					const hasFocus = elements[i].isContains(this.range.focus.element)
+					const hasFocus = elements[i].isContains(this.range!.focus.element)
 					//终点元素是否它后代文本元素或者自闭合元素中的最后一个
-					const isLast = this.range.focus.element.isLast(elements[i])
+					const isLast = this.range!.focus.element.isLast(elements[i])
 					//该元素都在选区内，并且终点也在该元素内
 					if (anchorInStart && isFirst && hasFocus && isLast && focusInEnd) {
 						flatList.push({
@@ -1706,26 +1741,26 @@ class AlexEditor {
 					}
 				}
 				//终点元素
-				else if (this.range.focus.element.isEqual(elements[i])) {
+				else if (this.range!.focus.element.isEqual(elements[i])) {
 					//如果终点在元素结尾处
 					if (focusInEnd) {
 						flatList.push({
-							element: this.range.focus.element,
+							element: this.range!.focus.element,
 							offset: false
 						})
 					}
 					//如果终点不在元素起点处，则终点所在元素必然是文本元素
-					else if (this.range.focus.offset > 0) {
+					else if (this.range!.focus.offset > 0) {
 						flatList.push({
-							element: this.range.focus.element,
-							offset: [0, this.range.focus.offset]
+							element: this.range!.focus.element,
+							offset: [0, this.range!.focus.offset]
 						})
 					}
 				}
 				//包含终点的元素
-				else if (elements[i].isContains(this.range.focus.element)) {
+				else if (elements[i].isContains(this.range!.focus.element)) {
 					//终点元素是否它后代文本元素或者自闭合元素中的最后一个
-					const isLast = this.range.focus.element.isLast(elements[i])
+					const isLast = this.range!.focus.element.isLast(elements[i])
 					//该元素都在选区内
 					if (isLast && focusInEnd) {
 						flatList.push({
@@ -1745,13 +1780,13 @@ class AlexEditor {
 			return flatList
 		}
 		//根据扁平化的数据获取非扁平化的数组
-		const getList = flatList => {
+		const getList = (flatList: ElementRangeType[]) => {
 			//返回的树结构数组
-			let list = []
+			let list: ElementRangeType[] = []
 			//返回的树结构数组中的根级块元素数组
-			let blockElements = []
+			let blockElements: AlexElement[] = []
 			//返回的树结构数组中的行内元素、内部块元素
-			let notBlockElements = []
+			let notBlockElements: AlexElement[] = []
 			//遍历扁平化的数据结果
 			const length = flatList.length
 			for (let i = 0; i < length; i++) {
@@ -1803,7 +1838,7 @@ class AlexEditor {
 	/**
 	 * 将指定元素添加到父元素的子元素数组中
 	 */
-	addElementTo(childEle, parentEle, index = 0) {
+	addElementTo(childEle: AlexElement, parentEle: AlexElement, index: number | undefined = 0) {
 		if (!AlexElement.isElement(childEle)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}
@@ -1815,10 +1850,10 @@ class AlexEditor {
 		}
 		//如果有子元素
 		if (parentEle.hasChildren()) {
-			if (index >= parentEle.children.length) {
-				parentEle.children.push(childEle)
+			if (index >= parentEle.children!.length) {
+				parentEle.children!.push(childEle)
 			} else {
-				parentEle.children.splice(index, 0, childEle)
+				parentEle.children!.splice(index, 0, childEle)
 			}
 		} else {
 			parentEle.children = [childEle]
@@ -1830,7 +1865,7 @@ class AlexEditor {
 	/**
 	 * 将指定元素添加到另一个元素前面
 	 */
-	addElementBefore(newEle, targetEle) {
+	addElementBefore(newEle: AlexElement, targetEle: AlexElement) {
 		if (!AlexElement.isElement(newEle)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}
@@ -1839,22 +1874,22 @@ class AlexEditor {
 		}
 		if (targetEle.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return targetEle.isEqual(item)
+				return item && targetEle.isEqual(item)
 			})
 			this.stack.splice(index, 0, newEle)
 			newEle.parent = null
 		} else {
-			const index = targetEle.parent.children.findIndex(item => {
-				return targetEle.isEqual(item)
+			const index = targetEle.parent!.children!.findIndex(item => {
+				return item && targetEle.isEqual(item)
 			})
-			this.addElementTo(newEle, targetEle.parent, index)
+			this.addElementTo(newEle, targetEle.parent!, index)
 		}
 	}
 
 	/**
 	 * 将指定元素添加到另一个元素后面
 	 */
-	addElementAfter(newEle, targetEle) {
+	addElementAfter(newEle: AlexElement, targetEle: AlexElement) {
 		if (!AlexElement.isElement(newEle)) {
 			throw new Error('The first argument must be an AlexElement instance')
 		}
@@ -1863,7 +1898,7 @@ class AlexEditor {
 		}
 		if (targetEle.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return targetEle.isEqual(item)
+				return item && targetEle.isEqual(item)
 			})
 			if (index >= this.stack.length - 1) {
 				this.stack.push(newEle)
@@ -1872,17 +1907,17 @@ class AlexEditor {
 			}
 			newEle.parent = null
 		} else {
-			const index = targetEle.parent.children.findIndex(item => {
-				return targetEle.isEqual(item)
+			const index = targetEle.parent!.children!.findIndex(item => {
+				return item && targetEle.isEqual(item)
 			})
-			this.addElementTo(newEle, targetEle.parent, index + 1)
+			this.addElementTo(newEle, targetEle.parent!, index + 1)
 		}
 	}
 
 	/**
 	 * 将虚拟光标设置到指定元素开始处
 	 */
-	collapseToStart(element) {
+	collapseToStart(element: AlexElement) {
 		if (this.disabled) {
 			return
 		}
@@ -1897,30 +1932,30 @@ class AlexEditor {
 		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
-			this.range.anchor.moveToStart(element)
-			this.range.focus.moveToStart(element)
+			this.range!.anchor.moveToStart(element)
+			this.range!.focus.moveToStart(element)
 		}
 		//文档最前面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom!)
 			})
 			if (flatElements.length == 0) {
 				throw new Error('There is no element to set the focus')
 			}
-			this.range.anchor.moveToStart(flatElements[0])
-			this.range.focus.moveToStart(flatElements[0])
+			this.range!.anchor.moveToStart(flatElements[0])
+			this.range!.focus.moveToStart(flatElements[0])
 		}
 		//如果一开始range是null的话，则更新当前history的range
 		if (rangeIsNull) {
-			this.history.updateCurrentRange(this.range)
+			this.history.updateCurrentRange(this.range!)
 		}
 	}
 
 	/**
 	 * 将虚拟光标设置到指定元素最后
 	 */
-	collapseToEnd(element) {
+	collapseToEnd(element: AlexElement) {
 		if (this.disabled) {
 			return
 		}
@@ -1935,24 +1970,24 @@ class AlexEditor {
 		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
-			this.range.anchor.moveToEnd(element)
-			this.range.focus.moveToEnd(element)
+			this.range!.anchor.moveToEnd(element)
+			this.range!.focus.moveToEnd(element)
 		}
 		//文档最后面
 		else {
 			const flatElements = AlexElement.flatElements(this.stack).filter(el => {
-				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom)
+				return !el.isEmpty() && !AlexElement.VOID_NODES.includes(el.parsedom!)
 			})
 			const length = flatElements.length
 			if (length == 0) {
 				throw new Error('There is no element to set the focus')
 			}
-			this.range.anchor.moveToEnd(flatElements[length - 1])
-			this.range.focus.moveToEnd(flatElements[length - 1])
+			this.range!.anchor.moveToEnd(flatElements[length - 1])
+			this.range!.focus.moveToEnd(flatElements[length - 1])
 		}
 		//如果一开始range是null的话，则更新当前history的range
 		if (rangeIsNull) {
-			this.history.updateCurrentRange(this.range)
+			this.history.updateCurrentRange(this.range!)
 		}
 	}
 
@@ -1969,15 +2004,15 @@ class AlexEditor {
 	 */
 	setEnabled() {
 		this.disabled = false
-		this.$el.setAttribute('contenteditable', true)
+		this.$el.setAttribute('contenteditable', 'true')
 	}
 
 	/**
 	 * 触发自定义事件
 	 */
-	emit(eventName, ...value) {
+	emit(eventName: string, ...value: any) {
 		if (Array.isArray(this.__events[eventName])) {
-			this.__events[eventName].forEach(fn => {
+			this.__events[eventName].forEach((fn: (...args: any) => void) => {
 				fn.apply(this, [...value])
 			})
 			return true
@@ -1988,7 +2023,7 @@ class AlexEditor {
 	/**
 	 * 监听自定义事件
 	 */
-	on(eventName, eventHandle) {
+	on(eventName: string, eventHandle: (...args: any) => void) {
 		if (!this.__events[eventName]) {
 			this.__events[eventName] = []
 		}
@@ -2005,4 +2040,3 @@ class AlexEditor {
 		DapEvent.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
 	}
 }
-export default AlexEditor

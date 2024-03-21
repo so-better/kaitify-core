@@ -1,9 +1,47 @@
 import { data as DapData, element as DapElement, common as DapCommon } from 'dap-util'
+import { AlexElement } from '../Element'
+import { AlexPoint } from '../Point'
+
+//定义一个对象集合的类型
+export type ObjectType = {
+	[key: string]: any | null
+}
+
+//编辑器参数类型
+export type EditorOptionsType = {
+	//是否禁用
+	disabled?: boolean
+	//自定义渲染规则
+	renderRules?: ((element: AlexElement) => void)[]
+	//编辑器的默认html值
+	value?: string
+	//是否允许复制
+	allowCopy?: boolean
+	//是否允许粘贴
+	allowPaste?: boolean
+	//是否允许剪切
+	allowCut?: boolean
+	//是否允许粘贴html
+	allowPasteHtml?: boolean
+	//自定义纯文本粘贴方法
+	customTextPaste?: ((text: string) => void | Promise<void>) | null
+	//自定义html粘贴方法
+	customHtmlPaste?: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null
+	//自定义图片粘贴方法
+	customImagePaste?: ((url: string) => void | Promise<void>) | null
+	//自定义视频粘贴方法
+	customVideoPaste?: ((url: string) => void | Promise<void>) | null
+	//自定义处理不可编辑元素合并的逻辑
+	customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
+	//自定义dom转为非文本元素的后续处理逻辑
+	customParseNode?: ((el: AlexElement) => AlexElement) | null
+}
+
 /**
  * 获取node元素的属性集合
  */
-export const getAttributes = function (node) {
-	let o = {}
+export const getAttributes = function (node: HTMLElement) {
+	let o: ObjectType = {}
 	const length = node.attributes.length
 	for (let i = 0; i < length; i++) {
 		const attribute = node.attributes[i]
@@ -19,10 +57,10 @@ export const getAttributes = function (node) {
 /**
  * 获取node元素的样式集合
  */
-export const getStyles = function (node) {
-	let o = {}
-	if (node.getAttribute('style')) {
-		const styles = node.getAttribute('style')
+export const getStyles = function (node: HTMLElement) {
+	let o: ObjectType = {}
+	const styles = node.getAttribute('style')
+	if (styles) {
 		let i = 0
 		let start = 0
 		let splitStyles = []
@@ -50,7 +88,7 @@ export const getStyles = function (node) {
 /**
  * 生成唯一的key
  */
-export const createUniqueKey = function () {
+export const createUniqueKey = function (): number {
 	//获取唯一id
 	let key = DapData.get(window, 'data-alex-editor-key') || 0
 	key++
@@ -61,7 +99,7 @@ export const createUniqueKey = function () {
 /**
  * 生成唯一的guid
  */
-export const createGuid = function () {
+export const createGuid = function (): number {
 	//获取唯一id
 	let key = DapData.get(window, 'data-alex-editor-guid') || 0
 	key++
@@ -72,14 +110,14 @@ export const createGuid = function () {
 /**
  * 判断字符串是否零宽度无断空白字符
  */
-export const isSpaceText = function (val) {
+export const isSpaceText = function (val: string) {
 	return /^[\uFEFF]+$/g.test(val)
 }
 
 /**
  * 深拷贝函数
  */
-export const cloneData = function (data) {
+export const cloneData = function (data: any) {
 	if (DapCommon.isObject(data) || Array.isArray(data)) {
 		return JSON.parse(JSON.stringify(data))
 	}
@@ -89,9 +127,9 @@ export const cloneData = function (data) {
 /**
  * 判断某个node是否包含另一个node
  */
-export const isContains = function (parentNode, childNode) {
+export const isContains = function (parentNode: HTMLElement, childNode: HTMLElement) {
 	if (childNode.nodeType == 3) {
-		return DapElement.isContains(parentNode, childNode.parentNode)
+		return DapElement.isContains(parentNode, <HTMLElement>childNode.parentNode)
 	}
 	return DapElement.isContains(parentNode, childNode)
 }
@@ -99,11 +137,11 @@ export const isContains = function (parentNode, childNode) {
 /**
  * blob对象转base64字符串
  */
-export const blobToBase64 = function (blob) {
-	return new Promise(resolve => {
+export const blobToBase64 = function (blob: Blob) {
+	return new Promise<string>(resolve => {
 		const fileReader = new FileReader()
 		fileReader.onload = e => {
-			resolve(e.target.result)
+			resolve(<string>e.target!.result)
 		}
 		fileReader.readAsDataURL(blob)
 	})
@@ -127,55 +165,42 @@ export const canUseClipboard = function () {
 /**
  * 初始化编辑器dom
  */
-export const initEditorNode = function (node) {
+export const initEditorNode = function (node: HTMLElement | string) {
 	//判断是否字符串，如果是字符串按照选择器来寻找元素
 	if (typeof node == 'string' && node) {
-		node = document.body.querySelector(node)
+		node = <HTMLElement>document.body.querySelector(node)
 	}
 	//如何node不是元素则抛出异常
 	if (!DapElement.isElement(node)) {
 		throw new Error('You must specify a dom container to initialize the editor')
 	}
 	//如果已经初始化过了则抛出异常
-	if (DapData.get(node, 'data-alex-editor-init')) {
+	if (DapData.get(<HTMLElement>node, 'data-alex-editor-init')) {
 		throw new Error('The element node has been initialized to the editor')
 	}
 	//添加初始化的标记
-	DapData.set(node, 'data-alex-editor-init', true)
+	DapData.set(<HTMLElement>node, 'data-alex-editor-init', true)
 
-	return node
+	return <HTMLElement>node
 }
 
 /**
  * 格式化编辑器的options参数
  */
-export const initEditorOptions = function (options) {
-	let opts = {
-		//是否禁用
+export const initEditorOptions = function (options: EditorOptionsType) {
+	let opts: EditorOptionsType = {
 		disabled: false,
-		//自定义渲染规则
 		renderRules: [],
-		//编辑器的默认html值
 		value: '',
-		//是否允许复制
 		allowCopy: true,
-		//是否允许粘贴
 		allowPaste: true,
-		//是否允许剪切
 		allowCut: true,
-		//是否允许粘贴html
 		allowPasteHtml: false,
-		//自定义纯文本粘贴方法
 		customTextPaste: null,
-		//自定义html粘贴方法
 		customHtmlPaste: null,
-		//自定义图片粘贴方法
 		customImagePaste: null,
-		//自定义视频粘贴方法
 		customVideoPaste: null,
-		//自定义处理不可编辑元素合并的逻辑
 		customMerge: null,
-		//自定义dom转为非文本元素的后续处理逻辑
 		customParseNode: null
 	}
 	if (DapCommon.isObject(options)) {
@@ -225,7 +250,7 @@ export const initEditorOptions = function (options) {
 /**
  * 获取以目标元素为子孙元素中文本元素或者自闭合元素排列第一的元素的最高级元素
  */
-export const getHighestByFirst = function (point) {
+export const getHighestByFirst = function (point: AlexPoint) {
 	//element一定是文本元素或者自闭合元素
 	let temp = point.element
 	while (temp.parent) {

@@ -1,14 +1,15 @@
-import AlexElement from '../Element'
+import AlexEditor from '..'
+import { AlexElement } from '../Element'
 import { cloneData } from './tool'
 
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
  */
-export const handleNotStackBlock = function (element) {
+export const handleNotStackBlock = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
 		//获取子元素中的根级块元素
-		const blocks = element.children.filter(el => {
-			return !el.isEmpty() && el.isBlock()
+		const blocks: AlexElement[] = element.children!.filter((el): el is AlexElement => {
+			return !!el && !el.isEmpty() && el.isBlock()
 		})
 		//对子元素中的根级块元素进行转换
 		blocks.forEach(el => {
@@ -25,11 +26,11 @@ export const handleNotStackBlock = function (element) {
 /**
  * 内部块元素与其他元素不能同时存在于父元素的子元素数组中
  */
-export const handleInblockWithOther = function (element) {
+export const handleInblockWithOther = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
 		//子元素数组中非空元素
-		const children = element.children.filter(el => {
-			return !el.isEmpty()
+		const children = element.children!.filter((el): el is AlexElement => {
+			return !!el && !el.isEmpty()
 		})
 		//子元素中的内部块元素
 		const inblocks = children.filter(el => {
@@ -47,12 +48,12 @@ export const handleInblockWithOther = function (element) {
 /**
  * 行内元素的子元素不能是内部块元素
  */
-export const handleInlineChildrenNotInblock = function (element) {
+export const handleInlineChildrenNotInblock = function (this: AlexEditor, element: AlexElement) {
 	//如果行内元素有子元素
 	if (element.isInline() && element.hasChildren()) {
 		//元素中的内部块元素
-		const inblocks = element.children.filter(el => {
-			return !el.isEmpty() && el.isInblock()
+		const inblocks = element.children!.filter((el): el is AlexElement => {
+			return !!el && !el.isEmpty() && el.isInblock()
 		})
 		//对子元素中的内部块元素进行转换为行内元素
 		inblocks.forEach(el => {
@@ -64,12 +65,12 @@ export const handleInlineChildrenNotInblock = function (element) {
 /**
  * 换行符清除规则（虚拟光标可能更新）
  */
-export const breakFormat = function (element) {
+export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 	//如果元素有子元素
 	if (element.hasChildren()) {
 		//子元素数组中过滤掉空元素
-		const children = element.children.filter(el => {
-			return !el.isEmpty()
+		const children = element.children!.filter((el): el is AlexElement => {
+			return !el || !el.isEmpty()
 		})
 		//子元素数组中的换行符元素
 		const breaks = children.filter(el => {
@@ -99,9 +100,9 @@ export const breakFormat = function (element) {
 /**
  * 父子元素合并策略（虚拟光标可能更新）
  */
-export const mergeWithParentElement = function (element) {
+export const mergeWithParentElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
-	const canMerge = (parent, child) => {
+	const canMerge = (parent: AlexElement, child: AlexElement) => {
 		//子元素是文本元素，父元素是标签等于文本标签的行内元素
 		if (child.isText() && parent.isInline()) {
 			return parent.parsedom == AlexElement.TEXT_NODE
@@ -113,7 +114,7 @@ export const mergeWithParentElement = function (element) {
 		return false
 	}
 	//两个元素的合并方法
-	const merge = (parent, child) => {
+	const merge = (parent: AlexElement, child: AlexElement) => {
 		//子元素是文本元素，父元素与之标签名相同
 		if (child.isText()) {
 			parent.type = 'text'
@@ -121,7 +122,7 @@ export const mergeWithParentElement = function (element) {
 			//如果子元素有标记
 			if (child.hasMarks()) {
 				if (parent.hasMarks()) {
-					Object.assign(parent.marks, cloneData(child.marks))
+					Object.assign(parent.marks!, cloneData(child.marks))
 				} else {
 					parent.marks = cloneData(child.marks)
 				}
@@ -129,7 +130,7 @@ export const mergeWithParentElement = function (element) {
 			//如果子元素有样式
 			if (child.hasStyles()) {
 				if (parent.hasStyles()) {
-					Object.assign(parent.styles, cloneData(child.styles))
+					Object.assign(parent.styles!, cloneData(child.styles))
 				} else {
 					parent.styles = cloneData(child.styles)
 				}
@@ -150,7 +151,7 @@ export const mergeWithParentElement = function (element) {
 			//如果子元素有标记
 			if (child.hasMarks()) {
 				if (parent.hasMarks()) {
-					Object.assign(parent.marks, cloneData(child.marks))
+					Object.assign(parent.marks!, cloneData(child.marks))
 				} else {
 					parent.marks = cloneData(child.marks)
 				}
@@ -158,26 +159,28 @@ export const mergeWithParentElement = function (element) {
 			//如果子元素有样式
 			if (child.hasStyles()) {
 				if (parent.hasStyles()) {
-					Object.assign(parent.styles, cloneData(child.styles))
+					Object.assign(parent.styles!, cloneData(child.styles))
 				} else {
 					parent.styles = cloneData(child.styles)
 				}
 			}
 			//如果子元素也有子元素
 			if (child.hasChildren()) {
-				parent.children = [...child.children]
+				parent.children = [...child.children!]
 				parent.children.forEach(item => {
-					item.parent = parent
+					if (item) {
+						item.parent = parent
+					}
 				})
 			}
 			//子元素与父元素合并和再对父元素进行处理
 			mergeElement(parent)
 		}
 	}
-	const mergeElement = ele => {
+	const mergeElement = (ele: AlexElement) => {
 		//存在子元素并且子元素只有一个且父子元素可以合并
-		if (ele.hasChildren() && ele.children.length == 1 && canMerge(ele, ele.children[0])) {
-			merge(ele, ele.children[0])
+		if (ele.hasChildren() && ele.children!.length == 1 && ele.children![0] && canMerge(ele, ele.children![0])) {
+			merge(ele, ele.children![0])
 		}
 	}
 	mergeElement(element)
@@ -186,9 +189,9 @@ export const mergeWithParentElement = function (element) {
 /**
  * 兄弟元素合并策略（虚拟光标可能更新）
  */
-export const mergeWithBrotherElement = function (element) {
+export const mergeWithBrotherElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
-	const canMerge = (pel, nel) => {
+	const canMerge = (pel: AlexElement, nel: AlexElement) => {
 		//都是空元素，可以合并
 		if (pel.isEmpty() || nel.isEmpty()) {
 			return true
@@ -204,7 +207,7 @@ export const mergeWithBrotherElement = function (element) {
 		return false
 	}
 	//两个元素的合并方法
-	const merge = (pel, nel) => {
+	const merge = (pel: AlexElement, nel: AlexElement) => {
 		//存在空元素
 		if (pel.isEmpty() || nel.isEmpty()) {
 			//后一个元素是空元素
@@ -228,10 +231,10 @@ export const mergeWithBrotherElement = function (element) {
 					}
 				}
 				//删除被合并的元素
-				const index = nel.parent.children.findIndex(item => {
-					return nel.isEqual(item)
+				const index = nel.parent!.children!.findIndex(item => {
+					return item && nel.isEqual(item)
 				})
-				nel.parent.children.splice(index, 1)
+				nel.parent!.children!.splice(index, 1)
 			}
 			//前一个元素是空元素
 			else if (pel.isEmpty()) {
@@ -254,10 +257,10 @@ export const mergeWithBrotherElement = function (element) {
 					}
 				}
 				//删除被合并的元素
-				const index = pel.parent.children.findIndex(item => {
-					return pel.isEqual(item)
+				const index = pel.parent!.children!.findIndex(item => {
+					return item && pel.isEqual(item)
 				})
-				pel.parent.children.splice(index, 1)
+				pel.parent!.children!.splice(index, 1)
 			}
 		}
 		//文本元素合并
@@ -265,44 +268,48 @@ export const mergeWithBrotherElement = function (element) {
 			//起点在后一个元素上，则将起点设置到前一个元素上
 			if (this.range && nel.isEqual(this.range.anchor.element)) {
 				this.range.anchor.element = pel
-				this.range.anchor.offset = pel.textContent.length + this.range.anchor.offset
+				this.range.anchor.offset = pel.textContent!.length + this.range.anchor.offset
 			}
 			//终点在后一个元素上，则将终点设置到前一个元素上
 			if (this.range && nel.isEqual(this.range.focus.element)) {
 				this.range.focus.element = pel
-				this.range.focus.offset = pel.textContent.length + this.range.focus.offset
+				this.range.focus.offset = pel.textContent!.length + this.range.focus.offset
 			}
 			//将后一个元素的内容给前一个元素
-			pel.textContent += nel.textContent
+			pel.textContent! += nel.textContent!
 			//删除被合并的元素
-			const index = nel.parent.children.findIndex(item => {
-				return nel.isEqual(item)
+			const index = nel.parent!.children!.findIndex(item => {
+				return item && nel.isEqual(item)
 			})
-			nel.parent.children.splice(index, 1)
+			nel.parent!.children!.splice(index, 1)
 		}
 		//行内元素合并
 		else if (pel.isInline()) {
-			pel.children.push(...nel.children)
-			pel.children.forEach(item => {
-				item.parent = pel
+			pel.children!.push(...nel.children!)
+			pel.children!.forEach(item => {
+				if (item) {
+					item.parent = pel
+				}
 			})
 			//继续对子元素执行合并
 			mergeElement(pel)
 			//删除被合并的元素
-			const index = nel.parent.children.findIndex(item => {
-				return nel.isEqual(item)
+			const index = nel.parent!.children!.findIndex(item => {
+				if (item) {
+					return nel.isEqual(item)
+				}
 			})
-			nel.parent.children.splice(index, 1)
+			nel.parent!.children!.splice(index, 1)
 		}
 	}
 	//元素合并操作
-	const mergeElement = ele => {
+	const mergeElement = (ele: AlexElement) => {
 		//存在子元素并且子元素数量大于1
-		if (ele.hasChildren() && ele.children.length > 1) {
+		if (ele.hasChildren() && ele.children!.length > 1) {
 			let index = 0
-			while (index <= ele.children.length - 2) {
-				if (canMerge(ele.children[index], ele.children[index + 1])) {
-					merge(ele.children[index], ele.children[index + 1])
+			while (index <= ele.children!.length - 2) {
+				if (canMerge(ele.children![index]!, ele.children![index + 1]!)) {
+					merge(ele.children![index]!, ele.children![index + 1]!)
 					continue
 				}
 				index++
