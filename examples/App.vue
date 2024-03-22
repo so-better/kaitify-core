@@ -1,15 +1,20 @@
 <template>
 	<div style="padding: 20px">
-		<editor></editor>
+		<div style="width: 100%; height: 400px; border: 1px solid #ddd" id="editor"></div>
 	</div>
 </template>
-<script>
-import editor from './editor/index.vue'
-export default {
-	components: {
-		editor
-	}
-}
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue'
+import { AlexEditor, AlexElement } from '../src'
+
+onMounted(() => {
+	const editor = new AlexEditor('#editor', {
+		value: '<p>333</p>',
+		allowPasteHtml: true
+	})
+	editor.formatElementStack()
+	editor.domRender()
+})
 </script>
 <style lang="less">
 html {

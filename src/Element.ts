@@ -7,6 +7,7 @@ export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed'
 //内部块行为值
 export type AlexElementInblockBehaviorType = 'default' | 'block'
 
+//node转换元素的config类型
 export type AlexElementConfigType = {
 	type: AlexElementType
 	parsedom: string
