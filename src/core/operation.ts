@@ -56,15 +56,13 @@ export const emptyDefaultBehaviorInblock = function (this: AlexEditor, element: 
 	}
 	if (element.hasChildren()) {
 		element.children!.forEach(item => {
-			if (item) {
-				if (item.isInblock()) {
-					emptyDefaultBehaviorInblock.apply(this, [item])
-				} else {
-					item.toEmpty()
-					if (item.parent!.isEmpty()) {
-						const breakEl = new AlexElement('closed', 'br', null, null, null)
-						this.addElementTo(breakEl, item.parent!)
-					}
+			if (item.isInblock()) {
+				emptyDefaultBehaviorInblock.apply(this, [item])
+			} else {
+				item.toEmpty()
+				if (item.parent!.isEmpty()) {
+					const breakEl = new AlexElement('closed', 'br', null, null, null)
+					this.addElementTo(breakEl, item.parent!)
 				}
 			}
 		})

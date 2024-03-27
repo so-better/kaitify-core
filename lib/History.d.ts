@@ -1,11 +1,11 @@
 import { AlexElement } from './Element';
 import { AlexRange } from './Range';
 export type AlexHistoryRecordsItemType = {
-    stack: (AlexElement | null)[];
+    stack: AlexElement[];
     range: AlexRange | null;
 };
 export type AlexHistoryResultType = {
-    stack: (AlexElement | null)[];
+    stack: AlexElement[];
     range: AlexRange | null;
     current: number;
 };
@@ -16,7 +16,7 @@ export declare class AlexHistory {
     /**
      * 入栈
      */
-    push(stack: (AlexElement | null)[], range?: AlexRange | null): void;
+    push(stack: AlexElement[], range?: AlexRange | null): void;
     /**
      * 获取
      */
@@ -28,5 +28,5 @@ export declare class AlexHistory {
     /**
      * 克隆range
      */
-    __cloneRange(newStack: (AlexElement | null)[], range?: AlexRange | null): AlexRange | null;
+    __cloneRange(newStack: AlexElement[], range?: AlexRange | null): AlexRange | null;
 }

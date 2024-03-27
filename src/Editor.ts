@@ -52,7 +52,7 @@ export class AlexEditor {
 	//创建历史记录
 	history: AlexHistory = new AlexHistory()
 	//存放元素的数组
-	stack: (AlexElement | null)[]
+	stack: AlexElement[]
 	//光标虚拟对象
 	range: AlexRange | null = null
 
@@ -1116,7 +1116,7 @@ export class AlexEditor {
 	 */
 	formatElementStack() {
 		//一种格式化方法对一组元素的格式化
-		const format = (elements: (AlexElement | null)[], fn: (el: AlexElement) => void, isStack?: boolean) => {
+		const format = (elements: AlexElement[], fn: (el: AlexElement) => void, isStack?: boolean) => {
 			if (typeof isStack != 'boolean') {
 				isStack = false
 			}
@@ -1197,10 +1197,8 @@ export class AlexEditor {
 		const fragment = document.createDocumentFragment()
 		//生成新的dom
 		this.stack.forEach(element => {
-			if (element) {
-				element.__render()
-				fragment.appendChild(element.elm!)
-			}
+			element.__render()
+			fragment.appendChild(element.elm!)
 		})
 		//更新dom值
 		this.$el.innerHTML = ''
@@ -1251,7 +1249,7 @@ export class AlexEditor {
 				else {
 					node = point.element.parent!.elm
 					const index = point.element.parent!.children!.findIndex(item => {
-						return item && point.element.isEqual(item)
+						return point.element.isEqual(item)
 					})
 					offset = point.offset + index
 				}
@@ -1412,9 +1410,7 @@ export class AlexEditor {
 		} else {
 			previousEle.children!.push(...ele.children!)
 			previousEle.children!.forEach(item => {
-				if (item) {
-					item.parent = previousEle
-				}
+				item.parent = previousEle
 			})
 			ele.children = null
 		}
@@ -1427,7 +1423,7 @@ export class AlexEditor {
 		if (!key) {
 			throw new Error('You need to specify a key to do the query')
 		}
-		const fn = (elements: (AlexElement | null)[]): AlexElement | null => {
+		const fn = (elements: AlexElement[]): AlexElement | null => {
 			let element: AlexElement | null = null
 			const length = elements.length
 			for (let i = 0; i < length; i++) {
@@ -1458,7 +1454,7 @@ export class AlexEditor {
 		}
 		if (ele.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return item && ele.isEqual(item)
+				return ele.isEqual(item)
 			})
 			if (index <= 0) {
 				return null
@@ -1469,7 +1465,7 @@ export class AlexEditor {
 			return this.stack[index - 1]
 		} else {
 			const index = ele.parent!.children!.findIndex(item => {
-				return item && ele.isEqual(item)
+				return ele.isEqual(item)
 			})
 			if (index <= 0) {
 				return null
@@ -1490,7 +1486,7 @@ export class AlexEditor {
 		}
 		if (ele.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return item && ele.isEqual(item)
+				return ele.isEqual(item)
 			})
 			if (index >= this.stack.length - 1) {
 				return null
@@ -1501,7 +1497,7 @@ export class AlexEditor {
 			return this.stack[index + 1]
 		} else {
 			const index = ele.parent!.children!.findIndex(item => {
-				return item && ele.isEqual(item)
+				return ele.isEqual(item)
 			})
 			if (index >= ele.parent!.children!.length - 1) {
 				return null
@@ -1521,14 +1517,14 @@ export class AlexEditor {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
 		//查找子元素中的可设为焦点的元素
-		const fnChild = (children: (AlexElement | null)[]): AlexElement | null => {
+		const fnChild = (children: AlexElement[]): AlexElement | null => {
 			let el = null
 			//遍历子元素
 			const length = children.length
 			for (let i = length - 1; i >= 0; i--) {
 				const child = children[i]
 				//如果子元素是空元素跳过
-				if (!child || child.isEmpty()) {
+				if (child.isEmpty()) {
 					continue
 				}
 				//如果子元素是文本元素或者自闭合元素
@@ -1580,14 +1576,14 @@ export class AlexEditor {
 			throw new Error('The argument must be an AlexPoint instance')
 		}
 		//查找子元素中的可设为焦点的元素
-		const fnChild = (children: (AlexElement | null)[]): AlexElement | null => {
+		const fnChild = (children: AlexElement[]): AlexElement | null => {
 			let el: AlexElement | null = null
 			//遍历子元素
 			const length = children.length
 			for (let i = 0; i < length; i++) {
 				const child = children[i]
 				//如果子元素是空元素跳过
-				if (!child || child.isEmpty()) {
+				if (child.isEmpty()) {
 					continue
 				}
 				//如果子元素是文本元素或者自闭合元素
@@ -1683,8 +1679,8 @@ export class AlexEditor {
 			const anchorBlock = this.range!.anchor.element.getBlock()
 			const focusBlock = this.range!.focus.element.getBlock()
 			//获取起点和终点所在根级块的序列
-			const anchorBlockIndex = this.stack.findIndex(el => el && anchorBlock.isEqual(el))
-			const focusBlockIndex = this.stack.findIndex(el => el && focusBlock.isEqual(el))
+			const anchorBlockIndex = this.stack.findIndex(el => anchorBlock.isEqual(el))
+			const focusBlockIndex = this.stack.findIndex(el => focusBlock.isEqual(el))
 			//获取这两个块元素之间所有元素，包括起点和终点
 			let elements = AlexElement.flatElements(this.stack.slice(anchorBlockIndex, focusBlockIndex + 1))
 			//获取以起点所在元素为第一个文本元素或者自闭合元素的最高级元素
@@ -1874,13 +1870,13 @@ export class AlexEditor {
 		}
 		if (targetEle.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return item && targetEle.isEqual(item)
+				return targetEle.isEqual(item)
 			})
 			this.stack.splice(index, 0, newEle)
 			newEle.parent = null
 		} else {
 			const index = targetEle.parent!.children!.findIndex(item => {
-				return item && targetEle.isEqual(item)
+				return targetEle.isEqual(item)
 			})
 			this.addElementTo(newEle, targetEle.parent!, index)
 		}
@@ -1898,7 +1894,7 @@ export class AlexEditor {
 		}
 		if (targetEle.isBlock()) {
 			const index = this.stack.findIndex(item => {
-				return item && targetEle.isEqual(item)
+				return targetEle.isEqual(item)
 			})
 			if (index >= this.stack.length - 1) {
 				this.stack.push(newEle)
@@ -1908,7 +1904,7 @@ export class AlexEditor {
 			newEle.parent = null
 		} else {
 			const index = targetEle.parent!.children!.findIndex(item => {
-				return item && targetEle.isEqual(item)
+				return targetEle.isEqual(item)
 			})
 			this.addElementTo(newEle, targetEle.parent!, index + 1)
 		}

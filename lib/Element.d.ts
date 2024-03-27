@@ -18,7 +18,7 @@ export declare class AlexElement {
     marks: ObjectType | null;
     styles: ObjectType | null;
     textContent: string | null;
-    children: (AlexElement | null)[] | null;
+    children: AlexElement[] | null;
     parent: AlexElement | null;
     behavior?: AlexElementInblockBehaviorType;
     elm: HTMLElement | null;
@@ -147,7 +147,7 @@ export declare class AlexElement {
     /**
      * 扁平化处理元素数组
      */
-    static flatElements(elements: (AlexElement | null)[]): AlexElement[];
+    static flatElements(elements: AlexElement[]): AlexElement[];
     /**
      * 创建一个空白文本元素并返回
      */

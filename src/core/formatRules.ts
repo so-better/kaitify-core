@@ -8,8 +8,8 @@ import { cloneData } from './tool'
 export const handleNotStackBlock = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
 		//获取子元素中的根级块元素
-		const blocks: AlexElement[] = element.children!.filter((el): el is AlexElement => {
-			return !!el && !el.isEmpty() && el.isBlock()
+		const blocks: AlexElement[] = element.children!.filter(el => {
+			return !el.isEmpty() && el.isBlock()
 		})
 		//对子元素中的根级块元素进行转换
 		blocks.forEach(el => {
@@ -29,8 +29,8 @@ export const handleNotStackBlock = function (this: AlexEditor, element: AlexElem
 export const handleInblockWithOther = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
 		//子元素数组中非空元素
-		const children = element.children!.filter((el): el is AlexElement => {
-			return !!el && !el.isEmpty()
+		const children = element.children!.filter(el => {
+			return !el.isEmpty()
 		})
 		//子元素中的内部块元素
 		const inblocks = children.filter(el => {
@@ -52,8 +52,8 @@ export const handleInlineChildrenNotInblock = function (this: AlexEditor, elemen
 	//如果行内元素有子元素
 	if (element.isInline() && element.hasChildren()) {
 		//元素中的内部块元素
-		const inblocks = element.children!.filter((el): el is AlexElement => {
-			return !!el && !el.isEmpty() && el.isInblock()
+		const inblocks = element.children!.filter(el => {
+			return !el.isEmpty() && el.isInblock()
 		})
 		//对子元素中的内部块元素进行转换为行内元素
 		inblocks.forEach(el => {
@@ -69,8 +69,8 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 	//如果元素有子元素
 	if (element.hasChildren()) {
 		//子元素数组中过滤掉空元素
-		const children = element.children!.filter((el): el is AlexElement => {
-			return !el || !el.isEmpty()
+		const children = element.children!.filter(el => {
+			return !el.isEmpty()
 		})
 		//子元素数组中的换行符元素
 		const breaks = children.filter(el => {
@@ -168,9 +168,7 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
 			if (child.hasChildren()) {
 				parent.children = [...child.children!]
 				parent.children.forEach(item => {
-					if (item) {
-						item.parent = parent
-					}
+					item.parent = parent
 				})
 			}
 			//子元素与父元素合并和再对父元素进行处理
@@ -232,7 +230,7 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 				}
 				//删除被合并的元素
 				const index = nel.parent!.children!.findIndex(item => {
-					return item && nel.isEqual(item)
+					return nel.isEqual(item)
 				})
 				nel.parent!.children!.splice(index, 1)
 			}
@@ -258,7 +256,7 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 				}
 				//删除被合并的元素
 				const index = pel.parent!.children!.findIndex(item => {
-					return item && pel.isEqual(item)
+					return pel.isEqual(item)
 				})
 				pel.parent!.children!.splice(index, 1)
 			}
@@ -279,7 +277,7 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 			pel.textContent! += nel.textContent!
 			//删除被合并的元素
 			const index = nel.parent!.children!.findIndex(item => {
-				return item && nel.isEqual(item)
+				return nel.isEqual(item)
 			})
 			nel.parent!.children!.splice(index, 1)
 		}
@@ -287,17 +285,13 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 		else if (pel.isInline()) {
 			pel.children!.push(...nel.children!)
 			pel.children!.forEach(item => {
-				if (item) {
-					item.parent = pel
-				}
+				item.parent = pel
 			})
 			//继续对子元素执行合并
 			mergeElement(pel)
 			//删除被合并的元素
 			const index = nel.parent!.children!.findIndex(item => {
-				if (item) {
-					return nel.isEqual(item)
-				}
+				return nel.isEqual(item)
 			})
 			nel.parent!.children!.splice(index, 1)
 		}

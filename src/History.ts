@@ -3,12 +3,12 @@ import { AlexPoint } from './Point'
 import { AlexRange } from './Range'
 
 export type AlexHistoryRecordsItemType = {
-	stack: (AlexElement | null)[]
+	stack: AlexElement[]
 	range: AlexRange | null
 }
 
 export type AlexHistoryResultType = {
-	stack: (AlexElement | null)[]
+	stack: AlexElement[]
 	range: AlexRange | null
 	current: number
 }
@@ -24,17 +24,14 @@ export class AlexHistory {
 	/**
 	 * 入栈
 	 */
-	push(stack: (AlexElement | null)[], range?: AlexRange | null) {
+	push(stack: AlexElement[], range?: AlexRange | null) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.current < this.records.length - 1) {
 			this.records.length = this.current + 1
 		}
 		//生成一个新的stack
 		const newStack = stack.map(ele => {
-			if (ele) {
-				return ele.__fullClone()
-			}
-			return null
+			return ele.__fullClone()
 		})
 		//生成一个新的range
 		const newRange = this.__cloneRange(newStack, range)
@@ -73,10 +70,7 @@ export class AlexHistory {
 		const { stack, range } = this.records[current]
 		//创建新的stack
 		const newStack = stack.map(ele => {
-			if (ele) {
-				return ele.__fullClone()
-			}
-			return null
+			return ele.__fullClone()
 		})
 		//创建新的range
 		const newRange = this.__cloneRange(newStack, range)
@@ -100,7 +94,7 @@ export class AlexHistory {
 	/**
 	 * 克隆range
 	 */
-	__cloneRange(newStack: (AlexElement | null)[], range?: AlexRange | null) {
+	__cloneRange(newStack: AlexElement[], range?: AlexRange | null) {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素

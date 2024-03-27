@@ -28,7 +28,7 @@ export declare class AlexEditor {
     customParseNode: ((el: AlexElement) => AlexElement) | null;
     useClipboard: boolean;
     history: AlexHistory;
-    stack: (AlexElement | null)[];
+    stack: AlexElement[];
     range: AlexRange | null;
     private __guid;
     private __events;

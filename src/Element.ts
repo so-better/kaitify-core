@@ -33,7 +33,7 @@ export class AlexElement {
 	//文本值
 	textContent: string | null
 	//子元素
-	children: (AlexElement | null)[] | null = null
+	children: AlexElement[] | null = null
 	//父元素
 	parent: AlexElement | null = null
 	//定义内部块元素的行为
@@ -105,7 +105,7 @@ export class AlexElement {
 				return true
 			}
 			const allEmpty: boolean = this.children!.every(el => {
-				return !el || el.isEmpty()
+				return el.isEmpty()
 			})
 			return allEmpty
 		}
@@ -162,11 +162,11 @@ export class AlexElement {
 		if (this.hasChildren()) {
 			//子元素中存在换行符
 			const hasBreak = this.children!.some(item => {
-				return item && item.isBreak()
+				return item.isBreak()
 			})
-			//子元素中每个元素都是换行符或者空元素或者null
+			//子元素中每个元素都是换行符或者空元素
 			const isAll = this.children!.every(item => {
-				return !item || item.isBreak() || item.isEmpty()
+				return item.isBreak() || item.isEmpty()
 			})
 			return hasBreak && isAll
 		}
@@ -259,15 +259,13 @@ export class AlexElement {
 		el.behavior = this.behavior
 		if (deep && this.hasChildren()) {
 			this.children!.forEach(child => {
-				if (child) {
-					let clonedChild = child.clone(deep)
-					if (el.hasChildren()) {
-						el.children!.push(clonedChild)
-					} else {
-						el.children = [clonedChild]
-					}
-					clonedChild.parent = el
+				let clonedChild = child.clone(deep)
+				if (el.hasChildren()) {
+					el.children!.push(clonedChild)
+				} else {
+					el.children = [clonedChild]
 				}
+				clonedChild.parent = el
 			})
 		}
 		return el
@@ -315,9 +313,7 @@ export class AlexElement {
 		}
 		if (this.hasChildren()) {
 			this.children!.forEach(el => {
-				if (el) {
-					el.toEmpty()
-				}
+				el.toEmpty()
 			})
 		}
 	}
@@ -446,10 +442,8 @@ export class AlexElement {
 			//渲染子元素
 			if (this.hasChildren()) {
 				this.children!.forEach(child => {
-					if (child) {
-						child.__render()
-						el!.appendChild(<Node>child.elm)
-					}
+					child.__render()
+					el!.appendChild(<Node>child.elm)
 				})
 			}
 		}
@@ -483,15 +477,13 @@ export class AlexElement {
 		el.elm = this.elm
 		if (this.hasChildren()) {
 			this.children!.forEach(child => {
-				if (child) {
-					let clonedChild = child.__fullClone()
-					if (el.hasChildren()) {
-						el.children!.push(clonedChild)
-					} else {
-						el.children = [clonedChild]
-					}
-					clonedChild.parent = el
+				let clonedChild = child.__fullClone()
+				if (el.hasChildren()) {
+					el.children!.push(clonedChild)
+				} else {
+					el.children = [clonedChild]
 				}
+				clonedChild.parent = el
 			})
 		}
 		return el
@@ -507,16 +499,15 @@ export class AlexElement {
 	/**
 	 * 扁平化处理元素数组
 	 */
-	static flatElements(elements: (AlexElement | null)[]) {
-		const fn = (arr: (AlexElement | null)[]) => {
+	static flatElements(elements: AlexElement[]) {
+		const fn = (arr: AlexElement[]) => {
 			let result: AlexElement[] = []
 			const length = arr.length
 			for (let i = 0; i < length; i++) {
-				const item = arr[i]
-				if (item) {
-					result.push(item)
-					if (item.hasChildren()) {
-						const childResult = fn(item.children!)
+				if (arr[i]) {
+					result.push(arr[i])
+					if (arr[i].hasChildren()) {
+						const childResult = fn(arr[i].children!)
 						result.push(...childResult)
 					}
 				}
