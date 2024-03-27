@@ -3,13 +3,13 @@ import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
 import { EditorOptionsType } from './core/tool';
-export type ElementRangeType = {
+export type AlexElementRangeType = {
     element: AlexElement;
     offset: number[] | false;
 };
-export type ElementsRangeType = {
-    list: ElementRangeType[];
-    flatList: ElementRangeType[];
+export type AlexElementsRangeType = {
+    list: AlexElementRangeType[];
+    flatList: AlexElementRangeType[];
 };
 export declare class AlexEditor {
     $el: HTMLElement;
@@ -125,7 +125,7 @@ export declare class AlexEditor {
     /**
      * 获取选区之间的元素，flat参数表示是否返回扁平化的数据
      */
-    getElementsByRange(): ElementsRangeType;
+    getElementsByRange(): AlexElementsRangeType;
     /**
      * 将指定元素添加到父元素的子元素数组中
      */

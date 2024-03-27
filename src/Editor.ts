@@ -8,14 +8,14 @@ import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttr
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
-export type ElementRangeType = {
+export type AlexElementRangeType = {
 	element: AlexElement
 	offset: number[] | false
 }
 
-export type ElementsRangeType = {
-	list: ElementRangeType[]
-	flatList: ElementRangeType[]
+export type AlexElementsRangeType = {
+	list: AlexElementRangeType[]
+	flatList: AlexElementRangeType[]
 }
 
 export class AlexEditor {
@@ -1634,7 +1634,7 @@ export class AlexEditor {
 	/**
 	 * 获取选区之间的元素，flat参数表示是否返回扁平化的数据
 	 */
-	getElementsByRange(): ElementsRangeType {
+	getElementsByRange(): AlexElementsRangeType {
 		//虚拟光标不存在
 		if (!this.range) {
 			return {
@@ -1674,7 +1674,7 @@ export class AlexEditor {
 
 		//获取扁平化的数据
 		const getFlatList = () => {
-			let flatList: ElementRangeType[] = []
+			let flatList: AlexElementRangeType[] = []
 			//起点是不是在元素开始处
 			const anchorInStart = this.range!.anchor.offset == 0
 			//终点是不是在元素末尾处
@@ -1780,9 +1780,9 @@ export class AlexEditor {
 			return flatList
 		}
 		//根据扁平化的数据获取非扁平化的数组
-		const getList = (flatList: ElementRangeType[]) => {
+		const getList = (flatList: AlexElementRangeType[]) => {
 			//返回的树结构数组
-			let list: ElementRangeType[] = []
+			let list: AlexElementRangeType[] = []
 			//返回的树结构数组中的根级块元素数组
 			let blockElements: AlexElement[] = []
 			//返回的树结构数组中的行内元素、内部块元素
