@@ -132,7 +132,7 @@ export class AlexEditor {
 	 * 根据光标执行复制操作
 	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
 	 */
-	async copy(isCut = false) {
+	async copy(isCut: boolean | undefined = false) {
 		if (!this.useClipboard) {
 			return
 		}
@@ -1259,15 +1259,19 @@ export class AlexEditor {
 			const anchorResult = handler(this.range.anchor)
 			const focusResult = handler(this.range.focus)
 			//设置光标
-			const selection = window.getSelection()!
-			selection.removeAllRanges()
-			const range = document.createRange()
-			range.setStart(anchorResult.node!, anchorResult.offset)
-			range.setEnd(focusResult.node!, focusResult.offset)
-			selection.addRange(range)
+			const selection = window.getSelection()
+			if (selection) {
+				selection.removeAllRanges()
+				const range = document.createRange()
+				range.setStart(anchorResult.node!, anchorResult.offset)
+				range.setEnd(focusResult.node!, focusResult.offset)
+				selection.addRange(range)
+			}
 		} else {
-			const selection = window.getSelection()!
-			selection.removeAllRanges()
+			const selection = window.getSelection()
+			if (selection) {
+				selection.removeAllRanges()
+			}
 		}
 		setTimeout(() => {
 			setRangeInVisible.apply(this)

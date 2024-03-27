@@ -187,8 +187,8 @@ export const handleSelectionChange = function (this: AlexEditor) {
 	if (this.__innerSelectionChange) {
 		return
 	}
-	const selection = window.getSelection()!
-	if (selection.rangeCount) {
+	const selection = window.getSelection()
+	if (selection && selection.rangeCount) {
 		const range = selection.getRangeAt(0)
 		if (isContains(this.$el, <HTMLElement>range.startContainer) && isContains(this.$el, <HTMLElement>range.endContainer)) {
 			let anchorNode = null

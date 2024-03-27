@@ -4,16 +4,13 @@ import { createUniqueKey, isSpaceText, cloneData, ObjectType } from './core/tool
 //元素类型
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed'
 
-//内部块行为值
-export type AlexElementInblockBehaviorType = 'default' | 'block'
-
 //node转换元素的config类型
 export type AlexElementConfigType = {
 	type: AlexElementType
 	parsedom: string
 	marks: ObjectType
 	styles: ObjectType
-	behavior: AlexElementInblockBehaviorType
+	behavior: 'default' | 'block'
 }
 
 /**
@@ -37,7 +34,7 @@ export class AlexElement {
 	//父元素
 	parent: AlexElement | null = null
 	//定义内部块元素的行为
-	behavior?: AlexElementInblockBehaviorType = 'default'
+	behavior?: 'default' | 'block' = 'default'
 	//真实node
 	elm: HTMLElement | null = null
 

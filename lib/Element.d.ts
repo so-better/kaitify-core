@@ -1,12 +1,11 @@
 import { ObjectType } from './core/tool';
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed';
-export type AlexElementInblockBehaviorType = 'default' | 'block';
 export type AlexElementConfigType = {
     type: AlexElementType;
     parsedom: string;
     marks: ObjectType;
     styles: ObjectType;
-    behavior: AlexElementInblockBehaviorType;
+    behavior: 'default' | 'block';
 };
 /**
  * 编辑器元素对象
@@ -20,7 +19,7 @@ export declare class AlexElement {
     textContent: string | null;
     children: AlexElement[] | null;
     parent: AlexElement | null;
-    behavior?: AlexElementInblockBehaviorType;
+    behavior?: 'default' | 'block';
     elm: HTMLElement | null;
     constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null);
     /**

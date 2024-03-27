@@ -45,7 +45,7 @@ export declare class AlexEditor {
      * 根据光标执行复制操作
      * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
      */
-    copy(isCut?: boolean): Promise<{
+    copy(isCut?: boolean | undefined): Promise<{
         text: string;
         html: string;
     } | undefined>;
