@@ -141,11 +141,11 @@ export declare class AlexEditor {
     /**
      * 将虚拟光标设置到指定元素开始处
      */
-    collapseToStart(element: AlexElement): void;
+    collapseToStart(element?: AlexElement): void;
     /**
      * 将虚拟光标设置到指定元素最后
      */
-    collapseToEnd(element: AlexElement): void;
+    collapseToEnd(element?: AlexElement): void;
     /**
      * 禁用编辑器
      */

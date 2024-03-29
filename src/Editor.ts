@@ -1917,7 +1917,7 @@ export class AlexEditor {
 	/**
 	 * 将虚拟光标设置到指定元素开始处
 	 */
-	collapseToStart(element: AlexElement) {
+	collapseToStart(element?: AlexElement) {
 		if (this.disabled) {
 			return
 		}
@@ -1932,8 +1932,8 @@ export class AlexEditor {
 		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
-			this.range!.anchor.moveToStart(element)
-			this.range!.focus.moveToStart(element)
+			this.range!.anchor.moveToStart(element!)
+			this.range!.focus.moveToStart(element!)
 		}
 		//文档最前面
 		else {
@@ -1955,7 +1955,7 @@ export class AlexEditor {
 	/**
 	 * 将虚拟光标设置到指定元素最后
 	 */
-	collapseToEnd(element: AlexElement) {
+	collapseToEnd(element?: AlexElement) {
 		if (this.disabled) {
 			return
 		}
@@ -1970,8 +1970,8 @@ export class AlexEditor {
 		}
 		//指定了某个元素
 		if (AlexElement.isElement(element)) {
-			this.range!.anchor.moveToEnd(element)
-			this.range!.focus.moveToEnd(element)
+			this.range!.anchor.moveToEnd(element!)
+			this.range!.focus.moveToEnd(element!)
 		}
 		//文档最后面
 		else {
