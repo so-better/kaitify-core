@@ -57,11 +57,11 @@ export class AlexEditor {
 	range: AlexRange | null = null
 
 	//编辑器唯一id
-	private __guid: number = createGuid()
+	__guid: number = createGuid()
 	//事件集合
-	private __events: ObjectType = {}
+	__events: ObjectType = {}
 	//是否第一次渲染
-	private __firstRender: boolean = true
+	__firstRender: boolean = true
 	//是否正在输入中文
 	__isInputChinese: boolean = false
 	//是否内部修改真实光标引起selctionChange事件

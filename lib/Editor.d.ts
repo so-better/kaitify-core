@@ -2,7 +2,7 @@ import { AlexElement } from './Element';
 import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
-import { EditorOptionsType } from './core/tool';
+import { EditorOptionsType, ObjectType } from './core/tool';
 export type AlexElementRangeType = {
     element: AlexElement;
     offset: number[] | false;
@@ -30,9 +30,9 @@ export declare class AlexEditor {
     history: AlexHistory;
     stack: AlexElement[];
     range: AlexRange | null;
-    private __guid;
-    private __events;
-    private __firstRender;
+    __guid: number;
+    __events: ObjectType;
+    __firstRender: boolean;
     __isInputChinese: boolean;
     __innerSelectionChange: boolean;
     __chineseInputTimer: any;
