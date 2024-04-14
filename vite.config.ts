@@ -26,5 +26,8 @@ export default defineConfig({
 			}
 		},
 		sourcemap: false //是否构建source map 文件
+	},
+	server: {
+		host: '0.0.0.0'
 	}
 })
