@@ -1200,6 +1200,10 @@ export class AlexEditor {
 		const marks = getAttributes(node)
 		const styles = getStyles(node)
 		const parsedom = node.nodeName.toLocaleLowerCase()
+		//如果是style、meta和script标签，则返回一个空文本元素
+		if (parsedom == 'style' || parsedom == 'meta' || parsedom == 'script' || parsedom == 'link') {
+			return new AlexElement('text', null, null, null, null)
+		}
 		//默认配置
 		const block = blockParse.find(item => item.parsedom == parsedom)
 		const inblock = inblockParse.find(item => item.parsedom == parsedom)

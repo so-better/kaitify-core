@@ -9,7 +9,7 @@ import { AlexEditor, AlexElement } from '../src'
 
 onMounted(() => {
 	const editor = new AlexEditor('#editor', {
-		value: '<p>333</p>',
+		value: '<p><br/></p>',
 		allowPasteHtml: true
 	})
 	editor.formatElementStack()
