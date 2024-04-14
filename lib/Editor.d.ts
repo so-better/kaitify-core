@@ -24,6 +24,7 @@ export declare class AlexEditor {
     customHtmlPaste: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null;
     customImagePaste: ((url: string) => void | Promise<void>) | null;
     customVideoPaste: ((url: string) => void | Promise<void>) | null;
+    customMediaPaste: ((url: string) => void | Promise<void>) | null;
     customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null;
     customParseNode: ((el: AlexElement) => AlexElement) | null;
     useClipboard: boolean;
@@ -56,10 +57,6 @@ export declare class AlexEditor {
         text: string;
         html: string;
     } | undefined>;
-    /**
-     * 根据光标进行粘贴操作
-     */
-    paste(): Promise<void>;
     /**
      * 根据光标进行删除操作
      */

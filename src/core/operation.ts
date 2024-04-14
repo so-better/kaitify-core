@@ -1,7 +1,7 @@
 import { AlexElement } from '../Element'
 import { AlexRange } from '../Range'
 import { AlexPoint } from '../Point'
-import { element as DapElement, data as DapData } from 'dap-util'
+import { element as DapElement, data as DapData, file as DapFile } from 'dap-util'
 import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
 import { AlexEditor } from '../Editor'
@@ -384,6 +384,99 @@ export const handleCut = async function (this: AlexEditor, e: Event) {
 }
 
 /**
+ * 粘贴具体处理方法
+ */
+const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
+	//如果含有html
+	if (html) {
+		//允许粘贴html
+		if (this.allowPasteHtml) {
+			const elements = this.parseHtml(html).filter(el => {
+				return !el.isEmpty()
+			})
+			if (typeof this.customHtmlPaste == 'function') {
+				await this.customHtmlPaste.apply(this, [elements, html])
+			} else {
+				for (let i = 0; i < elements.length; i++) {
+					this.insertElement(elements[i], false)
+				}
+				this.emit('pasteHtml', elements, html)
+			}
+		}
+		//不允许粘贴html，则粘贴纯文本
+		else if (text) {
+			if (typeof this.customTextPaste == 'function') {
+				await this.customTextPaste.apply(this, [text])
+			} else {
+				this.insertText(text)
+				this.emit('pasteText', text)
+			}
+		}
+	}
+	//如果没有html
+	else {
+		//如果有文本则粘贴文本
+		if (text) {
+			if (typeof this.customTextPaste == 'function') {
+				await this.customTextPaste.apply(this, [text])
+			} else {
+				this.insertText(text)
+				this.emit('pasteText', text)
+			}
+		}
+		//粘贴媒体文件
+		else {
+			let length = files.length
+			for (let i = 0; i < length; i++) {
+				const url = await DapFile.dataFileToBase64(files[i])
+				//图片粘贴
+				if (files[i].type.startsWith('image/')) {
+					if (typeof this.customImagePaste == 'function') {
+						await this.customImagePaste.apply(this, [url])
+					} else {
+						const image = new AlexElement(
+							'closed',
+							'img',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(image)
+						this.emit('pasteImage', url)
+					}
+				}
+				//视频粘贴
+				else if (files[i].type.startsWith('video/')) {
+					if (typeof this.customVideoPaste == 'function') {
+						await this.customVideoPaste.apply(this, [url])
+					} else {
+						const video = new AlexElement(
+							'closed',
+							'video',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(video)
+						this.emit('pasteVideo', url)
+					}
+				}
+				//其他媒体文件粘贴
+				else {
+					if (typeof this.customMediaPaste == 'function') {
+						await this.customMediaPaste.apply(this, [url])
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
  * 监听编辑器粘贴
  */
 export const handlePaste = async function (this: AlexEditor, e: Event) {
@@ -391,17 +484,62 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
 		return
 	}
-	await this.paste()
-	this.formatElementStack()
-	this.domRender()
-	this.rangeRender()
+	if (!this.range) {
+		return
+	}
+	if (!this.allowPaste) {
+		return
+	}
+
+	const event = <ClipboardEvent>e
+	if (event.clipboardData) {
+		//html内容
+		const html = event.clipboardData.getData('text/html')
+		//文本内容
+		const text = event.clipboardData.getData('text/plain')
+		//文件数组
+		const files = event.clipboardData.files
+		//粘贴处理
+		doPaste.apply(this, [html, text, files])
+		//格式化和渲染
+		this.formatElementStack()
+		this.domRender()
+		this.rangeRender()
+	}
 }
 
 /**
  * 监听编辑器拖拽和拖放
  */
-export const handleDragDrop = function (this: AlexEditor, e: Event) {
+export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 	e.preventDefault()
+	//处理拖放
+	if (e.type == 'drop') {
+		if (this.disabled) {
+			return
+		}
+		if (!this.range) {
+			return
+		}
+		if (!this.allowPaste) {
+			return
+		}
+		const event = <DragEvent>e
+		if (event.dataTransfer) {
+			//html内容
+			const html = event.dataTransfer.getData('text/html')
+			//文本内容
+			const text = event.dataTransfer.getData('text/plain')
+			//文件数组
+			const files = event.dataTransfer.files
+			//粘贴处理
+			doPaste.apply(this, [html, text, files])
+			//格式化和渲染
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
+		}
+	}
 }
 
 /**

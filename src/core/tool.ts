@@ -31,6 +31,8 @@ export type EditorOptionsType = {
 	customImagePaste?: ((url: string) => void | Promise<void>) | null
 	//自定义视频粘贴方法
 	customVideoPaste?: ((url: string) => void | Promise<void>) | null
+	//自定义媒体文件粘贴方法
+	customMediaPaste?: ((url: string) => void | Promise<void>) | null
 	//自定义处理不可编辑元素合并的逻辑
 	customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
@@ -135,19 +137,6 @@ export const isContains = function (parentNode: HTMLElement, childNode: HTMLElem
 }
 
 /**
- * blob对象转base64字符串
- */
-export const blobToBase64 = function (blob: Blob) {
-	return new Promise<string>(resolve => {
-		const fileReader = new FileReader()
-		fileReader.onload = e => {
-			resolve(<string>e.target!.result)
-		}
-		fileReader.readAsDataURL(blob)
-	})
-}
-
-/**
  * 判断是否可以使用Clipboard
  */
 export const canUseClipboard = function () {
@@ -200,6 +189,7 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		customHtmlPaste: null,
 		customImagePaste: null,
 		customVideoPaste: null,
+		customMediaPaste: null,
 		customMerge: null,
 		customParseNode: null
 	}
@@ -236,6 +226,9 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		}
 		if (typeof options.customVideoPaste == 'function') {
 			opts.customVideoPaste = options.customVideoPaste
+		}
+		if (typeof options.customMediaPaste == 'function') {
+			opts.customMediaPaste = options.customMediaPaste
 		}
 		if (typeof options.customMerge == 'function') {
 			opts.customMerge = options.customMerge

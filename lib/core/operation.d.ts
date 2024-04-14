@@ -52,7 +52,7 @@ export declare const handlePaste: (this: AlexEditor, e: Event) => Promise<void>;
 /**
  * 监听编辑器拖拽和拖放
  */
-export declare const handleDragDrop: (this: AlexEditor, e: Event) => void;
+export declare const handleDragDrop: (this: AlexEditor, e: Event) => Promise<void>;
 /**
  * 监听编辑器获取焦点
  */

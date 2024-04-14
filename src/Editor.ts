@@ -4,7 +4,7 @@ import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, blobToBase64, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
+import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -43,6 +43,8 @@ export class AlexEditor {
 	customImagePaste: ((url: string) => void | Promise<void>) | null
 	//自定义视频粘贴方法
 	customVideoPaste: ((url: string) => void | Promise<void>) | null
+	//自定义媒体文件粘贴方法（除图片视频外）
+	customMediaPaste: ((url: string) => void | Promise<void>) | null
 	//自定义处理不可编辑元素合并的逻辑
 	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
@@ -83,6 +85,7 @@ export class AlexEditor {
 		this.customHtmlPaste = options.customHtmlPaste!
 		this.customImagePaste = options.customImagePaste!
 		this.customVideoPaste = options.customVideoPaste!
+		this.customMediaPaste = options.customMediaPaste!
 		this.customMerge = options.customMerge!
 		this.customParseNode = options.customParseNode!
 
@@ -108,7 +111,7 @@ export class AlexEditor {
 		//监听编辑器复制
 		DapEvent.on(this.$el, 'copy.alex_editor', handleCopy.bind(this))
 		//禁用编辑器拖拽和拖放
-		DapEvent.on(this.$el, 'dragstart.alex_editor drop.alex_editor ', handleDragDrop.bind(this))
+		DapEvent.on(this.$el, 'dragstart.alex_editor drop.alex_editor', handleDragDrop.bind(this))
 		//监听编辑器获取焦点
 		DapEvent.on(this.$el, 'focus.alex_editor', handleFocus.bind(this))
 		//监听编辑器失去焦点
@@ -190,127 +193,6 @@ export class AlexEditor {
 			this.emit('cut', result.text, result.html)
 		}
 		return result
-	}
-
-	/**
-	 * 根据光标进行粘贴操作
-	 */
-	async paste() {
-		if (this.disabled) {
-			return
-		}
-		if (!this.range) {
-			return
-		}
-		if (!this.useClipboard) {
-			return
-		}
-		if (!this.allowPaste) {
-			return
-		}
-		const clipboardItems = await navigator.clipboard.read()
-		const clipboardItem = clipboardItems[0]
-		const getTypeFunctions: Promise<Blob>[] = []
-		clipboardItem.types.forEach(type => {
-			getTypeFunctions.push(clipboardItem.getType(type))
-		})
-		const blobs = await Promise.all(getTypeFunctions)
-		const length = blobs.length
-		//是否存在html
-		const hasHtml = blobs.some(blob => {
-			return blob.type == 'text/html'
-		})
-		//只要存在html
-		if (hasHtml) {
-			for (let i = 0; i < length; i++) {
-				const blob = blobs[i]
-				//纯文本粘贴
-				if (blob.type == 'text/plain' && !this.allowPasteHtml) {
-					const data = await blob.text()
-					if (data) {
-						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data])
-						} else {
-							this.insertText(data)
-							this.emit('pasteText', data)
-						}
-					}
-				}
-				//粘贴html
-				else if (blob.type == 'text/html' && this.allowPasteHtml) {
-					const data = await blob.text()
-					if (data) {
-						const elements = this.parseHtml(data).filter(el => {
-							return !el.isEmpty()
-						})
-						if (typeof this.customHtmlPaste == 'function') {
-							await this.customHtmlPaste.apply(this, [elements, data])
-						} else {
-							for (let i = 0; i < elements.length; i++) {
-								this.insertElement(elements[i], false)
-							}
-							this.emit('pasteHtml', elements, data)
-						}
-					}
-				}
-			}
-		}
-		//不存在html
-		else {
-			for (let i = 0; i < length; i++) {
-				const blob = blobs[i]
-				//图片粘贴
-				if (blob.type.startsWith('image/')) {
-					const url = await blobToBase64(blob)
-					if (typeof this.customImagePaste == 'function') {
-						await this.customImagePaste.apply(this, [url])
-					} else {
-						const image = new AlexElement(
-							'closed',
-							'img',
-							{
-								src: url
-							},
-							null,
-							null
-						)
-						this.insertElement(image)
-						this.emit('pasteImage', url)
-					}
-				}
-				//视频粘贴
-				else if (blob.type.startsWith('video/')) {
-					const url = await blobToBase64(blob)
-					if (typeof this.customVideoPaste == 'function') {
-						await this.customVideoPaste.apply(this, [url])
-					} else {
-						const video = new AlexElement(
-							'closed',
-							'video',
-							{
-								src: url
-							},
-							null,
-							null
-						)
-						this.insertElement(video)
-						this.emit('pasteVideo', url)
-					}
-				}
-				//文字粘贴
-				else if (blob.type == 'text/plain') {
-					const data = await blob.text()
-					if (data) {
-						if (typeof this.customTextPaste == 'function') {
-							await this.customTextPaste.apply(this, [data])
-						} else {
-							this.insertText(data)
-							this.emit('pasteText', data)
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**

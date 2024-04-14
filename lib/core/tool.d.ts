@@ -15,6 +15,7 @@ export type EditorOptionsType = {
     customHtmlPaste?: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null;
     customImagePaste?: ((url: string) => void | Promise<void>) | null;
     customVideoPaste?: ((url: string) => void | Promise<void>) | null;
+    customMediaPaste?: ((url: string) => void | Promise<void>) | null;
     customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null;
     customParseNode?: ((el: AlexElement) => AlexElement) | null;
 };
@@ -46,10 +47,6 @@ export declare const cloneData: (data: any) => any;
  * 判断某个node是否包含另一个node
  */
 export declare const isContains: (parentNode: HTMLElement, childNode: HTMLElement) => boolean;
-/**
- * blob对象转base64字符串
- */
-export declare const blobToBase64: (blob: Blob) => Promise<string>;
 /**
  * 判断是否可以使用Clipboard
  */
