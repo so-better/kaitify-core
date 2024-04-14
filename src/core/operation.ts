@@ -500,9 +500,10 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 		//文件数组
 		const files = event.clipboardData.files
 		//粘贴处理
-		doPaste.apply(this, [html, text, files])
+		await doPaste.apply(this, [html, text, files])
 		//格式化和渲染
 		this.formatElementStack()
+
 		this.domRender()
 		this.rangeRender()
 	}
@@ -533,7 +534,7 @@ export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 			//文件数组
 			const files = event.dataTransfer.files
 			//粘贴处理
-			doPaste.apply(this, [html, text, files])
+			await doPaste.apply(this, [html, text, files])
 			//格式化和渲染
 			this.formatElementStack()
 			this.domRender()
