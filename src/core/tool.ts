@@ -31,8 +31,8 @@ export type EditorOptionsType = {
 	customImagePaste?: ((url: string) => void | Promise<void>) | null
 	//自定义视频粘贴方法
 	customVideoPaste?: ((url: string) => void | Promise<void>) | null
-	//自定义媒体文件粘贴方法
-	customMediaPaste?: ((url: string) => void | Promise<void>) | null
+	//自定义文件粘贴方法
+	customFilePaste?: ((url: string) => void | Promise<void>) | null
 	//自定义处理不可编辑元素合并的逻辑
 	customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
@@ -189,7 +189,7 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		customHtmlPaste: null,
 		customImagePaste: null,
 		customVideoPaste: null,
-		customMediaPaste: null,
+		customFilePaste: null,
 		customMerge: null,
 		customParseNode: null
 	}
@@ -227,8 +227,8 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		if (typeof options.customVideoPaste == 'function') {
 			opts.customVideoPaste = options.customVideoPaste
 		}
-		if (typeof options.customMediaPaste == 'function') {
-			opts.customMediaPaste = options.customMediaPaste
+		if (typeof options.customFilePaste == 'function') {
+			opts.customFilePaste = options.customFilePaste
 		}
 		if (typeof options.customMerge == 'function') {
 			opts.customMerge = options.customMerge

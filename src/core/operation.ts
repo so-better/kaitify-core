@@ -424,7 +424,7 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 				this.emit('pasteText', text)
 			}
 		}
-		//粘贴媒体文件
+		//粘贴文件
 		else {
 			let length = files.length
 			for (let i = 0; i < length; i++) {
@@ -465,10 +465,10 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 						this.emit('pasteVideo', url)
 					}
 				}
-				//其他媒体文件粘贴
+				//其他文件粘贴
 				else {
-					if (typeof this.customMediaPaste == 'function') {
-						await this.customMediaPaste.apply(this, [url])
+					if (typeof this.customFilePaste == 'function') {
+						await this.customFilePaste.apply(this, [url])
 					}
 				}
 			}

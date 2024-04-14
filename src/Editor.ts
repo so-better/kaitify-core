@@ -43,8 +43,8 @@ export class AlexEditor {
 	customImagePaste: ((url: string) => void | Promise<void>) | null
 	//自定义视频粘贴方法
 	customVideoPaste: ((url: string) => void | Promise<void>) | null
-	//自定义媒体文件粘贴方法（除图片视频外）
-	customMediaPaste: ((url: string) => void | Promise<void>) | null
+	//自定义文件粘贴方法（除图片视频外）
+	customFilePaste: ((url: string) => void | Promise<void>) | null
 	//自定义处理不可编辑元素合并的逻辑
 	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
@@ -85,7 +85,7 @@ export class AlexEditor {
 		this.customHtmlPaste = options.customHtmlPaste!
 		this.customImagePaste = options.customImagePaste!
 		this.customVideoPaste = options.customVideoPaste!
-		this.customMediaPaste = options.customMediaPaste!
+		this.customFilePaste = options.customFilePaste!
 		this.customMerge = options.customMerge!
 		this.customParseNode = options.customParseNode!
 
