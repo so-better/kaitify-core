@@ -28,11 +28,11 @@ export type EditorOptionsType = {
 	//自定义html粘贴方法
 	customHtmlPaste?: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null
 	//自定义图片粘贴方法
-	customImagePaste?: ((url: string) => void | Promise<void>) | null
+	customImagePaste?: ((file: File) => void | Promise<void>) | null
 	//自定义视频粘贴方法
-	customVideoPaste?: ((url: string) => void | Promise<void>) | null
+	customVideoPaste?: ((file: File) => void | Promise<void>) | null
 	//自定义文件粘贴方法
-	customFilePaste?: ((url: string) => void | Promise<void>) | null
+	customFilePaste?: ((file: File) => void | Promise<void>) | null
 	//自定义处理不可编辑元素合并的逻辑
 	customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑

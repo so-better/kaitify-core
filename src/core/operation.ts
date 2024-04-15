@@ -431,8 +431,7 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 				//图片粘贴
 				if (files[i].type.startsWith('image/')) {
 					if (typeof this.customImagePaste == 'function') {
-						const url = await DapFile.dataFileToBase64(files[i])
-						await this.customImagePaste.apply(this, [url])
+						await this.customImagePaste.apply(this, [files[i]])
 					} else {
 						const url = await DapFile.dataFileToBase64(files[i])
 						const image = new AlexElement(
@@ -451,8 +450,7 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 				//视频粘贴
 				else if (files[i].type.startsWith('video/')) {
 					if (typeof this.customVideoPaste == 'function') {
-						const url = await DapFile.dataFileToBase64(files[i])
-						await this.customVideoPaste.apply(this, [url])
+						await this.customVideoPaste.apply(this, [files[i]])
 					} else {
 						const url = await DapFile.dataFileToBase64(files[i])
 						const video = new AlexElement(
@@ -471,8 +469,7 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 				//其他文件粘贴
 				else {
 					if (typeof this.customFilePaste == 'function') {
-						const url = await DapFile.dataFileToBase64(files[i])
-						await this.customFilePaste.apply(this, [url])
+						await this.customFilePaste.apply(this, [files[i]])
 					}
 				}
 			}
