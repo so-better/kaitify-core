@@ -657,7 +657,7 @@ export class AlexEditor {
 					this.insertElement(text)
 					this.range.anchor.moveToEnd(text)
 					this.range.focus.moveToEnd(text)
-					this.emit('insertParagraph', null, inblock)
+					this.emit('insertParagraph', inblock, inblock)
 				}
 				//不在代码块样式中且内部块元素的行为值是block
 				else if (inblock.behavior == 'block') {
@@ -712,7 +712,7 @@ export class AlexEditor {
 					this.insertElement(text)
 					this.range.anchor.moveToEnd(text)
 					this.range.focus.moveToEnd(text)
-					this.emit('insertParagraph', null, block)
+					this.emit('insertParagraph', block, block)
 				}
 				//不在代码块样式中
 				else {
