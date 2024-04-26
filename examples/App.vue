@@ -1,6 +1,6 @@
 <template>
 	<div style="padding: 20px">
-		<div style="width: 100%; height: 400px; border: 1px solid #ddd" id="editor"></div>
+		<div style="width: 100%; height: 400px; border: 1px solid #ddd; overflow: auto" id="editor"></div>
 	</div>
 </template>
 <script lang="ts" setup>
