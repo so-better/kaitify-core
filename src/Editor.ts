@@ -5,7 +5,7 @@ import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
-import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement } from './core/formatRules'
+import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 export type AlexElementRangeType = {
@@ -1061,7 +1061,7 @@ export class AlexEditor {
 			return typeof fn == 'function'
 		})
 		//这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
-		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, ...renderRules].forEach(fn => {
+		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
 			format(this.stack, fn, true)
 		})
 		//判断stack是否为空进行初始化

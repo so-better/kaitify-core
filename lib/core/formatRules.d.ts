@@ -17,10 +17,14 @@ export declare const handleInlineChildrenNotInblock: (this: AlexEditor, element:
  */
 export declare const breakFormat: (this: AlexEditor, element: AlexElement) => void;
 /**
+ * 兄弟元素合并策略（虚拟光标可能更新）
+ */
+export declare const mergeWithBrotherElement: (this: AlexEditor, element: AlexElement) => void;
+/**
  * 父子元素合并策略（虚拟光标可能更新）
  */
 export declare const mergeWithParentElement: (this: AlexEditor, element: AlexElement) => void;
 /**
- * 兄弟元素合并策略（虚拟光标可能更新）
+ * 将文本元素内的空白元素合一
  */
-export declare const mergeWithBrotherElement: (this: AlexEditor, element: AlexElement) => void;
+export declare const mergeWithSpaceTextElement: (this: AlexEditor, element: AlexElement) => void;
