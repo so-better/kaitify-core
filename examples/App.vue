@@ -12,6 +12,15 @@ onMounted(() => {
 		value: '<p><br/></p>',
 		allowPasteHtml: true
 	})
+	editor.on('copy', (text, html) => {
+		console.log('复制事件', text, html)
+	})
+	editor.on('cut', (text, html) => {
+		console.log('剪切事件', text, html)
+	})
+	editor.on('pasteHtml', (elements, html) => {
+		console.log('粘贴事件', elements, html)
+	})
 	editor.formatElementStack()
 	editor.domRender()
 })

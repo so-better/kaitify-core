@@ -137,21 +137,6 @@ export const isContains = function (parentNode: HTMLElement, childNode: HTMLElem
 }
 
 /**
- * 判断是否可以使用Clipboard
- */
-export const canUseClipboard = function () {
-	if (!window.ClipboardItem) {
-		console.warn("window.ClipboardItem must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
-		return false
-	}
-	if (!navigator.clipboard) {
-		console.warn("navigator.clipboard must be obtained in a secure environment, such as localhost, 127.0.0.1, or https, so the editor's copy, paste, and cut functions cannot be used")
-		return false
-	}
-	return true
-}
-
-/**
  * 初始化编辑器dom
  */
 export const initEditorNode = function (node: HTMLElement | string) {

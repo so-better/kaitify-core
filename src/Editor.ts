@@ -4,7 +4,7 @@ import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, canUseClipboard, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
+import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
@@ -49,8 +49,6 @@ export class AlexEditor {
 	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
 	customParseNode: ((el: AlexElement) => AlexElement) | null
-	//复制粘贴语法是否能够使用
-	useClipboard: boolean = canUseClipboard()
 	//创建历史记录
 	history: AlexHistory = new AlexHistory()
 	//存放元素的数组
@@ -129,70 +127,6 @@ export class AlexEditor {
 		const anchor = new AlexPoint(firstElement, 0)
 		const focus = new AlexPoint(firstElement, 0)
 		this.range = new AlexRange(anchor, focus)
-	}
-
-	/**
-	 * 根据光标执行复制操作
-	 * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
-	 */
-	async copy(isCut: boolean | undefined = false) {
-		if (!this.useClipboard) {
-			return
-		}
-		if (!this.range) {
-			return
-		}
-		if (!this.allowCopy) {
-			return
-		}
-		let result = this.getElementsByRange().list
-		if (result.length == 0) {
-			return
-		}
-		let html = ''
-		let text = ''
-		result.forEach(item => {
-			const newEl = item.element.clone()
-			//offset存在值则说明该元素不是全部在选区内
-			if (item.offset) {
-				newEl.textContent = newEl.textContent!.substring(item.offset[0], item.offset[1])
-			}
-			newEl.__render()
-			html += newEl.elm!.outerHTML
-			text += newEl.elm!.innerText
-		})
-		const clipboardItem = new window.ClipboardItem({
-			'text/html': new Blob([html], { type: 'text/html' }),
-			'text/plain': new Blob([text], { type: 'text/plain' })
-		})
-		await navigator.clipboard.write([clipboardItem])
-		if (!isCut) {
-			this.emit('copy', text, html)
-		}
-		return { text, html }
-	}
-
-	/**
-	 * 根据光标进行剪切操作
-	 */
-	async cut() {
-		if (!this.useClipboard) {
-			return
-		}
-		if (!this.range) {
-			return
-		}
-		if (!this.allowCut) {
-			return
-		}
-		const result = await this.copy(true)
-		if (result) {
-			if (!this.disabled) {
-				this.delete()
-			}
-			this.emit('cut', result.text, result.html)
-		}
-		return result
 	}
 
 	/**

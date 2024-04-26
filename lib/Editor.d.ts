@@ -27,7 +27,6 @@ export declare class AlexEditor {
     customFilePaste: ((file: File) => void | Promise<void>) | null;
     customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null;
     customParseNode: ((el: AlexElement) => AlexElement) | null;
-    useClipboard: boolean;
     history: AlexHistory;
     stack: AlexElement[];
     range: AlexRange | null;
@@ -42,21 +41,6 @@ export declare class AlexEditor {
      * 初始化range
      */
     initRange(): void;
-    /**
-     * 根据光标执行复制操作
-     * isCut表示是否在执行剪切操作，默认为false，这个参数仅在内部使用
-     */
-    copy(isCut?: boolean | undefined): Promise<{
-        text: string;
-        html: string;
-    } | undefined>;
-    /**
-     * 根据光标进行剪切操作
-     */
-    cut(): Promise<{
-        text: string;
-        html: string;
-    } | undefined>;
     /**
      * 根据光标进行删除操作
      */

@@ -48,10 +48,6 @@ export declare const cloneData: (data: any) => any;
  */
 export declare const isContains: (parentNode: HTMLElement, childNode: HTMLElement) => boolean;
 /**
- * 判断是否可以使用Clipboard
- */
-export declare const canUseClipboard: () => boolean;
-/**
  * 初始化编辑器dom
  */
 export declare const initEditorNode: (node: HTMLElement | string) => HTMLElement;

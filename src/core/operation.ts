@@ -4,7 +4,124 @@ import { AlexPoint } from '../Point'
 import { element as DapElement, data as DapData, file as DapFile } from 'dap-util'
 import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
-import { AlexEditor } from '../Editor'
+import { AlexEditor, AlexElementRangeType } from '../Editor'
+
+/**
+ * 获取选区内的元素转为html和text塞入剪切板并返回
+ */
+const setClipboardData = function (this: AlexEditor, data: DataTransfer, result: AlexElementRangeType[]) {
+	let html = ''
+	let text = ''
+	result.forEach(item => {
+		const newEl = item.element.clone()
+		//offset存在值则说明该元素不是全部在选区内
+		if (item.offset) {
+			newEl.textContent = newEl.textContent!.substring(item.offset[0], item.offset[1])
+		}
+		newEl.__render()
+		html += newEl.elm!.outerHTML
+		text += newEl.elm!.innerText
+	})
+	//把text和html塞入剪切板
+	data.setData('text/plain', text)
+	data.setData('text/html', html)
+	//将结果返回
+	return { html, text }
+}
+
+/**
+ * 粘贴具体处理方法
+ */
+const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
+	//如果含有html
+	if (html) {
+		//允许粘贴html
+		if (this.allowPasteHtml) {
+			const elements = this.parseHtml(html).filter(el => {
+				return !el.isEmpty()
+			})
+			if (typeof this.customHtmlPaste == 'function') {
+				await this.customHtmlPaste.apply(this, [elements, html])
+			} else {
+				for (let i = 0; i < elements.length; i++) {
+					this.insertElement(elements[i], false)
+				}
+				this.emit('pasteHtml', elements, html)
+			}
+		}
+		//不允许粘贴html，则粘贴纯文本
+		else if (text) {
+			if (typeof this.customTextPaste == 'function') {
+				await this.customTextPaste.apply(this, [text])
+			} else {
+				this.insertText(text)
+				this.emit('pasteText', text)
+			}
+		}
+	}
+	//如果没有html
+	else {
+		//如果有文本则粘贴文本
+		if (text) {
+			if (typeof this.customTextPaste == 'function') {
+				await this.customTextPaste.apply(this, [text])
+			} else {
+				this.insertText(text)
+				this.emit('pasteText', text)
+			}
+		}
+		//粘贴文件
+		else {
+			let length = files.length
+			for (let i = 0; i < length; i++) {
+				//图片粘贴
+				if (files[i].type.startsWith('image/')) {
+					if (typeof this.customImagePaste == 'function') {
+						await this.customImagePaste.apply(this, [files[i]])
+					} else {
+						const url = await DapFile.dataFileToBase64(files[i])
+						const image = new AlexElement(
+							'closed',
+							'img',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(image)
+						this.emit('pasteImage', url)
+					}
+				}
+				//视频粘贴
+				else if (files[i].type.startsWith('video/')) {
+					if (typeof this.customVideoPaste == 'function') {
+						await this.customVideoPaste.apply(this, [files[i]])
+					} else {
+						const url = await DapFile.dataFileToBase64(files[i])
+						const video = new AlexElement(
+							'closed',
+							'video',
+							{
+								src: url
+							},
+							null,
+							null
+						)
+						this.insertElement(video)
+						this.emit('pasteVideo', url)
+					}
+				}
+				//其他文件粘贴
+				else {
+					if (typeof this.customFilePaste == 'function') {
+						await this.customFilePaste.apply(this, [files[i]])
+					}
+				}
+			}
+		}
+	}
+}
 
 /**
  * 初始化校验stack
@@ -366,114 +483,55 @@ export const handleKeydown = function (this: AlexEditor, e: Event) {
  * 监听编辑器复制
  */
 export const handleCopy = async function (this: AlexEditor, e: Event) {
+	//阻止默认事件
 	e.preventDefault()
-	await this.copy()
+	//没有获取光标
+	if (!this.range) {
+		return
+	}
+	//不允许复制
+	if (!this.allowCopy) {
+		return
+	}
+	const event = e as ClipboardEvent
+	//获取选区内的元素数据
+	const result = this.getElementsByRange().list
+	//如果剪切板有数据并且有光标选区
+	if (event.clipboardData && result.length) {
+		const { text, html } = setClipboardData.apply(this, [event.clipboardData, result])
+		this.emit('copy', text, html)
+	}
 }
 
 /**
  * 监听编辑器剪切
  */
 export const handleCut = async function (this: AlexEditor, e: Event) {
+	//阻止默认事件
 	e.preventDefault()
-	const result = await this.cut()
-	if (result && !this.disabled) {
-		this.formatElementStack()
-		this.domRender()
-		this.rangeRender()
+	//没有获取光标
+	if (!this.range) {
+		return
 	}
-}
-
-/**
- * 粘贴具体处理方法
- */
-const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
-	//如果含有html
-	if (html) {
-		//允许粘贴html
-		if (this.allowPasteHtml) {
-			const elements = this.parseHtml(html).filter(el => {
-				return !el.isEmpty()
-			})
-			if (typeof this.customHtmlPaste == 'function') {
-				await this.customHtmlPaste.apply(this, [elements, html])
-			} else {
-				for (let i = 0; i < elements.length; i++) {
-					this.insertElement(elements[i], false)
-				}
-				this.emit('pasteHtml', elements, html)
-			}
-		}
-		//不允许粘贴html，则粘贴纯文本
-		else if (text) {
-			if (typeof this.customTextPaste == 'function') {
-				await this.customTextPaste.apply(this, [text])
-			} else {
-				this.insertText(text)
-				this.emit('pasteText', text)
-			}
-		}
+	//不允许剪切
+	if (!this.allowCut) {
+		return
 	}
-	//如果没有html
-	else {
-		//如果有文本则粘贴文本
-		if (text) {
-			if (typeof this.customTextPaste == 'function') {
-				await this.customTextPaste.apply(this, [text])
-			} else {
-				this.insertText(text)
-				this.emit('pasteText', text)
-			}
+	const event = e as ClipboardEvent
+	//获取选区内的元素数据
+	const result = this.getElementsByRange().list
+	//如果支持剪切板数据并且有光标选区
+	if (event.clipboardData && result.length) {
+		const { text, html } = setClipboardData.apply(this, [event.clipboardData, result])
+		//在编辑器不禁用的情况下将选区内的元素都删除
+		if (!this.disabled) {
+			this.delete()
+			this.formatElementStack()
+			this.domRender()
+			this.rangeRender()
 		}
-		//粘贴文件
-		else {
-			let length = files.length
-			for (let i = 0; i < length; i++) {
-				//图片粘贴
-				if (files[i].type.startsWith('image/')) {
-					if (typeof this.customImagePaste == 'function') {
-						await this.customImagePaste.apply(this, [files[i]])
-					} else {
-						const url = await DapFile.dataFileToBase64(files[i])
-						const image = new AlexElement(
-							'closed',
-							'img',
-							{
-								src: url
-							},
-							null,
-							null
-						)
-						this.insertElement(image)
-						this.emit('pasteImage', url)
-					}
-				}
-				//视频粘贴
-				else if (files[i].type.startsWith('video/')) {
-					if (typeof this.customVideoPaste == 'function') {
-						await this.customVideoPaste.apply(this, [files[i]])
-					} else {
-						const url = await DapFile.dataFileToBase64(files[i])
-						const video = new AlexElement(
-							'closed',
-							'video',
-							{
-								src: url
-							},
-							null,
-							null
-						)
-						this.insertElement(video)
-						this.emit('pasteVideo', url)
-					}
-				}
-				//其他文件粘贴
-				else {
-					if (typeof this.customFilePaste == 'function') {
-						await this.customFilePaste.apply(this, [files[i]])
-					}
-				}
-			}
-		}
+		//触发剪切事件
+		this.emit('cut', text, html)
 	}
 }
 
@@ -491,8 +549,7 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 	if (!this.allowPaste) {
 		return
 	}
-
-	const event = <ClipboardEvent>e
+	const event = e as ClipboardEvent
 	if (event.clipboardData) {
 		//html内容
 		const html = event.clipboardData.getData('text/html')
@@ -504,7 +561,6 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 		await doPaste.apply(this, [html, text, files])
 		//格式化和渲染
 		this.formatElementStack()
-
 		this.domRender()
 		this.rangeRender()
 	}
@@ -526,7 +582,7 @@ export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 		if (!this.allowPaste) {
 			return
 		}
-		const event = <DragEvent>e
+		const event = e as DragEvent
 		if (event.dataTransfer) {
 			//html内容
 			const html = event.dataTransfer.getData('text/html')
