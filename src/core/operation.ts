@@ -442,40 +442,50 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 }
 
 /**
- * 监听键盘按下
+ * 监听键盘事件
  */
-export const handleKeydown = function (this: AlexEditor, e: Event) {
+export const handleKeyboard = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
 		return
 	}
 	if (this.__isInputChinese) {
 		return
 	}
-	//撤销
-	if (isUndo(<KeyboardEvent>e)) {
-		e.preventDefault()
-		const historyRecord = this.history.get(-1)
-		if (historyRecord) {
-			this.history.current = historyRecord.current
-			this.stack = historyRecord.stack
-			this.range = historyRecord.range
-			this.formatElementStack()
-			this.domRender(true)
-			this.rangeRender()
+	//键盘按下
+	if (e.type == 'keydown') {
+		//撤销
+		if (isUndo(<KeyboardEvent>e)) {
+			e.preventDefault()
+			const historyRecord = this.history.get(-1)
+			if (historyRecord) {
+				this.history.current = historyRecord.current
+				this.stack = historyRecord.stack
+				this.range = historyRecord.range
+				this.formatElementStack()
+				this.domRender(true)
+				this.rangeRender()
+			}
 		}
+		//重做
+		else if (isRedo(<KeyboardEvent>e)) {
+			e.preventDefault()
+			const historyRecord = this.history.get(1)
+			if (historyRecord) {
+				this.history.current = historyRecord.current
+				this.stack = historyRecord.stack
+				this.range = historyRecord.range
+				this.formatElementStack()
+				this.domRender(true)
+				this.rangeRender()
+			}
+		}
+		//触发keydown事件
+		this.emit('keydown', this.value, e as KeyboardEvent)
 	}
-	//重做
-	else if (isRedo(<KeyboardEvent>e)) {
-		e.preventDefault()
-		const historyRecord = this.history.get(1)
-		if (historyRecord) {
-			this.history.current = historyRecord.current
-			this.stack = historyRecord.stack
-			this.range = historyRecord.range
-			this.formatElementStack()
-			this.domRender(true)
-			this.rangeRender()
-		}
+	//键盘松开
+	else if (e.type == 'keyup') {
+		//触发keyup事件
+		this.emit('keyup', this.value, e as KeyboardEvent)
 	}
 }
 
@@ -603,19 +613,19 @@ export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 /**
  * 监听编辑器获取焦点
  */
-export const handleFocus = function (this: AlexEditor) {
+export const handleFocus = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
 		return
 	}
-	this.emit('focus', this.value)
+	this.emit('focus', this.value, e as FocusEvent)
 }
 
 /**
  * 监听编辑器失去焦点
  */
-export const handleBlur = function (this: AlexEditor) {
+export const handleBlur = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
 		return
 	}
-	this.emit('blur', this.value)
+	this.emit('blur', this.value, e as FocusEvent)
 }

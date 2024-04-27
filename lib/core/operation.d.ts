@@ -34,9 +34,9 @@ export declare const handleBeforeInput: (this: AlexEditor, e: Event) => void;
  */
 export declare const handleChineseInput: (this: AlexEditor, e: Event) => void;
 /**
- * 监听键盘按下
+ * 监听键盘事件
  */
-export declare const handleKeydown: (this: AlexEditor, e: Event) => void;
+export declare const handleKeyboard: (this: AlexEditor, e: Event) => void;
 /**
  * 监听编辑器复制
  */
@@ -56,8 +56,8 @@ export declare const handleDragDrop: (this: AlexEditor, e: Event) => Promise<voi
 /**
  * 监听编辑器获取焦点
  */
-export declare const handleFocus: (this: AlexEditor) => void;
+export declare const handleFocus: (this: AlexEditor, e: Event) => void;
 /**
  * 监听编辑器失去焦点
  */
-export declare const handleBlur: (this: AlexEditor) => void;
+export declare const handleBlur: (this: AlexEditor, e: Event) => void;

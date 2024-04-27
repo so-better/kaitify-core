@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeydown, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 export type AlexElementRangeType = {
 	element: AlexElement
@@ -100,8 +100,8 @@ export class AlexEditor {
 		DapEvent.on(this.$el, 'beforeinput.alex_editor', handleBeforeInput.bind(this))
 		//监听中文输入
 		DapEvent.on(this.$el, 'compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor', handleChineseInput.bind(this))
-		//监听键盘按下
-		DapEvent.on(this.$el, 'keydown.alex_editor', handleKeydown.bind(this))
+		//监听键盘事件
+		DapEvent.on(this.$el, 'keydown.alex_editor keyup.alex_editor', handleKeyboard.bind(this))
 		//监听编辑器剪切
 		DapEvent.on(this.$el, 'cut.alex_editor', handleCut.bind(this))
 		//监听编辑器粘贴
