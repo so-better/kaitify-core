@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../node_modules/vue/dist/vue.global.prod.js"></script>
+    <script src="../lib/alex-editor.umd.js"></script>
+</head>
+
+<body>
+    <div id="editor" style="width: 400px;height: 400px;border: 1px solid #ddd;overflow: auto;"></div>
+</body>
+<script>
+    const { AlexElement, AlexEditor } = window['alex-editor']
+    const editor = new AlexEditor('#editor', {
+        value: '<p>hello,我是一个编辑器</p>'
+    })
+    console.log(window['alex-editor']);
+    editor.formatElementStack()
+    editor.domRender()
+</script>
+
+</html>
