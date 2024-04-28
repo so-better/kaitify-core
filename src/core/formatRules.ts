@@ -1,6 +1,7 @@
 import AlexEditor from '..'
 import { AlexElement } from '../Element'
-import { cloneData } from './tool'
+import { cloneData, isSpaceText } from './tool'
+import { string as DapString } from 'dap-util'
 
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
@@ -318,6 +319,27 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
  */
 export const mergeWithSpaceTextElement = function (this: AlexEditor, element: AlexElement) {
 	if (element.isText()) {
-		element.textContent = element.textContent!.replace(/[\uFEFF]+/, '\uFEFF')
+		let val = element.textContent!
+		let i = 0
+		while (i < val.length) {
+			//获取当前字符串
+			const chart = val.charAt(i)
+			//如果当前字符是空白字符并且前一个字符也是空白字符
+			if (isSpaceText(chart) && i > 0 && isSpaceText(val.charAt(i - 1))) {
+				//如果起点在元素上并且起点在当前这个空白字符上
+				if (this.range && this.range.anchor.element.isEqual(element) && this.range.anchor.offset >= i + 1) {
+					this.range.anchor.offset -= 1
+				}
+				//如果终点在元素上并且终点在当前这个空白字符上
+				if (this.range && this.range.focus.element.isEqual(element) && this.range.focus.offset >= i + 1) {
+					this.range.focus.offset -= 1
+				}
+				//删除空白字符
+				val = DapString.delete(val, i, 1)
+			} else {
+				i++
+			}
+		}
+		element.textContent = val
 	}
 }
