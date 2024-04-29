@@ -1471,26 +1471,7 @@ export class AlexEditor {
 			}
 		}
 
-		//起点和终点在一个元素里
-		if (this.range.anchor.element.isEqual(this.range.focus.element)) {
-			const isCover = this.range.anchor.offset == 0 && this.range.focus.offset == (this.range.anchor.element.isText() ? this.range.anchor.element.textContent!.length : 1)
-			return {
-				list: [
-					{
-						element: this.range.anchor.element,
-						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-					}
-				],
-				flatList: [
-					{
-						element: this.range.anchor.element,
-						offset: isCover ? false : [this.range.anchor.offset, this.range.focus.offset]
-					}
-				]
-			}
-		}
-
-		/** 以下是起点和终点不在一个元素里的情况 */
+		/** 以下是起点和终点不在一起的情况 */
 
 		//获取扁平化的数据
 		const getFlatList = () => {
