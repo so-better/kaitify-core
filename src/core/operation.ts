@@ -44,7 +44,12 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 				await this.customHtmlPaste.apply(this, [elements, html])
 			} else {
 				for (let i = 0; i < elements.length; i++) {
-					this.insertElement(elements[i], false)
+					//第一个元素会在当前光标所在根级块元素只有一个换行符时进行覆盖
+					if (i == 0) {
+						this.insertElement(elements[i])
+					} else {
+						this.insertElement(elements[i], false)
+					}
 				}
 				this.emit('pasteHtml', elements, html)
 			}
