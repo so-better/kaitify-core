@@ -1138,6 +1138,10 @@ export class AlexEditor {
 		if (parsedom == 'style' || parsedom == 'meta' || parsedom == 'script' || parsedom == 'link') {
 			return new AlexElement('text', null, null, null, null)
 		}
+		//如果是TEXT_NOE并且内部只有文本节点，则返回文本元素
+		if (parsedom == AlexElement.TEXT_NODE && Array.from(node.childNodes).every(childNode => childNode.nodeType == 3)) {
+			return new AlexElement('text', null, marks, styles, node.textContent)
+		}
 		//默认配置
 		const block = blockParse.find(item => item.parsedom == parsedom)
 		const inblock = inblockParse.find(item => item.parsedom == parsedom)
