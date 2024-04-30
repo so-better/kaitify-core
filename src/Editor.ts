@@ -91,9 +91,9 @@ export class AlexEditor {
 		this.stack = this.parseHtml(this.value)
 		//初始化校验stack
 		checkStack.apply(this)
-
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
+
 		//设置selection的监听更新range
 		DapEvent.on(document, `selectionchange.alex_editor_${this.__guid}`, handleSelectionChange.bind(this))
 		//监听内容输入
@@ -117,7 +117,7 @@ export class AlexEditor {
 	}
 
 	/**
-	 * 初始化range
+	 * 初始化设置默认的range
 	 */
 	initRange() {
 		const elements = AlexElement.flatElements(this.stack).filter(el => {
@@ -938,7 +938,7 @@ export class AlexEditor {
 			}
 			let index = 0
 			while (index < elements.length) {
-				//如果是null直接删除
+				//如果是null直接删除，跳过当前后续步骤
 				if (!elements[index]) {
 					elements.splice(index, 1)
 					continue

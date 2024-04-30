@@ -19,8 +19,6 @@ export class AlexHistory {
 	//记录当前展示的stack的序列
 	current: number = -1
 
-	constructor() {}
-
 	/**
 	 * 入栈
 	 */

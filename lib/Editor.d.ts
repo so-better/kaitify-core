@@ -38,7 +38,7 @@ export declare class AlexEditor {
     __chineseInputTimer: any;
     constructor(node: HTMLElement | string, opts: EditorOptionsType);
     /**
-     * 初始化range
+     * 初始化设置默认的range
      */
     initRange(): void;
     /**

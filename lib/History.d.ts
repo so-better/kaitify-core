@@ -12,7 +12,6 @@ export type AlexHistoryResultType = {
 export declare class AlexHistory {
     records: AlexHistoryRecordsItemType[];
     current: number;
-    constructor();
     /**
      * 入栈
      */
