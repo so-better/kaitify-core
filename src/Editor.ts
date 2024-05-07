@@ -1194,7 +1194,7 @@ export class AlexEditor {
 		//其余元素
 		else {
 			config.type = 'inline'
-			config.parsedom = 'span'
+			config.parsedom = AlexElement.TEXT_NODE
 		}
 		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
 		//设置行为值
