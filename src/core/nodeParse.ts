@@ -106,12 +106,6 @@ export const closedParse: NodeClosedParseType[] = [
 	},
 	{
 		parsedom: 'audio'
-	},
-	{
-		parsedom: 'svg'
-	},
-	{
-		parsedom: 'canvas'
 	}
 ]
 

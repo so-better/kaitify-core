@@ -49,6 +49,8 @@ export class AlexEditor {
 	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
 	customParseNode: ((el: AlexElement) => AlexElement) | null
+	//dom转为非文本元素时需要额外保留的标签数组
+	extraKeepTags: string[]
 	//创建历史记录
 	history: AlexHistory = new AlexHistory()
 	//存放元素的数组
@@ -86,6 +88,7 @@ export class AlexEditor {
 		this.customFilePaste = options.customFilePaste!
 		this.customMerge = options.customMerge!
 		this.customParseNode = options.customParseNode!
+		this.extraKeepTags = options.extraKeepTags!
 
 		//将html内容转为元素数组
 		this.stack = this.parseHtml(this.value)
@@ -1193,8 +1196,10 @@ export class AlexEditor {
 		}
 		//其余元素
 		else {
+			if (!this.extraKeepTags.includes(config.parsedom)) {
+				config.parsedom = AlexElement.TEXT_NODE
+			}
 			config.type = 'inline'
-			config.parsedom = AlexElement.TEXT_NODE
 		}
 		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
 		//设置行为值

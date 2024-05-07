@@ -37,6 +37,8 @@ export type EditorOptionsType = {
 	customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
 	//自定义dom转为非文本元素的后续处理逻辑
 	customParseNode?: ((el: AlexElement) => AlexElement) | null
+	//dom转为非文本元素时需要额外保留处理的标签数组
+	extraKeepTags?: string[]
 }
 
 /**
@@ -176,7 +178,8 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		customVideoPaste: null,
 		customFilePaste: null,
 		customMerge: null,
-		customParseNode: null
+		customParseNode: null,
+		extraKeepTags: []
 	}
 	if (DapCommon.isObject(options)) {
 		if (typeof options.disabled == 'boolean') {
@@ -220,6 +223,9 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		}
 		if (typeof options.customParseNode == 'function') {
 			opts.customParseNode = options.customParseNode
+		}
+		if (Array.isArray(options.extraKeepTags)) {
+			opts.extraKeepTags = options.extraKeepTags
 		}
 	}
 	return opts

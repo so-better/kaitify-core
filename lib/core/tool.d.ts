@@ -18,6 +18,7 @@ export type EditorOptionsType = {
     customFilePaste?: ((file: File) => void | Promise<void>) | null;
     customMerge?: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null;
     customParseNode?: ((el: AlexElement) => AlexElement) | null;
+    extraKeepTags?: string[];
 };
 /**
  * 获取node元素的属性集合

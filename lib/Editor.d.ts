@@ -27,6 +27,7 @@ export declare class AlexEditor {
     customFilePaste: ((file: File) => void | Promise<void>) | null;
     customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null;
     customParseNode: ((el: AlexElement) => AlexElement) | null;
+    extraKeepTags: string[];
     history: AlexHistory;
     stack: AlexElement[];
     range: AlexRange | null;
