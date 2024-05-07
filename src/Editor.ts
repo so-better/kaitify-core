@@ -1134,9 +1134,11 @@ export class AlexEditor {
 			return new AlexElement('text', null, null, null, node.textContent)
 		}
 		//元素节点
-		const marks = getAttributes(node)
-		const styles = getStyles(node)
-		const parsedom = node.nodeName.toLocaleLowerCase()
+		const marks = getAttributes(node) //标记
+		const styles = getStyles(node) //样式
+		const parsedom = node.nodeName.toLocaleLowerCase() //标签名称
+		const nameSpace = node.namespaceURI //命名空间
+
 		//如果是style、meta和script标签，则返回一个空文本元素
 		if (parsedom == 'style' || parsedom == 'meta' || parsedom == 'script' || parsedom == 'link') {
 			return new AlexElement('text', null, null, null, null)
@@ -1154,11 +1156,12 @@ export class AlexEditor {
 		let element: AlexElement | null = null
 		//构造参数
 		let config: AlexElementConfigType = {
-			type: 'inblock',
+			type: 'inline',
 			parsedom,
 			marks,
 			styles,
-			behavior: 'default'
+			behavior: 'default',
+			nameSpace
 		}
 		//默认的根级块元素
 		if (block) {
@@ -1194,16 +1197,17 @@ export class AlexEditor {
 		else if (closed) {
 			config.type = 'closed'
 		}
-		//其余元素
-		else {
-			if (!this.extraKeepTags.includes(config.parsedom)) {
-				config.parsedom = AlexElement.TEXT_NODE
-			}
+		//其余元素如果不在extraKeepTags范围内则默认转为行内的TEXT_NODE元素
+		else if (!this.extraKeepTags.includes(config.parsedom)) {
 			config.type = 'inline'
+			config.parsedom = AlexElement.TEXT_NODE
+			config.nameSpace = null
 		}
 		element = new AlexElement(config.type, config.parsedom, config.marks, config.styles, null)
 		//设置行为值
 		element.behavior = config.behavior
+		//设置命名空间
+		element.nameSpace = config.nameSpace
 		//如果不是自闭合元素则设置子元素
 		if (!closed) {
 			Array.from(node.childNodes).forEach(childNode => {

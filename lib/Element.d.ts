@@ -6,6 +6,7 @@ export type AlexElementConfigType = {
     marks: ObjectType;
     styles: ObjectType;
     behavior: 'default' | 'block';
+    nameSpace: string | null;
 };
 /**
  * 编辑器元素对象
@@ -20,6 +21,7 @@ export declare class AlexElement {
     children: AlexElement[] | null;
     parent: AlexElement | null;
     behavior?: 'default' | 'block';
+    nameSpace: string | null;
     elm: HTMLElement | null;
     constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null);
     /**

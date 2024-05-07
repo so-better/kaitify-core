@@ -11,6 +11,7 @@ export type AlexElementConfigType = {
 	marks: ObjectType
 	styles: ObjectType
 	behavior: 'default' | 'block'
+	nameSpace: string | null
 }
 
 /**
@@ -35,6 +36,8 @@ export class AlexElement {
 	parent: AlexElement | null = null
 	//定义内部块元素的行为
 	behavior?: 'default' | 'block' = 'default'
+	//命名空间(对于svg之类的元素需要定义命名空间)
+	nameSpace: string | null = null
 	//真实node
 	elm: HTMLElement | null = null
 
@@ -254,6 +257,7 @@ export class AlexElement {
 		}
 		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
+		el.nameSpace = this.nameSpace
 		if (deep && this.hasChildren()) {
 			this.children!.forEach(child => {
 				let clonedChild = child.clone(deep)
@@ -297,6 +301,7 @@ export class AlexElement {
 			this.styles = null
 			this.textContent = null
 			this.elm = null
+			this.nameSpace = null
 			return
 		}
 		if (this.isClosed()) {
@@ -306,6 +311,7 @@ export class AlexElement {
 			this.styles = null
 			this.textContent = null
 			this.elm = null
+			this.nameSpace = null
 			return
 		}
 		if (this.hasChildren()) {
@@ -429,13 +435,21 @@ export class AlexElement {
 		let el: HTMLElement | null = null
 		//文本元素
 		if (this.isText()) {
-			el = document.createElement(AlexElement.TEXT_NODE)
+			if (this.nameSpace) {
+				el = document.createElementNS(this.nameSpace, AlexElement.TEXT_NODE) as HTMLElement
+			} else {
+				el = document.createElement(AlexElement.TEXT_NODE)
+			}
 			const text = document.createTextNode(this.textContent!)
 			el.appendChild(text)
 		}
 		//非文本元素
 		else {
-			el = <HTMLElement>document.createElement(this.parsedom!)
+			if (this.nameSpace) {
+				el = document.createElementNS(this.nameSpace, this.parsedom!) as HTMLElement
+			} else {
+				el = document.createElement(this.parsedom!)
+			}
 			//渲染子元素
 			if (this.hasChildren()) {
 				this.children!.forEach(child => {
@@ -470,6 +484,7 @@ export class AlexElement {
 	__fullClone() {
 		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
+		el.nameSpace = this.nameSpace
 		el.key = this.key
 		el.elm = this.elm
 		if (this.hasChildren()) {
