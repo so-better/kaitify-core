@@ -104,6 +104,10 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 export const mergeWithBrotherElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
 	const canMerge = (pel: AlexElement, nel: AlexElement) => {
+		//如果元素锁住，则无法进行合并
+		if (pel.locked || nel.locked) {
+			return false
+		}
 		//都是空元素，可以合并
 		if (pel.isEmpty() || nel.isEmpty()) {
 			return true
@@ -233,6 +237,10 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 export const mergeWithParentElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
 	const canMerge = (parent: AlexElement, child: AlexElement) => {
+		//父元素或者子元素锁住则无法合并
+		if (parent.locked || child.locked) {
+			return false
+		}
 		//子元素是文本元素，父元素是标签等于文本标签的行内元素
 		if (child.isText() && parent.isInline()) {
 			return parent.parsedom == AlexElement.TEXT_NODE

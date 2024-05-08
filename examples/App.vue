@@ -9,12 +9,12 @@ import { AlexEditor, AlexElement } from '../src'
 
 onMounted(() => {
 	const editor = new AlexEditor('#editor', {
-		value: '<p dataBox="1">\uFEFF<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="red" /></svg>\uFEFF</p>',
+		value: '<p><span style="color:red;"><span>3</span></span></p>',
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle'],
 		customParseNode: el => {
-			if (el.parsedom == 'circle') {
-				el.type = 'closed'
+			if (el.parsedom == 'span') {
+				el.locked = true
 			}
 			return el
 		}

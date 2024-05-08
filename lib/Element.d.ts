@@ -20,8 +20,9 @@ export declare class AlexElement {
     textContent: string | null;
     children: AlexElement[] | null;
     parent: AlexElement | null;
-    behavior?: 'default' | 'block';
+    behavior: 'default' | 'block';
     namespace: string | null;
+    locked: boolean;
     elm: HTMLElement | null;
     constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null);
     /**
