@@ -260,6 +260,7 @@ export class AlexElement {
 		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.namespace = this.namespace
+		el.locked = this.locked
 		if (deep && this.hasChildren()) {
 			this.children!.forEach(child => {
 				let clonedChild = child.clone(deep)
@@ -304,6 +305,7 @@ export class AlexElement {
 			this.textContent = null
 			this.elm = null
 			this.namespace = null
+			this.locked = false
 			return
 		}
 		if (this.isClosed()) {
@@ -314,6 +316,7 @@ export class AlexElement {
 			this.textContent = null
 			this.elm = null
 			this.namespace = null
+			this.locked = false
 			return
 		}
 		if (this.hasChildren()) {
@@ -487,6 +490,7 @@ export class AlexElement {
 		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.namespace = this.namespace
+		el.locked = this.locked
 		el.key = this.key
 		el.elm = this.elm
 		if (this.hasChildren()) {
