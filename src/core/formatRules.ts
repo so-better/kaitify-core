@@ -1,4 +1,4 @@
-import AlexEditor from '..'
+import { AlexEditor } from '../Editor'
 import { AlexElement } from '../Element'
 import { cloneData, isSpaceText } from './tool'
 import { string as DapString } from 'dap-util'
