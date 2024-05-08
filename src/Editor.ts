@@ -1139,8 +1139,8 @@ export class AlexEditor {
 		const parsedom = node.nodeName.toLocaleLowerCase() //标签名称
 		const namespace = node.namespaceURI //命名空间
 
-		//如果是style、meta和script标签，则返回一个空文本元素
-		if (parsedom == 'style' || parsedom == 'meta' || parsedom == 'script' || parsedom == 'link') {
+		//如果是语义化标签，则返回一个空文本元素
+		if (parsedom == 'meta' || parsedom == 'link' || parsedom == 'style' || parsedom == 'script' || parsedom == 'title' || parsedom == 'base' || parsedom == 'noscript' || parsedom == 'template' || parsedom == 'annotation') {
 			return new AlexElement('text', null, null, null, null)
 		}
 		//如果是TEXT_NOE并且内部只有文本节点，则返回文本元素
