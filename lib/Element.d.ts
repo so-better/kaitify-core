@@ -165,4 +165,8 @@ export declare class AlexElement {
      * 定义不显示的元素标签
      */
     static VOID_NODES: string[];
+    /**
+     * 定义需要置空的元素标签
+     */
+    static EMPTY_NODES: string[];
 }

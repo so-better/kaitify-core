@@ -550,4 +550,9 @@ export class AlexElement {
 	 * 定义不显示的元素标签
 	 */
 	static VOID_NODES = ['colgroup', 'col']
+
+	/**
+	 * 定义需要置空的元素标签
+	 */
+	static EMPTY_NODES = ['meta', 'link', 'style', 'script', 'title', 'base', 'noscript', 'template', 'annotation']
 }
