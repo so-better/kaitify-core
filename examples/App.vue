@@ -24,6 +24,9 @@ onMounted(() => {
 	})
 	editor.formatElementStack()
 	editor.domRender()
+	editor.rangeRender().then(() => {
+		console.log(1)
+	})
 })
 </script>
 <style lang="less">

@@ -133,7 +133,7 @@ export const cloneData = function (data: any) {
  */
 export const isContains = function (parentNode: HTMLElement, childNode: HTMLElement) {
 	if (childNode.nodeType == 3) {
-		return DapElement.isContains(parentNode, <HTMLElement>childNode.parentNode)
+		return DapElement.isContains(parentNode, childNode.parentNode as HTMLElement)
 	}
 	return DapElement.isContains(parentNode, childNode)
 }
@@ -144,20 +144,21 @@ export const isContains = function (parentNode: HTMLElement, childNode: HTMLElem
 export const initEditorNode = function (node: HTMLElement | string) {
 	//判断是否字符串，如果是字符串按照选择器来寻找元素
 	if (typeof node == 'string' && node) {
-		node = <HTMLElement>document.body.querySelector(node)
+		node = document.body.querySelector(node) as HTMLElement
 	}
+	node = node as HTMLElement
 	//如何node不是元素则抛出异常
 	if (!DapElement.isElement(node)) {
 		throw new Error('You must specify a dom container to initialize the editor')
 	}
 	//如果已经初始化过了则抛出异常
-	if (DapData.get(<HTMLElement>node, 'data-alex-editor-init')) {
+	if (DapData.get(node, 'data-alex-editor-init')) {
 		throw new Error('The element node has been initialized to the editor')
 	}
 	//添加初始化的标记
-	DapData.set(<HTMLElement>node, 'data-alex-editor-init', true)
+	DapData.set(node, 'data-alex-editor-init', true)
 
-	return <HTMLElement>node
+	return node
 }
 
 /**

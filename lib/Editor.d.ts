@@ -1,4 +1,4 @@
-import { AlexElement } from './Element';
+import { AlexElement, AlexElementType } from './Element';
 import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
@@ -10,6 +10,14 @@ export type AlexElementRangeType = {
 export type AlexElementsRangeType = {
     list: AlexElementRangeType[];
     flatList: AlexElementRangeType[];
+};
+export type AlexElementConfigType = {
+    type: AlexElementType;
+    parsedom: string;
+    marks: ObjectType;
+    styles: ObjectType;
+    behavior: 'default' | 'block';
+    namespace: string | null;
 };
 export declare class AlexEditor {
     $el: HTMLElement;
@@ -71,7 +79,7 @@ export declare class AlexEditor {
     /**
      * 根据range来设置真实的光标
      */
-    rangeRender(): void;
+    rangeRender(): Promise<void>;
     /**
      * 将html转为元素
      */

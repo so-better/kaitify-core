@@ -26,9 +26,9 @@ export class AlexElement {
 	parent: AlexElement | null = null
 	//定义内部块元素的行为
 	behavior: 'default' | 'block' = 'default'
-	//命名空间(对于svg之类的元素需要定义命名空间)
+	//命名空间(用于创建dom)
 	namespace: string | null = null
-	//是否锁定的，此值为true表示元素不会被规则进行自动合并
+	//是否锁定，此值为true表示元素不会被规则进行自动合并
 	locked: boolean = false
 	//真实node
 	elm: HTMLElement | null = null
@@ -112,7 +112,7 @@ export class AlexElement {
 	}
 
 	/**
-	 * 获取设置不可编辑的元素，如果是null，说明元素是可编辑的
+	 * 获取不可编辑的元素，如果是null，说明元素是可编辑的
 	 */
 	getUneditableElement(): AlexElement | null {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
@@ -449,7 +449,7 @@ export class AlexElement {
 			if (this.hasChildren()) {
 				this.children!.forEach(child => {
 					child.__render()
-					el!.appendChild(<Node>child.elm)
+					el!.appendChild(child.elm as Node)
 				})
 			}
 		}

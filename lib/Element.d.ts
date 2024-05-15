@@ -1,13 +1,5 @@
 import { ObjectType } from './core/tool';
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed';
-export type AlexElementConfigType = {
-    type: AlexElementType;
-    parsedom: string;
-    marks: ObjectType;
-    styles: ObjectType;
-    behavior: 'default' | 'block';
-    namespace: string | null;
-};
 /**
  * 编辑器元素对象
  */
@@ -58,7 +50,7 @@ export declare class AlexElement {
      */
     isSpaceText(): boolean;
     /**
-     * 获取设置不可编辑的元素，如果是null，说明元素是可编辑的
+     * 获取不可编辑的元素，如果是null，说明元素是可编辑的
      */
     getUneditableElement(): AlexElement | null;
     /**

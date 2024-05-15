@@ -273,7 +273,7 @@ export const setRangeInVisible = function (this: AlexEditor) {
 		let root = this.range.focus.element.elm
 		while (DapElement.isElement(root) && root != document.documentElement) {
 			fn(root)
-			root = <HTMLElement>root.parentNode
+			root = root.parentNode as HTMLElement
 		}
 	}
 }
@@ -312,7 +312,7 @@ export const handleSelectionChange = function (this: AlexEditor) {
 	const selection = window.getSelection()
 	if (selection && selection.rangeCount) {
 		const range = selection.getRangeAt(0)
-		if (isContains(this.$el, <HTMLElement>range.startContainer) && isContains(this.$el, <HTMLElement>range.endContainer)) {
+		if (isContains(this.$el, range.startContainer as HTMLElement) && isContains(this.$el, range.endContainer as HTMLElement)) {
 			let anchorNode = null
 			let focusNode = null
 			let anchorOffset = null
@@ -361,12 +361,12 @@ export const handleSelectionChange = function (this: AlexEditor) {
 					focusOffset = 1
 				}
 			}
-			const anchorKey = DapData.get(<HTMLElement>anchorNode, 'data-alex-editor-key')
-			const focusKey = DapData.get(<HTMLElement>focusNode, 'data-alex-editor-key')
-			const anchorEle = this.getElementByKey(anchorKey)
-			const focusEle = this.getElementByKey(focusKey)
-			const anchor = new AlexPoint(<AlexElement>anchorEle, anchorOffset!)
-			const focus = new AlexPoint(<AlexElement>focusEle, focusOffset!)
+			const anchorKey = DapData.get(anchorNode as HTMLElement, 'data-alex-editor-key')
+			const focusKey = DapData.get(focusNode as HTMLElement, 'data-alex-editor-key')
+			const anchorEle = this.getElementByKey(anchorKey)!
+			const focusEle = this.getElementByKey(focusKey)!
+			const anchor = new AlexPoint(anchorEle, anchorOffset!)
+			const focus = new AlexPoint(focusEle, focusOffset!)
 			if (this.range) {
 				this.range.anchor = anchor
 				this.range.focus = focus
@@ -383,31 +383,32 @@ export const handleSelectionChange = function (this: AlexEditor) {
  * 监听beforeinput
  */
 export const handleBeforeInput = function (this: AlexEditor, e: Event) {
+	const event = e as InputEvent
 	if (this.disabled) {
 		return
 	}
 	//以下输入类型不进行处理
-	if ((<InputEvent>e).inputType == 'deleteByCut' || (<InputEvent>e).inputType == 'insertFromPaste' || (<InputEvent>e).inputType == 'deleteByDrag' || (<InputEvent>e).inputType == 'insertFromDrop') {
+	if (event.inputType == 'deleteByCut' || event.inputType == 'insertFromPaste' || event.inputType == 'deleteByDrag' || event.inputType == 'insertFromDrop') {
 		return
 	}
 	//禁用系统默认行为
-	e.preventDefault()
+	event.preventDefault()
 	//插入文本
-	if ((<InputEvent>e).inputType == 'insertText' && (<InputEvent>e).data) {
-		this.insertText((<InputEvent>e).data!)
+	if (event.inputType == 'insertText' && event.data) {
+		this.insertText(event.data!)
 		this.formatElementStack()
 		this.domRender()
 		this.rangeRender()
 	}
 	//插入段落
-	else if ((<InputEvent>e).inputType == 'insertParagraph' || (<InputEvent>e).inputType == 'insertLineBreak') {
+	else if (event.inputType == 'insertParagraph' || event.inputType == 'insertLineBreak') {
 		this.insertParagraph()
 		this.formatElementStack()
 		this.domRender()
 		this.rangeRender()
 	}
 	//删除内容
-	else if ((<InputEvent>e).inputType == 'deleteContentBackward') {
+	else if (event.inputType == 'deleteContentBackward') {
 		this.delete()
 		this.formatElementStack()
 		this.domRender()
@@ -422,8 +423,9 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
 		return
 	}
-	e.preventDefault()
-	if (e.type == 'compositionstart') {
+	const event = e as InputEvent
+	event.preventDefault()
+	if (event.type == 'compositionstart') {
 		//每次开始输入中文时先清除延时器
 		if (this.__chineseInputTimer) {
 			clearTimeout(this.__chineseInputTimer)
@@ -431,10 +433,10 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 		}
 		//改变标识
 		this.__isInputChinese = true
-	} else if (e.type == 'compositionend') {
+	} else if (event.type == 'compositionend') {
 		//在中文输入结束后插入数据
-		if ((<InputEvent>e).data) {
-			this.insertText((<InputEvent>e).data!)
+		if (event.data) {
+			this.insertText(event.data!)
 			this.formatElementStack()
 			this.domRender()
 			this.rangeRender()
@@ -456,11 +458,12 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 	if (this.__isInputChinese) {
 		return
 	}
+	const event = e as KeyboardEvent
 	//键盘按下
-	if (e.type == 'keydown') {
+	if (event.type == 'keydown') {
 		//撤销
-		if (isUndo(<KeyboardEvent>e)) {
-			e.preventDefault()
+		if (isUndo(event)) {
+			event.preventDefault()
 			const historyRecord = this.history.get(-1)
 			if (historyRecord) {
 				this.history.current = historyRecord.current
@@ -472,8 +475,8 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 			}
 		}
 		//重做
-		else if (isRedo(<KeyboardEvent>e)) {
-			e.preventDefault()
+		else if (isRedo(event)) {
+			event.preventDefault()
 			const historyRecord = this.history.get(1)
 			if (historyRecord) {
 				this.history.current = historyRecord.current
@@ -485,12 +488,12 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 			}
 		}
 		//触发keydown事件
-		this.emit('keydown', this.value, e as KeyboardEvent)
+		this.emit('keydown', this.value, event)
 	}
 	//键盘松开
-	else if (e.type == 'keyup') {
+	else if (event.type == 'keyup') {
 		//触发keyup事件
-		this.emit('keyup', this.value, e as KeyboardEvent)
+		this.emit('keyup', this.value, event)
 	}
 }
 
@@ -498,8 +501,9 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
  * 监听编辑器复制
  */
 export const handleCopy = async function (this: AlexEditor, e: Event) {
+	const event = e as ClipboardEvent
 	//阻止默认事件
-	e.preventDefault()
+	event.preventDefault()
 	//没有获取光标
 	if (!this.range) {
 		return
@@ -508,7 +512,6 @@ export const handleCopy = async function (this: AlexEditor, e: Event) {
 	if (!this.allowCopy) {
 		return
 	}
-	const event = e as ClipboardEvent
 	//获取选区内的元素数据
 	const result = this.getElementsByRange().list
 	//如果剪切板有数据并且有光标选区
@@ -522,8 +525,9 @@ export const handleCopy = async function (this: AlexEditor, e: Event) {
  * 监听编辑器剪切
  */
 export const handleCut = async function (this: AlexEditor, e: Event) {
+	const event = e as ClipboardEvent
 	//阻止默认事件
-	e.preventDefault()
+	event.preventDefault()
 	//没有获取光标
 	if (!this.range) {
 		return
@@ -532,7 +536,6 @@ export const handleCut = async function (this: AlexEditor, e: Event) {
 	if (!this.allowCut) {
 		return
 	}
-	const event = e as ClipboardEvent
 	//获取选区内的元素数据
 	const result = this.getElementsByRange().list
 	//如果支持剪切板数据并且有光标选区
@@ -554,7 +557,8 @@ export const handleCut = async function (this: AlexEditor, e: Event) {
  * 监听编辑器粘贴
  */
 export const handlePaste = async function (this: AlexEditor, e: Event) {
-	e.preventDefault()
+	const event = e as ClipboardEvent
+	event.preventDefault()
 	if (this.disabled) {
 		return
 	}
@@ -564,7 +568,6 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 	if (!this.allowPaste) {
 		return
 	}
-	const event = e as ClipboardEvent
 	if (event.clipboardData) {
 		//html内容
 		const html = event.clipboardData.getData('text/html')

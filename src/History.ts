@@ -28,9 +28,7 @@ export class AlexHistory {
 			this.records.length = this.current + 1
 		}
 		//生成一个新的stack
-		const newStack = stack.map(ele => {
-			return ele.__fullClone()
-		})
+		const newStack = stack.map(ele => ele.__fullClone())
 		//生成一个新的range
 		const newRange = this.__cloneRange(newStack, range)
 		//推入栈中
@@ -67,9 +65,7 @@ export class AlexHistory {
 		//获取栈中的stack和range
 		const { stack, range } = this.records[current]
 		//创建新的stack
-		const newStack = stack.map(ele => {
-			return ele.__fullClone()
-		})
+		const newStack = stack.map(ele => ele.__fullClone())
 		//创建新的range
 		const newRange = this.__cloneRange(newStack, range)
 		//返回给编辑器

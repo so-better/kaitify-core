@@ -1059,54 +1059,56 @@ export class AlexEditor {
 	 * 根据range来设置真实的光标
 	 */
 	rangeRender() {
-		//如果编辑器被禁用则无法设置真实光标
-		if (this.disabled) {
-			return
-		}
-		if (this.range) {
-			//将虚拟光标位置转为真实光标位置
-			const handler = (point: AlexPoint) => {
-				let node: HTMLElement | null = null
-				let offset: number | null = null
-				//如果是文本元素
-				if (point.element.isText()) {
-					node = <HTMLElement>point.element.elm!.childNodes[0]
-					offset = point.offset
+		return new Promise<void>(resolve => {
+			//如果编辑器被禁用则无法设置真实光标
+			if (this.disabled) {
+				resolve()
+				return
+			}
+			if (this.range) {
+				//将虚拟光标位置转为真实光标位置
+				const handler = (point: AlexPoint) => {
+					let node: HTMLElement | null = null
+					let offset: number | null = null
+					//如果是文本元素
+					if (point.element.isText()) {
+						node = point.element.elm!.childNodes[0] as HTMLElement
+						offset = point.offset
+					}
+					//自闭合元素
+					else {
+						node = point.element.parent!.elm
+						const index = point.element.parent!.children!.findIndex(item => point.element.isEqual(item))
+						offset = point.offset + index
+					}
+					return { node, offset }
 				}
-				//自闭合元素
-				else {
-					node = point.element.parent!.elm
-					const index = point.element.parent!.children!.findIndex(item => {
-						return point.element.isEqual(item)
-					})
-					offset = point.offset + index
+				this.__innerSelectionChange = true
+				const anchorResult = handler(this.range.anchor)
+				const focusResult = handler(this.range.focus)
+				//设置光标
+				const selection = window.getSelection()
+				if (selection) {
+					selection.removeAllRanges()
+					const range = document.createRange()
+					range.setStart(anchorResult.node!, anchorResult.offset)
+					range.setEnd(focusResult.node!, focusResult.offset)
+					selection.addRange(range)
 				}
-				return { node, offset }
+			} else {
+				const selection = window.getSelection()
+				if (selection) {
+					selection.removeAllRanges()
+				}
 			}
-			this.__innerSelectionChange = true
-			const anchorResult = handler(this.range.anchor)
-			const focusResult = handler(this.range.focus)
-			//设置光标
-			const selection = window.getSelection()
-			if (selection) {
-				selection.removeAllRanges()
-				const range = document.createRange()
-				range.setStart(anchorResult.node!, anchorResult.offset)
-				range.setEnd(focusResult.node!, focusResult.offset)
-				selection.addRange(range)
-			}
-		} else {
-			const selection = window.getSelection()
-			if (selection) {
-				selection.removeAllRanges()
-			}
-		}
-		setTimeout(() => {
-			setRangeInVisible.apply(this)
-			this.__innerSelectionChange = false
-			this.history.updateCurrentRange(this.range!)
-			this.emit('rangeUpdate', this.range)
-		}, 0)
+			setTimeout(() => {
+				setRangeInVisible.apply(this)
+				this.__innerSelectionChange = false
+				this.history.updateCurrentRange(this.range!)
+				this.emit('rangeUpdate', this.range)
+				resolve()
+			}, 0)
+		})
 	}
 
 	/**
@@ -1121,7 +1123,7 @@ export class AlexEditor {
 		let elements: AlexElement[] = []
 		Array.from(node.childNodes).forEach(el => {
 			if (el.nodeType == 1 || el.nodeType == 3) {
-				const element = this.parseNode(<HTMLElement>el)
+				const element = this.parseNode(el as HTMLElement)
 				elements.push(element)
 			}
 		})
@@ -1192,11 +1194,12 @@ export class AlexEditor {
 			if (inline.parse) {
 				config.parsedom = AlexElement.TEXT_NODE
 				if (DapCommon.isObject(inline.parse)) {
-					for (let key in <ObjectType>inline.parse) {
-						if (typeof (<ObjectType>inline.parse)[key] == 'function') {
-							config.styles[key] = (<ObjectType>inline.parse)[key].apply(this, [node])
+					const inlineParse = inline.parse as ObjectType
+					for (let key in inlineParse) {
+						if (typeof inlineParse[key] == 'function') {
+							config.styles[key] = inlineParse[key].apply(this, [node])
 						} else {
-							config.styles[key] = (<ObjectType>inline.parse)[key]
+							config.styles[key] = inlineParse[key]
 						}
 					}
 				}
@@ -1221,7 +1224,7 @@ export class AlexEditor {
 		if (!closed) {
 			Array.from(node.childNodes).forEach(childNode => {
 				if (childNode.nodeType == 1 || childNode.nodeType == 3) {
-					const childEle = this.parseNode(<HTMLElement>childNode)
+					const childEle = this.parseNode(childNode as HTMLElement)
 					childEle.parent = element
 					if (element!.hasChildren()) {
 						element!.children!.push(childEle)
