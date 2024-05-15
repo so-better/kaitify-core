@@ -4,16 +4,6 @@ import { createUniqueKey, isSpaceText, cloneData, ObjectType } from './core/tool
 //元素类型
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed'
 
-//node转换元素的config类型
-export type AlexElementConfigType = {
-	type: AlexElementType
-	parsedom: string
-	marks: ObjectType
-	styles: ObjectType
-	behavior: 'default' | 'block'
-	namespace: string | null
-}
-
 /**
  * 编辑器元素对象
  */

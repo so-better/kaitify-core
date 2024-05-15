@@ -9,8 +9,8 @@ export { AlexPoint } from './Point'
 //导出光标范围对象
 export { AlexRange } from './Range'
 //导出类型
-export type { AlexElementRangeType, AlexElementsRangeType } from './Editor'
-export type { AlexElementConfigType, AlexElementType } from './Element'
+export type { AlexElementRangeType, AlexElementsRangeType, AlexElementConfigType } from './Editor'
+export type { AlexElementType } from './Element'
 export type { AlexHistoryRecordsItemType, AlexHistoryResultType } from './History'
 //导出版本
 export const version = '1.4.6'

@@ -1,5 +1,5 @@
 import { event as DapEvent, common as DapCommon } from 'dap-util'
-import { AlexElement, AlexElementConfigType } from './Element'
+import { AlexElement, AlexElementType } from './Element'
 import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
@@ -16,6 +16,15 @@ export type AlexElementRangeType = {
 export type AlexElementsRangeType = {
 	list: AlexElementRangeType[]
 	flatList: AlexElementRangeType[]
+}
+
+export type AlexElementConfigType = {
+	type: AlexElementType
+	parsedom: string
+	marks: ObjectType
+	styles: ObjectType
+	behavior: 'default' | 'block'
+	namespace: string | null
 }
 
 export class AlexEditor {
