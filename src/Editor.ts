@@ -1435,6 +1435,10 @@ export class AlexEditor {
 				if (child.isEmpty()) {
 					continue
 				}
+				//如果子元素是不可见元素跳过
+				if (!child.isText() && AlexElement.VOID_NODES.includes(child.parsedom!)) {
+					continue
+				}
 				//如果子元素是文本元素或者自闭合元素
 				if (child.isText() || child.isClosed()) {
 					el = child
@@ -1459,8 +1463,12 @@ export class AlexEditor {
 				if (nextElement.isEmpty()) {
 					return fn(nextElement)
 				}
-				//如果是文本元素或者自闭合元素
+				//如果兄弟元素是不可见元素，直接下一个
+				if (!nextElement.isText() && AlexElement.VOID_NODES.includes(nextElement.parsedom!)) {
+					return fn(nextElement)
+				}
 				if (nextElement.isText() || nextElement.isClosed()) {
+					//如果是文本元素或者自闭合元素
 					return nextElement
 				}
 				/** 其他元素的情况下 */

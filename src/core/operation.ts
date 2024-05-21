@@ -151,17 +151,17 @@ export const setRecentlyPoint = function (this: AlexEditor, point: AlexPoint) {
 	const nextElement = this.getNextElementOfPoint(point)
 	const block = point.element.getBlock()
 	const inblock = point.element.getInblock()
-	if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom!) && inblock && inblock.isContains(previousElement)) {
+	if (previousElement && inblock && inblock.isContains(previousElement)) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom!) && inblock && inblock.isContains(nextElement)) {
+	} else if (nextElement && inblock && inblock.isContains(nextElement)) {
 		point.moveToStart(nextElement)
-	} else if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom!) && block.isContains(previousElement)) {
+	} else if (previousElement && block.isContains(previousElement)) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom!) && block.isContains(nextElement)) {
+	} else if (nextElement && block.isContains(nextElement)) {
 		point.moveToStart(nextElement)
-	} else if (previousElement && !AlexElement.VOID_NODES.includes(previousElement.parsedom!)) {
+	} else if (previousElement) {
 		point.moveToEnd(previousElement)
-	} else if (nextElement && !AlexElement.VOID_NODES.includes(nextElement.parsedom!)) {
+	} else if (nextElement) {
 		point.moveToStart(nextElement)
 	}
 }
