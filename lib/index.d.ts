@@ -4,6 +4,6 @@ export { AlexHistory } from './History';
 export { AlexPoint } from './Point';
 export { AlexRange } from './Range';
 export type { AlexElementRangeType, AlexElementsRangeType, AlexElementConfigType } from './Editor';
-export type { AlexElementType } from './Element';
+export type { AlexElementType, AlexElementCreateConfigType } from './Element';
 export type { AlexHistoryRecordsItemType, AlexHistoryResultType } from './History';
-export declare const version = "1.4.9";
+export declare const version = "1.4.10";

@@ -1,14 +1,18 @@
 <template>
 	<div style="padding: 20px">
 		<div style="width: 100%; height: 400px; border: 1px solid #ddd; overflow: auto" id="editor"></div>
+		<button @click="insert">插入一个段落</button>
 	</div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { AlexEditor, AlexElement } from '../src'
+import { color } from 'dap-util'
+
+const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
-	const editor = new AlexEditor('#editor', {
+	editor.value = new AlexEditor('#editor', {
 		value: '<p><span style="color:red;"><span>3</span></span></p>',
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle'],
@@ -19,15 +23,45 @@ onMounted(() => {
 			return el
 		}
 	})
-	editor.on('keydown', (val, e) => {
+	editor.value.on('keydown', (val, e) => {
 		console.log('keydown', val, e)
 	})
-	editor.formatElementStack()
-	editor.domRender()
-	editor.rangeRender().then(() => {
-		console.log(1)
-	})
+	editor.value.formatElementStack()
+	editor.value.domRender()
+	editor.value.rangeRender()
 })
+
+const insert = () => {
+	const el = AlexElement.create({
+		type: 'block',
+		parsedom: 'p',
+		children: [
+			{
+				type: 'closed',
+				parsedom: 'img',
+				marks: {
+					src: '#'
+				},
+				styles: {
+					width: '100px'
+				}
+			},
+			{
+				type: 'text',
+				textcontent: '左边是一个图片',
+				styles: {
+					color: '#1983f3',
+					'font-size': '12px'
+				}
+			}
+		]
+	})
+	console.log(el)
+	editor.value!.insertElement(el)
+	editor.value!.formatElementStack()
+	editor.value!.domRender()
+	editor.value!.rangeRender()
+}
 </script>
 <style lang="less">
 html {

@@ -1,5 +1,6 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
+
 export type ObjectType = {
     [key: string]: any | null;
 };

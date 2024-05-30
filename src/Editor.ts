@@ -1093,7 +1093,7 @@ export class AlexEditor {
 					}
 					//自闭合元素
 					else {
-						node = point.element.parent!.elm
+						node = point.element.parent!.elm!
 						const index = point.element.parent!.children!.findIndex(item => point.element.isEqual(item))
 						offset = point.offset + index
 					}

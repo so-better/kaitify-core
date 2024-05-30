@@ -7,6 +7,21 @@ import { createUniqueKey, isSpaceText, cloneData, ObjectType } from './core/tool
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed'
 
 /**
+ * 创建元素的入参类型
+ */
+export type AlexElementCreateConfigType = {
+	type: AlexElementType
+	parsedom?: string | null
+	marks?: ObjectType | null
+	styles?: ObjectType | null
+	children?: AlexElementCreateConfigType[] | null
+	textcontent?: string | null
+	behavior?: 'default' | 'block'
+	namespace?: string | null
+	locked?: boolean
+}
+
+/**
  * 编辑器元素对象
  */
 export class AlexElement {
@@ -15,27 +30,27 @@ export class AlexElement {
 	//类型
 	type: AlexElementType
 	//真实节点名称
-	parsedom: string | null
+	parsedom?: string | null
 	//标记集合
-	marks: ObjectType | null
+	marks?: ObjectType | null
 	//样式集合
-	styles: ObjectType | null
+	styles?: ObjectType | null
 	//文本值
-	textContent: string | null
+	textContent?: string | null
 	//子元素
-	children: AlexElement[] | null = null
+	children?: AlexElement[] | null = null
 	//父元素
-	parent: AlexElement | null = null
+	parent?: AlexElement | null = null
 	//定义内部块元素的行为
-	behavior: 'default' | 'block' = 'default'
+	behavior?: 'default' | 'block' = 'default'
 	//命名空间(用于创建dom)
-	namespace: string | null = null
+	namespace?: string | null = null
 	//是否锁定，此值为true表示元素不会被规则进行自动合并
-	locked: boolean = false
+	locked?: boolean = false
 	//真实node
-	elm: HTMLElement | null = null
+	elm?: HTMLElement | null = null
 
-	constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null) {
+	constructor(type: AlexElementType, parsedom?: string | null, marks?: ObjectType | null, styles?: ObjectType | null, textContent?: string | null) {
 		this.type = type
 		this.parsedom = parsedom
 		this.marks = marks
@@ -571,6 +586,38 @@ export class AlexElement {
 	 */
 	static getSpaceElement() {
 		return new AlexElement('text', null, null, null, '\uFEFF')
+	}
+
+	/**
+	 * 创建元素的快捷方法
+	 * @param elementConfig
+	 * @returns
+	 */
+	static create(elementConfig: AlexElementCreateConfigType) {
+		let el: AlexElement | null = null
+		//处理文本元素
+		if (elementConfig.type == 'text') {
+			el = new AlexElement(elementConfig.type, null, elementConfig.marks, elementConfig.styles, elementConfig.textcontent)
+		}
+		//其他元素
+		else {
+			el = new AlexElement(elementConfig.type, elementConfig.parsedom, elementConfig.marks, elementConfig.styles, null)
+			//内部块元素设置行为值
+			if (elementConfig.type == 'inblock') {
+				el.behavior = elementConfig.behavior
+			}
+			//非自闭和元素设置子元素
+			if (elementConfig.type != 'closed' && Array.isArray(elementConfig.children)) {
+				el.children = elementConfig.children.map(item => {
+					const child = AlexElement.create(item)
+					child.parent = el
+					return child
+				})
+			}
+		}
+		el.namespace = elementConfig.namespace
+		el.locked = elementConfig.locked
+		return el
 	}
 
 	/**
