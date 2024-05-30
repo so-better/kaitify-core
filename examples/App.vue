@@ -37,22 +37,34 @@ const insert = () => {
 		parsedom: 'p',
 		children: [
 			{
-				type: 'closed',
-				parsedom: 'img',
-				marks: {
-					src: '#'
-				},
-				styles: {
-					width: '100px'
-				}
+				type: 'inline',
+				parsedom: 'span',
+				children: [
+					{
+						type: 'text',
+						styles: {
+							color: 'red'
+						},
+						textcontent: '红色字体'
+					},
+					{
+						type: 'text',
+						styles: {
+							'font-weight': 'bold'
+						},
+						textcontent: '加粗字体'
+					}
+				]
 			},
 			{
-				type: 'text',
-				textcontent: '左边是一个图片',
-				styles: {
-					color: '#1983f3',
-					'font-size': '12px'
-				}
+				type: 'inline',
+				parsedom: 'code',
+				children: [
+					{
+						type: 'text',
+						textcontent: 'var a = 2;'
+					}
+				]
 			}
 		]
 	})
