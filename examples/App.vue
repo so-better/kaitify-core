@@ -1,6 +1,6 @@
 <template>
 	<div style="padding: 20px">
-		<div style="width: 100%; height: 400px; border: 1px solid #ddd; overflow: auto" id="editor"></div>
+		<div id="editor"></div>
 		<button @click="insert">插入一个段落</button>
 	</div>
 </template>
@@ -87,5 +87,30 @@ body {
 #app {
 	height: 100%;
 	overflow-y: auto;
+}
+
+#editor {
+	width: 100%;
+	height: 400px;
+	border: 1px solid #ddd;
+	overflow: auto;
+	padding: 10px;
+	border-radius: 4px;
+	margin-bottom: 20px;
+	transition: all 200ms;
+
+	&:focus {
+		border-color: #708af3;
+	}
+
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin: 0 0 15px 0;
+	}
 }
 </style>
