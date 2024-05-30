@@ -192,7 +192,7 @@ export const emptyDefaultBehaviorInblock = function (this: AlexEditor, element: 
 	}
 	if (element.hasChildren()) {
 		element.children!.forEach(item => {
-			if (item.isInblock()) {
+			if (item.isInblock() && item.behavior == 'default') {
 				emptyDefaultBehaviorInblock.apply(this, [item])
 			} else {
 				item.toEmpty()

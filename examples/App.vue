@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: '<p><span style="color:red;"><span>3</span></span></p>',
+		value: '<table><tbody><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><div>333</div></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr></tbody></table><p><span style="color:red;"><span>3</span></span></p>',
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
@@ -111,6 +111,18 @@ body {
 	h5,
 	h6 {
 		margin: 0 0 15px 0;
+	}
+
+	table {
+		border: 1px solid #ccc;
+		width: 100%;
+		border-collapse: collapse;
+
+		th,
+		td {
+			border: 1px solid #ccc;
+			padding: 10px;
+		}
 	}
 }
 </style>
