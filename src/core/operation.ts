@@ -8,6 +8,10 @@ import { AlexEditor, AlexElementRangeType } from '../Editor'
 
 /**
  * 获取选区内的元素转为html和text塞入剪切板并返回
+ * @param this
+ * @param data
+ * @param result
+ * @returns
  */
 const setClipboardData = function (this: AlexEditor, data: DataTransfer, result: AlexElementRangeType[]) {
 	let html = ''
@@ -31,6 +35,10 @@ const setClipboardData = function (this: AlexEditor, data: DataTransfer, result:
 
 /**
  * 粘贴具体处理方法
+ * @param this
+ * @param html
+ * @param text
+ * @param files
  */
 const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
 	//如果含有html
@@ -130,6 +138,7 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 
 /**
  * 初始化校验stack
+ * @param this
  */
 export const checkStack = function (this: AlexEditor) {
 	const elements = AlexElement.flatElements(this.stack).filter(el => {
@@ -145,6 +154,8 @@ export const checkStack = function (this: AlexEditor) {
 
 /**
  * 更新焦点的元素为最近的可设置光标的元素
+ * @param this
+ * @param point
  */
 export const setRecentlyPoint = function (this: AlexEditor, point: AlexPoint) {
 	const previousElement = this.getPreviousElementOfPoint(point)
@@ -168,6 +179,9 @@ export const setRecentlyPoint = function (this: AlexEditor, point: AlexPoint) {
 
 /**
  * 清空默认行为的内部块元素
+ * @param this
+ * @param element
+ * @returns
  */
 export const emptyDefaultBehaviorInblock = function (this: AlexEditor, element: AlexElement) {
 	if (!element.isInblock()) {
@@ -193,6 +207,7 @@ export const emptyDefaultBehaviorInblock = function (this: AlexEditor, element: 
 
 /**
  * 判断焦点是否在可视范围内，如果不在则进行设置
+ * @param this
  */
 export const setRangeInVisible = function (this: AlexEditor) {
 	const fn = async (root: HTMLElement) => {
@@ -280,6 +295,7 @@ export const setRangeInVisible = function (this: AlexEditor) {
 
 /**
  * 判断stack是否为空，为空则进行初始化
+ * @param this
  */
 export const handleStackEmpty = function (this: AlexEditor) {
 	const elements = AlexElement.flatElements(this.stack).filter(el => {
@@ -299,6 +315,8 @@ export const handleStackEmpty = function (this: AlexEditor) {
 
 /**
  * 监听selection改变
+ * @param this
+ * @returns
  */
 export const handleSelectionChange = function (this: AlexEditor) {
 	//如果是中文输入则不更新range
@@ -381,6 +399,9 @@ export const handleSelectionChange = function (this: AlexEditor) {
 
 /**
  * 监听beforeinput
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleBeforeInput = function (this: AlexEditor, e: Event) {
 	const event = e as InputEvent
@@ -418,6 +439,9 @@ export const handleBeforeInput = function (this: AlexEditor, e: Event) {
 
 /**
  * 监听中文输入
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleChineseInput = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
@@ -450,6 +474,9 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 
 /**
  * 监听键盘事件
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleKeyboard = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
@@ -499,6 +526,9 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器复制
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleCopy = async function (this: AlexEditor, e: Event) {
 	const event = e as ClipboardEvent
@@ -523,6 +553,9 @@ export const handleCopy = async function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器剪切
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleCut = async function (this: AlexEditor, e: Event) {
 	const event = e as ClipboardEvent
@@ -555,6 +588,9 @@ export const handleCut = async function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器粘贴
+ * @param this
+ * @param e
+ * @returns
  */
 export const handlePaste = async function (this: AlexEditor, e: Event) {
 	const event = e as ClipboardEvent
@@ -586,6 +622,9 @@ export const handlePaste = async function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器拖拽和拖放
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 	e.preventDefault()
@@ -620,6 +659,9 @@ export const handleDragDrop = async function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器获取焦点
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleFocus = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {
@@ -630,6 +672,9 @@ export const handleFocus = function (this: AlexEditor, e: Event) {
 
 /**
  * 监听编辑器失去焦点
+ * @param this
+ * @param e
+ * @returns
  */
 export const handleBlur = function (this: AlexEditor, e: Event) {
 	if (this.disabled) {

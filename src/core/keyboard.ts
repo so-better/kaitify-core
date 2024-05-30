@@ -4,6 +4,8 @@ const { Mac } = platform.os()
 
 /**
  * 键盘是否执行撤销操作
+ * @param e
+ * @returns
  */
 export const isUndo = function (e: KeyboardEvent) {
 	if (Mac) {
@@ -14,6 +16,8 @@ export const isUndo = function (e: KeyboardEvent) {
 
 /**
  * 键盘是否执行重做操作
+ * @param e
+ * @returns
  */
 export const isRedo = function (e: KeyboardEvent) {
 	if (Mac) {

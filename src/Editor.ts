@@ -8,16 +8,25 @@ import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
+/**
+ * 光标选区返回的结果数据项类型
+ */
 export type AlexElementRangeType = {
 	element: AlexElement
 	offset: number[] | false
 }
 
+/**
+ * 光标选区返回的结果类型
+ */
 export type AlexElementsRangeType = {
 	list: AlexElementRangeType[]
 	flatList: AlexElementRangeType[]
 }
 
+/**
+ * AlexElement元素构造类型
+ */
 export type AlexElementConfigType = {
 	type: AlexElementType
 	parsedom: string
@@ -143,6 +152,7 @@ export class AlexEditor {
 
 	/**
 	 * 根据光标进行删除操作
+	 * @returns
 	 */
 	delete() {
 		if (this.disabled) {
@@ -525,6 +535,8 @@ export class AlexEditor {
 
 	/**
 	 * 根据光标位置向编辑器内插入文本
+	 * @param data
+	 * @returns
 	 */
 	insertText(data: string) {
 		if (this.disabled) {
@@ -574,6 +586,7 @@ export class AlexEditor {
 
 	/**
 	 * 在光标处换行
+	 * @returns
 	 */
 	insertParagraph() {
 		if (this.disabled) {
@@ -714,7 +727,9 @@ export class AlexEditor {
 
 	/**
 	 * 根据光标插入元素
-	 * cover表示所在根级块或者内部块元素只有换行符时是否覆盖此元素
+	 * @param ele 插入的元素
+	 * @param cover 所在根级块或者内部块元素只有换行符时是否覆盖此元素
+	 * @returns
 	 */
 	insertElement(ele: AlexElement, cover: boolean | undefined = true) {
 		if (this.disabled) {
@@ -1016,7 +1031,7 @@ export class AlexEditor {
 
 	/**
 	 * 渲染编辑器dom内容
-	 * unPushHistory为false表示加入历史记录
+	 * @param unPushHistory 为false表示加入历史记录
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
 		//触发事件
@@ -1057,6 +1072,7 @@ export class AlexEditor {
 
 	/**
 	 * 根据range来设置真实的光标
+	 * @returns
 	 */
 	rangeRender() {
 		return new Promise<void>(resolve => {
@@ -1113,6 +1129,8 @@ export class AlexEditor {
 
 	/**
 	 * 将html转为元素
+	 * @param html
+	 * @returns
 	 */
 	parseHtml(html: string) {
 		if (!html) {
@@ -1132,6 +1150,8 @@ export class AlexEditor {
 
 	/**
 	 * 将node转为元素
+	 * @param node
+	 * @returns
 	 */
 	parseNode(node: HTMLElement) {
 		if (!(node instanceof Node)) {
@@ -1242,6 +1262,8 @@ export class AlexEditor {
 
 	/**
 	 * 将指定元素与另一个元素进行合并（仅限内部块元素和根级块元素）
+	 * @param ele
+	 * @param previousEle
 	 */
 	merge(ele: AlexElement, previousEle: AlexElement) {
 		if (!AlexElement.isElement(ele)) {
@@ -1267,6 +1289,8 @@ export class AlexEditor {
 
 	/**
 	 * 根据key查询元素
+	 * @param key
+	 * @returns
 	 */
 	getElementByKey(key: number) {
 		if (!key) {
@@ -1296,6 +1320,8 @@ export class AlexEditor {
 
 	/**
 	 * 获取指定元素的前一个兄弟元素（会跳过空元素）
+	 * @param ele
+	 * @returns
 	 */
 	getPreviousElement(ele: AlexElement): AlexElement | null {
 		if (!AlexElement.isElement(ele)) {
@@ -1328,6 +1354,8 @@ export class AlexEditor {
 
 	/**
 	 * 获取指定元素的后一个兄弟元素（会跳过空元素）
+	 * @param ele
+	 * @returns
 	 */
 	getNextElement(ele: AlexElement): AlexElement | null {
 		if (!AlexElement.isElement(ele)) {
@@ -1360,6 +1388,8 @@ export class AlexEditor {
 
 	/**
 	 * 向上查询可以设置焦点的元素（会跳过空元素）
+	 * @param point
+	 * @returns
 	 */
 	getPreviousElementOfPoint(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
@@ -1419,6 +1449,8 @@ export class AlexEditor {
 
 	/**
 	 * 向下查找可以设置焦点的元素（会跳过空元素）
+	 * @param point
+	 * @returns
 	 */
 	getNextElementOfPoint(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
@@ -1485,7 +1517,8 @@ export class AlexEditor {
 	}
 
 	/**
-	 * 获取选区之间的元素，flat参数表示是否返回扁平化的数据
+	 * 获取选区之间的元素
+	 * @returns
 	 */
 	getElementsByRange(): AlexElementsRangeType {
 		//虚拟光标不存在
@@ -1692,6 +1725,9 @@ export class AlexEditor {
 
 	/**
 	 * 将指定元素添加到父元素的子元素数组中
+	 * @param childEle
+	 * @param parentEle
+	 * @param index
 	 */
 	addElementTo(childEle: AlexElement, parentEle: AlexElement, index: number | undefined = 0) {
 		if (!AlexElement.isElement(childEle)) {
@@ -1719,6 +1755,8 @@ export class AlexEditor {
 
 	/**
 	 * 将指定元素添加到另一个元素前面
+	 * @param newEle
+	 * @param targetEle
 	 */
 	addElementBefore(newEle: AlexElement, targetEle: AlexElement) {
 		if (!AlexElement.isElement(newEle)) {
@@ -1743,6 +1781,8 @@ export class AlexEditor {
 
 	/**
 	 * 将指定元素添加到另一个元素后面
+	 * @param newEle
+	 * @param targetEle
 	 */
 	addElementAfter(newEle: AlexElement, targetEle: AlexElement) {
 		if (!AlexElement.isElement(newEle)) {
@@ -1771,6 +1811,8 @@ export class AlexEditor {
 
 	/**
 	 * 将虚拟光标设置到指定元素开始处
+	 * @param element
+	 * @returns
 	 */
 	collapseToStart(element?: AlexElement) {
 		if (this.disabled) {
@@ -1809,6 +1851,8 @@ export class AlexEditor {
 
 	/**
 	 * 将虚拟光标设置到指定元素最后
+	 * @param element
+	 * @returns
 	 */
 	collapseToEnd(element?: AlexElement) {
 		if (this.disabled) {
@@ -1864,6 +1908,9 @@ export class AlexEditor {
 
 	/**
 	 * 触发自定义事件
+	 * @param eventName
+	 * @param value
+	 * @returns
 	 */
 	emit(eventName: string, ...value: any) {
 		if (Array.isArray(this.__events[eventName])) {
@@ -1877,6 +1924,8 @@ export class AlexEditor {
 
 	/**
 	 * 监听自定义事件
+	 * @param eventName
+	 * @param eventHandle
 	 */
 	on(eventName: string, eventHandle: (...args: any) => void) {
 		if (!this.__events[eventName]) {
@@ -1884,6 +1933,7 @@ export class AlexEditor {
 		}
 		this.__events[eventName].push(eventHandle)
 	}
+
 	/**
 	 * 销毁编辑器的方法
 	 */

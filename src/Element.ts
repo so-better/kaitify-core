@@ -1,7 +1,9 @@
 import { common as DapCommon, data as DapData } from 'dap-util'
 import { createUniqueKey, isSpaceText, cloneData, ObjectType } from './core/tool'
 
-//元素类型
+/**
+ * 元素类型
+ */
 export type AlexElementType = 'block' | 'inblock' | 'inline' | 'text' | 'closed'
 
 /**
@@ -43,6 +45,7 @@ export class AlexElement {
 
 	/**
 	 * 是否根级块元素
+	 * @returns
 	 */
 	isBlock() {
 		return this.type == 'block'
@@ -50,6 +53,7 @@ export class AlexElement {
 
 	/**
 	 * 是否内部块元素
+	 * @returns
 	 */
 	isInblock() {
 		return this.type == 'inblock'
@@ -57,6 +61,7 @@ export class AlexElement {
 
 	/**
 	 * 是否行内元素
+	 * @returns
 	 */
 	isInline() {
 		return this.type == 'inline'
@@ -64,6 +69,7 @@ export class AlexElement {
 
 	/**
 	 * 是否自闭合元素
+	 * @returns
 	 */
 	isClosed() {
 		return this.type == 'closed'
@@ -71,6 +77,7 @@ export class AlexElement {
 
 	/**
 	 * 是否文本元素
+	 * @returns
 	 */
 	isText() {
 		return this.type == 'text'
@@ -78,6 +85,7 @@ export class AlexElement {
 
 	/**
 	 * 是否换行符
+	 * @returns
 	 */
 	isBreak() {
 		return this.isClosed() && this.parsedom == 'br'
@@ -85,6 +93,7 @@ export class AlexElement {
 
 	/**
 	 * 是否空元素
+	 * @returns
 	 */
 	isEmpty(): boolean {
 		//文本元素
@@ -106,6 +115,7 @@ export class AlexElement {
 
 	/**
 	 * 是否零宽度无断空白元素
+	 * @returns
 	 */
 	isSpaceText() {
 		return this.isText() && !this.isEmpty() && isSpaceText(this.textContent!)
@@ -113,6 +123,7 @@ export class AlexElement {
 
 	/**
 	 * 获取不可编辑的元素，如果是null，说明元素是可编辑的
+	 * @returns
 	 */
 	getUneditableElement(): AlexElement | null {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
@@ -126,6 +137,8 @@ export class AlexElement {
 
 	/**
 	 * 比较当前元素和另一个元素是否相等
+	 * @param element
+	 * @returns
 	 */
 	isEqual(element: AlexElement) {
 		if (!AlexElement.isElement(element)) {
@@ -136,6 +149,8 @@ export class AlexElement {
 
 	/**
 	 * 判断当前元素是否包含另一个元素
+	 * @param element
+	 * @returns
 	 */
 	isContains(element: AlexElement): boolean {
 		if (this.isEqual(element)) {
@@ -149,6 +164,7 @@ export class AlexElement {
 
 	/**
 	 * 判断当前元素的子元素数组是否只包含换行符
+	 * @returns
 	 */
 	isOnlyHasBreak() {
 		if (this.hasChildren()) {
@@ -167,6 +183,7 @@ export class AlexElement {
 
 	/**
 	 * 判断当前元素是否在拥有代码块样式的块内（包括自身）
+	 * @returns
 	 */
 	isPreStyle(): boolean {
 		const block = this.getBlock()
@@ -195,6 +212,7 @@ export class AlexElement {
 
 	/**
 	 * 是否含有标记
+	 * @returns
 	 */
 	hasMarks() {
 		if (!this.marks) {
@@ -208,6 +226,7 @@ export class AlexElement {
 
 	/**
 	 * 是否含有样式
+	 * @returns
 	 */
 	hasStyles() {
 		if (!this.styles) {
@@ -221,6 +240,7 @@ export class AlexElement {
 
 	/**
 	 * 是否有子元素
+	 * @returns
 	 */
 	hasChildren() {
 		if (this.isClosed() || this.isText()) {
@@ -234,6 +254,8 @@ export class AlexElement {
 
 	/**
 	 * 判断当前元素与另一个元素是否有包含关系
+	 * @param element
+	 * @returns
 	 */
 	hasContains(element: AlexElement) {
 		return this.isContains(element) || element.isContains(this)
@@ -241,7 +263,8 @@ export class AlexElement {
 
 	/**
 	 * 克隆当前元素
-	 * deep为true表示深度克隆，即克隆子元素，否则只会克隆自身
+	 * @param deep 为true表示深度克隆，即克隆子元素，否则只会克隆自身
+	 * @returns
 	 */
 	clone(deep: boolean | undefined = true) {
 		if (typeof deep != 'boolean') {
@@ -267,6 +290,7 @@ export class AlexElement {
 
 	/**
 	 * 将当前元素转换成根级块元素
+	 * @returns
 	 */
 	convertToBlock() {
 		if (this.isBlock()) {
@@ -284,6 +308,7 @@ export class AlexElement {
 
 	/**
 	 * 设置为空元素
+	 * @returns
 	 */
 	toEmpty() {
 		if (this.isEmpty()) {
@@ -318,6 +343,7 @@ export class AlexElement {
 
 	/**
 	 * 获取所在根级块元素
+	 * @returns
 	 */
 	getBlock(): AlexElement {
 		if (this.isBlock()) {
@@ -328,6 +354,7 @@ export class AlexElement {
 
 	/**
 	 * 获取所在内部块元素
+	 * @returns
 	 */
 	getInblock(): AlexElement | null {
 		if (this.isInblock()) {
@@ -341,6 +368,7 @@ export class AlexElement {
 
 	/**
 	 * 获取所在行内元素
+	 * @returns
 	 */
 	getInline(): AlexElement | null {
 		if (this.isInline()) {
@@ -354,6 +382,8 @@ export class AlexElement {
 
 	/**
 	 * 比较当前元素和另一个元素的styles是否一致
+	 * @param element
+	 * @returns
 	 */
 	isEqualStyles(element: AlexElement) {
 		if (!this.hasStyles() && !element.hasStyles()) {
@@ -367,6 +397,8 @@ export class AlexElement {
 
 	/**
 	 * 比较当前元素和另一个元素的marks是否一致
+	 * @param element
+	 * @returns
 	 */
 	isEqualMarks(element: AlexElement) {
 		if (!this.hasMarks() && !element.hasMarks()) {
@@ -380,6 +412,8 @@ export class AlexElement {
 
 	/**
 	 * 如果当前元素是文本元素或者自闭合元素，判断它是不是指定元素的后代所有文本元素和自闭合元素中的第一个
+	 * @param element
+	 * @returns
 	 */
 	isFirst(element: AlexElement) {
 		//如果不是自闭合元素和文本元素返回false
@@ -402,6 +436,8 @@ export class AlexElement {
 
 	/**
 	 * 如果当前元素是文本元素或者自闭合元素，判断它是不是指定元素的后代所有文本元素和自闭合元素中的最后一个
+	 * @param element
+	 * @returns
 	 */
 	isLast(element: AlexElement) {
 		//如果不是自闭合元素和文本元素返回false
@@ -499,6 +535,8 @@ export class AlexElement {
 
 	/**
 	 * 判断参数是否为AlexElement元素
+	 * @param val
+	 * @returns
 	 */
 	static isElement(val: any) {
 		return val instanceof AlexElement
@@ -506,6 +544,8 @@ export class AlexElement {
 
 	/**
 	 * 扁平化处理元素数组
+	 * @param elements
+	 * @returns
 	 */
 	static flatElements(elements: AlexElement[]) {
 		const fn = (arr: AlexElement[]) => {
@@ -527,6 +567,7 @@ export class AlexElement {
 
 	/**
 	 * 创建一个空白文本元素并返回
+	 * @returns
 	 */
 	static getSpaceElement() {
 		return new AlexElement('text', null, null, null, '\uFEFF')

@@ -2,11 +2,17 @@ import { AlexElement } from './Element'
 import { AlexPoint } from './Point'
 import { AlexRange } from './Range'
 
+/**
+ * 历史记录数据项类型
+ */
 export type AlexHistoryRecordsItemType = {
 	stack: AlexElement[]
 	range: AlexRange | null
 }
 
+/**
+ * 历史记录结果类型
+ */
 export type AlexHistoryResultType = {
 	stack: AlexElement[]
 	range: AlexRange | null
@@ -21,6 +27,8 @@ export class AlexHistory {
 
 	/**
 	 * 入栈
+	 * @param stack
+	 * @param range
 	 */
 	push(stack: AlexElement[], range?: AlexRange | null) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
@@ -41,6 +49,8 @@ export class AlexHistory {
 
 	/**
 	 * 获取
+	 * @param type
+	 * @returns
 	 */
 	get(type: -1 | 1): AlexHistoryResultType | null {
 		let current = this.current
@@ -78,6 +88,7 @@ export class AlexHistory {
 
 	/**
 	 * 更新当前历史记录的range
+	 * @param range
 	 */
 	updateCurrentRange(range: AlexRange) {
 		const records = this.records[this.current]
@@ -87,6 +98,9 @@ export class AlexHistory {
 
 	/**
 	 * 克隆range
+	 * @param newStack
+	 * @param range
+	 * @returns
 	 */
 	__cloneRange(newStack: AlexElement[], range?: AlexRange | null) {
 		//如果range存在

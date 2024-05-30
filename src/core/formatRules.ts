@@ -5,6 +5,8 @@ import { string as DapString } from 'dap-util'
 
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
+ * @param this
+ * @param element
  */
 export const handleNotStackBlock = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
@@ -26,6 +28,8 @@ export const handleNotStackBlock = function (this: AlexEditor, element: AlexElem
 
 /**
  * 内部块元素与其他元素不能同时存在于父元素的子元素数组中
+ * @param this
+ * @param element
  */
 export const handleInblockWithOther = function (this: AlexEditor, element: AlexElement) {
 	if (element.hasChildren()) {
@@ -48,6 +52,8 @@ export const handleInblockWithOther = function (this: AlexEditor, element: AlexE
 
 /**
  * 行内元素的子元素不能是内部块元素
+ * @param this
+ * @param element
  */
 export const handleInlineChildrenNotInblock = function (this: AlexEditor, element: AlexElement) {
 	//如果行内元素有子元素
@@ -65,6 +71,8 @@ export const handleInlineChildrenNotInblock = function (this: AlexEditor, elemen
 
 /**
  * 换行符清除规则（虚拟光标可能更新）
+ * @param this
+ * @param element
  */
 export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 	//如果元素有子元素
@@ -100,6 +108,8 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 
 /**
  * 兄弟元素合并策略（虚拟光标可能更新）
+ * @param this
+ * @param element
  */
 export const mergeWithBrotherElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
@@ -233,6 +243,8 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 
 /**
  * 父子元素合并策略（虚拟光标可能更新）
+ * @param this
+ * @param element
  */
 export const mergeWithParentElement = function (this: AlexEditor, element: AlexElement) {
 	//判断两个元素是否可以合并
@@ -324,6 +336,8 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
 
 /**
  * 将文本元素内的空白元素合一
+ * @param this
+ * @param element
  */
 export const mergeWithSpaceTextElement = function (this: AlexEditor, element: AlexElement) {
 	if (element.isText()) {

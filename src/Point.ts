@@ -26,6 +26,8 @@ export class AlexPoint {
 
 	/**
 	 * 是否Point类型数据
+	 * @param val
+	 * @returns
 	 */
 	static isPoint(val: any) {
 		return val instanceof AlexPoint
@@ -33,6 +35,8 @@ export class AlexPoint {
 
 	/**
 	 * 两个点是否相等
+	 * @param point
+	 * @returns
 	 */
 	isEqual(point: AlexPoint) {
 		if (!AlexPoint.isPoint(point)) {
@@ -43,6 +47,7 @@ export class AlexPoint {
 
 	/**
 	 * 移动到到指定元素最后
+	 * @param element
 	 */
 	moveToEnd(element: AlexElement) {
 		if (!AlexElement.isElement(element)) {
@@ -79,6 +84,7 @@ export class AlexPoint {
 
 	/**
 	 * 移动到指定元素最前
+	 * @param element
 	 */
 	moveToStart(element: AlexElement) {
 		if (!AlexElement.isElement(element)) {
