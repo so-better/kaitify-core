@@ -7,7 +7,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { AlexEditor, AlexElement } from '../src'
-import { color } from 'dap-util'
 
 const editor = ref<AlexEditor | null>(null)
 
@@ -15,13 +14,7 @@ onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
 		value: '<p><span style="color:red;"><span>3</span></span></p>',
 		allowPasteHtml: true,
-		extraKeepTags: ['svg', 'circle'],
-		customParseNode: el => {
-			if (el.parsedom == 'span') {
-				el.locked = true
-			}
-			return el
-		}
+		extraKeepTags: ['svg', 'circle']
 	})
 	editor.value.on('keydown', (val, e) => {
 		console.log('keydown', val, e)

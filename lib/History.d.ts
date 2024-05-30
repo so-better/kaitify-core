@@ -17,7 +17,13 @@ export type AlexHistoryResultType = {
     current: number;
 };
 export declare class AlexHistory {
+    /**
+     * 存放历史记录的堆栈
+     */
     records: AlexHistoryRecordsItemType[];
+    /**
+     * 记录当前展示的stack的序列
+     */
     current: number;
     /**
      * 入栈

@@ -1,9 +1,13 @@
 import { AlexElement } from './Element'
 
 export class AlexPoint {
-	//虚拟光标对应的元素
+	/**
+	 * 虚拟光标对应的元素
+	 */
 	element: AlexElement
-	//虚拟光标在元素中的偏移值
+	/**
+	 * 虚拟光标在元素中的偏移值
+	 */
 	offset: number
 
 	constructor(element: AlexElement, offset: number) {

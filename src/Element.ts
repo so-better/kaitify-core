@@ -25,29 +25,53 @@ export type AlexElementCreateConfigType = {
  * 编辑器元素对象
  */
 export class AlexElement {
-	//key值
+	/**
+	 * key值
+	 */
 	key: number = createUniqueKey()
-	//类型
+	/**
+	 * 类型
+	 */
 	type: AlexElementType
-	//真实节点名称
+	/**
+	 * 真实节点名称
+	 */
 	parsedom: string | null
-	//标记集合
+	/**
+	 * 标记集合
+	 */
 	marks: ObjectType | null
-	//样式集合
+	/**
+	 * 样式集合
+	 */
 	styles: ObjectType | null
-	//文本值
+	/**
+	 * 文本值
+	 */
 	textContent: string | null
-	//子元素
+	/**
+	 * 子元素数组
+	 */
 	children: AlexElement[] | null = null
-	//父元素
+	/**
+	 * 父元素
+	 */
 	parent: AlexElement | null = null
-	//定义内部块元素的行为
+	/**
+	 * 定义内部块元素的行为
+	 */
 	behavior: 'default' | 'block' = 'default'
-	//命名空间(用于创建dom)
+	/**
+	 * 命名空间(用于创建dom)
+	 */
 	namespace: string | null = null
-	//是否锁定，此值为true表示元素不会被规则进行自动合并
+	/**
+	 * 是否锁定，此值为true表示元素不会被规则进行自动合并
+	 */
 	locked: boolean = false
-	//真实node
+	/**
+	 * 真实node
+	 */
 	elm: HTMLElement | null = null
 
 	constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null) {

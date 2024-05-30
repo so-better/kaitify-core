@@ -1,7 +1,13 @@
 import { AlexElement } from './Element';
 
 export declare class AlexPoint {
+    /**
+     * 虚拟光标对应的元素
+     */
     element: AlexElement;
+    /**
+     * 虚拟光标在元素中的偏移值
+     */
     offset: number;
     constructor(element: AlexElement, offset: number);
     /**

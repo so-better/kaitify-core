@@ -37,56 +37,106 @@ export type AlexElementConfigType = {
 }
 
 export class AlexEditor {
-	//编辑器容器
+	/**
+	 * 编辑器容器
+	 */
 	$el: HTMLElement
-	//是否禁用
+	/**
+	 * 是否禁用
+	 */
 	disabled: boolean
-	//编辑器的值
+	/**
+	 * 编辑器的值
+	 */
 	value: string
-	//自定义渲染规则
+	/**
+	 * 自定义渲染规则
+	 */
 	renderRules: ((element: AlexElement) => void)[]
-	//是否允许复制
+	/**
+	 * 是否允许复制
+	 */
 	allowCopy: boolean
-	//是否允许粘贴
+	/**
+	 * 是否允许粘贴
+	 */
 	allowPaste: boolean
-	//是否允许剪切
+	/**
+	 * 是否允许剪切
+	 */
 	allowCut: boolean
-	//是否允许粘贴html
+	/**
+	 * 是否允许粘贴html
+	 */
 	allowPasteHtml: boolean
-	//自定义纯文本粘贴方法
+	/**
+	 * 自定义纯文本粘贴方法
+	 */
 	customTextPaste: ((text: string) => void | Promise<void>) | null
-	//自定义html粘贴方法
+	/**
+	 * 自定义html粘贴方法
+	 */
 	customHtmlPaste: ((AlexElements: AlexElement[], html: string) => void | Promise<void>) | null
-	//自定义图片粘贴方法
+	/**
+	 * 自定义图片粘贴方法
+	 */
 	customImagePaste: ((file: File) => void | Promise<void>) | null
-	//自定义视频粘贴方法
+	/**
+	 * 自定义视频粘贴方法
+	 */
 	customVideoPaste: ((file: File) => void | Promise<void>) | null
-	//自定义文件粘贴方法（除图片视频外）
+	/**
+	 * 自定义文件粘贴方法（除图片视频外）
+	 */
 	customFilePaste: ((file: File) => void | Promise<void>) | null
-	//自定义处理不可编辑元素合并的逻辑
+	/**
+	 * 自定义处理不可编辑元素合并的逻辑
+	 */
 	customMerge: ((mergeElement: AlexElement, targetElement: AlexElement) => void | Promise<void>) | null
-	//自定义dom转为非文本元素的后续处理逻辑
+	/**
+	 * 自定义dom转为非文本元素的后续处理逻辑
+	 */
 	customParseNode: ((el: AlexElement) => AlexElement) | null
-	//dom转为非文本元素时需要额外保留的标签数组
+	/**
+	 * dom转为非文本元素时需要额外保留的标签数组
+	 */
 	extraKeepTags: string[]
-	//创建历史记录
+	/**
+	 * 历史记录
+	 */
 	history: AlexHistory = new AlexHistory()
-	//存放元素的数组
+	/**
+	 * 存放元素的数组
+	 */
 	stack: AlexElement[]
-	//光标虚拟对象
+	/**
+	 * 光标虚拟对象
+	 */
 	range: AlexRange | null = null
 
-	//编辑器唯一id
+	/**
+	 * 编辑器唯一id
+	 */
 	__guid: number = createGuid()
-	//事件集合
+	/**
+	 * 事件集合
+	 */
 	__events: ObjectType = {}
-	//是否第一次渲染
+	/**
+	 * 是否第一次渲染
+	 */
 	__firstRender: boolean = true
-	//是否正在输入中文
+	/**
+	 * 是否正在输入中文
+	 */
 	__isInputChinese: boolean = false
-	//是否内部修改真实光标引起selctionChange事件
+	/**
+	 * 是否内部修改真实光标引起selctionChange事件
+	 */
 	__innerSelectionChange: boolean = false
-	//取消中文输入标识的延时器
+	/**
+	 * 取消中文输入标识的延时器
+	 */
 	__chineseInputTimer: any = null
 
 	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
