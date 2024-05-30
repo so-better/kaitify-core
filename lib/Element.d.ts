@@ -24,17 +24,17 @@ export type AlexElementCreateConfigType = {
 export declare class AlexElement {
     key: number;
     type: AlexElementType;
-    parsedom?: string | null;
-    marks?: ObjectType | null;
-    styles?: ObjectType | null;
-    textContent?: string | null;
-    children?: AlexElement[] | null;
-    parent?: AlexElement | null;
-    behavior?: 'default' | 'block';
-    namespace?: string | null;
-    locked?: boolean;
-    elm?: HTMLElement | null;
-    constructor(type: AlexElementType, parsedom?: string | null, marks?: ObjectType | null, styles?: ObjectType | null, textContent?: string | null);
+    parsedom: string | null;
+    marks: ObjectType | null;
+    styles: ObjectType | null;
+    textContent: string | null;
+    children: AlexElement[] | null;
+    parent: AlexElement | null;
+    behavior: 'default' | 'block';
+    namespace: string | null;
+    locked: boolean;
+    elm: HTMLElement | null;
+    constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null);
     /**
      * 是否根级块元素
      * @returns

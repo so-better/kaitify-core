@@ -30,27 +30,27 @@ export class AlexElement {
 	//类型
 	type: AlexElementType
 	//真实节点名称
-	parsedom?: string | null
+	parsedom: string | null
 	//标记集合
-	marks?: ObjectType | null
+	marks: ObjectType | null
 	//样式集合
-	styles?: ObjectType | null
+	styles: ObjectType | null
 	//文本值
-	textContent?: string | null
+	textContent: string | null
 	//子元素
-	children?: AlexElement[] | null = null
+	children: AlexElement[] | null = null
 	//父元素
-	parent?: AlexElement | null = null
+	parent: AlexElement | null = null
 	//定义内部块元素的行为
-	behavior?: 'default' | 'block' = 'default'
+	behavior: 'default' | 'block' = 'default'
 	//命名空间(用于创建dom)
-	namespace?: string | null = null
+	namespace: string | null = null
 	//是否锁定，此值为true表示元素不会被规则进行自动合并
-	locked?: boolean = false
+	locked: boolean = false
 	//真实node
-	elm?: HTMLElement | null = null
+	elm: HTMLElement | null = null
 
-	constructor(type: AlexElementType, parsedom?: string | null, marks?: ObjectType | null, styles?: ObjectType | null, textContent?: string | null) {
+	constructor(type: AlexElementType, parsedom: string | null, marks: ObjectType | null, styles: ObjectType | null, textContent: string | null) {
 		this.type = type
 		this.parsedom = parsedom
 		this.marks = marks
@@ -597,13 +597,13 @@ export class AlexElement {
 		let el: AlexElement | null = null
 		//处理文本元素
 		if (elementConfig.type == 'text') {
-			el = new AlexElement(elementConfig.type, null, elementConfig.marks, elementConfig.styles, elementConfig.textcontent)
+			el = new AlexElement(elementConfig.type, null, elementConfig.marks ? elementConfig.marks : null, elementConfig.styles ? elementConfig.styles : null, elementConfig.textcontent ? elementConfig.textcontent : null)
 		}
 		//其他元素
 		else {
-			el = new AlexElement(elementConfig.type, elementConfig.parsedom, elementConfig.marks, elementConfig.styles, null)
+			el = new AlexElement(elementConfig.type, elementConfig.parsedom!, elementConfig.marks ? elementConfig.marks : null, elementConfig.styles ? elementConfig.styles : null, null)
 			//内部块元素设置行为值
-			if (elementConfig.type == 'inblock') {
+			if (elementConfig.type == 'inblock' && elementConfig.behavior) {
 				el.behavior = elementConfig.behavior
 			}
 			//非自闭和元素设置子元素
@@ -615,8 +615,13 @@ export class AlexElement {
 				})
 			}
 		}
-		el.namespace = elementConfig.namespace
-		el.locked = elementConfig.locked
+		if (elementConfig.namespace) {
+			el.namespace = elementConfig.namespace
+		}
+		if (typeof elementConfig.locked == 'boolean') {
+			el.locked = elementConfig.locked
+		}
+
 		return el
 	}
 
