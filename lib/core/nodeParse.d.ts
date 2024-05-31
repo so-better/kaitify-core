@@ -1,4 +1,5 @@
 import { ObjectType } from './tool';
+
 export type NodeBlockParseType = {
     parsedom: string;
     parse?: boolean;
