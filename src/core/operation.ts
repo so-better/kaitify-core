@@ -51,14 +51,13 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 			if (typeof this.customHtmlPaste == 'function') {
 				await this.customHtmlPaste.apply(this, [elements, html])
 			} else {
-				for (let i = 0; i < elements.length; i++) {
-					//第一个元素会在当前光标所在根级块元素只有一个换行符时进行覆盖
-					if (i == 0) {
-						this.insertElement(elements[i])
-					} else {
-						this.insertElement(elements[i], false)
-					}
+				//第一个元素会在当前光标所在根级块元素只有一个换行符时进行覆盖
+				this.insertElement(elements[0])
+				for (let i = elements.length - 1; i >= 1; i--) {
+					this.addElementAfter(elements[i], elements[0])
 				}
+				this.range!.anchor.moveToEnd(elements[elements.length - 1])
+				this.range!.focus.moveToEnd(elements[elements.length - 1])
 				this.emit('pasteHtml', elements, html)
 			}
 		}
