@@ -1,6 +1,6 @@
 {
 	"name": "alex-editor",
-	"version": "1.4.15",
+	"version": "1.4.16",
 	"private": false,
 	"type": "module",
 	"author": "kailing",
@@ -14,7 +14,7 @@
 		"lib": "vue-tsc && vite build"
 	},
 	"dependencies": {
-		"dap-util": "^1.5.4",
+		"dap-util": "^1.5.5",
 		"vue": "^3.4.19"
 	},
 	"devDependencies": {
