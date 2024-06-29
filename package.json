@@ -1,9 +1,9 @@
 {
 	"name": "alex-editor",
-	"version": "1.4.14",
+	"version": "1.4.15",
 	"private": false,
 	"type": "module",
-	"author": "ling0523",
+	"author": "kailing",
 	"main": "lib/alex-editor.umd.js",
 	"module": "lib/alex-editor.es.js",
 	"types": "lib/index.d.ts",

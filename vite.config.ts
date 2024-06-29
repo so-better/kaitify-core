@@ -11,7 +11,7 @@ export default defineConfig({
 		minify: 'terser',
 		lib: {
 			entry: path.resolve(__dirname, 'src/index.ts'),
-			name: 'alex-editor',
+			name: 'AlexEditor',
 			fileName: format => `alex-editor.${format}.js`
 		},
 		rollupOptions: {

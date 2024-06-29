@@ -3,7 +3,6 @@ import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
 import { EditorOptionsType, ObjectType } from './core/tool';
-
 /**
  * 光标选区返回的结果数据项类型
  */
