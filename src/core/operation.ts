@@ -689,9 +689,7 @@ export const handleBlur = function (this: AlexEditor, e: Event) {
  * @param oldStack
  */
 export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[], oldElements: AlexElement[]) {
-	const oldLength = newElements.length
-	const newLength = oldElements.length
-	const max = Math.max(oldLength, newLength)
+	const max = Math.max(oldElements.length, newElements.length)
 	for (let i = 0; i < max; i++) {
 		const newElement = newElements[i]
 		const oldElement = oldElements[i]
@@ -750,26 +748,17 @@ export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[]
 		else if (newElement) {
 			//生成dom
 			newElement.__render()
-			//获取序列
-			const index = newElements.findIndex(item => item.isEqual(newElement))
-			//是第一个元素
-			if (index == 0) {
-				//获取父元素
-				const parent = newElement.parent
-				//如果父元素存在
-				if (parent) {
-					parent.elm!.firstElementChild ? parent.elm!.insertBefore(newElement.elm!, parent.elm!.firstElementChild) : parent.elm!.appendChild(newElement.elm!)
-				}
-				//父元素不存在表示是根元素，同时也是编辑器的第一个元素
-				else {
-					this.$el.firstElementChild ? this.$el.insertBefore(newElement.elm!, this.$el.firstElementChild) : this.$el.appendChild(newElement.elm!)
-				}
+			//获取父元素的真实dom
+			const parentElm = newElement.parent?.elm || this.$el
+			//获取前一个兄弟元素
+			const previousElement = newElements[i - 1]
+			//前一个兄弟元素存在
+			if (previousElement) {
+				previousElement.elm!.nextElementSibling ? parentElm.insertBefore(newElement.elm!, previousElement.elm!.nextElementSibling) : parentElm.appendChild(newElement.elm!)
 			}
-			//不是第一个元素
+			//前一个兄弟元素不存在
 			else {
-				//获取前一个兄弟元素
-				const previousElement = newElements[index - 1]
-				previousElement.elm!.nextElementSibling ? previousElement.elm!.parentElement!.insertBefore(newElement.elm!, previousElement.elm!.nextElementSibling) : previousElement.elm!.parentElement!.appendChild(newElement.elm!)
+				parentElm.firstElementChild ? parentElm.insertBefore(newElement.elm!, parentElm.firstElementChild) : parentElm.appendChild(newElement.elm!)
 			}
 		}
 		//新元素不存在，表示移除旧元素
