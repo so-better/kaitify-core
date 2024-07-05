@@ -699,52 +699,54 @@ export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[]
 			if (newElement.key != oldElement.key || newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
 				newElement.__render()
 				oldElement.elm!.replaceWith(newElement.elm!)
-				continue
 			}
-			//将dom给新元素
-			newElement.elm = oldElement.elm
-			//如果marks不一致，则更新marks
-			if (!newElement.isEqualMarks(oldElement)) {
-				//移除除了style以外的全部属性
-				const attributes = Array.from(newElement.elm!.attributes)
-				const length = attributes.length
-				for (let i = 0; i < length; i++) {
-					if (attributes[i].name != 'style') {
-						newElement.elm!.removeAttribute(attributes[i].name)
+			//不重新进行渲染的情况下，逐渐比对
+			else {
+				//使用旧的dom，减少创建dom的次数
+				newElement.elm = oldElement.elm
+				//如果marks不一致，则更新marks
+				if (!newElement.isEqualMarks(oldElement)) {
+					//移除除了style以外的全部属性
+					const attributes = Array.from(newElement.elm!.attributes)
+					const length = attributes.length
+					for (let i = 0; i < length; i++) {
+						if (attributes[i].name != 'style') {
+							newElement.elm!.removeAttribute(attributes[i].name)
+						}
+					}
+					//设置属性
+					if (newElement.hasMarks()) {
+						Object.keys(newElement.marks!).forEach(key => {
+							if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
+								newElement.elm!.setAttribute(key, newElement.marks![key])
+							}
+						})
 					}
 				}
-				//设置属性
-				if (newElement.hasMarks()) {
-					Object.keys(newElement.marks!).forEach(key => {
-						if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
-							newElement.elm!.setAttribute(key, newElement.marks![key])
-						}
-					})
+				//如果styles不一致，则更新styles
+				if (!newElement.isEqualStyles(oldElement)) {
+					//移除样式
+					newElement.elm!.removeAttribute('style')
+					//设置新的样式
+					if (newElement.hasStyles()) {
+						Object.keys(newElement.styles!).forEach(key => {
+							newElement.elm!.style.setProperty(key, newElement.styles![key])
+						})
+					}
 				}
-			}
-			//如果styles不一致，则更新styles
-			if (!newElement.isEqualStyles(oldElement)) {
-				//移除样式
-				newElement.elm!.removeAttribute('style')
-				//设置新的样式
-				if (newElement.hasStyles()) {
-					Object.keys(newElement.styles!).forEach(key => {
-						newElement.elm!.style.setProperty(key, newElement.styles![key])
-					})
+				//如果文本元素textContent不一致，则更新textContent
+				if (newElement.isText() && newElement.textContent != oldElement.textContent) {
+					const text = document.createTextNode(newElement.textContent!)
+					newElement.elm!.innerHTML = ''
+					newElement.elm!.appendChild(text)
 				}
-			}
-			//如果文本元素textContent不一致，则更新textContent
-			if (newElement.isText() && newElement.textContent != oldElement.textContent) {
-				const text = document.createTextNode(newElement.textContent!)
-				newElement.elm!.innerHTML = ''
-				newElement.elm!.appendChild(text)
-			}
-			//继续比较子元素数组
-			if (newElement.hasChildren() || oldElement.hasChildren()) {
-				diffUpdate.apply(this, [newElement.children || [], oldElement.children || []])
+				//继续比较子元素数组
+				if (newElement.hasChildren() || oldElement.hasChildren()) {
+					diffUpdate.apply(this, [newElement.children || [], oldElement.children || []])
+				}
 			}
 		}
-		//旧元素不存在，表示插入新元素
+		//插入新元素（旧元素不存在）
 		else if (newElement) {
 			//生成dom
 			newElement.__render()
@@ -752,16 +754,16 @@ export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[]
 			const parentElm = newElement.parent?.elm || this.$el
 			//获取前一个兄弟元素
 			const previousElement = newElements[i - 1]
-			//前一个兄弟元素存在
+			//前一个兄弟元素存在则将dom插入兄弟元素后
 			if (previousElement) {
 				previousElement.elm!.nextElementSibling ? parentElm.insertBefore(newElement.elm!, previousElement.elm!.nextElementSibling) : parentElm.appendChild(newElement.elm!)
 			}
-			//前一个兄弟元素不存在
+			//前一个兄弟元素不存在则将dom插入到父元素最前面
 			else {
 				parentElm.firstElementChild ? parentElm.insertBefore(newElement.elm!, parentElm.firstElementChild) : parentElm.appendChild(newElement.elm!)
 			}
 		}
-		//新元素不存在，表示移除旧元素
+		//移除旧元素（新元素不存在）
 		else {
 			oldElement.elm!.remove()
 		}
