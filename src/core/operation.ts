@@ -683,7 +683,7 @@ export const handleBlur = function (this: AlexEditor, e: Event) {
 }
 
 /**
- * domRender期间通过比对新旧stack进行节点动态更新
+ * domRender期间通过比对新旧元素数组进行节点动态更新
  * @param this
  * @param newStack
  * @param oldStack
