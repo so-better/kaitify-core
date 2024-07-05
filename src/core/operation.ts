@@ -681,3 +681,100 @@ export const handleBlur = function (this: AlexEditor, e: Event) {
 	}
 	this.emit('blur', this.value, e as FocusEvent)
 }
+
+/**
+ * domRender期间通过比对新旧stack进行节点动态更新
+ * @param this
+ * @param newStack
+ * @param oldStack
+ */
+export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[], oldElements: AlexElement[]) {
+	const oldLength = newElements.length
+	const newLength = oldElements.length
+	const max = Math.max(oldLength, newLength)
+	for (let i = 0; i < max; i++) {
+		const newElement = newElements[i]
+		const oldElement = oldElements[i]
+		//新旧元素都存在则进行比较
+		if (newElement && oldElement) {
+			//key不一致、parsedom不椅子、类型不一致都重新进行渲染
+			if (newElement.key != oldElement.key || newElement.parsedom != oldElement.parsedom || newElement.type != oldElement.type) {
+				newElement.__render()
+				oldElement.elm!.replaceWith(newElement.elm!)
+				continue
+			}
+			//将dom给新元素
+			newElement.elm = oldElement.elm
+			//如果marks不一致，则更新marks
+			if (!newElement.isEqualMarks(oldElement)) {
+				//移除除了style以外的全部属性
+				const attributes = Array.from(newElement.elm!.attributes)
+				const length = attributes.length
+				for (let i = 0; i < length; i++) {
+					if (attributes[i].name != 'style') {
+						newElement.elm!.removeAttribute(attributes[i].name)
+					}
+				}
+				//设置属性
+				if (newElement.hasMarks()) {
+					Object.keys(newElement.marks!).forEach(key => {
+						if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
+							newElement.elm!.setAttribute(key, newElement.marks![key])
+						}
+					})
+				}
+			}
+			//如果styles不一致，则更新styles
+			if (!newElement.isEqualStyles(oldElement)) {
+				//移除样式
+				newElement.elm!.removeAttribute('style')
+				//设置新的样式
+				if (newElement.hasStyles()) {
+					Object.keys(newElement.styles!).forEach(key => {
+						newElement.elm!.style.setProperty(key, newElement.styles![key])
+					})
+				}
+			}
+			//如果文本元素textContent不一致，则更新textContent
+			if (newElement.isText() && newElement.textContent != oldElement.textContent) {
+				const text = document.createTextNode(newElement.textContent!)
+				newElement.elm!.innerHTML = ''
+				newElement.elm!.appendChild(text)
+			}
+			//继续比较子元素数组
+			if (newElement.hasChildren() || oldElement.hasChildren()) {
+				diffUpdate.apply(this, [newElement.children || [], oldElement.children || []])
+			}
+		}
+		//旧元素不存在，表示插入新元素
+		else if (newElement) {
+			//生成dom
+			newElement.__render()
+			//获取序列
+			const index = newElements.findIndex(item => item.isEqual(newElement))
+			//是第一个元素
+			if (index == 0) {
+				//获取父元素
+				const parent = newElement.parent
+				//如果父元素存在
+				if (parent) {
+					parent.elm!.firstElementChild ? parent.elm!.insertBefore(newElement.elm!, parent.elm!.firstElementChild) : parent.elm!.appendChild(newElement.elm!)
+				}
+				//父元素不存在表示是根元素，同时也是编辑器的第一个元素
+				else {
+					this.$el.firstElementChild ? this.$el.insertBefore(newElement.elm!, this.$el.firstElementChild) : this.$el.appendChild(newElement.elm!)
+				}
+			}
+			//不是第一个元素
+			else {
+				//获取前一个兄弟元素
+				const previousElement = newElements[index - 1]
+				previousElement.elm!.nextElementSibling ? previousElement.elm!.parentElement!.insertBefore(newElement.elm!, previousElement.elm!.nextElementSibling) : previousElement.elm!.parentElement!.appendChild(newElement.elm!)
+			}
+		}
+		//新元素不存在，表示移除旧元素
+		else {
+			oldElement.elm!.remove()
+		}
+	}
+}

@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, diffUpdate } from './core/operation'
 
 /**
  * 光标选区返回的结果数据项类型
@@ -123,9 +123,9 @@ export class AlexEditor {
 	 */
 	__events: ObjectType = {}
 	/**
-	 * 是否第一次渲染
+	 * 缓存的前一个stack
 	 */
-	__firstRender: boolean = true
+	__oldStack: AlexElement[] = []
 	/**
 	 * 是否正在输入中文
 	 */
@@ -1084,26 +1084,22 @@ export class AlexEditor {
 	 * @param unPushHistory 为false表示加入历史记录
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
+		//是否第一次渲染
+		const firstRender = !this.__oldStack.length
 		//触发事件
 		this.emit('beforeRender')
-		//创建fragment
-		const fragment = document.createDocumentFragment()
-		//生成新的dom
-		this.stack.forEach(element => {
-			element.__render()
-			fragment.appendChild(element.elm!)
-		})
-		//更新dom值
-		this.$el.innerHTML = ''
-		this.$el.appendChild(fragment)
 		//暂记旧值
 		const oldValue = this.value
+		//动态更新dom
+		diffUpdate.apply(this, [this.stack, this.__oldStack])
 		//设置新值
 		this.value = this.$el.innerHTML
+		//更新旧的stack
+		this.__oldStack = this.stack.map(ele => ele.__fullClone())
 		//如果是第一次渲染或者值发生变化
-		if (this.__firstRender || oldValue != this.value) {
+		if (firstRender || oldValue != this.value) {
 			//如果不是第一次渲染，则触发change事件
-			if (!this.__firstRender) {
+			if (!firstRender) {
 				this.emit('change', this.value, oldValue)
 			}
 			//如果unPushHistory为false，则加入历史记录
@@ -1111,10 +1107,6 @@ export class AlexEditor {
 				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
 			}
-		}
-		//修改是否第一次渲染的标记
-		if (this.__firstRender) {
-			this.__firstRender = false
 		}
 		//触发事件
 		this.emit('afterRender')

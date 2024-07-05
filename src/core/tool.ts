@@ -9,7 +9,9 @@ export type ObjectType = {
 	[key: string]: any | null
 }
 
-//编辑器参数类型
+/**
+ * 编辑器参数类型
+ */
 export type EditorOptionsType = {
 	/**
 	 * 是否禁用
@@ -73,8 +75,10 @@ export type EditorOptionsType = {
 	extraKeepTags?: string[]
 }
 
-/***
+/**
  * 获取node元素的属性集合
+ * @param node
+ * @returns
  */
 export const getAttributes = function (node: HTMLElement) {
 	let o: ObjectType = {}
@@ -92,6 +96,8 @@ export const getAttributes = function (node: HTMLElement) {
 
 /**
  * 获取node元素的样式集合
+ * @param node
+ * @returns
  */
 export const getStyles = function (node: HTMLElement) {
 	let o: ObjectType = {}
@@ -123,6 +129,7 @@ export const getStyles = function (node: HTMLElement) {
 
 /**
  * 生成唯一的key
+ * @returns
  */
 export const createUniqueKey = function (): number {
 	//获取唯一id
@@ -134,6 +141,7 @@ export const createUniqueKey = function (): number {
 
 /**
  * 生成唯一的guid
+ * @returns
  */
 export const createGuid = function (): number {
 	//获取唯一id
@@ -145,6 +153,8 @@ export const createGuid = function (): number {
 
 /**
  * 判断字符串是否零宽度无断空白字符
+ * @param val
+ * @returns
  */
 export const isSpaceText = function (val: string) {
 	return /^[\uFEFF]+$/g.test(val)
@@ -152,6 +162,8 @@ export const isSpaceText = function (val: string) {
 
 /**
  * 深拷贝函数
+ * @param data
+ * @returns
  */
 export const cloneData = function (data: any) {
 	if (DapCommon.isObject(data) || Array.isArray(data)) {
@@ -162,6 +174,9 @@ export const cloneData = function (data: any) {
 
 /**
  * 判断某个node是否包含另一个node
+ * @param parentNode
+ * @param childNode
+ * @returns
  */
 export const isContains = function (parentNode: HTMLElement, childNode: HTMLElement) {
 	if (childNode.nodeType == 3) {
@@ -172,6 +187,8 @@ export const isContains = function (parentNode: HTMLElement, childNode: HTMLElem
 
 /**
  * 初始化编辑器dom
+ * @param node
+ * @returns
  */
 export const initEditorNode = function (node: HTMLElement | string) {
 	//判断是否字符串，如果是字符串按照选择器来寻找元素
@@ -195,6 +212,8 @@ export const initEditorNode = function (node: HTMLElement | string) {
 
 /**
  * 格式化编辑器的options参数
+ * @param options
+ * @returns
  */
 export const initEditorOptions = function (options: EditorOptionsType) {
 	let opts: EditorOptionsType = {
@@ -266,6 +285,8 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 
 /**
  * 获取以目标元素为子孙元素中文本元素或者自闭合元素排列第一的元素的最高级元素
+ * @param point
+ * @returns
  */
 export const getHighestByFirst = function (point: AlexPoint) {
 	//element一定是文本元素或者自闭合元素
