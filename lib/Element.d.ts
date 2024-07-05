@@ -1,4 +1,5 @@
 import { ObjectType } from './core/tool';
+
 /**
  * 元素类型
  */

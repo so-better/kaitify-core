@@ -3,6 +3,7 @@ import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
 import { EditorOptionsType, ObjectType } from './core/tool';
+
 /**
  * 光标选区返回的结果数据项类型
  */
@@ -114,9 +115,9 @@ export declare class AlexEditor {
      */
     __events: ObjectType;
     /**
-     * 是否第一次渲染
+     * 缓存的前一个stack
      */
-    __firstRender: boolean;
+    __oldStack: AlexElement[];
     /**
      * 是否正在输入中文
      */

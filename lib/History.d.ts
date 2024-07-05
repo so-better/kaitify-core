@@ -1,5 +1,6 @@
 import { AlexElement } from './Element';
 import { AlexRange } from './Range';
+
 /**
  * 历史记录数据项类型
  */

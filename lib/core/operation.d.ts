@@ -1,6 +1,7 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
 import { AlexEditor } from '../Editor';
+
 /**
  * 初始化校验stack
  * @param this
@@ -98,3 +99,10 @@ export declare const handleFocus: (this: AlexEditor, e: Event) => void;
  * @returns
  */
 export declare const handleBlur: (this: AlexEditor, e: Event) => void;
+/**
+ * domRender期间通过比对新旧stack进行节点动态更新
+ * @param this
+ * @param newStack
+ * @param oldStack
+ */
+export declare const diffUpdate: (this: AlexEditor, newElements: AlexElement[], oldElements: AlexElement[]) => void;
