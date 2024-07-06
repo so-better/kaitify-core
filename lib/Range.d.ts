@@ -1,5 +1,4 @@
 import { AlexPoint } from './Point';
-
 export declare class AlexRange {
     /**
      * 起点虚拟光标

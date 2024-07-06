@@ -144,10 +144,7 @@ export class AlexElement {
 			if (!this.hasChildren()) {
 				return true
 			}
-			const allEmpty: boolean = this.children!.every(el => {
-				return el.isEmpty()
-			})
-			return allEmpty
+			return this.children!.every(el => el.isEmpty())
 		}
 		return false
 	}
@@ -157,7 +154,7 @@ export class AlexElement {
 	 * @returns
 	 */
 	isSpaceText() {
-		return this.isText() && !this.isEmpty() && isSpaceText(this.textContent!)
+		return !this.isEmpty() && this.isText() && isSpaceText(this.textContent!)
 	}
 
 	/**
@@ -207,15 +204,8 @@ export class AlexElement {
 	 */
 	isOnlyHasBreak() {
 		if (this.hasChildren()) {
-			//子元素中存在换行符
-			const hasBreak = this.children!.some(item => {
-				return item.isBreak()
-			})
-			//子元素中每个元素都是换行符或者空元素
-			const isAll = this.children!.every(item => {
-				return item.isBreak() || item.isEmpty()
-			})
-			return hasBreak && isAll
+			const elements = this.children!.filter(el => !el.isEmpty())
+			return elements.length && elements.every(el => el.isBreak())
 		}
 		return false
 	}
@@ -225,28 +215,14 @@ export class AlexElement {
 	 * @returns
 	 */
 	isPreStyle(): boolean {
-		const block = this.getBlock()
-		const inblock = this.getInblock()
-		//在内部块里
-		if (inblock) {
-			if (inblock.parsedom == 'pre') {
-				return true
-			}
-			if (inblock.hasStyles() && (inblock.styles!['white-space'] == 'pre' || inblock.styles!['white-space'] == 'pre-wrap')) {
-				return true
-			}
-			return inblock.parent!.isPreStyle()
+		const block = this.getInblock() || this.getBlock()
+		if (block.parsedom == 'pre') {
+			return true
 		}
-		//在根级块内
-		else {
-			if (block.parsedom == 'pre') {
-				return true
-			}
-			if (block.hasStyles() && (block.styles!['white-space'] == 'pre' || block.styles!['white-space'] == 'pre-wrap')) {
-				return true
-			}
-			return false
+		if (block.hasStyles() && ['pre', 'pre-wrap'].includes(block.styles!['white-space'])) {
+			return true
 		}
+		return block.parent ? block.parent.isPreStyle() : false
 	}
 
 	/**
@@ -465,9 +441,7 @@ export class AlexElement {
 		}
 		//如果目标元素包含当前元素
 		if (element.isContains(this)) {
-			const elements = AlexElement.flatElements(element.children!).filter(el => {
-				return el.isText() || el.isClosed()
-			})
+			const elements = AlexElement.flatElements(element.children!).filter(el => el.isText() || el.isClosed())
 			return this.isEqual(elements[0])
 		}
 		return false
@@ -489,11 +463,8 @@ export class AlexElement {
 		}
 		//如果目标元素包含当前元素
 		if (element.isContains(this)) {
-			const elements = AlexElement.flatElements(element.children!).filter(el => {
-				return el.isText() || el.isClosed()
-			})
-			const length = elements.length
-			return this.isEqual(elements[length - 1])
+			const elements = AlexElement.flatElements(element.children!).filter(el => el.isText() || el.isClosed())
+			return this.isEqual(elements[elements.length - 1])
 		}
 		return false
 	}

@@ -1,4 +1,4 @@
-import { event as DapEvent, common as DapCommon } from 'dap-util'
+import { event as DapEvent, common as DapCommon, element as DapElement } from 'dap-util'
 import { AlexElement, AlexElementType } from './Element'
 import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
@@ -1129,8 +1129,7 @@ export class AlexEditor {
 		return new Promise<void>(resolve => {
 			//如果编辑器被禁用则无法设置真实光标
 			if (this.disabled) {
-				resolve()
-				return
+				return resolve()
 			}
 			if (this.range) {
 				//将虚拟光标位置转为真实光标位置
@@ -1187,10 +1186,9 @@ export class AlexEditor {
 		if (!html) {
 			throw new Error('You need to give an html content to convert')
 		}
-		const node = document.createElement('div')
-		node.innerHTML = html
+		const nodes = DapElement.string2dom(html)
 		let elements: AlexElement[] = []
-		Array.from(node.childNodes).forEach(el => {
+		;(Array.isArray(nodes) ? nodes : [nodes]).forEach(el => {
 			if (el.nodeType == 1 || el.nodeType == 3) {
 				const element = this.parseNode(el as HTMLElement)
 				elements.push(element)

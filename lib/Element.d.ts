@@ -1,5 +1,4 @@
 import { ObjectType } from './core/tool';
-
 /**
  * 元素类型
  */
@@ -132,7 +131,7 @@ export declare class AlexElement {
      * 判断当前元素的子元素数组是否只包含换行符
      * @returns
      */
-    isOnlyHasBreak(): boolean;
+    isOnlyHasBreak(): boolean | 0;
     /**
      * 判断当前元素是否在拥有代码块样式的块内（包括自身）
      * @returns
