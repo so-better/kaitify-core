@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: '<p><a href="#">这是一个连接</a>33444</p><p>333<video style="width:200px;" autoplay controls src="https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4" loop muted /></p><table><tbody><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><div>333</div></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr></tbody></table><p><span style="color:red;"><span>3</span></span></p>',
+		value: '<p><a href="#">这是一个连接</a>33444</p><p>33\n3<video style="width:200px;" autoplay controls src="https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4" loop muted /></p><table><tbody><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><div>333</div></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr></tbody></table><p><span style="color:red;"><span>3</span></span></p>',
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})

@@ -736,9 +736,7 @@ export const diffUpdate = function (this: AlexEditor, newElements: AlexElement[]
 				}
 				//如果文本元素textContent不一致，则更新textContent
 				if (newElement.isText() && newElement.textContent != oldElement.textContent) {
-					const text = document.createTextNode(newElement.textContent!)
-					newElement.elm!.innerHTML = ''
-					newElement.elm!.appendChild(text)
+					newElement.elm!.innerHTML = newElement.textContent!
 				}
 				//继续比较子元素数组
 				if (newElement.hasChildren() || oldElement.hasChildren()) {
