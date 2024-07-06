@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, diffUpdate } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
 
 /**
  * 光标选区返回的结果数据项类型
@@ -1084,14 +1084,23 @@ export class AlexEditor {
 	 * @param unPushHistory 为false表示加入历史记录
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
-		//是否第一次渲染
-		const firstRender = !this.__oldStack.length
 		//触发事件
 		this.emit('beforeRender')
+		//是否第一次渲染
+		const firstRender = !this.__oldStack.length
 		//暂记旧值
 		const oldValue = this.value
-		//动态更新dom
-		diffUpdate.apply(this, [this.stack, this.__oldStack])
+		//清空原来内容
+		this.$el.innerHTML = ''
+		//创建fragment
+		const fragment = document.createDocumentFragment()
+		//生成新的dom
+		this.stack.forEach(element => {
+			element.__render()
+			fragment.appendChild(element.elm!)
+		})
+		//更新dom
+		this.$el.appendChild(fragment)
 		//设置新值
 		this.value = this.$el.innerHTML
 		//更新旧的stack
