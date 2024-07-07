@@ -1,4 +1,4 @@
-import { event as DapEvent, common as DapCommon, element as DapElement } from 'dap-util'
+import { event as DapEvent, common as DapCommon } from 'dap-util'
 import { AlexElement, AlexElementType } from './Element'
 import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
@@ -1186,9 +1186,10 @@ export class AlexEditor {
 		if (!html) {
 			throw new Error('You need to give an html content to convert')
 		}
-		const nodes = DapElement.string2dom(html)
+		const template = document.createElement('template')
+		template.innerHTML = html
 		let elements: AlexElement[] = []
-		;(Array.isArray(nodes) ? nodes : [nodes]).forEach(el => {
+		template.content.childNodes.forEach(el => {
 			if (el.nodeType == 1 || el.nodeType == 3) {
 				const element = this.parseNode(el as HTMLElement)
 				elements.push(element)
