@@ -99,3 +99,18 @@ export declare const handleFocus: (this: AlexEditor, e: Event) => void;
  * @returns
  */
 export declare const handleBlur: (this: AlexEditor, e: Event) => void;
+/**
+ * 对元素数组使用某个方法进行格式化
+ * @param this
+ * @param elements
+ * @param fn
+ */
+export declare const format: (this: AlexEditor, elements: AlexElement[], fn: (el: AlexElement) => void, isStack: boolean) => void;
+/**
+ *
+ * @param this
+ * @param stack
+ * @param oldStack
+ * @returns
+ */
+export declare const getNeedFormatElements: (newElements: AlexElement[], oldElements: AlexElement[]) => AlexElement[];

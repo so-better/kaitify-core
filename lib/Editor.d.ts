@@ -159,12 +159,7 @@ export declare class AlexEditor {
      */
     insertElement(ele: AlexElement, cover?: boolean | undefined): void;
     /**
-     * 格式化stack
-     */
-    formatElementStack(): void;
-    /**
-     * 渲染编辑器dom内容
-     * @param unPushHistory 为false表示加入历史记录
+     * 格式化并渲染编辑器
      */
     domRender(unPushHistory?: boolean | undefined): void;
     /**

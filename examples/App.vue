@@ -16,7 +16,6 @@ onMounted(() => {
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
-	editor.value.formatElementStack()
 	editor.value.domRender()
 	editor.value.rangeRender()
 })
@@ -33,7 +32,6 @@ const insert = () => {
 		]
 	})
 	editor.value!.insertElement(el)
-	editor.value!.formatElementStack()
 	editor.value!.domRender()
 	editor.value!.rangeRender()
 }

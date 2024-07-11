@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, format, getNeedFormatElements } from './core/operation'
 
 /**
  * 光标选区返回的结果数据项类型
@@ -1005,120 +1005,50 @@ export class AlexEditor {
 	}
 
 	/**
-	 * 格式化stack
-	 */
-	formatElementStack() {
-		//一种格式化方法对一组元素的格式化
-		const format = (elements: AlexElement[], fn: (el: AlexElement) => void, isStack?: boolean) => {
-			if (typeof isStack != 'boolean') {
-				isStack = false
-			}
-			let index = 0
-			while (index < elements.length) {
-				//如果是null直接删除，跳过当前后续步骤
-				if (!elements[index]) {
-					elements.splice(index, 1)
-					continue
-				}
-				//如果是空元素则直接删除，跳过当前后续步骤
-				if (elements[index]!.isEmpty()) {
-					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
-						setRecentlyPoint.apply(this, [this.range.anchor])
-					}
-					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
-						setRecentlyPoint.apply(this, [this.range.focus])
-					}
-					elements.splice(index, 1)
-					continue
-				}
-				//对元素使用该方法进行格式化
-				fn.apply(this, [elements[index]!])
-				//如果在经过格式化后是空元素，则需要删除该元素，并且跳过当前后续步骤
-				if (elements[index]!.isEmpty()) {
-					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
-						setRecentlyPoint.apply(this, [this.range.anchor])
-					}
-					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
-						setRecentlyPoint.apply(this, [this.range.focus])
-					}
-					elements.splice(index, 1)
-					continue
-				}
-				//如果当前元素是根级元素，但是不是根级块元素则转为根级块元素
-				if (!elements[index]!.isBlock() && isStack) {
-					elements[index]!.convertToBlock()
-				}
-				//对自身所有的子元素进行格式化
-				if (elements[index]!.hasChildren()) {
-					format(elements[index]!.children!, fn)
-				}
-				//子元素格式化后，当前元素变成空元素，则需要删除该元素，并且跳过后续步骤
-				if (elements[index]!.isEmpty()) {
-					if (this.range && elements[index]!.isContains(this.range.anchor.element)) {
-						setRecentlyPoint.apply(this, [this.range.anchor])
-					}
-					if (this.range && elements[index]!.isContains(this.range.focus.element)) {
-						setRecentlyPoint.apply(this, [this.range.focus])
-					}
-					elements.splice(index, 1)
-					continue
-				}
-				//序列+1
-				index++
-			}
-		}
-		//获取自定义的格式化规则
-		let renderRules = this.renderRules.filter(fn => {
-			return typeof fn == 'function'
-		})
-		//这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
-		;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
-			format(this.stack, fn, true)
-		})
-		//判断stack是否为空进行初始化
-		handleStackEmpty.apply(this)
-	}
-
-	/**
-	 * 渲染编辑器dom内容
-	 * @param unPushHistory 为false表示加入历史记录
+	 * 格式化并渲染编辑器
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
-		//触发事件
-		this.emit('beforeRender')
-		//是否第一次渲染
-		const firstRender = !this.__oldStack.length
-		//暂记旧值
-		const oldValue = this.value
-		//清空原来内容
-		this.$el.innerHTML = ''
-		//创建fragment
-		const fragment = document.createDocumentFragment()
-		//生成新的dom
-		this.stack.forEach(element => {
-			element.__render()
-			fragment.appendChild(element.elm!)
-		})
-		//更新dom
-		this.$el.appendChild(fragment)
-		//设置新值
-		this.value = this.$el.innerHTML
-		//更新旧的stack
-		this.__oldStack = this.stack.map(ele => ele.__fullClone())
-		//如果是第一次渲染或者值发生变化
-		if (firstRender || oldValue != this.value) {
-			//如果不是第一次渲染，则触发change事件
-			if (!firstRender) {
-				this.emit('change', this.value, oldValue)
-			}
-			//如果unPushHistory为false，则加入历史记录
+		//获取需要进行格式化的根级元素
+		const elements = getNeedFormatElements(this.stack, this.__oldStack)
+		//如果elements数组没有变化，则不需要进行更新
+		if (elements.length > 0) {
+			//触发事件
+			this.emit('beforeRender')
+			//获取自定义的格式化规则
+			let renderRules = this.renderRules.filter(fn => typeof fn == 'function')
+			//进行格式化，这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
+			;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
+				//format第三个参数表示当前该元素数组是否stack根元素组成，通过此标识format内部可对stack进行处理
+				format.apply(this, [elements, fn, true])
+			})
+			//判断stack是否为空进行初始化
+			handleStackEmpty.apply(this)
+			//清空原来编辑器的内容
+			this.$el.innerHTML = ''
+			//更新编辑器的内容
+			const fragment = document.createDocumentFragment()
+			this.stack.forEach(element => {
+				element.__render()
+				fragment.appendChild(element.elm!)
+			})
+			this.$el.appendChild(fragment)
+			//历史记录处理
 			if (!unPushHistory) {
-				//将本次的stack和range推入历史栈中
 				this.history.push(this.stack, this.range)
 			}
+			//记录之前的value
+			const oldValue = this.value
+			//更新value
+			this.value = this.$el.innerHTML
+			//不是第一次渲染
+			if (!!this.__oldStack.length) {
+				this.emit('change', this.value, oldValue)
+			}
+			//更新__oldStack
+			this.__oldStack = this.stack.map(ele => ele.__fullClone())
+			//触发事件
+			this.emit('afterRender')
 		}
-		//触发事件
-		this.emit('afterRender')
 	}
 
 	/**
