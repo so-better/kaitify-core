@@ -1184,7 +1184,7 @@ export class AlexEditor {
 	 */
 	parseHtml(html: string) {
 		if (!html) {
-			throw new Error('You need to give an html content to convert')
+			html = '<p><br/></p>'
 		}
 		const template = document.createElement('template')
 		template.innerHTML = html
