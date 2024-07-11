@@ -15,6 +15,6 @@ export type * from './History'
 export type * from './core/tool'
 export type * from './core/nodeParse'
 //导出版本
-export const version = '1.4.21'
+export const version = '1.4.22'
 //显示版本信息
 console.log(`%c alex-editor %c v${version} `, 'padding: 2px 1px; border-radius: 3px 0 0 3px; color: #fff; background: #606060; font-weight: bold;', 'padding: 2px 1px; border-radius: 0 3px 3px 0; color: #fff; background: #42c02e; font-weight: bold;')

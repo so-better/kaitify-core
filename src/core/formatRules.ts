@@ -85,8 +85,8 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 		const breaks = children.filter(el => {
 			return el.isBreak()
 		})
-		//如果全是换行符则只保留第一个
-		if (breaks.length && breaks.length == children.length) {
+		//如果子元素数量大于1并且都是换行符，则只保留第一个
+		if (children.length > 1 && breaks.length == children.length) {
 			//如果起点在该元素里，则移动到第一个换行符上
 			if (this.range && element.isContains(this.range.anchor.element)) {
 				this.range.anchor.moveToStart(breaks[0])
@@ -97,8 +97,8 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 			}
 			element.children = [breaks[0]]
 		}
-		//有换行符也有其他元素则把换行符元素都置为空元素
-		else if (breaks.length) {
+		//子元素数量大于1并且有换行符也有其他元素则把换行符元素都置为空元素
+		else if (children.length > 1 && breaks.length) {
 			breaks.forEach(el => {
 				el.toEmpty()
 			})
@@ -340,7 +340,8 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
  * @param element
  */
 export const mergeWithSpaceTextElement = function (this: AlexEditor, element: AlexElement) {
-	if (element.isText()) {
+	//如果是非空的文本元素并且文本中有空白字符的
+	if (element.isText() && !element.isEmpty() && element.textContent!.split('').some(item => isSpaceText(item))) {
 		let val = element.textContent!
 		let i = 0
 		while (i < val.length) {
