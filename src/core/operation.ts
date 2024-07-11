@@ -684,11 +684,11 @@ export const format = function (this: AlexEditor, elements: AlexElement[], fn: (
 	while (index < elements.length) {
 		//如果是null直接删除，跳过当前后续步骤
 		if (!elements[index]) {
-			elements.splice(index, 1)
 			if (isStack) {
 				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
 				this.stack.splice(idx, 1)
 			}
+			elements.splice(index, 1)
 			continue
 		}
 		//如果是空元素则直接删除，跳过当前后续步骤
@@ -699,11 +699,11 @@ export const format = function (this: AlexEditor, elements: AlexElement[], fn: (
 			if (this.range && elements[index].isContains(this.range.focus.element)) {
 				setRecentlyPoint.apply(this, [this.range.focus])
 			}
-			elements.splice(index, 1)
 			if (isStack) {
 				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
 				this.stack.splice(idx, 1)
 			}
+			elements.splice(index, 1)
 			continue
 		}
 		//对元素使用该方法进行格式化
@@ -716,11 +716,11 @@ export const format = function (this: AlexEditor, elements: AlexElement[], fn: (
 			if (this.range && elements[index].isContains(this.range.focus.element)) {
 				setRecentlyPoint.apply(this, [this.range.focus])
 			}
-			elements.splice(index, 1)
 			if (isStack) {
 				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
 				this.stack.splice(idx, 1)
 			}
+			elements.splice(index, 1)
 			continue
 		}
 		//如果当前元素是根级元素，但是不是块元素则转为根级块元素
@@ -739,11 +739,11 @@ export const format = function (this: AlexEditor, elements: AlexElement[], fn: (
 			if (this.range && elements[index].isContains(this.range.focus.element)) {
 				setRecentlyPoint.apply(this, [this.range.focus])
 			}
-			elements.splice(index, 1)
 			if (isStack) {
 				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
 				this.stack.splice(idx, 1)
 			}
+			elements.splice(index, 1)
 			continue
 		}
 		//序列+1
