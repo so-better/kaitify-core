@@ -111,6 +111,7 @@ export declare const format: (this: AlexEditor, elements: AlexElement[], fn: (el
  * @param this
  * @param stack
  * @param oldStack
+ * @param useLength  如果是true表示只作为判断是否有子元素需要被格式化
  * @returns
  */
-export declare const getNeedFormatElements: (newElements: AlexElement[], oldElements: AlexElement[]) => AlexElement[];
+export declare const getNeedFormatElements: (newElements: AlexElement[], oldElements: AlexElement[], useLength: boolean) => AlexElement[];

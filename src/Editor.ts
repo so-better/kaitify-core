@@ -1009,7 +1009,7 @@ export class AlexEditor {
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
 		//获取需要进行格式化的根级元素
-		const elements = getNeedFormatElements(this.stack, this.__oldStack)
+		const elements = getNeedFormatElements(this.stack, this.__oldStack, false)
 		//如果elements数组没有变化，则不需要进行更新
 		if (elements.length > 0) {
 			//触发事件

@@ -756,65 +756,103 @@ export const format = function (this: AlexEditor, elements: AlexElement[], fn: (
  * @param this
  * @param stack
  * @param oldStack
+ * @param useLength  如果是true表示只作为判断是否有子元素需要被格式化
  * @returns
  */
-export const getNeedFormatElements = function (newElements: AlexElement[], oldElements: AlexElement[]) {
+export const getNeedFormatElements = function (newElements: AlexElement[], oldElements: AlexElement[], useLength: boolean) {
 	let result: AlexElement[] = []
-	newElements.forEach(el => {
+	const length = newElements.length
+	for (let i = 0; i < length; i++) {
+		const el = newElements[i]
 		//元素是空元素则需要进行格式化
 		if (el.isEmpty()) {
 			result.push(el)
-			return
+			if (useLength) {
+				break
+			} else {
+				continue
+			}
 		}
 		//在旧元素数组中寻找
 		const oldIndex = oldElements.findIndex(item => item.key == el.key)
 		//没有找到则表示该元素是新增的则需要进行格式化
 		if (oldIndex < 0) {
 			result.push(el)
+			if (useLength) {
+				break
+			} else {
+				continue
+			}
 		}
 		//元素已存在，进行下一步判断
-		else {
-			//获取旧元素
-			const oldEl = oldElements[oldIndex]
-			//元素的类型或者locked、marks、styles不一致，则需要进行格式化
-			if (el.type != oldEl.type || el.locked != oldEl.locked || !el.isEqualMarks(oldEl) || !el.isEqualStyles(oldEl)) {
-				result.push(el)
-				return
+		const oldEl = oldElements[oldIndex]
+		//元素的类型或者locked、marks、styles不一致，则需要进行格式化
+		if (el.type != oldEl.type || el.locked != oldEl.locked || !el.isEqualMarks(oldEl) || !el.isEqualStyles(oldEl)) {
+			result.push(el)
+			if (useLength) {
+				break
+			} else {
+				continue
 			}
-			//文本元素的文本值不一致，则需要进行格式化
-			if (el.isText() && el.textContent != oldEl.textContent) {
-				result.push(el)
-				return
+		}
+		//文本元素的文本值不一致，则需要进行格式化
+		if (el.isText() && el.textContent != oldEl.textContent) {
+			result.push(el)
+			if (useLength) {
+				break
+			} else {
+				continue
 			}
-			//非文本元素的parsedom不一致，则需要进行格式化
-			if (!el.isText() && el.parsedom != oldEl.parsedom) {
-				result.push(el)
-				return
+		}
+		//非文本元素的parsedom不一致，则需要进行格式化
+		if (!el.isText() && el.parsedom != oldEl.parsedom) {
+			result.push(el)
+			if (useLength) {
+				break
+			} else {
+				continue
 			}
-			//内部块元素的行为值不一致，则需要进行格式化
-			if (el.isInblock() && el.behavior != oldEl.behavior) {
-				result.push(el)
-				return
+		}
+		//内部块元素的行为值不一致，则需要进行格式化
+		if (el.isInblock() && el.behavior != oldEl.behavior) {
+			result.push(el)
+			if (useLength) {
+				break
+			} else {
+				continue
 			}
-			//根级块元素、内部卡元素和行内元素需要对子元素进行判断
-			if (!el.isText() && !el.isClosed()) {
-				//没有子元素，则需要进行格式化
-				if (!el.hasChildren() || !oldEl.hasChildren()) {
-					result.push(el)
-					return
+		}
+		//根级块元素、内部块元素和行内元素需要对子元素进行判断
+		if (!el.isText() && !el.isClosed()) {
+			//没有子元素，则需要进行格式化
+			if (!el.hasChildren() || !oldEl.hasChildren()) {
+				result.push(el)
+				if (useLength) {
+					break
+				} else {
+					continue
 				}
-				//子元素数量有变化，则需要进行格式化
-				if (el.children!.length != oldEl.children!.length) {
-					result.push(el)
-					return
+			}
+			//子元素数量有变化，则需要进行格式化
+			if (el.children!.length != oldEl.children!.length) {
+				result.push(el)
+				if (useLength) {
+					break
+				} else {
+					continue
 				}
-				const childResult = getNeedFormatElements(el.children!, oldEl.children!)
-				//子元素中有需要被格式化的元素，则表示该元素自身也需要被格式化
-				if (childResult.length) {
-					result.push(el)
+			}
+			const childResult = getNeedFormatElements(el.children!, oldEl.children!, true)
+			//子元素中有需要被格式化的元素，则表示该元素自身也需要被格式化
+			if (childResult.length) {
+				result.push(el)
+				if (useLength) {
+					break
+				} else {
+					continue
 				}
 			}
 		}
-	})
+	}
 	return result
 }
