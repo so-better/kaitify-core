@@ -481,8 +481,7 @@ export class AlexElement {
 			} else {
 				el = document.createElement(AlexElement.TEXT_NODE)
 			}
-			const text = document.createTextNode(this.textContent!)
-			el.appendChild(text)
+			el.textContent = this.textContent!
 		}
 		//非文本元素
 		else {

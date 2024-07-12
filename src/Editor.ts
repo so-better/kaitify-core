@@ -6,7 +6,8 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, format, getNeedFormatElements } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement } from './core/operation'
+import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
 
 /**
  * 光标选区返回的结果数据项类型
@@ -1008,46 +1009,123 @@ export class AlexEditor {
 	 * 格式化并渲染编辑器
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
-		//获取需要进行格式化的根级元素
-		const elements = getNeedFormatElements(this.stack, this.__oldStack, false)
-		//如果elements数组没有变化，则不需要进行更新
-		if (elements.length > 0) {
-			//触发事件
-			this.emit('beforeRender')
+		//使用diff算法进行新旧stack比对
+		const elementMap = new Map<number, AlexElement>()
+		//对比对的结果进行遍历，只要存在newElement都是在新Stack中有影响的
+		patch(this.stack, this.__oldStack, false).forEach(item => {
+			if (item.newElement) {
+				//获取元素的父元素，如果元素是根级元素则使用自身
+				const el = item.newElement!.parent ? item.newElement!.parent : item.newElement!
+				elementMap.set(el.key, el)
+			}
+		})
+		//有需要进行格式化的元素则进行格式化处理
+		if (elementMap.size > 0) {
 			//获取自定义的格式化规则
 			let renderRules = this.renderRules.filter(fn => typeof fn == 'function')
 			//进行格式化，这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
-			;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
-				//format第三个参数表示当前该元素数组是否stack根元素组成，通过此标识format内部可对stack进行处理
-				format.apply(this, [elements, fn, true])
+			elementMap.forEach(el => {
+				;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
+					//format第三个参数表示当前该元素数组是否stack根元素组成，通过此标识format内部可对stack进行处理
+					formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
+				})
 			})
 			//判断stack是否为空进行初始化
 			handleStackEmpty.apply(this)
-			//清空原来编辑器的内容
-			this.$el.innerHTML = ''
-			//更新编辑器的内容
-			const fragment = document.createDocumentFragment()
-			this.stack.forEach(element => {
-				element.__render()
-				fragment.appendChild(element.elm!)
+		}
+		//再次进行比对
+		const result = patch(this.stack, this.__oldStack, true)
+		//比对有差异则进行dom更新
+		if (result.length > 0) {
+			//触发事件
+			this.emit('beforeRender')
+			//第一次进行渲染清空内容
+			if (!this.__oldStack.length) {
+				this.$el.innerHTML = ''
+			}
+			result.forEach(item => {
+				//插入元素
+				if (item.type == 'insert') {
+					item.newElement!.__render()
+					const previousElement = this.getPreviousElement(item.newElement!)
+					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
+					if (previousElement) {
+						previousElement.elm!.nextElementSibling ? parentNode.insertBefore(item.newElement!.elm!, previousElement.elm!.nextElementSibling) : parentNode.appendChild(item.newElement!.elm!)
+					} else {
+						parentNode.firstElementChild ? parentNode.insertBefore(item.newElement!.elm!, parentNode.firstElementChild) : parentNode.appendChild(item.newElement!.elm!)
+					}
+				}
+				//移除元素
+				else if (item.type == 'remove') {
+					item.oldElement!.elm!.remove()
+				}
+				//更新元素
+				else if (item.type == 'update') {
+					//文本元素更新文本值
+					if (item.update == 'textContent') {
+						item.newElement!.elm!.textContent = item.newElement!.textContent
+					}
+					//更新样式
+					else if (item.update == 'styles') {
+						const { setStyles, removeStyles } = getDifferentStyles(item.newElement!, item.oldElement!)
+						for (let key in removeStyles) {
+							item.newElement!.elm!.style.removeProperty(key)
+						}
+						for (let key in setStyles) {
+							item.newElement!.elm!.style.setProperty(key, setStyles[key])
+						}
+					}
+					//更新属性
+					else if (item.update == 'marks') {
+						const { setMarks, removeMarks } = getDifferentMarks(item.newElement!, item.oldElement!)
+						for (let key in removeMarks) {
+							item.newElement!.elm!.removeAttribute(key)
+						}
+						for (let key in setMarks) {
+							if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
+								item.newElement!.elm!.setAttribute(key, setMarks[key])
+							}
+						}
+					}
+				}
+				//替代元素
+				else if (item.type == 'replace') {
+					item.newElement!.__render()
+					const parentNode = item.oldElement!.parent ? item.oldElement!.parent!.elm! : this.$el
+					parentNode.insertBefore(item.newElement!.elm!, item.oldElement!.elm!)
+					item.oldElement!.elm!.remove()
+				}
+				//移动元素
+				else if (item.type == 'move') {
+					const newIndex = (item.newElement!.parent ? item.newElement!.parent.children! : this.stack).findIndex(el => item.newElement!.isEqual(el))
+					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
+					parentNode.insertBefore(item.newElement!.elm!, parentNode.children[newIndex])
+				}
 			})
-			this.$el.appendChild(fragment)
+
+			const t1 = Date.now()
 			//历史记录处理
 			if (!unPushHistory) {
 				this.history.push(this.stack, this.range)
 			}
+			const t2 = Date.now()
 			//记录之前的value
 			const oldValue = this.value
 			//更新value
 			this.value = this.$el.innerHTML
+			const t3 = Date.now()
 			//不是第一次渲染
 			if (!!this.__oldStack.length) {
 				this.emit('change', this.value, oldValue)
 			}
 			//更新__oldStack
 			this.__oldStack = this.stack.map(ele => ele.__fullClone())
+			const t4 = Date.now()
 			//触发事件
 			this.emit('afterRender')
+			console.log(`历史记录处理耗时：${t2 - t1}ms`)
+			console.log(`更新value耗时：${t3 - t2}ms`)
+			console.log(`更新oldStack耗时：${t4 - t3}ms`)
 		}
 	}
 

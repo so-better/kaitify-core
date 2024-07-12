@@ -675,184 +675,61 @@ export const handleBlur = function (this: AlexEditor, e: Event) {
 
 /**
  * 对元素数组使用某个方法进行格式化
- * @param this
- * @param elements
- * @param fn
+ * @param this editor实例
+ * @param element 格式化对象元素
+ * @param fn 格式化函数
+ * @param receiver 源数组
  */
-export const format = function (this: AlexEditor, elements: AlexElement[], fn: (el: AlexElement) => void, isStack: boolean) {
-	let index = 0
-	while (index < elements.length) {
-		//如果是null直接删除，跳过当前后续步骤
-		if (!elements[index]) {
-			if (isStack) {
-				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
-				this.stack.splice(idx, 1)
-			}
-			elements.splice(index, 1)
-			continue
+export const formatElement = function (this: AlexEditor, element: AlexElement, fn: (el: AlexElement) => void, receiver: AlexElement[]) {
+	const index = receiver.findIndex(el => el.isEqual(element))
+	//表示该元素已经不在父元素数组内了，已经处理过了
+	if (index < 0) {
+		return
+	}
+	//如果是空元素则直接删除
+	if (element.isEmpty()) {
+		if (this.range && element.isContains(this.range.anchor.element)) {
+			setRecentlyPoint.apply(this, [this.range.anchor])
 		}
-		//如果是空元素则直接删除，跳过当前后续步骤
-		if (elements[index].isEmpty()) {
-			if (this.range && elements[index].isContains(this.range.anchor.element)) {
-				setRecentlyPoint.apply(this, [this.range.anchor])
-			}
-			if (this.range && elements[index].isContains(this.range.focus.element)) {
-				setRecentlyPoint.apply(this, [this.range.focus])
-			}
-			if (isStack) {
-				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
-				this.stack.splice(idx, 1)
-			}
-			elements.splice(index, 1)
-			continue
+		if (this.range && element.isContains(this.range.focus.element)) {
+			setRecentlyPoint.apply(this, [this.range.focus])
 		}
+		receiver.splice(index, 1)
+	}
+	//不是空元素则继续格式化
+	else {
 		//对元素使用该方法进行格式化
-		fn.apply(this, [elements[index]])
-		//如果在经过格式化后是空元素，则需要删除该元素，并且跳过当前后续步骤
-		if (elements[index].isEmpty()) {
-			if (this.range && elements[index].isContains(this.range.anchor.element)) {
+		fn.apply(this, [element])
+		//如果在经过格式化后是空元素，则需要删除该元素
+		if (element.isEmpty()) {
+			if (this.range && element.isContains(this.range.anchor.element)) {
 				setRecentlyPoint.apply(this, [this.range.anchor])
 			}
-			if (this.range && elements[index].isContains(this.range.focus.element)) {
+			if (this.range && element.isContains(this.range.focus.element)) {
 				setRecentlyPoint.apply(this, [this.range.focus])
 			}
-			if (isStack) {
-				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
-				this.stack.splice(idx, 1)
+			receiver.splice(index, 1)
+		} else {
+			//如果当前元素不是根级块元素，但是却是在根部，则转为根级块元素
+			if (!element.isBlock() && receiver === this.stack) {
+				element.convertToBlock()
 			}
-			elements.splice(index, 1)
-			continue
-		}
-		//如果当前元素是根级元素，但是不是块元素则转为根级块元素
-		if (isStack && !elements[index].isBlock()) {
-			elements[index].convertToBlock()
-		}
-		//对自身所有的子元素进行格式化
-		if (elements[index].hasChildren()) {
-			format.apply(this, [elements[index].children!, fn, false])
-		}
-		//子元素格式化后，当前元素变成空元素，则需要删除该元素，并且跳过后续步骤
-		if (elements[index].isEmpty()) {
-			if (this.range && elements[index].isContains(this.range.anchor.element)) {
-				setRecentlyPoint.apply(this, [this.range.anchor])
+			//对自身所有的子元素进行格式化
+			if (element.hasChildren()) {
+				element.children!.forEach(child => {
+					formatElement.apply(this, [child, fn, element.children!])
+				})
 			}
-			if (this.range && elements[index].isContains(this.range.focus.element)) {
-				setRecentlyPoint.apply(this, [this.range.focus])
-			}
-			if (isStack) {
-				const idx = this.stack.findIndex(el => el.isEqual(elements[index]))
-				this.stack.splice(idx, 1)
-			}
-			elements.splice(index, 1)
-			continue
-		}
-		//序列+1
-		index++
-	}
-}
-
-/**
- *
- * @param this
- * @param stack
- * @param oldStack
- * @param useLength  如果是true表示只作为判断是否有子元素需要被格式化
- * @returns
- */
-export const getNeedFormatElements = function (newElements: AlexElement[], oldElements: AlexElement[], useLength: boolean) {
-	let result: AlexElement[] = []
-	const length = newElements.length
-	for (let i = 0; i < length; i++) {
-		const el = newElements[i]
-		//元素是空元素则需要进行格式化
-		if (el.isEmpty()) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//在旧元素数组中寻找
-		const oldIndex = oldElements.findIndex(item => item.key == el.key)
-		//没有找到则表示该元素是新增的则需要进行格式化
-		if (oldIndex < 0) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//元素已存在，进行下一步判断
-		const oldEl = oldElements[oldIndex]
-		//元素的类型或者locked、marks、styles不一致，则需要进行格式化
-		if (el.type != oldEl.type || el.locked != oldEl.locked || !el.isEqualMarks(oldEl) || !el.isEqualStyles(oldEl)) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//文本元素的文本值不一致，则需要进行格式化
-		if (el.isText() && el.textContent != oldEl.textContent) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//非文本元素的parsedom不一致，则需要进行格式化
-		if (!el.isText() && el.parsedom != oldEl.parsedom) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//内部块元素的行为值不一致，则需要进行格式化
-		if (el.isInblock() && el.behavior != oldEl.behavior) {
-			result.push(el)
-			if (useLength) {
-				break
-			} else {
-				continue
-			}
-		}
-		//根级块元素、内部块元素和行内元素需要对子元素进行判断
-		if (!el.isText() && !el.isClosed()) {
-			//没有子元素，则需要进行格式化
-			if (!el.hasChildren() || !oldEl.hasChildren()) {
-				result.push(el)
-				if (useLength) {
-					break
-				} else {
-					continue
+			//子元素格式化后，当前元素变成空元素，则需要删除该元素
+			if (element.isEmpty()) {
+				if (this.range && element.isContains(this.range.anchor.element)) {
+					setRecentlyPoint.apply(this, [this.range.anchor])
 				}
-			}
-			//子元素数量有变化，则需要进行格式化
-			if (el.children!.length != oldEl.children!.length) {
-				result.push(el)
-				if (useLength) {
-					break
-				} else {
-					continue
+				if (this.range && element.isContains(this.range.focus.element)) {
+					setRecentlyPoint.apply(this, [this.range.focus])
 				}
-			}
-			const childResult = getNeedFormatElements(el.children!, oldEl.children!, true)
-			//子元素中有需要被格式化的元素，则表示该元素自身也需要被格式化
-			if (childResult.length) {
-				result.push(el)
-				if (useLength) {
-					break
-				} else {
-					continue
-				}
+				receiver.splice(index, 1)
 			}
 		}
 	}
-	return result
 }

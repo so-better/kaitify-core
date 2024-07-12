@@ -101,17 +101,9 @@ export declare const handleFocus: (this: AlexEditor, e: Event) => void;
 export declare const handleBlur: (this: AlexEditor, e: Event) => void;
 /**
  * 对元素数组使用某个方法进行格式化
- * @param this
- * @param elements
- * @param fn
+ * @param this editor实例
+ * @param element 格式化对象元素
+ * @param fn 格式化函数
+ * @param receiver 源数组
  */
-export declare const format: (this: AlexEditor, elements: AlexElement[], fn: (el: AlexElement) => void, isStack: boolean) => void;
-/**
- *
- * @param this
- * @param stack
- * @param oldStack
- * @param useLength  如果是true表示只作为判断是否有子元素需要被格式化
- * @returns
- */
-export declare const getNeedFormatElements: (newElements: AlexElement[], oldElements: AlexElement[], useLength: boolean) => AlexElement[];
+export declare const formatElement: (this: AlexEditor, element: AlexElement, fn: (el: AlexElement) => void, receiver: AlexElement[]) => void;
