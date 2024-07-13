@@ -122,7 +122,7 @@ export class AlexEditor {
 	/**
 	 * 事件集合
 	 */
-	__events: ObjectType = {}
+	__events: { [key: string]: ((...args: any) => void)[] } = {}
 	/**
 	 * 缓存的前一个stack
 	 */
@@ -1977,7 +1977,7 @@ export class AlexEditor {
 	 */
 	emit(eventName: string, ...value: any) {
 		if (Array.isArray(this.__events[eventName])) {
-			this.__events[eventName].forEach((fn: (...args: any) => void) => {
+			this.__events[eventName].forEach(fn => {
 				fn.apply(this, [...value])
 			})
 			return true
@@ -1986,7 +1986,7 @@ export class AlexEditor {
 	}
 
 	/**
-	 * 监听自定义事件
+	 * 监听事件
 	 * @param eventName
 	 * @param eventHandle
 	 */
@@ -1995,6 +1995,24 @@ export class AlexEditor {
 			this.__events[eventName] = []
 		}
 		this.__events[eventName].push(eventHandle)
+	}
+
+	/**
+	 * 取消对事件的监听
+	 * @param eventName
+	 */
+	off(eventName: string, eventHandle?: (...args: any) => void) {
+		if (!this.__events[eventName]) {
+			return
+		}
+		if (eventHandle) {
+			const index = this.__events[eventName].findIndex(item => item === eventHandle)
+			if (index > -1) {
+				this.__events[eventName].splice(index, 1)
+			}
+		} else {
+			this.__events[eventName] = []
+		}
 	}
 
 	/**

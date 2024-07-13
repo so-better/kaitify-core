@@ -28,6 +28,7 @@ onMounted(() => {
 		extraKeepTags: ['svg', 'circle']
 	})
 	editor.value.domRender()
+
 	//editor.value.rangeRender()
 })
 
