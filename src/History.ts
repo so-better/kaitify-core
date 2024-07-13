@@ -34,15 +34,14 @@ export class AlexHistory {
 	 * 入栈
 	 * @param stack
 	 * @param range
-	 * @param stackIsClone 传入的stack是否已经克隆过的了
 	 */
-	push(stack: AlexElement[], range?: AlexRange | null, stackIsClone: boolean | undefined = false) {
+	push(stack: AlexElement[], range?: AlexRange | null) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.current < this.records.length - 1) {
 			this.records.length = this.current + 1
 		}
 		//生成一个新的stack
-		const newStack = stackIsClone ? stack : stack.map(ele => ele.__fullClone())
+		const newStack = stack.map(ele => ele.__fullClone())
 		//生成一个新的range
 		const newRange = this.__cloneRange(newStack, range)
 		//推入栈中

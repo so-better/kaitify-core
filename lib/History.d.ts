@@ -28,9 +28,8 @@ export declare class AlexHistory {
      * 入栈
      * @param stack
      * @param range
-     * @param stackIsClone 传入的stack是否已经克隆过的了
      */
-    push(stack: AlexElement[], range?: AlexRange | null, stackIsClone?: boolean | undefined): void;
+    push(stack: AlexElement[], range?: AlexRange | null): void;
     /**
      * 获取
      * @param type

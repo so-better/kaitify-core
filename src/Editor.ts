@@ -1115,7 +1115,7 @@ export class AlexEditor {
 			this.__oldStack = this.stack.map(ele => ele.__fullClone())
 			//历史记录处理
 			if (!unPushHistory) {
-				this.history.push(this.__oldStack, this.range, true)
+				this.history.push(this.stack, this.range)
 			}
 			//触发事件
 			this.emit('afterRender')
