@@ -708,7 +708,9 @@ export const formatElement = function (this: AlexEditor, element: AlexElement, f
 			if (this.range && element.isContains(this.range.focus.element)) {
 				setRecentlyPoint.apply(this, [this.range.focus])
 			}
-			receiver.splice(index, 1)
+			//因为在格式化过程中可能会改变元素在源数组中的序列位置，所以重新获取序列
+			const findIndex = receiver.findIndex(el => el.isEqual(element))
+			receiver.splice(findIndex, 1)
 		} else {
 			//如果当前元素不是根级块元素，但是却是在根部，则转为根级块元素
 			if (!element.isBlock() && receiver === this.stack) {
@@ -728,7 +730,9 @@ export const formatElement = function (this: AlexEditor, element: AlexElement, f
 				if (this.range && element.isContains(this.range.focus.element)) {
 					setRecentlyPoint.apply(this, [this.range.focus])
 				}
-				receiver.splice(index, 1)
+				//因为在格式化过程中可能会改变元素在源数组中的序列位置，所以重新获取序列
+				const findIndex = receiver.findIndex(el => el.isEqual(element))
+				receiver.splice(findIndex, 1)
 			}
 		}
 	}
