@@ -1,6 +1,5 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
-
 /**
  * 定义一个对象集合的类型
  */
@@ -131,3 +130,10 @@ export declare const initEditorOptions: (options: EditorOptionsType) => EditorOp
  * @returns
  */
 export declare const getHighestByFirst: (point: AlexPoint) => AlexElement;
+/**
+ * 在指定的stack中根据key值查找元素
+ * @param key
+ * @param stack
+ * @returns
+ */
+export declare const getElementByKey: (key: number, stack: AlexElement[]) => AlexElement | null;

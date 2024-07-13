@@ -529,14 +529,10 @@ export class AlexElement {
 		el.key = this.key
 		el.elm = this.elm
 		if (this.hasChildren()) {
-			this.children!.forEach(child => {
-				let clonedChild = child.__fullClone()
-				if (el.hasChildren()) {
-					el.children!.push(clonedChild)
-				} else {
-					el.children = [clonedChild]
-				}
-				clonedChild.parent = el
+			el.children = this.children!.map(child => {
+				const cloenChild = child.__fullClone()
+				cloenChild.parent = el
+				return cloenChild
 			})
 		}
 		return el

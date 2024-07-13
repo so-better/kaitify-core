@@ -1,7 +1,6 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
 import { AlexEditor } from '../Editor';
-
 /**
  * 初始化校验stack
  * @param this

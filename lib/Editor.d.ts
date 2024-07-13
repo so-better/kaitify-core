@@ -3,7 +3,6 @@ import { AlexRange } from './Range';
 import { AlexPoint } from './Point';
 import { AlexHistory } from './History';
 import { EditorOptionsType, ObjectType } from './core/tool';
-
 /**
  * 光标选区返回的结果数据项类型
  */
@@ -113,7 +112,9 @@ export declare class AlexEditor {
     /**
      * 事件集合
      */
-    __events: ObjectType;
+    __events: {
+        [key: string]: ((...args: any) => void)[];
+    };
     /**
      * 缓存的前一个stack
      */
@@ -267,11 +268,16 @@ export declare class AlexEditor {
      */
     emit(eventName: string, ...value: any): boolean;
     /**
-     * 监听自定义事件
+     * 监听事件
      * @param eventName
      * @param eventHandle
      */
     on(eventName: string, eventHandle: (...args: any) => void): void;
+    /**
+     * 取消对事件的监听
+     * @param eventName
+     */
+    off(eventName: string, eventHandle?: (...args: any) => void): void;
     /**
      * 销毁编辑器的方法
      */

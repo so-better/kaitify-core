@@ -33,7 +33,18 @@ onMounted(() => {
 })
 
 const insert = () => {
-	editor.value!.stack.reverse()
+	editor.value!.insertElement(
+		AlexElement.create({
+			type: 'block',
+			parsedom: 'h1',
+			children: [
+				{
+					type: 'text',
+					textcontent: '我是插入的h1'
+				}
+			]
+		})
+	)
 	editor.value!.domRender()
 
 	editor.value!.rangeRender()

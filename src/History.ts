@@ -1,6 +1,7 @@
 import { AlexElement } from './Element'
 import { AlexPoint } from './Point'
 import { AlexRange } from './Range'
+import { getElementByKey } from './core/tool'
 
 /**
  * 历史记录数据项类型
@@ -33,14 +34,15 @@ export class AlexHistory {
 	 * 入栈
 	 * @param stack
 	 * @param range
+	 * @param stackIsClone 传入的stack是否已经克隆过的了
 	 */
-	push(stack: AlexElement[], range?: AlexRange | null) {
+	push(stack: AlexElement[], range?: AlexRange | null, stackIsClone: boolean | undefined = false) {
 		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
 		if (this.current < this.records.length - 1) {
 			this.records.length = this.current + 1
 		}
 		//生成一个新的stack
-		const newStack = stack.map(ele => ele.__fullClone())
+		const newStack = stackIsClone ? stack : stack.map(ele => ele.__fullClone())
 		//生成一个新的range
 		const newRange = this.__cloneRange(newStack, range)
 		//推入栈中
@@ -110,13 +112,10 @@ export class AlexHistory {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素
-			const anchorElement = AlexElement.flatElements(newStack).find(ele => {
-				return ele.key == range.anchor.element.key
-			})
+			const anchorElement = getElementByKey(range.anchor.element.key, newStack)
 			//查找新stack中focus对应的元素
-			const focusElement = AlexElement.flatElements(newStack).find(ele => {
-				return ele.key == range.focus.element.key
-			})
+			const focusElement = getElementByKey(range.focus.element.key, newStack)
+			//如果都存在
 			if (anchorElement && focusElement) {
 				//创建新的anchor
 				const anchor = new AlexPoint(anchorElement, range.anchor.offset)

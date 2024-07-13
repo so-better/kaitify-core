@@ -4,7 +4,7 @@ import { AlexRange } from './Range'
 import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
-import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType } from './core/tool'
+import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType, getElementByKey } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
 import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement } from './core/operation'
 import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
@@ -1043,6 +1043,7 @@ export class AlexEditor {
 			if (!this.__oldStack.length) {
 				this.$el.innerHTML = ''
 			}
+			//执行dom更新
 			result.forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
@@ -1102,30 +1103,22 @@ export class AlexEditor {
 					parentNode.insertBefore(item.newElement!.elm!, parentNode.children[newIndex])
 				}
 			})
-
-			const t1 = Date.now()
-			//历史记录处理
-			if (!unPushHistory) {
-				this.history.push(this.stack, this.range)
-			}
-			const t2 = Date.now()
 			//记录之前的value
 			const oldValue = this.value
 			//更新value
 			this.value = this.$el.innerHTML
-			const t3 = Date.now()
 			//不是第一次渲染
 			if (!!this.__oldStack.length) {
 				this.emit('change', this.value, oldValue)
 			}
 			//更新__oldStack
 			this.__oldStack = this.stack.map(ele => ele.__fullClone())
-			const t4 = Date.now()
+			//历史记录处理
+			if (!unPushHistory) {
+				this.history.push(this.__oldStack, this.range, true)
+			}
 			//触发事件
 			this.emit('afterRender')
-			console.log(`历史记录处理耗时：${t2 - t1}ms`)
-			console.log(`更新value耗时：${t3 - t2}ms`)
-			console.log(`更新oldStack耗时：${t4 - t3}ms`)
 		}
 	}
 
@@ -1354,26 +1347,7 @@ export class AlexEditor {
 		if (!key) {
 			throw new Error('You need to specify a key to do the query')
 		}
-		const fn = (elements: AlexElement[]): AlexElement | null => {
-			let element: AlexElement | null = null
-			const length = elements.length
-			for (let i = 0; i < length; i++) {
-				const item = elements[i]
-				if (item && item.key === key) {
-					element = item
-					break
-				}
-				if (item && item.hasChildren()) {
-					const el = fn(item.children!)
-					if (el) {
-						element = el
-						break
-					}
-				}
-			}
-			return element
-		}
-		return fn(this.stack)
+		return getElementByKey(key, this.stack)
 	}
 
 	/**

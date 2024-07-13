@@ -300,3 +300,35 @@ export const getHighestByFirst = function (point: AlexPoint) {
 	}
 	return temp
 }
+
+/**
+ * 在指定的stack中根据key值查找元素
+ * @param key
+ * @param stack
+ * @returns
+ */
+export const getElementByKey = function (key: number, stack: AlexElement[]) {
+	if (!key) {
+		return null
+	}
+	const fn = (elements: AlexElement[]): AlexElement | null => {
+		let element: AlexElement | null = null
+		const length = elements.length
+		for (let i = 0; i < length; i++) {
+			const item = elements[i]
+			if (item && item.key === key) {
+				element = item
+				break
+			}
+			if (item && item.hasChildren()) {
+				const el = fn(item.children!)
+				if (el) {
+					element = el
+					break
+				}
+			}
+		}
+		return element
+	}
+	return fn(stack)
+}

@@ -1,6 +1,5 @@
 import { AlexElement } from './Element';
 import { AlexRange } from './Range';
-
 /**
  * 历史记录数据项类型
  */
@@ -29,8 +28,9 @@ export declare class AlexHistory {
      * 入栈
      * @param stack
      * @param range
+     * @param stackIsClone 传入的stack是否已经克隆过的了
      */
-    push(stack: AlexElement[], range?: AlexRange | null): void;
+    push(stack: AlexElement[], range?: AlexRange | null, stackIsClone?: boolean | undefined): void;
     /**
      * 获取
      * @param type
