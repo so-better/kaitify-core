@@ -1009,6 +1009,10 @@ export class AlexEditor {
 	 * 格式化并渲染编辑器
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
+		//如果是撤销或者重做操作，直接先清空旧的stack，重新渲染dom
+		if (unPushHistory) {
+			this.__oldStack = []
+		}
 		//使用diff算法进行新旧stack比对
 		const elementMap = new Map<number, AlexElement>()
 		//对比对的结果进行遍历，只要存在newElement都是在新Stack中有影响的
