@@ -1030,7 +1030,6 @@ export class AlexEditor {
 			//进行格式化，这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
 			elementMap.forEach(el => {
 				;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
-					//format第三个参数表示当前该元素数组是否stack根元素组成，通过此标识format内部可对stack进行处理
 					formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
 				})
 			})
