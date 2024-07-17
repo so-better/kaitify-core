@@ -1029,7 +1029,7 @@ export class AlexEditor {
 			let renderRules = this.renderRules.filter(fn => typeof fn == 'function')
 			//进行格式化，这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
 			elementMap.forEach(el => {
-				;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
+				;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
 					formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
 				})
 			})

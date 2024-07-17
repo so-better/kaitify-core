@@ -229,9 +229,13 @@ export const mergeWithBrotherElement = function (this: AlexEditor, element: Alex
 		//存在子元素并且子元素数量大于1
 		if (ele.hasChildren() && ele.children!.length > 1) {
 			let index = 0
-			while (index <= ele.children!.length - 2) {
+			//因为父子元素合并操作会导致children没有，此时判断一下hasChildren
+			while (ele.hasChildren() && index <= ele.children!.length - 2) {
 				if (canMerge(ele.children![index]!, ele.children![index + 1]!)) {
+					//合并兄弟元素
 					merge(ele.children![index]!, ele.children![index + 1]!)
+					//子元素中兄弟元素合并后可能只有一个子元素了，此时进行父子元素合并操作
+					mergeWithParentElement.apply(this, [ele])
 					continue
 				}
 				index++
@@ -321,14 +325,19 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
 					item.parent = parent
 				})
 			}
-			//子元素与父元素合并和再对父元素进行处理
+			//子元素与父元素合并后再对父元素进行处理
 			mergeElement(parent)
 		}
 	}
 	const mergeElement = (ele: AlexElement) => {
 		//存在子元素并且子元素只有一个且父子元素可以合并
 		if (ele.hasChildren() && ele.children!.length == 1 && ele.children![0] && canMerge(ele, ele.children![0])) {
+			//父子元素进行合并
 			merge(ele, ele.children![0])
+			//父子元素合并后，可能父元素需要再和兄弟元素进行合并
+			if (ele.parent) {
+				mergeWithBrotherElement.apply(this, [ele.parent])
+			}
 		}
 	}
 	mergeElement(element)

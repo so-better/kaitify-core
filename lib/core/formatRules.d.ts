@@ -38,7 +38,7 @@ export declare const mergeWithBrotherElement: (this: AlexEditor, element: AlexEl
  */
 export declare const mergeWithParentElement: (this: AlexEditor, element: AlexElement) => void;
 /**
- * 将文本元素内的空白元素合一
+ * 将文本元素内的空白元素合一（虚拟光标可能更新）
  * @param this
  * @param element
  */
