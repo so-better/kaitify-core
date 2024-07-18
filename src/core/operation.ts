@@ -453,6 +453,13 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 		}
 		//改变标识
 		this.__isInputChinese = true
+		//如果起点是在换行符上，需要使用空白文本字符替换，主要是为了解决中文输入的问题
+		if (this.range!.anchor.element.isBreak()) {
+			const spaceText = AlexElement.getSpaceElement()
+			this.addElementBefore(spaceText, this.range!.anchor.element)
+			this.domRender()
+			this.rangeRender()
+		}
 	} else if (event.type == 'compositionend') {
 		//在中文输入结束后插入数据
 		if (event.data) {

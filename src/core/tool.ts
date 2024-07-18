@@ -161,18 +161,6 @@ export const isSpaceText = function (val: string) {
 }
 
 /**
- * 深拷贝函数
- * @param data
- * @returns
- */
-export const cloneData = function (data: any) {
-	if (DapCommon.isObject(data) || Array.isArray(data)) {
-		return JSON.parse(JSON.stringify(data))
-	}
-	return data
-}
-
-/**
  * 判断某个node是否包含另一个node
  * @param parentNode
  * @param childNode

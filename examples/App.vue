@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<p>下面是<span><span>一个</span>有序</span>列表</p><ol><li>第一个</li><li>第二个</li><li>第三个</li><li>第四个</li><li><ol><li>第一个</li><li>第二个</li><li>第三个</li><li>第四个</li><li>第五个</li></ol></li></ol><p>下面是一个无序列表</p><ul><li>第一个</li><li>第二个</li><li>第三个</li><li>第四个</li><li>第五个</li></ul>`,
+		value: `<p><br></p><p><a href="#">\uFEFF这是一个链接\uFEFF</a></p><p>111111111111</p><p>222222222</p><p>333333333</p><p>444444444</p>`,
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})

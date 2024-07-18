@@ -101,12 +101,6 @@ export declare const createGuid: () => number;
  */
 export declare const isSpaceText: (val: string) => boolean;
 /**
- * 深拷贝函数
- * @param data
- * @returns
- */
-export declare const cloneData: (data: any) => any;
-/**
  * 判断某个node是否包含另一个node
  * @param parentNode
  * @param childNode

@@ -1,7 +1,7 @@
 import { AlexEditor } from '../Editor'
 import { AlexElement } from '../Element'
-import { cloneData, isSpaceText } from './tool'
-import { string as DapString } from 'dap-util'
+import { isSpaceText } from './tool'
+import { string as DapString, common as DapCommon } from 'dap-util'
 
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
@@ -85,8 +85,14 @@ export const breakFormat = function (this: AlexEditor, element: AlexElement) {
 		const breaks = children.filter(el => {
 			return el.isBreak()
 		})
+		//如果换行符在行内元素中则清除
+		if (element.isInline() && breaks.length) {
+			breaks.forEach(el => {
+				el.toEmpty()
+			})
+		}
 		//如果子元素数量大于1并且都是换行符，则只保留第一个
-		if (children.length > 1 && breaks.length == children.length) {
+		else if (children.length > 1 && breaks.length == children.length) {
 			//如果起点在该元素里，则移动到第一个换行符上
 			if (this.range && element.isContains(this.range.anchor.element)) {
 				this.range.anchor.moveToStart(breaks[0])
@@ -276,17 +282,17 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
 			//如果子元素有标记
 			if (child.hasMarks()) {
 				if (parent.hasMarks()) {
-					Object.assign(parent.marks!, cloneData(child.marks))
+					Object.assign(parent.marks!, DapCommon.clone(child.marks))
 				} else {
-					parent.marks = cloneData(child.marks)
+					parent.marks = DapCommon.clone(child.marks)
 				}
 			}
 			//如果子元素有样式
 			if (child.hasStyles()) {
 				if (parent.hasStyles()) {
-					Object.assign(parent.styles!, cloneData(child.styles))
+					Object.assign(parent.styles!, DapCommon.clone(child.styles))
 				} else {
-					parent.styles = cloneData(child.styles)
+					parent.styles = DapCommon.clone(child.styles)
 				}
 			}
 			parent.textContent = child.textContent
@@ -305,17 +311,17 @@ export const mergeWithParentElement = function (this: AlexEditor, element: AlexE
 			//如果子元素有标记
 			if (child.hasMarks()) {
 				if (parent.hasMarks()) {
-					Object.assign(parent.marks!, cloneData(child.marks))
+					Object.assign(parent.marks!, DapCommon.clone(child.marks))
 				} else {
-					parent.marks = cloneData(child.marks)
+					parent.marks = DapCommon.clone(child.marks)
 				}
 			}
 			//如果子元素有样式
 			if (child.hasStyles()) {
 				if (parent.hasStyles()) {
-					Object.assign(parent.styles!, cloneData(child.styles))
+					Object.assign(parent.styles!, DapCommon.clone(child.styles))
 				} else {
-					parent.styles = cloneData(child.styles)
+					parent.styles = DapCommon.clone(child.styles)
 				}
 			}
 			//如果子元素也有子元素

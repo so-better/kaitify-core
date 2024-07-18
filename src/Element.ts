@@ -1,5 +1,5 @@
 import { common as DapCommon, data as DapData } from 'dap-util'
-import { createUniqueKey, isSpaceText, cloneData, ObjectType } from './core/tool'
+import { createUniqueKey, isSpaceText, ObjectType } from './core/tool'
 
 /**
  * 元素类型
@@ -285,7 +285,7 @@ export class AlexElement {
 		if (typeof deep != 'boolean') {
 			throw new Error('The parameter must be a Boolean')
 		}
-		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, DapCommon.clone(this.marks), DapCommon.clone(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.namespace = this.namespace
 		el.locked = this.locked
@@ -522,7 +522,7 @@ export class AlexElement {
 	 * 完全复制元素，包括key也复制
 	 */
 	__fullClone() {
-		let el = new AlexElement(this.type, this.parsedom, cloneData(this.marks), cloneData(this.styles), this.textContent)
+		let el = new AlexElement(this.type, this.parsedom, DapCommon.clone(this.marks), DapCommon.clone(this.styles), this.textContent)
 		el.behavior = this.behavior
 		el.namespace = this.namespace
 		el.locked = this.locked
