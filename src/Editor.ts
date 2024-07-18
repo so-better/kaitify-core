@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType, getElementByKey } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve } from './core/operation'
 import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
 
 /**
@@ -139,6 +139,14 @@ export class AlexEditor {
 	 * 取消中文输入标识的延时器
 	 */
 	__chineseInputTimer: any = null
+	/**
+	 * dom新增监听器
+	 */
+	__domObserver: MutationObserver | null = null
+	/**
+	 * 需要移除的非法dom数组
+	 */
+	__illegalDoms: Node[] = []
 
 	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
 		this.$el = initEditorNode(node)
@@ -165,6 +173,8 @@ export class AlexEditor {
 		checkStack.apply(this)
 		//编辑器禁用和启用设置
 		this.disabled ? this.setDisabled() : this.setEnabled()
+		//对dom进行监听
+		setEditorDomObserve.apply(this)
 
 		//设置selection的监听更新range
 		DapEvent.on(document, `selectionchange.alex_editor_${this.__guid}`, handleSelectionChange.bind(this))
@@ -2001,5 +2011,10 @@ export class AlexEditor {
 		//移除相关监听事件
 		DapEvent.off(document, `selectionchange.alex_editor_${this.__guid}`)
 		DapEvent.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
+		//移除dom监听
+		if (this.__domObserver) {
+			this.__domObserver.disconnect()
+			this.__domObserver = null
+		}
 	}
 }

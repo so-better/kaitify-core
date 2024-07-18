@@ -13,7 +13,7 @@ import { AlexEditor, AlexElementRangeType } from '../Editor'
  * @param result
  * @returns
  */
-const setClipboardData = function (this: AlexEditor, data: DataTransfer, result: AlexElementRangeType[]) {
+export const setClipboardData = function (this: AlexEditor, data: DataTransfer, result: AlexElementRangeType[]) {
 	let html = ''
 	let text = ''
 	result.forEach(item => {
@@ -40,7 +40,7 @@ const setClipboardData = function (this: AlexEditor, data: DataTransfer, result:
  * @param text
  * @param files
  */
-const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
+export const doPaste = async function (this: AlexEditor, html: string, text: string, files: FileList) {
 	//如果含有html
 	if (html) {
 		//允许粘贴html
@@ -133,6 +133,69 @@ const doPaste = async function (this: AlexEditor, html: string, text: string, fi
 			}
 		}
 	}
+}
+
+/**
+ * 对非法dom进行删除
+ * @param this
+ */
+export const removeIllegalDoms = function (this: AlexEditor) {
+	while (this.__illegalDoms.length > 0) {
+		const node = this.__illegalDoms[0]
+		//删除dom
+		node.parentNode?.removeChild(node)
+		//从非法数组中剔除
+		this.__illegalDoms.splice(0, 1)
+	}
+}
+
+/**
+ * 对编辑器dom元素进行监听，获取非法dom
+ * @param this
+ */
+export const setEditorDomObserve = function (this: AlexEditor) {
+	if (!window.MutationObserver) {
+		console.warn('The current browser does not support MutationObserver')
+	}
+	if (this.__domObserver) {
+		this.__domObserver.disconnect()
+		this.__domObserver = null
+	}
+
+	this.__domObserver = new MutationObserver(mutationList => {
+		let length = mutationList.length
+		for (let i = 0; i < length; i++) {
+			//监听子节点变动
+			if (mutationList[i].type == 'childList') {
+				const addNodesLength = mutationList[i].addedNodes.length
+				for (let j = 0; j < addNodesLength; j++) {
+					const node = mutationList[i].addedNodes[j]
+					//如果是文本节点
+					if (node.nodeType == 3) {
+						//获取父节点
+						const parentNode = node.parentNode as HTMLElement
+						//获取父节点的key
+						const key = parentNode ? DapData.get(parentNode, 'data-alex-editor-key') : null
+						//父节点对应的元素
+						const element = key ? this.getElementByKey(key) : null
+						//元素如果不是文本元素则该文本节点是非法的
+						if (element && !element.isText()) {
+							this.__illegalDoms.push(node)
+						}
+					}
+					//如果是元素节点并且没有获取到key则是非法的
+					else if (DapElement.isElement(node) && !DapData.get(node as HTMLElement, 'data-alex-editor-key')) {
+						this.__illegalDoms.push(node)
+					}
+				}
+			}
+		}
+	})
+	this.__domObserver.observe(this.$el, {
+		attributes: false,
+		childList: true,
+		subtree: true
+	})
 }
 
 /**
@@ -453,13 +516,6 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 		}
 		//改变标识
 		this.__isInputChinese = true
-		//如果起点是在换行符上，需要使用空白文本字符替换，主要是为了解决中文输入的问题
-		if (this.range!.anchor.element.isBreak()) {
-			const spaceText = AlexElement.getSpaceElement()
-			this.addElementBefore(spaceText, this.range!.anchor.element)
-			this.domRender()
-			this.rangeRender()
-		}
 	} else if (event.type == 'compositionend') {
 		//在中文输入结束后插入数据
 		if (event.data) {
@@ -467,6 +523,8 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 			this.domRender()
 			this.rangeRender()
 		}
+		//删除非法的node
+		removeIllegalDoms.apply(this)
 		//加上延时器避免过早修改中文输入标识导致删除中文拼音时触发range更新
 		this.__chineseInputTimer = setTimeout(() => {
 			this.__isInputChinese = false
