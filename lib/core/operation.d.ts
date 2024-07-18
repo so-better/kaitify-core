@@ -1,7 +1,41 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
-import { AlexEditor } from '../Editor';
+import { AlexEditor, AlexElementRangeType } from '../Editor';
 
+/**
+ * 获取选区内的元素转为html和text塞入剪切板并返回
+ * @param this
+ * @param data
+ * @param result
+ * @returns
+ */
+export declare const setClipboardData: (this: AlexEditor, data: DataTransfer, result: AlexElementRangeType[]) => {
+    html: string;
+    text: string;
+};
+/**
+ * 粘贴具体处理方法
+ * @param this
+ * @param html
+ * @param text
+ * @param files
+ */
+export declare const doPaste: (this: AlexEditor, html: string, text: string, files: FileList) => Promise<void>;
+/**
+ * 对非法dom进行删除
+ * @param this
+ */
+export declare const removeIllegalDoms: (this: AlexEditor) => void;
+/**
+ * 对编辑器dom元素进行监听，获取非法dom
+ * @param this
+ */
+export declare const setEditorDomObserve: (this: AlexEditor) => void;
+/**
+ * 移除对编辑器的dom监听
+ * @param this
+ */
+export declare const removeEditorDomObserve: (this: AlexEditor) => void;
 /**
  * 初始化校验stack
  * @param this

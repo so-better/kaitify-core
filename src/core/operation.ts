@@ -161,7 +161,6 @@ export const setEditorDomObserve = function (this: AlexEditor) {
 		this.__domObserver.disconnect()
 		this.__domObserver = null
 	}
-
 	this.__domObserver = new MutationObserver(mutationList => {
 		let length = mutationList.length
 		for (let i = 0; i < length; i++) {
@@ -196,6 +195,17 @@ export const setEditorDomObserve = function (this: AlexEditor) {
 		childList: true,
 		subtree: true
 	})
+}
+
+/**
+ * 移除对编辑器的dom监听
+ * @param this
+ */
+export const removeEditorDomObserve = function (this: AlexEditor) {
+	if (this.__domObserver) {
+		this.__domObserver.disconnect()
+		this.__domObserver = null
+	}
 }
 
 /**
@@ -523,8 +533,6 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
 			this.domRender()
 			this.rangeRender()
 		}
-		//删除非法的node
-		removeIllegalDoms.apply(this)
 		//加上延时器避免过早修改中文输入标识导致删除中文拼音时触发range更新
 		this.__chineseInputTimer = setTimeout(() => {
 			this.__isInputChinese = false

@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType, getElementByKey } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve, removeIllegalDoms, removeEditorDomObserve } from './core/operation'
 import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
 
 /**
@@ -1023,6 +1023,8 @@ export class AlexEditor {
 		if (unPushHistory) {
 			this.__oldStack = []
 		}
+		//删除非法的node(中文输入可能导致一些非法的内容插入需要进行移除)
+		removeIllegalDoms.apply(this)
 		//使用diff算法进行新旧stack比对
 		const elementMap = new Map<number, AlexElement>()
 		//对比对的结果进行遍历，只要存在newElement都是在新Stack中有影响的
@@ -2006,15 +2008,12 @@ export class AlexEditor {
 	 * 销毁编辑器的方法
 	 */
 	destroy() {
+		//移除dom监听
+		removeEditorDomObserve.apply(this)
 		//去除可编辑效果
 		this.setDisabled()
 		//移除相关监听事件
 		DapEvent.off(document, `selectionchange.alex_editor_${this.__guid}`)
 		DapEvent.off(this.$el, 'beforeinput.alex_editor compositionstart.alex_editor compositionupdate.alex_editor compositionend.alex_editor keydown.alex_editor cut.alex_editor paste.alex_editor copy.alex_editor dragstart.alex_editor drop.alex_editor focus.alex_editor blur.alex_editor')
-		//移除dom监听
-		if (this.__domObserver) {
-			this.__domObserver.disconnect()
-			this.__domObserver = null
-		}
 	}
 }

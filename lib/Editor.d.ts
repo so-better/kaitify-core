@@ -132,6 +132,14 @@ export declare class AlexEditor {
      * 取消中文输入标识的延时器
      */
     __chineseInputTimer: any;
+    /**
+     * dom新增监听器
+     */
+    __domObserver: MutationObserver | null;
+    /**
+     * 需要移除的非法dom数组
+     */
+    __illegalDoms: Node[];
     constructor(node: HTMLElement | string, opts: EditorOptionsType);
     /**
      * 初始化设置默认的range
