@@ -165,10 +165,10 @@ export class AlexElement {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
 			return this
 		}
-		if (this.isBlock()) {
+		if (!this.parent) {
 			return null
 		}
-		return this.parent!.getUneditableElement()
+		return this.parent.getUneditableElement()
 	}
 
 	/**
@@ -192,10 +192,10 @@ export class AlexElement {
 		if (this.isEqual(element)) {
 			return true
 		}
-		if (element.isBlock()) {
+		if (!element.parent) {
 			return false
 		}
-		return this.isContains(element.parent!)
+		return this.isContains(element.parent)
 	}
 
 	/**
@@ -361,10 +361,10 @@ export class AlexElement {
 	 * @returns
 	 */
 	getBlock(): AlexElement {
-		if (this.isBlock()) {
+		if (!this.parent) {
 			return this
 		}
-		return this.parent!.getBlock()
+		return this.parent.getBlock()
 	}
 
 	/**
@@ -375,10 +375,10 @@ export class AlexElement {
 		if (this.isInblock()) {
 			return this
 		}
-		if (this.isBlock()) {
+		if (!this.parent) {
 			return null
 		}
-		return this.parent!.getInblock()
+		return this.parent.getInblock()
 	}
 
 	/**
@@ -389,10 +389,10 @@ export class AlexElement {
 		if (this.isInline()) {
 			return this
 		}
-		if (this.isBlock()) {
+		if (!this.parent) {
 			return null
 		}
-		return this.parent!.getInline()
+		return this.parent.getInline()
 	}
 
 	/**
