@@ -147,10 +147,6 @@ export class AlexEditor {
 	 * 需要移除的非法dom数组
 	 */
 	__illegalDoms: Node[] = []
-	/**
-	 * 是否第一次渲染
-	 */
-	__firstRender: boolean = true
 
 	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
 		this.$el = initEditorNode(node)
@@ -1023,16 +1019,36 @@ export class AlexEditor {
 	 * 格式化并渲染编辑器
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
-		//触发事件
+		//触发beforeRender事件
 		this.emit('beforeRender')
-		//如果是撤销或者重做操作，直接先清空旧的stack，触发编辑器完全地重新渲染
-		if (unPushHistory) {
-			this.__oldStack = []
-		}
+		//是否第一次渲染
+		const firstRender = !this.__oldStack.length
 		//格式化规则数组
 		const renderRules = [handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...this.renderRules.filter(fn => typeof fn == 'function')]
-		//如果__oldStack不是空数组，进行动态格式化和动态更新dom
-		if (this.__oldStack.length) {
+		//如果是第一次渲染，进行全量格式化和dom渲染
+		if (firstRender) {
+			//对整个stack进行格式化
+			this.stack.forEach(el => {
+				renderRules.forEach(fn => {
+					formatElement.apply(this, [el, fn, this.stack])
+				})
+			})
+			//判断stack是否为空进行初始化
+			handleStackEmpty.apply(this)
+			//创建fragment
+			const fragment = document.createDocumentFragment()
+			//生成新的dom
+			this.stack.forEach(element => {
+				element.__render()
+				fragment.appendChild(element.elm!)
+			})
+			//清空内容
+			this.$el.innerHTML = ''
+			//渲染内容
+			this.$el.appendChild(fragment)
+		}
+		//否则只需要进行动态格式化和dom更新
+		else {
 			//删除非法的node(中文输入可能导致一些非法的内容插入需要进行移除)
 			removeIllegalDoms.apply(this)
 			//使用diff算法进行新旧stack比对，遍历比对的结果进行动态格式化
@@ -1068,6 +1084,7 @@ export class AlexEditor {
 				}
 				//更新元素
 				else if (item.type == 'update') {
+					item.newElement!.elm = item.oldElement!.elm
 					//文本元素更新文本值
 					if (item.update == 'textContent') {
 						item.newElement!.elm!.textContent = item.newElement!.textContent
@@ -1110,28 +1127,6 @@ export class AlexEditor {
 				}
 			})
 		}
-		//如果__oldStack是空数组，进行全量格式化和全量渲染dom
-		else {
-			//对整个stack进行格式化
-			this.stack.forEach(el => {
-				renderRules.forEach(fn => {
-					formatElement.apply(this, [el, fn, this.stack])
-				})
-			})
-			//判断stack是否为空进行初始化
-			handleStackEmpty.apply(this)
-			//创建fragment
-			const fragment = document.createDocumentFragment()
-			//生成新的dom
-			this.stack.forEach(element => {
-				element.__render()
-				fragment.appendChild(element.elm!)
-			})
-			//清空内容
-			this.$el.innerHTML = ''
-			//渲染内容
-			this.$el.appendChild(fragment)
-		}
 		//记录之前的value
 		const oldValue = this.value
 		//更新value
@@ -1139,9 +1134,9 @@ export class AlexEditor {
 		//更新__oldStack
 		this.__oldStack = this.stack.map(ele => ele.__fullClone())
 		//是第一次渲染或者值发生变化
-		if (this.__firstRender || oldValue != this.value) {
+		if (firstRender || oldValue != this.value) {
 			//不是第一次渲染触发change事件
-			if (!this.__firstRender) {
+			if (!firstRender) {
 				this.emit('change', this.value, oldValue)
 			}
 			//如果unPushHistory为false，则加入历史记录
@@ -1149,11 +1144,7 @@ export class AlexEditor {
 				this.history.push(this.stack, this.range)
 			}
 		}
-		//修改是否第一次渲染的标记
-		if (this.__firstRender) {
-			this.__firstRender = false
-		}
-		//触发事件
+		//触发afterRender事件
 		this.emit('afterRender')
 	}
 

@@ -140,10 +140,6 @@ export declare class AlexEditor {
      * 需要移除的非法dom数组
      */
     __illegalDoms: Node[];
-    /**
-     * 是否第一次渲染
-     */
-    __firstRender: boolean;
     constructor(node: HTMLElement | string, opts: EditorOptionsType);
     /**
      * 初始化设置默认的range
