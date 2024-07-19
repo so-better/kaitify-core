@@ -170,6 +170,7 @@ export declare class AlexEditor {
     insertElement(ele: AlexElement, cover?: boolean | undefined): void;
     /**
      * 格式化并渲染编辑器
+     * @param unPushHistory 是否不加入历史记录
      */
     domRender(unPushHistory?: boolean | undefined): void;
     /**

@@ -1017,6 +1017,7 @@ export class AlexEditor {
 
 	/**
 	 * 格式化并渲染编辑器
+	 * @param unPushHistory 是否不加入历史记录
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
 		//触发beforeRender事件
@@ -1069,7 +1070,10 @@ export class AlexEditor {
 			patch(this.stack, this.__oldStack, true).forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
-					item.newElement!.__render()
+					//如果新元素的elm存在则不需要新渲染
+					if (!item.newElement!.elm) {
+						item.newElement!.__render()
+					}
 					const previousElement = this.getPreviousElement(item.newElement!)
 					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
 					if (previousElement) {
@@ -1084,7 +1088,6 @@ export class AlexEditor {
 				}
 				//更新元素
 				else if (item.type == 'update') {
-					item.newElement!.elm = item.oldElement!.elm
 					//文本元素更新文本值
 					if (item.update == 'textContent') {
 						item.newElement!.elm!.textContent = item.newElement!.textContent
