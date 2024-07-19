@@ -1026,8 +1026,8 @@ export class AlexEditor {
 		const firstRender = !this.__oldStack.length
 		//格式化规则数组
 		const renderRules = [handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...this.renderRules.filter(fn => typeof fn == 'function')]
-		//如果是第一次渲染，进行全量格式化和dom渲染
-		if (firstRender) {
+		//如果是第一次渲染或者不加入历史记录的，进行全量格式化和dom渲染
+		if (firstRender || unPushHistory) {
 			//对整个stack进行格式化
 			this.stack.forEach(el => {
 				renderRules.forEach(fn => {
@@ -1070,10 +1070,7 @@ export class AlexEditor {
 			patch(this.stack, this.__oldStack, true).forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
-					//如果新元素的elm存在则不需要新渲染
-					if (!item.newElement!.elm) {
-						item.newElement!.__render()
-					}
+					item.newElement!.__render()
 					const previousElement = this.getPreviousElement(item.newElement!)
 					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
 					if (previousElement) {
