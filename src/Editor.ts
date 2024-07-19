@@ -147,6 +147,10 @@ export class AlexEditor {
 	 * 需要移除的非法dom数组
 	 */
 	__illegalDoms: Node[] = []
+	/**
+	 * 是否第一次渲染
+	 */
+	__firstRender: boolean = true
 
 	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
 		this.$el = initEditorNode(node)
@@ -1019,47 +1023,34 @@ export class AlexEditor {
 	 * 格式化并渲染编辑器
 	 */
 	domRender(unPushHistory: boolean | undefined = false) {
-		//如果是撤销或者重做操作，直接先清空旧的stack，重新渲染dom
+		//触发事件
+		this.emit('beforeRender')
+		//如果是撤销或者重做操作，直接先清空旧的stack，触发编辑器完全地重新渲染
 		if (unPushHistory) {
 			this.__oldStack = []
 		}
-		//删除非法的node(中文输入可能导致一些非法的内容插入需要进行移除)
-		removeIllegalDoms.apply(this)
-		//使用diff算法进行新旧stack比对
-		const elementMap = new Map<number, AlexElement>()
-		//对比对的结果进行遍历，只要存在newElement都是在新Stack中有影响的
-		patch(this.stack, this.__oldStack, false).forEach(item => {
-			if (item.newElement) {
-				//获取元素的父元素，如果元素是根级元素则使用自身
-				const el = item.newElement!.parent ? item.newElement!.parent : item.newElement!
-				elementMap.set(el.key, el)
-			}
-		})
-		//有需要进行格式化的元素则进行格式化处理
-		if (elementMap.size > 0) {
-			//获取自定义的格式化规则
-			let renderRules = this.renderRules.filter(fn => typeof fn == 'function')
-			//进行格式化，这里合并父子元素执行两次，是因为合并兄弟元素会导致可能出现父子需要合并的情况
-			elementMap.forEach(el => {
-				;[handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...renderRules].forEach(fn => {
-					formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
-				})
+		//格式化规则数组
+		const renderRules = [handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...this.renderRules.filter(fn => typeof fn == 'function')]
+		//如果__oldStack不是空数组，进行动态格式化和动态更新dom
+		if (this.__oldStack.length) {
+			//删除非法的node(中文输入可能导致一些非法的内容插入需要进行移除)
+			removeIllegalDoms.apply(this)
+			//使用diff算法进行新旧stack比对，遍历比对的结果进行动态格式化
+			patch(this.stack, this.__oldStack, false).forEach(item => {
+				//只要存在newElement都是在新Stack中有影响的
+				if (item.newElement) {
+					//获取元素的父元素，如果元素是根级元素则使用自身
+					const el = item.newElement!.parent ? item.newElement!.parent : item.newElement!
+					//进行格式化
+					renderRules.forEach(fn => {
+						formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
+					})
+				}
 			})
 			//判断stack是否为空进行初始化
 			handleStackEmpty.apply(this)
-		}
-		//再次进行比对
-		const result = patch(this.stack, this.__oldStack, true)
-		//比对有差异则进行dom更新
-		if (result.length > 0) {
-			//触发事件
-			this.emit('beforeRender')
-			//第一次进行渲染清空内容
-			if (!this.__oldStack.length) {
-				this.$el.innerHTML = ''
-			}
-			//执行dom更新
-			result.forEach(item => {
+			//再次使用diff算法进行新旧stack比对，根据比对结果进行dom的动态更新
+			patch(this.stack, this.__oldStack, true).forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
 					item.newElement!.__render()
@@ -1118,23 +1109,52 @@ export class AlexEditor {
 					parentNode.insertBefore(item.newElement!.elm!, parentNode.children[newIndex])
 				}
 			})
-			//记录之前的value
-			const oldValue = this.value
-			//更新value
-			this.value = this.$el.innerHTML
-			//不是第一次渲染
-			if (!!this.__oldStack.length) {
+		}
+		//如果__oldStack是空数组，进行全量格式化和全量渲染dom
+		else {
+			//对整个stack进行格式化
+			this.stack.forEach(el => {
+				renderRules.forEach(fn => {
+					formatElement.apply(this, [el, fn, this.stack])
+				})
+			})
+			//判断stack是否为空进行初始化
+			handleStackEmpty.apply(this)
+			//创建fragment
+			const fragment = document.createDocumentFragment()
+			//生成新的dom
+			this.stack.forEach(element => {
+				element.__render()
+				fragment.appendChild(element.elm!)
+			})
+			//清空内容
+			this.$el.innerHTML = ''
+			//渲染内容
+			this.$el.appendChild(fragment)
+		}
+		//记录之前的value
+		const oldValue = this.value
+		//更新value
+		this.value = this.$el.innerHTML
+		//更新__oldStack
+		this.__oldStack = this.stack.map(ele => ele.__fullClone())
+		//是第一次渲染或者值发生变化
+		if (this.__firstRender || oldValue != this.value) {
+			//不是第一次渲染触发change事件
+			if (!this.__firstRender) {
 				this.emit('change', this.value, oldValue)
 			}
-			//更新__oldStack
-			this.__oldStack = this.stack.map(ele => ele.__fullClone())
-			//历史记录处理
+			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
 				this.history.push(this.stack, this.range)
 			}
-			//触发事件
-			this.emit('afterRender')
 		}
+		//修改是否第一次渲染的标记
+		if (this.__firstRender) {
+			this.__firstRender = false
+		}
+		//触发事件
+		this.emit('afterRender')
 	}
 
 	/**
