@@ -65,10 +65,6 @@ export declare class AlexElement {
      * 是否锁定，此值为true表示元素不会被规则进行自动合并
      */
     locked: boolean;
-    /***
-     * 是否强制渲染，此值为true表示元素在渲染时会强制重新创建dom
-     */
-    forceUpdate: boolean;
     /**
      * 真实node
      */

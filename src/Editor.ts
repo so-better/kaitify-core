@@ -1026,8 +1026,8 @@ export class AlexEditor {
 		const firstRender = !this.__oldStack.length
 		//格式化规则数组
 		const renderRules = [handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...this.renderRules.filter(fn => typeof fn == 'function')]
-		//如果是第一次渲染，进行全量格式化和dom渲染
-		if (firstRender) {
+		//如果是第一次渲染或者不加入历史记录的，进行全量格式化和dom渲染
+		if (firstRender || unPushHistory) {
 			//对整个stack进行格式化
 			this.stack.forEach(el => {
 				renderRules.forEach(fn => {
@@ -1070,21 +1070,25 @@ export class AlexEditor {
 			patch(this.stack, this.__oldStack, true).forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
-					//如果是强制更新或者dom不存在，则进行重新渲染，否则复用dom
-					if (item.newElement!.forceUpdate || !item.newElement!.elm) {
-						item.newElement!.__render()
-					}
+					item.newElement!.__render()
+					//获取新元素的前一个兄弟元素
 					const previousElement = this.getPreviousElement(item.newElement!)
+					//获取父节点
 					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
+					//如果前一个兄弟元素存在
 					if (previousElement) {
+						//插到前一个兄弟元素对应的真实dom之后
 						previousElement.elm!.nextElementSibling ? parentNode.insertBefore(item.newElement!.elm!, previousElement.elm!.nextElementSibling) : parentNode.appendChild(item.newElement!.elm!)
-					} else {
+					}
+					//如果前一个兄弟元素不存在
+					else {
+						//插到父元素对应的真实dom的第一个子节点
 						parentNode.firstElementChild ? parentNode.insertBefore(item.newElement!.elm!, parentNode.firstElementChild) : parentNode.appendChild(item.newElement!.elm!)
 					}
 				}
 				//移除元素
 				else if (item.type == 'remove') {
-					item.oldElement?.elm?.remove()
+					item.oldElement!.elm!.remove()
 				}
 				//更新元素
 				else if (item.type == 'update') {
@@ -1117,27 +1121,27 @@ export class AlexEditor {
 				}
 				//替代元素
 				else if (item.type == 'replace') {
-					//如果新元素存在dom则将dom转为元素
-					const sameElement = item.newElement!.elm ? this.parseNode(item.newElement!.elm) : null
-					//元素强制更新则需要渲染
-					//元素没有dom则需要渲染
-					//dom的namespace与新元素的不一致则需要渲染
-					//dom的parsedom与新元素的不一致则需要渲染
-					//dom有子元素而新元素没有子元素则需要渲染
-					//dom无子元素而新元素有子元素则需要渲染
-					if (item.newElement!.forceUpdate || !item.newElement!.elm || sameElement!.namespace != item.newElement!.namespace || (!sameElement!.isText() && sameElement!.parsedom != item.newElement!.parsedom) || (sameElement!.hasChildren() && !item.newElement!.hasChildren()) || (!sameElement!.hasChildren() && item.newElement!.hasChildren())) {
-						item.newElement!.__render()
-					}
-					//替换dom
+					item.newElement!.__render()
 					const parentNode = item.oldElement!.parent ? item.oldElement!.parent!.elm! : this.$el
 					parentNode.insertBefore(item.newElement!.elm!, item.oldElement!.elm!)
 					item.oldElement!.elm!.remove()
 				}
 				//移动元素
 				else if (item.type == 'move') {
-					const newIndex = (item.newElement!.parent ? item.newElement!.parent.children! : this.stack).findIndex(el => item.newElement!.isEqual(el))
+					//获取新元素的前一个兄弟元素
+					const previousElement = this.getPreviousElement(item.newElement!)
+					//获取父节点
 					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
-					parentNode.insertBefore(item.newElement!.elm!, parentNode.children[newIndex])
+					//如果前一个兄弟元素存在
+					if (previousElement) {
+						//插到前一个兄弟元素对应的真实dom之后
+						previousElement.elm!.nextElementSibling ? parentNode.insertBefore(item.newElement!.elm!, previousElement.elm!.nextElementSibling) : parentNode.appendChild(item.newElement!.elm!)
+					}
+					//如果前一个兄弟元素不存在
+					else {
+						//插到父元素对应的真实dom的第一个子节点
+						parentNode.firstElementChild ? parentNode.insertBefore(item.newElement!.elm!, parentNode.firstElementChild) : parentNode.appendChild(item.newElement!.elm!)
+					}
 				}
 			})
 		}
