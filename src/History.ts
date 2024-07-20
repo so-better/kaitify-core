@@ -28,7 +28,7 @@ export class AlexHistory {
 	 */
 	push(stack: AlexElement[], range: AlexRange | null) {
 		const newStack = stack.map(el => el.__fullClone())
-		const newRange = this.__cloneRange(newStack, range)
+		const newRange = this.cloneRange(newStack, range)
 		this.records.push({
 			stack: stack.map(el => el.__fullClone()),
 			range: newRange
@@ -50,7 +50,7 @@ export class AlexHistory {
 			//返回历史记录数组中的最近的一个
 			const r = this.records[this.records.length - 1]
 			const newStack = r.stack.map(el => el.__fullClone())
-			const newRange = this.__cloneRange(newStack, r.range)
+			const newRange = this.cloneRange(newStack, r.range)
 			return {
 				stack: newStack,
 				range: newRange
@@ -72,7 +72,7 @@ export class AlexHistory {
 			this.records.push(record)
 			//返回取出的这个撤销记录，即最近的一个历史记录
 			const newStack = record.stack.map(el => el.__fullClone())
-			const newRange = this.__cloneRange(newStack, record.range)
+			const newRange = this.cloneRange(newStack, record.range)
 			return {
 				stack: newStack,
 				range: newRange
@@ -83,10 +83,11 @@ export class AlexHistory {
 
 	/**
 	 * 更新光标
+	 * @param range
 	 */
 	updateRange(range: AlexRange) {
 		const record = this.records[this.records.length - 1]
-		const newRange = this.__cloneRange(record.stack, range)
+		const newRange = this.cloneRange(record.stack, range)
 		this.records[this.records.length - 1].range = newRange
 	}
 
@@ -96,7 +97,7 @@ export class AlexHistory {
 	 * @param range
 	 * @returns
 	 */
-	__cloneRange(newStack: AlexElement[], range: AlexRange | null) {
+	cloneRange(newStack: AlexElement[], range: AlexRange | null) {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素

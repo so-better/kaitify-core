@@ -270,6 +270,14 @@ export declare class AlexEditor {
      */
     setEnabled(): void;
     /**
+     * 撤销
+     */
+    undo(): void;
+    /**
+     * 重做
+     */
+    redo(): void;
+    /**
      * 触发自定义事件
      * @param eventName
      * @param value

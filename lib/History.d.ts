@@ -32,6 +32,7 @@ export declare class AlexHistory {
     redo(): AlexHistoryRecordType | null;
     /**
      * 更新光标
+     * @param range
      */
     updateRange(range: AlexRange): void;
     /**
@@ -40,5 +41,5 @@ export declare class AlexHistory {
      * @param range
      * @returns
      */
-    __cloneRange(newStack: AlexElement[], range: AlexRange | null): AlexRange | null;
+    cloneRange(newStack: AlexElement[], range: AlexRange | null): AlexRange | null;
 }

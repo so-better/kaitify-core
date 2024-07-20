@@ -1990,6 +1990,32 @@ export class AlexEditor {
 	}
 
 	/**
+	 * 撤销
+	 */
+	undo() {
+		const record = this.history.undo()
+		if (record) {
+			this.stack = record.stack
+			this.range = record.range
+			this.domRender(true)
+			this.rangeRender()
+		}
+	}
+
+	/**
+	 * 重做
+	 */
+	redo() {
+		const record = this.history.redo()
+		if (record) {
+			this.stack = record.stack
+			this.range = record.range
+			this.domRender(true)
+			this.rangeRender()
+		}
+	}
+
+	/**
 	 * 触发自定义事件
 	 * @param eventName
 	 * @param value

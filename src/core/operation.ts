@@ -559,24 +559,12 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 		//撤销
 		if (isUndo(event)) {
 			event.preventDefault()
-			const record = this.history.undo()
-			if (record) {
-				this.stack = record.stack
-				this.range = record.range
-				this.domRender(true)
-				this.rangeRender()
-			}
+			this.undo()
 		}
 		//重做
 		else if (isRedo(event)) {
 			event.preventDefault()
-			const record = this.history.redo()
-			if (record) {
-				this.stack = record.stack
-				this.range = record.range
-				this.domRender(true)
-				this.rangeRender()
-			}
+			this.redo()
 		}
 		//触发keydown事件
 		this.emit('keydown', this.value, event)
