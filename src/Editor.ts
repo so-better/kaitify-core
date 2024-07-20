@@ -1200,11 +1200,13 @@ export class AlexEditor {
 				//设置光标
 				const selection = window.getSelection()
 				if (selection) {
-					selection.removeAllRanges()
-					const range = document.createRange()
+					let range = selection.getRangeAt(0)
+					if (!range) {
+						range = document.createRange()
+						selection.addRange(range)
+					}
 					range.setStart(anchorResult.node!, anchorResult.offset)
 					range.setEnd(focusResult.node!, focusResult.offset)
-					selection.addRange(range)
 				}
 			} else {
 				const selection = window.getSelection()
