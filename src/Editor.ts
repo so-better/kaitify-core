@@ -1026,8 +1026,8 @@ export class AlexEditor {
 		const firstRender = !this.__oldStack.length
 		//格式化规则数组
 		const renderRules = [handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithParentElement, mergeWithBrotherElement, mergeWithSpaceTextElement, ...this.renderRules.filter(fn => typeof fn == 'function')]
-		//如果是第一次渲染或者不加入历史记录的，进行全量格式化和dom渲染
-		if (firstRender || unPushHistory) {
+		//如果是第一次渲染，进行全量格式化和dom渲染
+		if (firstRender) {
 			//对整个stack进行格式化
 			this.stack.forEach(el => {
 				renderRules.forEach(fn => {
@@ -1070,7 +1070,10 @@ export class AlexEditor {
 			patch(this.stack, this.__oldStack, true).forEach(item => {
 				//插入元素
 				if (item.type == 'insert') {
-					item.newElement!.__render()
+					//如果是强制更新或者dom不存在，则进行重新渲染，否则复用dom
+					if (item.newElement!.forceUpdate || !item.newElement!.elm) {
+						item.newElement!.__render()
+					}
 					const previousElement = this.getPreviousElement(item.newElement!)
 					const parentNode = item.newElement!.parent ? item.newElement!.parent!.elm! : this.$el
 					if (previousElement) {
@@ -1081,7 +1084,7 @@ export class AlexEditor {
 				}
 				//移除元素
 				else if (item.type == 'remove') {
-					item.oldElement!.elm!.remove()
+					item.oldElement?.elm?.remove()
 				}
 				//更新元素
 				else if (item.type == 'update') {
@@ -1114,7 +1117,18 @@ export class AlexEditor {
 				}
 				//替代元素
 				else if (item.type == 'replace') {
-					item.newElement!.__render()
+					//如果新元素存在dom则将dom转为元素
+					const sameElement = item.newElement!.elm ? this.parseNode(item.newElement!.elm) : null
+					//元素强制更新则需要渲染
+					//元素没有dom则需要渲染
+					//dom的namespace与新元素的不一致则需要渲染
+					//dom的parsedom与新元素的不一致则需要渲染
+					//dom有子元素而新元素没有子元素则需要渲染
+					//dom无子元素而新元素有子元素则需要渲染
+					if (item.newElement!.forceUpdate || !item.newElement!.elm || sameElement!.namespace != item.newElement!.namespace || (!sameElement!.isText() && sameElement!.parsedom != item.newElement!.parsedom) || (sameElement!.hasChildren() && !item.newElement!.hasChildren()) || (!sameElement!.hasChildren() && item.newElement!.hasChildren())) {
+						item.newElement!.__render()
+					}
+					//替换dom
 					const parentNode = item.oldElement!.parent ? item.oldElement!.parent!.elm! : this.$el
 					parentNode.insertBefore(item.newElement!.elm!, item.oldElement!.elm!)
 					item.oldElement!.elm!.remove()

@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<ol><li>3333</li><li>4444</li></ol>`,
+		value: `<p>33333</p><ol><li>3333</li><li>4444</li></ol>`,
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
@@ -34,18 +34,8 @@ onMounted(() => {
 })
 
 const insert = () => {
-	editor.value!.insertElement(
-		AlexElement.create({
-			type: 'block',
-			parsedom: 'h1',
-			children: [
-				{
-					type: 'text',
-					textcontent: '我是插入的h1'
-				}
-			]
-		})
-	)
+	const block = editor.value?.range?.anchor.element.getBlock()
+	block!.parsedom = 'h1'
 	editor.value!.domRender()
 
 	editor.value!.rangeRender()

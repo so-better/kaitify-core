@@ -1,6 +1,5 @@
 import { AlexElement } from '../Element';
 import { ObjectType } from './tool';
-
 /**
  * patch结果类型
  */
