@@ -1217,7 +1217,7 @@ export class AlexEditor {
 			setTimeout(() => {
 				setRangeInVisible.apply(this)
 				this.__innerSelectionChange = false
-				this.history.updateCurrentRange(this.range!)
+				this.history.updateRange(this.range!)
 				this.emit('rangeUpdate', this.range)
 				resolve()
 			}, 0)
@@ -1928,7 +1928,7 @@ export class AlexEditor {
 		}
 		//如果一开始range是null的话，则更新当前history的range
 		if (rangeIsNull) {
-			this.history.updateCurrentRange(this.range!)
+			this.history.updateRange(this.range!)
 		}
 	}
 
@@ -1969,7 +1969,7 @@ export class AlexEditor {
 		}
 		//如果一开始range是null的话，则更新当前history的range
 		if (rangeIsNull) {
-			this.history.updateCurrentRange(this.range!)
+			this.history.updateRange(this.range!)
 		}
 	}
 

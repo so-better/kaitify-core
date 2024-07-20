@@ -463,7 +463,7 @@ export const handleSelectionChange = function (this: AlexEditor) {
 			} else {
 				this.range = new AlexRange(anchor, focus)
 			}
-			this.history.updateCurrentRange(this.range)
+			this.history.updateRange(this.range)
 			this.emit('rangeUpdate', this.range)
 		}
 	}
@@ -559,11 +559,10 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 		//撤销
 		if (isUndo(event)) {
 			event.preventDefault()
-			const historyRecord = this.history.get(-1)
-			if (historyRecord) {
-				this.history.current = historyRecord.current
-				this.stack = historyRecord.stack
-				this.range = historyRecord.range
+			const record = this.history.undo()
+			if (record) {
+				this.stack = record.stack
+				this.range = record.range
 				this.domRender(true)
 				this.rangeRender()
 			}
@@ -571,11 +570,10 @@ export const handleKeyboard = function (this: AlexEditor, e: Event) {
 		//重做
 		else if (isRedo(event)) {
 			event.preventDefault()
-			const historyRecord = this.history.get(1)
-			if (historyRecord) {
-				this.history.current = historyRecord.current
-				this.stack = historyRecord.stack
-				this.range = historyRecord.range
+			const record = this.history.redo()
+			if (record) {
+				this.stack = record.stack
+				this.range = record.range
 				this.domRender(true)
 				this.rangeRender()
 			}

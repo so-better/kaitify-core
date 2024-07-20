@@ -1,51 +1,44 @@
 import { AlexElement } from './Element';
 import { AlexRange } from './Range';
 /**
- * 历史记录数据项类型
+ * 历史记录数据类型
  */
-export type AlexHistoryRecordsItemType = {
+export type AlexHistoryRecordType = {
     stack: AlexElement[];
     range: AlexRange | null;
-};
-/**
- * 历史记录结果类型
- */
-export type AlexHistoryResultType = {
-    stack: AlexElement[];
-    range: AlexRange | null;
-    current: number;
 };
 export declare class AlexHistory {
     /**
      * 存放历史记录的堆栈
      */
-    records: AlexHistoryRecordsItemType[];
+    records: AlexHistoryRecordType[];
     /**
-     * 记录当前展示的stack的序列
+     * 存放撤销记录的堆栈
      */
-    current: number;
+    redoRecords: AlexHistoryRecordType[];
     /**
-     * 入栈
+     * 保存记录
      * @param stack
      * @param range
      */
-    push(stack: AlexElement[], range?: AlexRange | null): void;
+    push(stack: AlexElement[], range: AlexRange | null): void;
     /**
-     * 获取
-     * @param type
-     * @returns
+     * 撤销操作
      */
-    get(type: -1 | 1): AlexHistoryResultType | null;
+    undo(): AlexHistoryRecordType | null;
     /**
-     * 更新当前历史记录的range
-     * @param range
+     * 重做操作
      */
-    updateCurrentRange(range: AlexRange): void;
+    redo(): AlexHistoryRecordType | null;
+    /**
+     * 更新光标
+     */
+    updateRange(range: AlexRange): void;
     /**
      * 克隆range
      * @param newStack
      * @param range
      * @returns
      */
-    __cloneRange(newStack: AlexElement[], range?: AlexRange | null): AlexRange | null;
+    __cloneRange(newStack: AlexElement[], range: AlexRange | null): AlexRange | null;
 }

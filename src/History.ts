@@ -4,101 +4,90 @@ import { AlexRange } from './Range'
 import { getElementByKey } from './core/tool'
 
 /**
- * 历史记录数据项类型
+ * 历史记录数据类型
  */
-export type AlexHistoryRecordsItemType = {
+export type AlexHistoryRecordType = {
 	stack: AlexElement[]
 	range: AlexRange | null
-}
-
-/**
- * 历史记录结果类型
- */
-export type AlexHistoryResultType = {
-	stack: AlexElement[]
-	range: AlexRange | null
-	current: number
 }
 
 export class AlexHistory {
 	/**
 	 * 存放历史记录的堆栈
 	 */
-	records: AlexHistoryRecordsItemType[] = []
+	records: AlexHistoryRecordType[] = []
 	/**
-	 * 记录当前展示的stack的序列
+	 * 存放撤销记录的堆栈
 	 */
-	current: number = -1
+	redoRecords: AlexHistoryRecordType[] = []
 
 	/**
-	 * 入栈
+	 * 保存记录
 	 * @param stack
 	 * @param range
 	 */
-	push(stack: AlexElement[], range?: AlexRange | null) {
-		//如果不是最后一个说明执行过撤销操作，并且没有入栈过，此时需要把后面的给删除掉
-		if (this.current < this.records.length - 1) {
-			this.records.length = this.current + 1
-		}
-		//生成一个新的stack
-		const newStack = stack.map(ele => ele.__fullClone())
-		//生成一个新的range
+	push(stack: AlexElement[], range: AlexRange | null) {
+		const newStack = stack.map(el => el.__fullClone())
 		const newRange = this.__cloneRange(newStack, range)
-		//推入栈中
 		this.records.push({
-			stack: newStack,
+			stack: stack.map(el => el.__fullClone()),
 			range: newRange
 		})
-		this.current += 1
+		//每次保存新状态时清空重做堆栈
+		this.redoRecords = []
 	}
 
 	/**
-	 * 获取
-	 * @param type
-	 * @returns
+	 * 撤销操作
 	 */
-	get(type: -1 | 1): AlexHistoryResultType | null {
-		let current = this.current
-		//撤销
-		if (type == -1) {
-			//已经是第一个了，无法再撤销
-			if (current <= 0) {
-				return null
+	undo(): AlexHistoryRecordType | null {
+		//存在的历史记录大于1则表示可以进行撤销操作
+		if (this.records.length > 1) {
+			//取出最近的历史记录
+			const record = this.records.pop()!
+			//将这个历史记录加入到撤销记录数组中
+			this.redoRecords.push(record)
+			//返回历史记录数组中的最近的一个
+			const r = this.records[this.records.length - 1]
+			const newStack = r.stack.map(el => el.__fullClone())
+			const newRange = this.__cloneRange(newStack, r.range)
+			return {
+				stack: newStack,
+				range: newRange
 			}
-			//回退1
-			current -= 1
 		}
-		//重做
-		else if (type == 1) {
-			//如果是最后一个了，无法重做
-			if (current >= this.records.length - 1) {
-				return null
-			}
-			//前进1
-			current += 1
-		}
-		//获取栈中的stack和range
-		const { stack, range } = this.records[current]
-		//创建新的stack
-		const newStack = stack.map(ele => ele.__fullClone())
-		//创建新的range
-		const newRange = this.__cloneRange(newStack, range)
-		//返回给编辑器
-		return {
-			current: current,
-			stack: newStack,
-			range: newRange
-		}
+		//没有历史记录则返回null
+		return null
 	}
 
 	/**
-	 * 更新当前历史记录的range
-	 * @param range
+	 * 重做操作
 	 */
-	updateCurrentRange(range: AlexRange) {
-		const records = this.records[this.current]
-		const newRange = this.__cloneRange(records.stack, range)
-		this.records[this.current].range = newRange
+	redo(): AlexHistoryRecordType | null {
+		//如果存在撤销记录
+		if (this.redoRecords.length > 0) {
+			//取出最近的一个撤销记录
+			const record = this.redoRecords.pop()!
+			//将撤销记录加入历史记录中
+			this.records.push(record)
+			//返回取出的这个撤销记录，即最近的一个历史记录
+			const newStack = record.stack.map(el => el.__fullClone())
+			const newRange = this.__cloneRange(newStack, record.range)
+			return {
+				stack: newStack,
+				range: newRange
+			}
+		}
+		return null
+	}
+
+	/**
+	 * 更新光标
+	 */
+	updateRange(range: AlexRange) {
+		const record = this.records[this.records.length - 1]
+		const newRange = this.__cloneRange(record.stack, range)
+		this.records[this.records.length - 1].range = newRange
 	}
 
 	/**
@@ -107,7 +96,7 @@ export class AlexHistory {
 	 * @param range
 	 * @returns
 	 */
-	__cloneRange(newStack: AlexElement[], range?: AlexRange | null) {
+	__cloneRange(newStack: AlexElement[], range: AlexRange | null) {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素
