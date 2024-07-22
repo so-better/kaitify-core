@@ -1176,8 +1176,14 @@ export class AlexEditor {
 			if (this.disabled) {
 				return resolve()
 			}
+			const selection = window.getSelection()
+			//selection不存在则无法设置真实光标
+			if (!selection) {
+				return resolve()
+			}
+			//有虚拟光标
 			if (this.range) {
-				//将虚拟光标位置转为真实光标位置
+				//将虚拟光标位置转为真实光标位置的方法
 				const handler = (point: AlexPoint) => {
 					let node: HTMLElement | null = null
 					let offset: number | null = null
@@ -1198,21 +1204,15 @@ export class AlexEditor {
 				const anchorResult = handler(this.range.anchor)
 				const focusResult = handler(this.range.focus)
 				//设置光标
-				const selection = window.getSelection()
-				if (selection) {
-					let range = selection.getRangeAt(0)
-					if (!range) {
-						range = document.createRange()
-						selection.addRange(range)
-					}
-					range.setStart(anchorResult.node!, anchorResult.offset)
-					range.setEnd(focusResult.node!, focusResult.offset)
-				}
-			} else {
-				const selection = window.getSelection()
-				if (selection) {
-					selection.removeAllRanges()
-				}
+				const range = document.createRange()
+				range.setStart(anchorResult.node!, anchorResult.offset)
+				range.setEnd(focusResult.node!, focusResult.offset)
+				selection.removeAllRanges()
+				selection.addRange(range)
+			}
+			//没有虚拟光标
+			else {
+				selection.removeAllRanges()
 			}
 			setTimeout(() => {
 				setRangeInVisible.apply(this)
