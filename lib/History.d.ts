@@ -12,18 +12,18 @@ export declare class AlexHistory {
     /**
      * 存放历史记录的堆栈
      */
-    private records;
+    records: AlexHistoryRecordType[];
     /**
      * 存放撤销记录的堆栈
      */
-    private redoRecords;
+    redoRecords: AlexHistoryRecordType[];
     /**
      * 克隆range
      * @param newStack
      * @param range
      * @returns
      */
-    private cloneRange;
+    cloneRange(newStack: AlexElement[], range: AlexRange | null): AlexRange | null;
     /**
      * 保存新的记录
      * @param stack

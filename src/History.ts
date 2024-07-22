@@ -15,11 +15,11 @@ export class AlexHistory {
 	/**
 	 * 存放历史记录的堆栈
 	 */
-	private records: AlexHistoryRecordType[] = []
+	records: AlexHistoryRecordType[] = []
 	/**
 	 * 存放撤销记录的堆栈
 	 */
-	private redoRecords: AlexHistoryRecordType[] = []
+	redoRecords: AlexHistoryRecordType[] = []
 
 	/**
 	 * 克隆range
@@ -27,7 +27,7 @@ export class AlexHistory {
 	 * @param range
 	 * @returns
 	 */
-	private cloneRange(newStack: AlexElement[], range: AlexRange | null) {
+	cloneRange(newStack: AlexElement[], range: AlexRange | null) {
 		//如果range存在
 		if (range) {
 			//查找新stack中anchor对应的元素
