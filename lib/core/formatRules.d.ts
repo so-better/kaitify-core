@@ -1,5 +1,6 @@
 import { AlexEditor } from '../Editor';
 import { AlexElement } from '../Element';
+
 /**
  * 将子元素中的根级块元素转为内部块元素或者行内元素（根级块元素只能在stack下）
  * @param this

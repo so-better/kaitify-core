@@ -1,6 +1,7 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
 import { AlexEditor, AlexElementRangeType } from '../Editor';
+
 /**
  * 获取选区内的元素转为html和text塞入剪切板并返回
  * @param this

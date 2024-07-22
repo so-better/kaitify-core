@@ -1159,7 +1159,7 @@ export class AlexEditor {
 			}
 			//如果unPushHistory为false，则加入历史记录
 			if (!unPushHistory) {
-				this.history.push(this.stack, this.range)
+				this.history.setState(this.stack, this.range)
 			}
 		}
 		//触发afterRender事件

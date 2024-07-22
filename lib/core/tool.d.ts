@@ -1,5 +1,6 @@
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
+
 /**
  * 定义一个对象集合的类型
  */

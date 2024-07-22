@@ -1,5 +1,6 @@
 import { AlexElement } from './Element';
 import { AlexRange } from './Range';
+
 /**
  * 历史记录数据类型
  */
@@ -11,23 +12,30 @@ export declare class AlexHistory {
     /**
      * 存放历史记录的堆栈
      */
-    records: AlexHistoryRecordType[];
+    private records;
     /**
      * 存放撤销记录的堆栈
      */
-    redoRecords: AlexHistoryRecordType[];
+    private redoRecords;
     /**
-     * 保存记录
+     * 克隆range
+     * @param newStack
+     * @param range
+     * @returns
+     */
+    private cloneRange;
+    /**
+     * 保存新的记录
      * @param stack
      * @param range
      */
-    push(stack: AlexElement[], range: AlexRange | null): void;
+    setState(stack: AlexElement[], range: AlexRange | null): void;
     /**
-     * 撤销操作
+     * 撤销操作：返回上一个历史记录
      */
     undo(): AlexHistoryRecordType | null;
     /**
-     * 重做操作
+     * 重做操作：返回下一个历史记录
      */
     redo(): AlexHistoryRecordType | null;
     /**
@@ -35,11 +43,4 @@ export declare class AlexHistory {
      * @param range
      */
     updateRange(range: AlexRange): void;
-    /**
-     * 克隆range
-     * @param newStack
-     * @param range
-     * @returns
-     */
-    cloneRange(newStack: AlexElement[], range: AlexRange | null): AlexRange | null;
 }

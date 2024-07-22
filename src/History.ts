@@ -15,18 +15,44 @@ export class AlexHistory {
 	/**
 	 * 存放历史记录的堆栈
 	 */
-	records: AlexHistoryRecordType[] = []
+	private records: AlexHistoryRecordType[] = []
 	/**
 	 * 存放撤销记录的堆栈
 	 */
-	redoRecords: AlexHistoryRecordType[] = []
+	private redoRecords: AlexHistoryRecordType[] = []
 
 	/**
-	 * 保存记录
+	 * 克隆range
+	 * @param newStack
+	 * @param range
+	 * @returns
+	 */
+	private cloneRange(newStack: AlexElement[], range: AlexRange | null) {
+		//如果range存在
+		if (range) {
+			//查找新stack中anchor对应的元素
+			const anchorElement = getElementByKey(range.anchor.element.key, newStack)
+			//查找新stack中focus对应的元素
+			const focusElement = getElementByKey(range.focus.element.key, newStack)
+			//如果都存在
+			if (anchorElement && focusElement) {
+				//创建新的anchor
+				const anchor = new AlexPoint(anchorElement, range.anchor.offset)
+				//创建新的focus
+				const focus = new AlexPoint(focusElement, range.focus.offset)
+				//创建新的range
+				return new AlexRange(anchor, focus)
+			}
+		}
+		return null
+	}
+
+	/**
+	 * 保存新的记录
 	 * @param stack
 	 * @param range
 	 */
-	push(stack: AlexElement[], range: AlexRange | null) {
+	setState(stack: AlexElement[], range: AlexRange | null) {
 		const newStack = stack.map(el => el.__fullClone())
 		const newRange = this.cloneRange(newStack, range)
 		this.records.push({
@@ -38,7 +64,7 @@ export class AlexHistory {
 	}
 
 	/**
-	 * 撤销操作
+	 * 撤销操作：返回上一个历史记录
 	 */
 	undo(): AlexHistoryRecordType | null {
 		//存在的历史记录大于1则表示可以进行撤销操作
@@ -47,10 +73,10 @@ export class AlexHistory {
 			const record = this.records.pop()!
 			//将这个历史记录加入到撤销记录数组中
 			this.redoRecords.push(record)
-			//返回历史记录数组中的最近的一个
-			const r = this.records[this.records.length - 1]
-			const newStack = r.stack.map(el => el.__fullClone())
-			const newRange = this.cloneRange(newStack, r.range)
+			//再次获取历史记录数组中的最近的一个
+			const lastRecord = this.records[this.records.length - 1]
+			const newStack = lastRecord.stack.map(el => el.__fullClone())
+			const newRange = this.cloneRange(newStack, lastRecord.range)
 			return {
 				stack: newStack,
 				range: newRange
@@ -61,7 +87,7 @@ export class AlexHistory {
 	}
 
 	/**
-	 * 重做操作
+	 * 重做操作：返回下一个历史记录
 	 */
 	redo(): AlexHistoryRecordType | null {
 		//如果存在撤销记录
@@ -89,31 +115,5 @@ export class AlexHistory {
 		const record = this.records[this.records.length - 1]
 		const newRange = this.cloneRange(record.stack, range)
 		this.records[this.records.length - 1].range = newRange
-	}
-
-	/**
-	 * 克隆range
-	 * @param newStack
-	 * @param range
-	 * @returns
-	 */
-	cloneRange(newStack: AlexElement[], range: AlexRange | null) {
-		//如果range存在
-		if (range) {
-			//查找新stack中anchor对应的元素
-			const anchorElement = getElementByKey(range.anchor.element.key, newStack)
-			//查找新stack中focus对应的元素
-			const focusElement = getElementByKey(range.focus.element.key, newStack)
-			//如果都存在
-			if (anchorElement && focusElement) {
-				//创建新的anchor
-				const anchor = new AlexPoint(anchorElement, range.anchor.offset)
-				//创建新的focus
-				const focus = new AlexPoint(focusElement, range.focus.offset)
-				//创建新的range
-				return new AlexRange(anchor, focus)
-			}
-		}
-		return null
 	}
 }
