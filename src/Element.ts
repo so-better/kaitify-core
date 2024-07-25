@@ -79,7 +79,8 @@ export class AlexElement {
 		this.parsedom = parsedom
 		this.marks = marks
 		this.styles = styles
-		this.textContent = textContent
+		//textContent将\r\n转为\n
+		this.textContent = textContent ? textContent.replace(/\r\n/g, '\n') : textContent
 	}
 
 	/**

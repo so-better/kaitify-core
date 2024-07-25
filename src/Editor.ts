@@ -609,6 +609,8 @@ export class AlexEditor {
 		if (!data || typeof data != 'string') {
 			throw new Error('The argument must be a string')
 		}
+		//处理换行符兼容性问题
+		data = data.replace(/\r\n/g, '\n')
 		//起点和终点在一个位置
 		if (this.range.anchor.isEqual(this.range.focus)) {
 			//不是代码块内则对空格进行处理
@@ -1234,7 +1236,7 @@ export class AlexEditor {
 			html = '<p><br/></p>'
 		}
 		const template = document.createElement('template')
-		template.innerHTML = html
+		template.innerHTML = html.replace(/\r\n/g, '\n')
 		let elements: AlexElement[] = []
 		template.content.childNodes.forEach(el => {
 			if (el.nodeType == 1 || el.nodeType == 3) {
