@@ -22,6 +22,11 @@ export declare const setClipboardData: (this: AlexEditor, data: DataTransfer, re
  */
 export declare const doPaste: (this: AlexEditor, html: string, text: string, files: FileList) => Promise<void>;
 /**
+ * 对非法dom进行删除
+ * @param this
+ */
+export declare const removeIllegalDoms: (this: AlexEditor) => void;
+/**
  * 对编辑器dom元素进行监听，获取非法dom
  * @param this
  */

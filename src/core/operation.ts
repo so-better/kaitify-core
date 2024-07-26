@@ -136,6 +136,20 @@ export const doPaste = async function (this: AlexEditor, html: string, text: str
 }
 
 /**
+ * 对非法dom进行删除
+ * @param this
+ */
+export const removeIllegalDoms = function (this: AlexEditor) {
+	while (this.__illegalDoms.length > 0) {
+		const node = this.__illegalDoms[0]
+		//删除dom
+		node.parentNode?.removeChild(node)
+		//从非法数组中剔除
+		this.__illegalDoms.splice(0, 1)
+	}
+}
+
+/**
  * 对编辑器dom元素进行监听，获取非法dom
  * @param this
  */
@@ -152,8 +166,6 @@ export const setEditorDomObserve = function (this: AlexEditor) {
 		for (let i = 0; i < length; i++) {
 			//监听子节点变动
 			if (mutationList[i].type == 'childList') {
-				//定义存放非法节点的数组
-				const illegalDoms: Node[] = []
 				//对新插入的节点进行遍历，判断是否非法，非法节点则加入到数组中
 				const addNodesLength = mutationList[i].addedNodes.length
 				for (let j = 0; j < addNodesLength; j++) {
@@ -168,21 +180,13 @@ export const setEditorDomObserve = function (this: AlexEditor) {
 						const element = key ? this.getElementByKey(key) : null
 						//元素如果不是文本元素则该文本节点是非法的
 						if (element && !element.isText()) {
-							illegalDoms.push(node)
+							this.__illegalDoms.push(node)
 						}
 					}
 					//如果是元素节点并且没有获取到key则是非法的
 					else if (DapElement.isElement(node) && !DapData.get(node as HTMLElement, 'data-alex-editor-key')) {
-						illegalDoms.push(node)
+						this.__illegalDoms.push(node)
 					}
-				}
-				//删除非法的节点
-				while (illegalDoms.length > 0) {
-					const node = illegalDoms[0]
-					//删除dom
-					node.parentNode?.removeChild(node)
-					//从非法数组中剔除
-					illegalDoms.splice(0, 1)
 				}
 			}
 		}

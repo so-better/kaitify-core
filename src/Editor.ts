@@ -6,7 +6,7 @@ import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType, getElementByKey } from './core/tool'
 import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve, removeEditorDomObserve } from './core/operation'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve, removeIllegalDoms, removeEditorDomObserve } from './core/operation'
 import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
 
 /**
@@ -143,6 +143,11 @@ export class AlexEditor {
 	 * dom新增监听器
 	 */
 	__domObserver: MutationObserver | null = null
+
+	/**
+	 * 需要移除的非法dom数组
+	 */
+	__illegalDoms: Node[] = []
 
 	constructor(node: HTMLElement | string, opts: EditorOptionsType) {
 		this.$el = initEditorNode(node)
@@ -1046,6 +1051,8 @@ export class AlexEditor {
 		}
 		//否则只需要进行动态格式化和dom更新
 		else {
+			//删除非法的node(中文输入可能导致一些非法的内容插入需要进行移除)
+			removeIllegalDoms.apply(this)
 			//使用diff算法进行新旧stack比对，遍历比对的结果进行动态格式化
 			patch(this.stack, this.__oldStack, false).forEach(item => {
 				//只要存在newElement都是在新Stack中有影响的
