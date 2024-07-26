@@ -79,7 +79,7 @@ export class AlexElement {
 		this.parsedom = parsedom
 		this.marks = marks
 		this.styles = styles
-		//textContent将\r\n转为\n
+		//统一将\r\n换成\n，解决Windows兼容问题
 		this.textContent = textContent ? textContent.replace(/\r\n/g, '\n') : textContent
 	}
 
