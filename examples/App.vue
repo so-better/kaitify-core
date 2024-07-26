@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<pre><br/></pre><p><br/></p>`,
+		value: `<pre><br/></pre><p><br/></p><a href="#">this is a link</a>`,
 		allowPasteHtml: false,
 		extraKeepTags: ['svg', 'circle']
 	})
