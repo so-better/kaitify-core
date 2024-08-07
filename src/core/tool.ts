@@ -204,7 +204,7 @@ export const initEditorNode = function (node: HTMLElement | string) {
  * @returns
  */
 export const initEditorOptions = function (options: EditorOptionsType) {
-	let opts: EditorOptionsType = {
+	const opts: EditorOptionsType = {
 		disabled: false,
 		renderRules: [],
 		value: '',

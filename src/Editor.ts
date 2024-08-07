@@ -5,8 +5,9 @@ import { AlexPoint } from './Point'
 import { AlexHistory } from './History'
 import { blockParse, closedParse, inblockParse, inlineParse } from './core/nodeParse'
 import { initEditorNode, initEditorOptions, createGuid, getAttributes, getStyles, isSpaceText, getHighestByFirst, EditorOptionsType, ObjectType, getElementByKey } from './core/tool'
-import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/formatRules'
-import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur, formatElement, setEditorDomObserve, removeIllegalDoms, removeEditorDomObserve } from './core/operation'
+import { handleNotStackBlock, handleInblockWithOther, handleInlineChildrenNotInblock, breakFormat, mergeWithBrotherElement, mergeWithParentElement, mergeWithSpaceTextElement } from './core/rules'
+import { checkStack, setRecentlyPoint, emptyDefaultBehaviorInblock, setRangeInVisible, handleStackEmpty, formatElement, setEditorDomObserve, removeIllegalDoms, removeEditorDomObserve } from './core/operation'
+import { handleSelectionChange, handleBeforeInput, handleChineseInput, handleKeyboard, handleCopy, handleCut, handlePaste, handleDragDrop, handleFocus, handleBlur } from './core/eventHandler'
 import { getDifferentMarks, getDifferentStyles, patch } from './core/diff'
 
 /**
