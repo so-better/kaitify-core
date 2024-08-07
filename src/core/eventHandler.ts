@@ -4,7 +4,7 @@ import { data as DapData } from 'dap-util'
 import { isContains } from './tool'
 import { isUndo, isRedo } from './keyboard'
 import { AlexEditor } from '../Editor'
-import { doPaste, setClipboardData } from './operation'
+import { doPaste, setClipboardData } from './function'
 
 /**
  * 监听selection改变
