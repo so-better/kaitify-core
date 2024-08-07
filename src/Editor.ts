@@ -1055,11 +1055,22 @@ export class AlexEditor {
 			removeIllegalDoms.apply(this)
 			//使用diff算法进行新旧stack比对，遍历比对的结果进行动态格式化
 			patch(this.stack, this.__oldStack, false).forEach(item => {
-				//只要存在newElement都是在新Stack中有影响的
+				//进行格式化的元素
+				let el: AlexElement | null = null
+				//有新元素表示insert、update、replace、move和empty
 				if (item.newElement) {
-					//获取元素的父元素，如果元素是根级元素则使用自身
-					const el = item.newElement!.parent ? item.newElement!.parent : item.newElement!
-					//进行格式化
+					//如果存在父元素则对父元素进行格式化处理，否则对自身进行处理
+					el = item.newElement!.parent ? item.newElement!.parent : item.newElement!
+				}
+				//没有新元素但是有旧元素，表示remove
+				else if (item.oldElement && item.oldElement!.parent) {
+					//根据父元素获取新数组中的父元素
+					const parent = getElementByKey(item.oldElement!.parent.key, this.stack)
+					//如果存在则对新数组中的父元素进行格式化处理
+					el = parent ? parent : null
+				}
+				//判断el是否有值进行格式化处理
+				if (el) {
 					renderRules.forEach(fn => {
 						formatElement.apply(this, [el, fn, el.parent ? el.parent.children! : this.stack])
 					})

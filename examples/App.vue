@@ -12,8 +12,8 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<pre><br/></pre><p><br/></p><a href="#">this is a link</a>`,
-		allowPasteHtml: false,
+		value: `<p>3333</p><p>44<span style="color:#f30;">2222</span>44</p>`,
+		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
 	let t = 0
@@ -34,9 +34,7 @@ onMounted(() => {
 })
 
 const insert = () => {
-	const arr = editor.value!.parseHtml('<div>1111\r\n22222\r\n3333</div>')
-	editor.value!.insertElement(arr[0])
-
+	editor.value!.stack[1].children!.splice(1, 1)
 	editor.value!.domRender()
 	editor.value!.rangeRender()
 }

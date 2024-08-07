@@ -58,37 +58,27 @@ export const patch = (newElements: AlexElement[], oldElements: (AlexElement | un
 			}
 			//起点新指针对应的元素与终点旧指针对应的元素，如果key一致，说明进行了移动
 			else if (newElements[newStartIndex].key == oldElements[oldEndIndex]!.key) {
-				//同级内移动不影响格式化
-				if (forRender) {
-					result.push(
-						{
-							type: 'move',
-							newElement: newElements[newStartIndex],
-							oldElement: oldElements[oldEndIndex]
-						},
-						...patchElement(newElements[newStartIndex], oldElements[oldEndIndex]!, forRender)
-					)
-				} else {
-					result.push(...patchElement(newElements[newStartIndex], oldElements[oldEndIndex]!, forRender))
-				}
+				result.push(
+					{
+						type: 'move',
+						newElement: newElements[newStartIndex],
+						oldElement: oldElements[oldEndIndex]
+					},
+					...patchElement(newElements[newStartIndex], oldElements[oldEndIndex]!, forRender)
+				)
 				newStartIndex++
 				oldEndIndex--
 			}
 			//终点新指针对应的元素与起点旧指针对应的元素，如果key一致，则进行比对
 			else if (newElements[newEndIndex].key == oldElements[oldStartIndex]!.key) {
-				//同级内移动不影响格式化
-				if (forRender) {
-					result.push(
-						{
-							type: 'move',
-							newElement: newElements[newEndIndex],
-							oldElement: oldElements[oldStartIndex]
-						},
-						...patchElement(newElements[newEndIndex], oldElements[oldStartIndex]!, forRender)
-					)
-				} else {
-					result.push(...patchElement(newElements[newEndIndex], oldElements[oldStartIndex]!, forRender))
-				}
+				result.push(
+					{
+						type: 'move',
+						newElement: newElements[newEndIndex],
+						oldElement: oldElements[oldStartIndex]
+					},
+					...patchElement(newElements[newEndIndex], oldElements[oldStartIndex]!, forRender)
+				)
 				newEndIndex--
 				oldStartIndex++
 			}
@@ -98,19 +88,14 @@ export const patch = (newElements: AlexElement[], oldElements: (AlexElement | un
 				let idxInOld = oldElements.findIndex(el => el && el.key === newElements[newStartIndex].key)
 				//存在同key元素
 				if (idxInOld >= 0) {
-					//同级内移动不影响格式化
-					if (forRender) {
-						result.push(
-							{
-								type: 'move',
-								newElement: newElements[newStartIndex],
-								oldElement: oldElements[idxInOld]
-							},
-							...patchElement(newElements[newStartIndex], oldElements[idxInOld]!, forRender)
-						)
-					} else {
-						result.push(...patchElement(newElements[newStartIndex], oldElements[idxInOld]!, forRender))
-					}
+					result.push(
+						{
+							type: 'move',
+							newElement: newElements[newStartIndex],
+							oldElement: oldElements[idxInOld]
+						},
+						...patchElement(newElements[newStartIndex], oldElements[idxInOld]!, forRender)
+					)
 					//此时将元素置为undefined表示元素已处理过
 					oldElements[idxInOld] = undefined
 				} else {
@@ -134,16 +119,13 @@ export const patch = (newElements: AlexElement[], oldElements: (AlexElement | un
 			}
 			//新指针遍历结束
 			else if (newStartIndex > newEndIndex) {
-				//如果是格式化，不需要知道remove差异
-				if (forRender) {
-					//旧指针还没结束，则是需要移除的，进行处理
-					for (; oldStartIndex <= oldEndIndex; oldStartIndex++) {
-						if (oldElements[oldStartIndex]) {
-							result.push({
-								type: 'remove',
-								oldElement: oldElements[oldStartIndex]
-							})
-						}
+				//旧指针还没结束，则是需要移除的，进行处理
+				for (; oldStartIndex <= oldEndIndex; oldStartIndex++) {
+					if (oldElements[oldStartIndex]) {
+						result.push({
+							type: 'remove',
+							oldElement: oldElements[oldStartIndex]
+						})
 					}
 				}
 			}
@@ -156,15 +138,12 @@ export const patch = (newElements: AlexElement[], oldElements: (AlexElement | un
 			}
 		})
 	} else if (oldElements.length) {
-		//如果是格式化不需要知道remove差异
-		if (forRender) {
-			result = oldElements.map(el => {
-				return {
-					type: 'remove',
-					oldElement: el
-				}
-			})
-		}
+		result = oldElements.map(el => {
+			return {
+				type: 'remove',
+				oldElement: el
+			}
+		})
 	}
 	return result
 }
