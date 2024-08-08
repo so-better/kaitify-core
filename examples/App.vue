@@ -12,7 +12,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<p>3333</p><p>44<span style="color:#f30;">2222</span>44</p>`,
+		value: `<table><tr><td><img src="#" /></td></tr></table><p>33333</p><ol><li>444444</li></ol><p>4444</p>`,
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
@@ -29,13 +29,11 @@ onMounted(() => {
 		console.log(`渲染耗时：${t2 - t}ms`)
 	})
 	editor.value.domRender()
-
-	//editor.value.rangeRender()
 })
 
 const insert = () => {
-	editor.value!.stack[1].children!.splice(1, 1)
-	editor.value!.domRender()
+	editor.value.range.anchor.moveToEnd(editor.value.stack[0])
+	editor.value.range.focus.moveToEnd(editor.value.stack[0])
 	editor.value!.rangeRender()
 }
 </script>

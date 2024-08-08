@@ -218,10 +218,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	delete() {
-		if (this.disabled) {
-			return
-		}
-		if (!this.range) {
+		if (this.disabled || !this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -238,22 +235,20 @@ export class AlexEditor {
 				if (this.range.anchor.offset == 0) {
 					//前一个可设置光标的元素存在
 					if (previousElement) {
-						//如果光标不在内部块元素的开始处
+						//如果前一个可设置光标的元素也在内部块元素内，则说明现在光标所在位置不是内部块元素的开始处
 						if (inblock.isContains(previousElement)) {
 							this.range.anchor.moveToEnd(previousElement)
 							this.range.focus.moveToEnd(previousElement)
 							this.delete()
 							return
 						}
-						//如果光标在内部块元素的开始处并且行为值为block
+						//光标在行为值是block的内部块元素开始处
 						else if (inblock.behavior == 'block') {
 							const previousBlock = previousElement.getBlock()
 							const previousInblock = previousElement.getInblock()
-							//前一个可获取焦点的元素在内部块内部，并且它的行为值是block，则进行合并操作
+							//前一个可获取焦点的元素在另一个内部块中，则将此内部块与另一个内部块合并
 							if (previousInblock) {
-								if (previousInblock.behavior == 'block') {
-									this.merge(inblock, previousInblock)
-								}
+								this.merge(inblock, previousInblock)
 							}
 							//不在内部块内部则合并根级块元素
 							else {
@@ -271,18 +266,23 @@ export class AlexEditor {
 				else {
 					//如果光标在空白元素文本内
 					if (this.range.anchor.element.isSpaceText()) {
+						//先清除空白文本元素
 						this.range.anchor.element.toEmpty()
+						//清除空白文本元素后如果内部块元素变成了空元素则新建换行符
 						if (inblock.isEmpty()) {
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, inblock)
 							this.range.anchor.moveToStart(breakEl)
 							this.range.focus.moveToStart(breakEl)
-						} else {
+						}
+						//如果内部块元素不是空元素，则将光标设置到空白文本元素前面
+						else {
 							this.range.anchor.offset = 0
 							this.range.focus.offset = 0
-							this.delete()
-							return
 						}
+						//继续执行删除
+						this.delete()
+						return
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
@@ -318,20 +318,18 @@ export class AlexEditor {
 						this.range.anchor.element.toEmpty()
 						//如果所在的内部块元素为空
 						if (inblock.isEmpty()) {
-							//如果删除的不是换行符或者内部块的行为值是默认的，则创建换行符
-							if (!isBreak || inblock.behavior == 'default') {
+							//第一种情况：如果删除的不是换行符
+							//第二种情况：如果是换行符但是前一个可以设置光标的元素不存在，此刻光标内部块的开始处，也在编辑器的开始处，且内部块为空了
+							if (!isBreak || !previousElement) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, inblock)
 								this.range.anchor.moveToStart(breakEl)
 								this.range.focus.moveToStart(breakEl)
-							}
-							//删除的是换行符并且内部块的行为值是block，但是前一个可以获取焦点的元素不存在
-							else if (!previousElement) {
-								//此刻光标在内部块的开始处，也在编辑器的开始处，且内部块为空了
-								const breakEl = new AlexElement('closed', 'br', null, null, null)
-								this.addElementTo(breakEl, inblock)
-								this.range.anchor.moveToStart(breakEl)
-								this.range.focus.moveToStart(breakEl)
+								//如果是换行符再执行一次删除，此时会触发deleteInStart
+								if (isBreak) {
+									this.delete()
+									return
+								}
 							}
 						}
 					}
@@ -343,7 +341,7 @@ export class AlexEditor {
 				if (this.range.anchor.offset == 0) {
 					//前一个可设置光标的元素存在
 					if (previousElement) {
-						//如果光标不在根级块元素的开始处
+						//如果前一个可设置光标的元素在此根级块内，则表示当前光标所在元素不是根级块元素的开始处，则将光标移动到前一个可设置光标的元素的末尾处再执行一次删除
 						if (block.isContains(previousElement)) {
 							this.range.anchor.moveToEnd(previousElement)
 							this.range.focus.moveToEnd(previousElement)
@@ -352,14 +350,13 @@ export class AlexEditor {
 						}
 						//如果光标在根级块元素的开始处
 						else {
+							//获取前一个可获取光标的元素所在的内部块元素
 							const previousInblock = previousElement.getInblock()
+							//获取前一个可获取光标的元素所在的根级块元素
 							const previousBlock = previousElement.getBlock()
-							//如果前一个可设置光标的元素在内部块内并且它的行为值是block，则进行合并
+							//前一个可获取焦点的元素在内部块中，则将此根级块与内部块合并
 							if (previousInblock) {
-								if (previousInblock.behavior == 'block') {
-									//将根级块元素与内部块元素进行合并
-									this.merge(block, previousInblock)
-								}
+								this.merge(block, previousInblock)
 							}
 							//如果前一个可设置光标的元素不在内部块内，则进行根级块元素的合并操作
 							else {
@@ -377,18 +374,23 @@ export class AlexEditor {
 				else {
 					//如果光标在空白元素文本内
 					if (this.range.anchor.element.isSpaceText()) {
+						//清除空白文本元素
 						this.range.anchor.element.toEmpty()
+						//在清除空白文本元素后判断根级块元素是否为空，是则建立换行符占位
 						if (block.isEmpty()) {
 							const breakEl = new AlexElement('closed', 'br', null, null, null)
 							this.addElementTo(breakEl, block)
 							this.range.anchor.moveToStart(breakEl)
 							this.range.focus.moveToStart(breakEl)
-						} else {
+						}
+						//如果根级块元素不是空，则光标移动到空白元素之前
+						else {
 							this.range.anchor.offset = 0
 							this.range.focus.offset = 0
-							this.delete()
-							return
 						}
+						//继续进行删除
+						this.delete()
+						return
 					}
 					//如果光标在文本元素内
 					else if (this.range.anchor.element.isText()) {
@@ -431,6 +433,11 @@ export class AlexEditor {
 								this.addElementTo(breakEl, block)
 								this.range.anchor.moveToStart(breakEl)
 								this.range.focus.moveToStart(breakEl)
+								//如果是换行符再执行一次删除，此时会触发deleteInStart
+								if (isBreak) {
+									this.delete()
+									return
+								}
 							}
 						}
 					}
@@ -462,6 +469,7 @@ export class AlexEditor {
 					else {
 						item.element.toEmpty()
 					}
+					//如果该内部块变成了空元素
 					if (anchorInblock.isEmpty()) {
 						const breakEl = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEl, anchorInblock)
@@ -477,10 +485,14 @@ export class AlexEditor {
 					}
 					//不存在offset说明全在选区内
 					else {
+						//如果是行为值为default的内部块元素则清空该内部块
 						if (item.element.isInblock() && item.element.behavior == 'default') {
 							emptyDefaultBehaviorInblock.apply(this, [item.element])
-						} else {
+						}
+						//否则置空该元素
+						else {
 							item.element.toEmpty()
+							//判断元素的父元素是否为空，创建占位符
 							if (item.element.parent && (item.element.parent.isInblock() || item.element.parent.isBlock()) && item.element.parent.isEmpty()) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, item.element.parent)
@@ -488,8 +500,8 @@ export class AlexEditor {
 						}
 					}
 				})
-				//如果两个内部块的行为值都是block，则合并
-				if (anchorInblock.behavior == 'block' && focusInblock.behavior == 'block') {
+				//如果终点所在内部块元素的行为值都是block，则进行合并
+				if (focusInblock.behavior == 'block') {
 					this.merge(focusInblock, anchorInblock)
 				}
 			}
@@ -502,10 +514,14 @@ export class AlexEditor {
 					}
 					//不存在offset说明全在选区内
 					else {
+						//如果是行为值为default的内部块元素则清空该内部块
 						if (item.element.isInblock() && item.element.behavior == 'default') {
 							emptyDefaultBehaviorInblock.apply(this, [item.element])
-						} else {
+						}
+						//否则置空该元素
+						else {
 							item.element.toEmpty()
+							//判断元素的父元素是否为空，创建占位符
 							if (item.element.parent && (item.element.parent.isInblock() || item.element.parent.isBlock()) && item.element.parent.isEmpty()) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, item.element.parent)
@@ -513,10 +529,8 @@ export class AlexEditor {
 						}
 					}
 				})
-				//如果起点所在内部块的行为值是block则合并
-				if (anchorInblock.behavior == 'block') {
-					this.merge(focusBlock, anchorInblock)
-				}
+				//将终点所在根级块元素与起点所在内部块元素进行合并
+				this.merge(focusBlock, anchorInblock)
 			}
 			//终点在内部块中，起点不在内部块中
 			else if (focusInblock) {
@@ -527,10 +541,14 @@ export class AlexEditor {
 					}
 					//不存在offset说明全在选区内
 					else {
+						//如果是行为值为default的内部块元素则清空该内部块
 						if (item.element.isInblock() && item.element.behavior == 'default') {
 							emptyDefaultBehaviorInblock.apply(this, [item.element])
-						} else {
+						}
+						//否则置空该元素
+						else {
 							item.element.toEmpty()
+							//判断元素的父元素是否为空，创建占位符
 							if (item.element.parent && (item.element.parent.isInblock() || item.element.parent.isBlock()) && item.element.parent.isEmpty()) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, item.element.parent)
@@ -554,6 +572,7 @@ export class AlexEditor {
 					else {
 						item.element.toEmpty()
 					}
+					//如果所在根级块元素是空元素则进行占位
 					if (anchorBlock.isEmpty()) {
 						const breakEl = new AlexElement('closed', 'br', null, null, null)
 						this.addElementTo(breakEl, anchorBlock)
@@ -569,10 +588,14 @@ export class AlexEditor {
 					}
 					//不存在offset说明全在选区内
 					else {
+						//如果是行为值为default的内部块元素则清空该内部块
 						if (item.element.isInblock() && item.element.behavior == 'default') {
 							emptyDefaultBehaviorInblock.apply(this, [item.element])
-						} else {
+						}
+						//否则置空该元素
+						else {
 							item.element.toEmpty()
+							//判断元素的父元素是否为空，创建占位符
 							if (item.element.parent && (item.element.parent.isInblock() || item.element.parent.isBlock()) && item.element.parent.isEmpty()) {
 								const breakEl = new AlexElement('closed', 'br', null, null, null)
 								this.addElementTo(breakEl, item.element.parent)
@@ -580,6 +603,7 @@ export class AlexEditor {
 						}
 					}
 				})
+				//根级块进行合并
 				this.merge(focusBlock, anchorBlock)
 			}
 		}
@@ -602,10 +626,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertText(data: string) {
-		if (this.disabled) {
-			return
-		}
-		if (!this.range) {
+		if (this.disabled || !this.range) {
 			return
 		}
 		if (!data || typeof data != 'string') {
@@ -652,10 +673,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertParagraph() {
-		if (this.disabled) {
-			return
-		}
-		if (!this.range) {
+		if (this.disabled || !this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -795,10 +813,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertElement(ele: AlexElement, cover: boolean | undefined = true) {
-		if (this.disabled) {
-			return
-		}
-		if (!this.range) {
+		if (this.disabled || !this.range) {
 			return
 		}
 		if (!AlexElement.isElement(ele)) {
