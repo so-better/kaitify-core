@@ -13,7 +13,7 @@ export type AlexElementCreateConfigType = {
     marks?: ObjectType | null;
     styles?: ObjectType | null;
     children?: AlexElementCreateConfigType[] | null;
-    textcontent?: string | null;
+    textContent?: string | null;
     behavior?: 'default' | 'block';
     namespace?: string | null;
     locked?: boolean;

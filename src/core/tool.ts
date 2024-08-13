@@ -14,17 +14,13 @@ export type ObjectType = {
  */
 export type EditorOptionsType = {
 	/**
-	 * 是否禁用
-	 */
-	disabled?: boolean
-	/**
-	 * 自定义渲染规则
-	 */
-	renderRules?: ((element: AlexElement) => void)[]
-	/**
 	 * 编辑器的默认html值
 	 */
 	value?: string
+	/**
+	 * 是否禁用
+	 */
+	disabled?: boolean
 	/**
 	 * 是否允许复制
 	 */
@@ -41,6 +37,14 @@ export type EditorOptionsType = {
 	 * 是否允许粘贴html
 	 */
 	allowPasteHtml?: boolean
+	/**
+	 * dom转为非文本元素时需要额外保留处理的标签数组
+	 */
+	extraKeepTags?: string[]
+	/**
+	 * 自定义渲染规则
+	 */
+	renderRules?: ((element: AlexElement) => void)[]
 	/**
 	 * 自定义纯文本粘贴方法
 	 */
@@ -69,10 +73,6 @@ export type EditorOptionsType = {
 	 * 自定义dom转为非文本元素的后续处理逻辑
 	 */
 	customParseNode?: ((el: AlexElement) => AlexElement) | null
-	/**
-	 * dom转为非文本元素时需要额外保留处理的标签数组
-	 */
-	extraKeepTags?: string[]
 }
 
 /**
@@ -205,31 +205,28 @@ export const initEditorNode = function (node: HTMLElement | string) {
  */
 export const initEditorOptions = function (options: EditorOptionsType) {
 	const opts: EditorOptionsType = {
-		disabled: false,
-		renderRules: [],
 		value: '',
+		disabled: false,
 		allowCopy: true,
 		allowPaste: true,
 		allowCut: true,
 		allowPasteHtml: false,
+		extraKeepTags: [],
+		renderRules: [],
 		customTextPaste: null,
 		customHtmlPaste: null,
 		customImagePaste: null,
 		customVideoPaste: null,
 		customFilePaste: null,
 		customMerge: null,
-		customParseNode: null,
-		extraKeepTags: []
+		customParseNode: null
 	}
 	if (DapCommon.isObject(options)) {
-		if (typeof options.disabled == 'boolean') {
-			opts.disabled = options.disabled
-		}
-		if (Array.isArray(options.renderRules)) {
-			opts.renderRules = options.renderRules
-		}
 		if (typeof options.value == 'string' && options.value) {
 			opts.value = options.value
+		}
+		if (typeof options.disabled == 'boolean') {
+			opts.disabled = options.disabled
 		}
 		if (typeof options.allowCopy == 'boolean') {
 			opts.allowCopy = options.allowCopy
@@ -242,6 +239,12 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		}
 		if (typeof options.allowPasteHtml == 'boolean') {
 			opts.allowPasteHtml = options.allowPasteHtml
+		}
+		if (Array.isArray(options.extraKeepTags)) {
+			opts.extraKeepTags = options.extraKeepTags
+		}
+		if (Array.isArray(options.renderRules)) {
+			opts.renderRules = options.renderRules
 		}
 		if (typeof options.customTextPaste == 'function') {
 			opts.customTextPaste = options.customTextPaste
@@ -263,9 +266,6 @@ export const initEditorOptions = function (options: EditorOptionsType) {
 		}
 		if (typeof options.customParseNode == 'function') {
 			opts.customParseNode = options.customParseNode
-		}
-		if (Array.isArray(options.extraKeepTags)) {
-			opts.extraKeepTags = options.extraKeepTags
 		}
 	}
 	return opts

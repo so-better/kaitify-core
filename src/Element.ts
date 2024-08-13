@@ -15,7 +15,7 @@ export type AlexElementCreateConfigType = {
 	marks?: ObjectType | null
 	styles?: ObjectType | null
 	children?: AlexElementCreateConfigType[] | null
-	textcontent?: string | null
+	textContent?: string | null
 	behavior?: 'default' | 'block'
 	namespace?: string | null
 	locked?: boolean
@@ -588,7 +588,7 @@ export class AlexElement {
 		let el: AlexElement | null = null
 		//处理文本元素
 		if (elementConfig.type == 'text') {
-			el = new AlexElement(elementConfig.type, null, elementConfig.marks ? elementConfig.marks : null, elementConfig.styles ? elementConfig.styles : null, elementConfig.textcontent ? elementConfig.textcontent : null)
+			el = new AlexElement(elementConfig.type, null, elementConfig.marks ? elementConfig.marks : null, elementConfig.styles ? elementConfig.styles : null, elementConfig.textContent ? elementConfig.textContent : null)
 		}
 		//其他元素
 		else {

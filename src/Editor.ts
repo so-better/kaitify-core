@@ -218,7 +218,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	delete() {
-		if (this.disabled || !this.range) {
+		if (!this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -626,7 +626,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertText(data: string) {
-		if (this.disabled || !this.range) {
+		if (!this.range) {
 			return
 		}
 		if (!data || typeof data != 'string') {
@@ -673,7 +673,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertParagraph() {
-		if (this.disabled || !this.range) {
+		if (!this.range) {
 			return
 		}
 		//起点和终点在一起
@@ -813,7 +813,7 @@ export class AlexEditor {
 	 * @returns
 	 */
 	insertElement(ele: AlexElement, cover: boolean | undefined = true) {
-		if (this.disabled || !this.range) {
+		if (!this.range) {
 			return
 		}
 		if (!AlexElement.isElement(ele)) {
@@ -1926,9 +1926,6 @@ export class AlexEditor {
 	 * @returns
 	 */
 	collapseToStart(element?: AlexElement) {
-		if (this.disabled) {
-			return
-		}
 		//range是否为null的标识
 		let rangeIsNull = false
 		//如果range为null
@@ -1966,9 +1963,6 @@ export class AlexEditor {
 	 * @returns
 	 */
 	collapseToEnd(element?: AlexElement) {
-		if (this.disabled) {
-			return
-		}
 		//range是否为null的标识
 		let rangeIsNull = false
 		//如果range为null

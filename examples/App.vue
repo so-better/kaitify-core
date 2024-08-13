@@ -1,7 +1,14 @@
 <template>
 	<div style="padding: 20px">
-		<div id="editor"></div>
-		<button @click="insert">插入一个段落</button>
+		<div tabindex="0" id="editor"></div>
+		<div>
+			<button @click="editor?.insertParagraph(), editor?.domRender(), editor?.rangeRender()">换行</button>
+			<button @click="insert">插入元素</button>
+			<button @click="editor?.insertText('hello，我是插入的文本'), editor?.domRender(), editor?.rangeRender()">插入文本</button>
+			<button @click="editor?.delete(), editor?.domRender(), editor?.rangeRender()">删除</button>
+			<button @click="editor?.collapseToEnd(), editor?.rangeRender()">光标移动到底部</button>
+			<button @click="editor?.collapseToStart(), editor?.rangeRender()">光标移动到头部</button>
+		</div>
 	</div>
 </template>
 <script lang="ts" setup>
@@ -12,15 +19,12 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		value: `<table><tr><td><img src="#" /></td></tr></table><p>33333</p><ol><li>444444</li></ol><p>4444</p>`,
+		disabled: true,
+		value: `<p>33333</p><ol><li>444444</li></ol><p>4444</p>`,
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
 	})
 	let t = 0
-	// editor.value.on('change', (newVal, oldVal) => {
-	// 	console.log(newVal)
-	// 	console.log(oldVal)
-	// })
 	editor.value.on('beforeRender', () => {
 		t = Date.now()
 	})
@@ -32,8 +36,19 @@ onMounted(() => {
 })
 
 const insert = () => {
-	editor.value.range.anchor.moveToEnd(editor.value.stack[0])
-	editor.value.range.focus.moveToEnd(editor.value.stack[0])
+	editor.value!.insertElement(
+		AlexElement.create({
+			type: 'block',
+			parsedom: 'h1',
+			children: [
+				{
+					type: 'text',
+					textContent: '当前系统时间：' + new Date().toLocaleDateString()
+				}
+			]
+		})
+	)
+	editor.value!.domRender()
 	editor.value!.rangeRender()
 }
 </script>
@@ -115,5 +130,9 @@ body {
 pre {
 	background-color: #f7f8fa;
 	padding: 10px;
+}
+
+button + button {
+	margin-left: 10px;
 }
 </style>

@@ -98,15 +98,16 @@ export const handleSelectionChange = function (this: AlexEditor) {
  */
 export const handleBeforeInput = function (this: AlexEditor, e: Event) {
 	const event = e as InputEvent
-	if (this.disabled) {
-		return
-	}
 	//以下输入类型不进行处理
 	if (event.inputType == 'deleteByCut' || event.inputType == 'insertFromPaste' || event.inputType == 'deleteByDrag' || event.inputType == 'insertFromDrop') {
 		return
 	}
 	//禁用系统默认行为
 	event.preventDefault()
+	//如果是禁用状态
+	if (this.disabled) {
+		return
+	}
 	//插入文本
 	if (event.inputType == 'insertText' && event.data) {
 		this.insertText(event.data!)
@@ -134,11 +135,11 @@ export const handleBeforeInput = function (this: AlexEditor, e: Event) {
  * @returns
  */
 export const handleChineseInput = function (this: AlexEditor, e: Event) {
+	const event = e as InputEvent
+	event.preventDefault()
 	if (this.disabled) {
 		return
 	}
-	const event = e as InputEvent
-	event.preventDefault()
 	if (event.type == 'compositionstart') {
 		//每次开始输入中文时先清除延时器
 		if (this.__chineseInputTimer) {
@@ -168,9 +169,6 @@ export const handleChineseInput = function (this: AlexEditor, e: Event) {
  * @returns
  */
 export const handleKeyboard = function (this: AlexEditor, e: Event) {
-	if (this.disabled) {
-		return
-	}
 	if (this.__isInputChinese) {
 		return
 	}
