@@ -8,6 +8,7 @@
 			<button @click="editor?.delete(), editor?.domRender(), editor?.rangeRender()">删除</button>
 			<button @click="editor?.collapseToEnd(), editor?.rangeRender()">光标移动到底部</button>
 			<button @click="editor?.collapseToStart(), editor?.rangeRender()">光标移动到头部</button>
+			<button @click="editor?.range?.anchor.moveToStart(editor.stack[0]), editor?.range?.focus.moveToEnd(editor.stack[editor.stack.length - 1]), editor?.rangeRender()">全选</button>
 		</div>
 	</div>
 </template>

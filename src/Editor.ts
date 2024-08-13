@@ -1200,10 +1200,6 @@ export class AlexEditor {
 	 */
 	rangeRender() {
 		return new Promise<void>(resolve => {
-			//如果编辑器被禁用则无法设置真实光标
-			if (this.disabled) {
-				return resolve()
-			}
 			const selection = window.getSelection()
 			//selection不存在则无法设置真实光标
 			if (!selection) {
