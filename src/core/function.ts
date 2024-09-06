@@ -159,10 +159,7 @@ export const setEditorDomObserve = function (this: AlexEditor) {
 	if (!window.MutationObserver) {
 		console.warn('The current browser does not support MutationObserver')
 	}
-	if (this.__domObserver) {
-		this.__domObserver.disconnect()
-		this.__domObserver = null
-	}
+	removeEditorDomObserve.apply(this)
 	this.__domObserver = new MutationObserver(mutationList => {
 		let length = mutationList.length
 		for (let i = 0; i < length; i++) {

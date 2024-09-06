@@ -20,7 +20,7 @@ const editor = ref<AlexEditor | null>(null)
 
 onMounted(() => {
 	editor.value = new AlexEditor('#editor', {
-		disabled: true,
+		disabled: false,
 		value: `<p>33333</p><ol><li>444444</li></ol><p>4444</p>`,
 		allowPasteHtml: true,
 		extraKeepTags: ['svg', 'circle']
