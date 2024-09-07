@@ -1,5 +1,4 @@
 import { AlexEditor } from '../Editor';
-
 /**
  * 监听selection改变
  * @param this

@@ -1,7 +1,10 @@
+/**
+ * 这里存放和编辑器实例相关的封装函数，供外部使用
+ * 这些函数都重新定义了this，指向编辑器实例
+ */
 import { AlexElement } from '../Element';
 import { AlexPoint } from '../Point';
 import { AlexEditor, AlexElementRangeType } from '../Editor';
-
 /**
  * 获取选区内的元素转为html和text塞入剪切板并返回
  * @param this

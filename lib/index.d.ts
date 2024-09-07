@@ -8,4 +8,4 @@ export type * from './Element';
 export type * from './History';
 export type * from './core/tool';
 export type * from './core/nodeParse';
-export declare const version = "1.5.0";
+export declare const version = "1.5.1";

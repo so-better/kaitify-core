@@ -1,5 +1,4 @@
 import { AlexElement } from './Element';
-
 export declare class AlexPoint {
     /**
      * 虚拟光标对应的元素
