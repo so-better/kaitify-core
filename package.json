@@ -1,11 +1,11 @@
 {
-	"name": "kaitify",
+	"name": "@kaitify/core",
 	"version": "0.0.1",
 	"private": false,
 	"type": "module",
 	"author": "so-better",
-	"main": "lib/kaitify.umd.js",
-	"module": "lib/kaitify.es.js",
+	"main": "lib/kaitify-core.umd.js",
+	"module": "lib/kaitify-core.es.js",
 	"types": "lib/index.d.ts",
 	"license": "MIT",
 	"description": "基于原生JS的富文本编辑器核心库",
@@ -36,6 +36,6 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/so-better/kaitify"
+		"url": "https://github.com/so-better/kaitify-core"
 	}
 }

@@ -11,8 +11,8 @@ export default defineConfig({
 		minify: 'terser',
 		lib: {
 			entry: path.resolve(__dirname, 'src/index.ts'),
-			name: 'kaitify',
-			fileName: format => `kaitify.${format}.js`
+			name: 'kaitify-core',
+			fileName: format => `kaitify-core.${format}.js`
 		},
 		rollupOptions: {
 			// 确保外部化处理那些你不想打包进库的依赖
