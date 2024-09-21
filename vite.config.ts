@@ -11,8 +11,8 @@ export default defineConfig({
 		minify: 'terser',
 		lib: {
 			entry: path.resolve(__dirname, 'src/index.ts'),
-			name: 'AlexEditor',
-			fileName: format => `alex-editor.${format}.js`
+			name: 'kaitify',
+			fileName: format => `kaitify.${format}.js`
 		},
 		rollupOptions: {
 			// 确保外部化处理那些你不想打包进库的依赖
