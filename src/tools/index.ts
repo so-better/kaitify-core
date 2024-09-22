@@ -1,6 +1,6 @@
 import { data as DapData, element as DapElement } from 'dap-util'
-import { KNodeMarksType, KNodeStylesType } from '../model/KNode'
-import { NODE_MARK } from '../view/core'
+import { KNodeMarksType, KNodeStylesType } from '../model'
+import { NODE_MARK } from '../view'
 /**
  * 用于KNode生成唯一的key
  */

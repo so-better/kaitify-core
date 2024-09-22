@@ -8,8 +8,8 @@ import { formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge,
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
-import { NODE_MARK } from '../view/core'
-import { defaultUpdateViewFunction } from '../view/js-render'
+import { NODE_MARK } from '../view'
+import { defaultUpdateView } from '../view/js-render'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -1826,7 +1826,7 @@ export class Editor {
 		const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [false]) : true
 		//使用默认逻辑
 		if (useDefault) {
-			defaultUpdateViewFunction.apply(this, [false])
+			defaultUpdateView.apply(this, [false])
 		}
 		//新的html值
 		const newHtml = this.$el.innerHTML
@@ -2154,7 +2154,7 @@ export class Editor {
 		const useDefault = typeof editor.onUpdateView == 'function' ? await editor.onUpdateView.apply(editor, [true]) : true
 		//使用默认逻辑
 		if (useDefault) {
-			defaultUpdateViewFunction.apply(editor, [true])
+			defaultUpdateView.apply(editor, [true])
 		}
 		//初始设置历史记录
 		editor.history.setState(editor.stackNodes, editor.selection)

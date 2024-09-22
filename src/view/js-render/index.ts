@@ -1,6 +1,6 @@
-import { Editor } from '../../model/Editor'
+import { Editor } from '../../model'
 import { camelToKebab } from '../../tools'
-import { getNodeRenderOptions, KNodeRenderOptionsType } from '../core'
+import { getNodeRenderOptions, KNodeRenderOptionsType } from '../index'
 import { getDifferentMarks, getDifferentStyles, patchNodes } from './dom-patch'
 
 /**
@@ -32,7 +32,7 @@ export const renderNode = (editor: Editor, opts: KNodeRenderOptionsType) => {
 /**
  * 默认的原生js渲染编辑器视图层
  */
-export const defaultUpdateViewFunction = function (this: Editor, init: boolean) {
+export const defaultUpdateView = function (this: Editor, init: boolean) {
 	if (!this.$el) {
 		return
 	}
