@@ -1468,7 +1468,7 @@ export class Editor {
 					this.onInsertParagraph.apply(this, [blockNode, blockNode])
 				}
 			}
-			//在非代码块样式内，且行为是可以删除和换行的
+			//在非代码块样式内，且不是固定的块节点
 			else if (!blockNode.fixed) {
 				//光标在块节点的起始处
 				if (firstSelectionNode.isEqual(node) && offset == 0) {

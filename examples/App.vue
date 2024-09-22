@@ -6,7 +6,7 @@
 			<button @click="onInsertNode">插入节点</button>
 			<button @click="onInsertDom">直接插入dom</button>
 		</div>
-		<div id="editor"></div>
+		<div id="editor" style="height: 400px;"</div>
 	</div>
 </template>
 <script lang="ts" setup>
@@ -49,7 +49,7 @@ const onInsertDom = () => {
 
 onMounted(async () => {
 	editor.value = await Editor.configure({
-		value: `<p data-kaitify-node="ss" style="line-height:20px;">天苍苍，水茫茫</p><ol><li>hello</li><li>我的名字是凌凯</li></ol><p style="line-height:20px;">一行白鹭上青天</p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td style="background:red;"><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p style="line-height:20px;">一行白鹭上青天</p>`,
+		value: `<h1>我是一个段落</h1><h2>我是一个段落</h2><h3>我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p>`,
 		el: '#editor',
 		allowPasteHtml: true,
 		allowPaste: true,
