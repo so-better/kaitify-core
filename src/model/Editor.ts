@@ -151,6 +151,10 @@ export type EditorConfigureOptionType = {
 	 */
 	autofocus?: boolean
 	/**
+	 * 是否使用默认css样式
+	 */
+	useDefaultCSS?: boolean
+	/**
 	 * 编辑器创建完成后触发的回调，在这里你可以增加额外的处理
 	 */
 	onCreated?: (this: Editor) => void
@@ -2110,6 +2114,8 @@ export class Editor {
 		const editor = new Editor()
 		//初始化编辑器dom
 		editor.$el = initEditorDom(options.el)
+		//初始化设置编辑器样式
+		if (options.useDefaultCSS !== false) editor.$el.className = 'Kaitify'
 		//初始化内部属性
 		if (typeof options.allowCopy == 'boolean') editor.allowCopy = options.allowCopy
 		if (typeof options.allowCut == 'boolean') editor.allowCut = options.allowCut

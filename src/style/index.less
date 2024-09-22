@@ -1,0 +1,91 @@
+@import url(./var.less);
+
+.Kaitify {
+	font-size: @font-size;
+	font-family: @font-family;
+	color: @color;
+	-webkit-font-smoothing: antialiased;
+	text-size-adjust: none;
+	line-height: @line-height;
+	border: 1px solid @border-color;
+	border-radius: @border-radius;
+	padding: @padding;
+	transition: border-color 500ms;
+
+	&:focus {
+		border-color: @theme;
+	}
+
+	::selection {
+		background-color: fade(@theme, 40);
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+		outline: none;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		line-height: @line-height;
+		margin: 0 0 @margin 0 !important;
+
+		&:last-child {
+			margin-bottom: 0 !important;
+		}
+	}
+
+	h1 {
+		font-size: @font-size-heading-1;
+	}
+	h2 {
+		font-size: @font-size-heading-2;
+	}
+	h3 {
+		font-size: @font-size-heading-3;
+	}
+	h4 {
+		font-size: @font-size-heading-4;
+	}
+	h5 {
+		font-size: @font-size-heading-5;
+	}
+	h6 {
+		font-size: @font-size-heading-6;
+	}
+
+	ol,
+	ul {
+		margin: 0 0 @margin 0;
+		padding: 0 0 0 @list-padding;
+
+		li {
+			margin: 0 0 @margin 0;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	table {
+		width: 100%;
+		border: 1px solid @border-color;
+		border-collapse: collapse;
+		margin: 0 0 @margin 0;
+
+		th,
+		td {
+			border: 1px solid @border-color;
+			padding: @padding;
+		}
+	}
+}

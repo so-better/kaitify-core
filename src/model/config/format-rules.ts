@@ -14,9 +14,9 @@ export type RuleFunctionType = (opts: { editor: Editor; node: KNode }) => void
 export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
 	//当前节点存在子节点
 	if (node.hasChildren() && !node.isEmpty()) {
-		//过滤子节点中的空节点
+		//过滤子节点中的空节点和占位符（因为占位符会在存在其他节点时清除，所以不考虑）
 		const nodes = node.children!.filter(item => {
-			return !item.isEmpty()
+			return !item.isEmpty() && !item.isPlaceholder()
 		})
 		//获取子节点中的块节点
 		const blockNodes = nodes.filter(item => {

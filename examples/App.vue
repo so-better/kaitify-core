@@ -54,6 +54,7 @@ onMounted(async () => {
 		allowPasteHtml: true,
 		allowPaste: true,
 		autofocus: true,
+		useDefaultCSS: true,
 		onSelectionUpdate: () => {
 			//	console.log('selection更新')
 		}
@@ -97,65 +98,6 @@ body {
 	button + button {
 		margin-left: 10px;
 	}
-}
-
-#editor {
-	width: 100%;
-	height: 400px;
-	border: 1px solid #ddd;
-	overflow: auto;
-	padding: 10px;
-	border-radius: 4px;
-	margin-bottom: 20px;
-	transition: all 200ms;
-
-	&:focus {
-		border-color: #708af3;
-	}
-
-	img {
-		width: 100px;
-	}
-
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		margin: 0 0 15px 0;
-	}
-
-	ul,
-	ol {
-		margin: 0 0 15px 0;
-	}
-
-	li {
-		margin-bottom: 10px;
-	}
-
-	li:last-child {
-		margin-bottom: 0;
-	}
-
-	table {
-		border: 1px solid #ccc;
-		width: 100%;
-		border-collapse: collapse;
-
-		th,
-		td {
-			border: 1px solid #ccc;
-			padding: 10px;
-		}
-	}
-}
-
-pre {
-	background-color: #f7f8fa;
-	padding: 10px;
 }
 
 button + button {

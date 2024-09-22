@@ -1,3 +1,5 @@
+//引入基本样式
+import './style/index.less'
 //基本数据结构相关类型和属性方法导出
 export type * from './model'
 export * from './model'
