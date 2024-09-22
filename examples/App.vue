@@ -49,7 +49,7 @@ const onInsertDom = () => {
 
 onMounted(async () => {
 	editor.value = await Editor.configure({
-		value: `<p data-kaitify-node="ss" style="line-height:20px;">天苍苍，水茫茫</p><ol><li>hello</li><li>我的名字是凌凯</li></ol><p style="line-height:20px;">一行白鹭上青天</p><table style="white-space:pre"><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td style="background:red;"><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p style="line-height:20px;">一行白鹭上青天</p>`,
+		value: `<p data-kaitify-node="ss" style="line-height:20px;">天苍苍，水茫茫</p><ol><li>hello</li><li>我的名字是凌凯</li></ol><p style="line-height:20px;">一行白鹭上青天</p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td style="background:red;"><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p style="line-height:20px;">一行白鹭上青天</p>`,
 		el: '#editor',
 		allowPasteHtml: true,
 		allowPaste: true,
