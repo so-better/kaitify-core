@@ -575,12 +575,17 @@ export class Editor {
 		//是否使用默认逻辑
 		const useDefault = typeof this.onMergeBlockNode == 'function' ? this.onMergeBlockNode.apply(this, [node, target]) : true
 		if (useDefault) {
-			const nodes = target.children!.map(item => {
-				item.parent = node
-				return item
-			})
-			node.children!.push(...nodes)
-			target.children = []
+			const uneditableNode = target.getUneditable()
+			if (uneditableNode) {
+				uneditableNode.toEmpty()
+			} else {
+				const nodes = target.children!.map(item => {
+					item.parent = node
+					return item
+				})
+				node.children!.push(...nodes)
+				target.children = []
+			}
 		}
 	}
 

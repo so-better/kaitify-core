@@ -263,14 +263,14 @@ export class KNode {
 	/**
 	 * 判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null
 	 */
-	isUneditable(): KNode | null {
+	getUneditable(): KNode | null {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
 			return this
 		}
 		if (!this.parent) {
 			return null
 		}
-		return this.parent.isUneditable()
+		return this.parent.getUneditable()
 	}
 
 	/**
