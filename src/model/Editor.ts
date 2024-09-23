@@ -1493,50 +1493,180 @@ export class Editor {
 			else if (!blockNode.fixed) {
 				//光标在块节点的起始处
 				if (firstSelectionNode.isEqual(node) && offset == 0) {
-					const newBlockNode = blockNode.clone(false)
-					const placeholderNode = KNode.createPlaceholder()
-					this.addNode(placeholderNode, newBlockNode)
-					this.addNodeBefore(newBlockNode, blockNode)
-					if (typeof this.onInsertParagraph == 'function') {
-						this.onInsertParagraph.apply(this, [blockNode, newBlockNode])
+					//如果块节点只有占位符并且块节点不是段落
+					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
+						//列表项元素特殊处理
+						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
+							//列表节点
+							const listNode = blockNode.parent
+							//获取该块节点在列表节点中的位置
+							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
+							//该块节点在列表节点第一个
+							if (index == 0) {
+								//将块节点移到列表节点之前
+								listNode.children!.splice(index, 1)
+								this.addNodeBefore(blockNode, listNode)
+							}
+							//该块节点在列表节点的最后一个
+							else if (index == listNode.children!.length - 1) {
+								//将块节点移到列表节点之后
+								listNode.children!.splice(index, 1)
+								this.addNodeAfter(blockNode, listNode)
+							}
+							//该块节点在列表节点中间
+							else {
+								//克隆父节点
+								const newParent = blockNode.parent.clone(false)
+								//获取父节点的子节点数组
+								const listItems = listNode.children!
+								//重新设置父节点的子节点
+								listNode.children! = listItems.slice(0, index)
+								//设置克隆的父节点的子节点
+								newParent.children = listItems.slice(index + 1)
+								//将块节点移动到父节点后
+								this.addNodeAfter(blockNode, listNode)
+								//将克隆的父节点添加到块节点后
+								this.addNodeAfter(newParent, blockNode)
+							}
+						}
+						//转为段落
+						blockNode.tag = this.blockRenderTag
+						blockNode.marks = {}
+						blockNode.styles = {}
+					}
+					//其他情况下正常换行
+					else {
+						const newBlockNode = blockNode.clone(false)
+						const placeholderNode = KNode.createPlaceholder()
+						this.addNode(placeholderNode, newBlockNode)
+						this.addNodeBefore(newBlockNode, blockNode)
+						if (typeof this.onInsertParagraph == 'function') {
+							this.onInsertParagraph.apply(this, [blockNode, newBlockNode])
+						}
 					}
 				}
 				//光标在块节点的末尾处
 				else if (lastSelectionNode.isEqual(node) && offset == (node.isText() ? node.textContent!.length : 1)) {
-					const newBlockNode = blockNode.clone(false)
-					const placeholderNode = KNode.createPlaceholder()
-					this.addNode(placeholderNode, newBlockNode)
-					this.addNodeAfter(newBlockNode, blockNode)
-					this.setSelectionBefore(placeholderNode)
-					if (typeof this.onInsertParagraph == 'function') {
-						this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+					//如果块节点只有占位符并且块节点不是段落
+					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
+						//列表项元素特殊处理
+						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
+							//列表节点
+							const listNode = blockNode.parent
+							//获取该块节点在列表节点中的位置
+							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
+							//该块节点在列表节点第一个
+							if (index == 0) {
+								//将块节点移到列表节点之前
+								listNode.children!.splice(index, 1)
+								this.addNodeBefore(blockNode, listNode)
+							}
+							//该块节点在列表节点的最后一个
+							else if (index == listNode.children!.length - 1) {
+								//将块节点移到列表节点之后
+								listNode.children!.splice(index, 1)
+								this.addNodeAfter(blockNode, listNode)
+							}
+							//该块节点在列表节点中间
+							else {
+								//克隆父节点
+								const newParent = blockNode.parent.clone(false)
+								//获取父节点的子节点数组
+								const listItems = listNode.children!
+								//重新设置父节点的子节点
+								listNode.children! = listItems.slice(0, index)
+								//设置克隆的父节点的子节点
+								newParent.children = listItems.slice(index + 1)
+								//将块节点移动到父节点后
+								this.addNodeAfter(blockNode, listNode)
+								//将克隆的父节点添加到块节点后
+								this.addNodeAfter(newParent, blockNode)
+							}
+						}
+						blockNode.tag = this.blockRenderTag
+						blockNode.marks = {}
+						blockNode.styles = {}
+					}
+					//其他情况下正常换行
+					else {
+						const newBlockNode = blockNode.clone(false)
+						const placeholderNode = KNode.createPlaceholder()
+						this.addNode(placeholderNode, newBlockNode)
+						this.addNodeAfter(newBlockNode, blockNode)
+						this.setSelectionBefore(placeholderNode)
+						if (typeof this.onInsertParagraph == 'function') {
+							this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+						}
 					}
 				}
 				//光标在块节点的中间
 				else {
-					//创建新的块节点
-					const newBlockNode = blockNode.clone(true)
-					//插入到光标所在块节点之后
-					this.addNodeAfter(newBlockNode, blockNode)
-					//记录光标所在节点在块节点中的序列
-					const index = KNode.flat(blockNode.children!).findIndex(item => {
-						return this.selection.start!.node.isEqual(item)
-					})
-					//记录光标的偏移值
-					const offset = this.selection.start!.offset
-					//将光标终点移动到块节点最后
-					this.setSelectionAfter(lastSelectionNode, 'end')
-					//删除原块节点光标所在位置后面的部分
-					this.delete()
-					//将光标起点移动到新块节点的起始处
-					this.setSelectionBefore(newBlockNode, 'start')
-					//将光标终点移动到新块节点中与老块节点对应的位置
-					this.selection.end!.node = KNode.flat(newBlockNode.children!)[index]
-					this.selection.end!.offset = offset
-					//删除新块节点光标所在位置前面的部分
-					this.delete()
-					if (typeof this.onInsertParagraph == 'function') {
-						this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+					//如果块节点只有占位符并且块节点不是段落
+					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
+						//列表项元素特殊处理
+						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
+							//列表节点
+							const listNode = blockNode.parent
+							//获取该块节点在列表节点中的位置
+							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
+							//该块节点在列表节点第一个
+							if (index == 0) {
+								//将块节点移到列表节点之前
+								listNode.children!.splice(index, 1)
+								this.addNodeBefore(blockNode, listNode)
+							}
+							//该块节点在列表节点的最后一个
+							else if (index == listNode.children!.length - 1) {
+								//将块节点移到列表节点之后
+								listNode.children!.splice(index, 1)
+								this.addNodeAfter(blockNode, listNode)
+							}
+							//该块节点在列表节点中间
+							else {
+								//克隆父节点
+								const newParent = blockNode.parent.clone(false)
+								//获取父节点的子节点数组
+								const listItems = listNode.children!
+								//重新设置父节点的子节点
+								listNode.children! = listItems.slice(0, index)
+								//设置克隆的父节点的子节点
+								newParent.children = listItems.slice(index + 1)
+								//将块节点移动到父节点后
+								this.addNodeAfter(blockNode, listNode)
+								//将克隆的父节点添加到块节点后
+								this.addNodeAfter(newParent, blockNode)
+							}
+						}
+						blockNode.tag = this.blockRenderTag
+						blockNode.marks = {}
+						blockNode.styles = {}
+					}
+					//其他情况下正常换行
+					else {
+						//创建新的块节点
+						const newBlockNode = blockNode.clone(true)
+						//插入到光标所在块节点之后
+						this.addNodeAfter(newBlockNode, blockNode)
+						//记录光标所在节点在块节点中的序列
+						const index = KNode.flat(blockNode.children!).findIndex(item => {
+							return this.selection.start!.node.isEqual(item)
+						})
+						//记录光标的偏移值
+						const offset = this.selection.start!.offset
+						//将光标终点移动到块节点最后
+						this.setSelectionAfter(lastSelectionNode, 'end')
+						//删除原块节点光标所在位置后面的部分
+						this.delete()
+						//将光标起点移动到新块节点的起始处
+						this.setSelectionBefore(newBlockNode, 'start')
+						//将光标终点移动到新块节点中与老块节点对应的位置
+						this.selection.end!.node = KNode.flat(newBlockNode.children!)[index]
+						this.selection.end!.offset = offset
+						//删除新块节点光标所在位置前面的部分
+						this.delete()
+						if (typeof this.onInsertParagraph == 'function') {
+							this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+						}
 					}
 				}
 			}
