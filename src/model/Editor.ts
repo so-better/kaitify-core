@@ -144,6 +144,10 @@ export type EditorConfigureOptionType = {
 	 * 节点粘贴保留样式的自定义方法
 	 */
 	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
+	/**
+	 * 视图更新后回调方法
+	 */
+	afterUpdateView?: (this: Editor) => void
 
 	/*--------------------------以下不作为编辑器内部属性-------------------------------*/
 
@@ -289,6 +293,10 @@ export class Editor {
 	 * 节点粘贴保留样式的自定义方法
 	 */
 	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
+	/**
+	 * 视图更新后回调方法
+	 */
+	afterUpdateView?: (this: Editor) => void
 
 	/*---------------------下面的属性都是不属于创建编辑器的参数---------------------------*/
 
@@ -367,6 +375,7 @@ export class Editor {
 		} else {
 			this.$el?.removeAttribute('contenteditable')
 		}
+		this.$el?.setAttribute('spellcheck', 'false')
 	}
 
 	/**
@@ -1992,6 +2001,8 @@ export class Editor {
 		this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
 		//此处进行光标的渲染
 		await this.updateRealSelection()
+		//视图更新后回调
+		if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
 	}
 
 	/**
@@ -2279,6 +2290,13 @@ export class Editor {
 				return styles
 			}
 		}
+		if (extension.afterUpdateView) {
+			const fn = this.afterUpdateView
+			this.afterUpdateView = () => {
+				if (fn) fn.apply(this)
+				extension.afterUpdateView!.apply(this)
+			}
+		}
 		console.log(`${extension.name}插件注册完成！`)
 	}
 
@@ -2333,6 +2351,7 @@ export class Editor {
 		if (options.onBlur) editor.onBlur = options.onBlur
 		if (options.pasteKeepMarks) editor.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) editor.pasteKeepStyles = options.pasteKeepStyles
+		if (options.afterUpdateView) editor.afterUpdateView = options.afterUpdateView
 		//注册插件
 		editor.extensions.forEach(item => editor.registerExtension(item))
 		//设置编辑器是否可编辑
@@ -2362,6 +2381,8 @@ export class Editor {
 			editor.setSelectionAfter()
 			await editor.updateRealSelection()
 		}
+		//视图更新后回调
+		if (typeof editor.afterUpdateView == 'function') editor.afterUpdateView.apply(editor)
 		//设置dom监听
 		setDomObserve(editor)
 		//监听js selection更新Selection

@@ -28,14 +28,6 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 				if (node.marks!['disabled']) {
 					marks['disabled'] = node.marks!['disabled']
 				}
-				//图片的alt属性保留
-				if (node.tag == 'img' && node.marks!['alt']) {
-					marks['alt'] = node.marks!['alt']
-				}
-				//图片和视频的src属性保留
-				if (['img', 'video'].includes(node.tag!) && node.marks!['src']) {
-					marks['src'] = node.marks!['src']
-				}
 				//视频的autoplay属性保留
 				if (node.tag == 'video' && node.marks!['autoplay']) {
 					marks['autoplay'] = node.marks!['autoplay']
@@ -79,10 +71,6 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 			}
 			//处理需要保留的样式
 			if (node.hasStyles()) {
-				//图片和视频保留width样式
-				if (['img', 'video'].includes(node.tag!) && node.styles!['width']) {
-					styles['width'] = node.styles!['width']
-				}
 				//块元素保留text-indent样式
 				if (node.isBlock() && node.styles!['text-indent']) {
 					styles['text-indent'] = node.styles!['text-indent']

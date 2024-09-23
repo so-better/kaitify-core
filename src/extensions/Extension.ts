@@ -36,6 +36,10 @@ export type ExtensionCreateOptionType = {
 	 */
 	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
 	/**
+	 * 视图更新后回调
+	 */
+	afterUpdateView?: (this: Editor) => void
+	/**
 	 * 指令配置
 	 */
 	commands?: (this: Editor) => ExtensionCommandType
@@ -74,6 +78,10 @@ export class Extension {
 	 */
 	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
 	/**
+	 * 视图更新后回调
+	 */
+	afterUpdateView?: (this: Editor) => void
+	/**
 	 * 指令配置
 	 */
 	commands?: (this: Editor) => ExtensionCommandType
@@ -92,6 +100,7 @@ export class Extension {
 		if (options.domParseNodeCallback) extension.domParseNodeCallback = options.domParseNodeCallback
 		if (options.pasteKeepMarks) extension.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles
+		if (options.afterUpdateView) extension.afterUpdateView = options.afterUpdateView
 		if (options.commands) extension.commands = options.commands
 		return extension
 	}
