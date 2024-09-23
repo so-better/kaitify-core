@@ -8,9 +8,9 @@ import { formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge,
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
+import { Extension, imageExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
-import { Extension } from '../extensions/Extension'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -212,7 +212,7 @@ export class Editor {
 	/**
 	 * 插件数组
 	 */
-	extensions: Extension[] = []
+	extensions: Extension[] = [imageExtension]
 	/**
 	 * 编辑器的节点数组格式化规则
 	 */

@@ -6,11 +6,6 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 export default defineConfig({
 	plugins: [vue(), dts(), cssInjectedByJsPlugin({ topExecutionPriority: false })],
-	resolve: {
-		alias: {
-			'@': path.resolve(__dirname, './src')
-		}
-	},
 	build: {
 		//打包后的目录名称
 		outDir: 'lib',
