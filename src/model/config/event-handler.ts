@@ -7,7 +7,7 @@ import { delay } from '../../tools'
 /**
  * 粘贴时对非文本节点的标记和样式的保留处理
  */
-const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
+const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]) {
 	//不是文本
 	nodes.forEach(node => {
 		//不是文本节点
@@ -97,13 +97,13 @@ const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
 				}
 			}
 			//自定义标记保留
-			if (typeof editor.pasteKeepMarks == 'function') {
-				const extendMarks = editor.pasteKeepMarks.apply(editor, [node])
+			if (typeof this.pasteKeepMarks == 'function') {
+				const extendMarks = this.pasteKeepMarks.apply(this, [node])
 				Object.assign(marks, extendMarks)
 			}
 			//自定义样式保留
-			if (typeof editor.pasteKeepStyles == 'function') {
-				const extendStyles = editor.pasteKeepStyles.apply(editor, [node])
+			if (typeof this.pasteKeepStyles == 'function') {
+				const extendStyles = this.pasteKeepStyles.apply(this, [node])
 				Object.assign(styles, extendStyles)
 			}
 			//将处理后的样式和标记给节点
@@ -111,7 +111,7 @@ const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
 			node.styles = styles
 			//处理子节点
 			if (node.hasChildren()) {
-				handlerForPasteKeepMarksAndStyles(editor, node.children!)
+				handlerForPasteKeepMarksAndStyles.apply(this, [node.children!])
 			}
 		}
 	})
@@ -120,7 +120,7 @@ const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
 /**
  * 粘贴处理
  */
-const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) => {
+const handlerForPasteDrop = async function (this: Editor, dataTransfer: DataTransfer) {
 	//html内容
 	const html = dataTransfer.getData('text/html')
 	//文本内容
@@ -128,31 +128,31 @@ const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) =
 	//文件数组
 	const files = dataTransfer.files
 	//有html内容并且允许粘贴html
-	if (html && editor.allowPasteHtml) {
+	if (html && this.allowPasteHtml) {
 		//将html转为节点数组
-		const nodes = editor.htmlParseNode(html).filter(item => {
+		const nodes = this.htmlParseNode(html).filter(item => {
 			return !item.isEmpty()
 		})
 		//粘贴时对非文本节点的标记和样式的保留处理
-		handlerForPasteKeepMarksAndStyles(editor, nodes)
+		handlerForPasteKeepMarksAndStyles.apply(this, [nodes])
 		//是否走默认逻辑
-		const useDefault = typeof editor.onPasteHtml == 'function' ? await editor.onPasteHtml.apply(editor, [nodes, html]) : true
+		const useDefault = typeof this.onPasteHtml == 'function' ? await this.onPasteHtml.apply(this, [nodes, html]) : true
 		//走默认逻辑
 		if (useDefault) {
-			editor.insertNode(nodes[0])
+			this.insertNode(nodes[0])
 			for (let i = nodes.length - 1; i >= 1; i--) {
-				editor.addNodeAfter(nodes[i], nodes[0])
+				this.addNodeAfter(nodes[i], nodes[0])
 			}
-			editor.setSelectionAfter(nodes[nodes.length - 1], 'all')
+			this.setSelectionAfter(nodes[nodes.length - 1], 'all')
 		}
 	}
 	//有文本内容
 	else if (text) {
 		//是否走默认逻辑
-		const useDefault = typeof editor.onPasteText == 'function' ? await editor.onPasteText.apply(editor, [text]) : true
+		const useDefault = typeof this.onPasteText == 'function' ? await this.onPasteText.apply(this, [text]) : true
 		//走默认逻辑
 		if (useDefault) {
-			editor.insertText(text)
+			this.insertText(text)
 		}
 	}
 	//有文件
@@ -162,7 +162,7 @@ const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) =
 			//图片粘贴
 			if (files[i].type.startsWith('image/')) {
 				//是否走默认逻辑
-				const useDefault = typeof editor.onPasteImage == 'function' ? await editor.onPasteImage.apply(editor, [files[i]]) : true
+				const useDefault = typeof this.onPasteImage == 'function' ? await this.onPasteImage.apply(this, [files[i]]) : true
 				//走默认逻辑
 				if (useDefault) {
 					const url = await DapFile.dataFileToBase64(files[i])
@@ -174,13 +174,13 @@ const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) =
 							alt: files[i].name || ''
 						}
 					})
-					editor.insertNode(image)
+					this.insertNode(image)
 				}
 			}
 			//视频粘贴
 			else if (files[i].type.startsWith('video/')) {
 				//是否走默认逻辑
-				const useDefault = typeof editor.onPasteVideo == 'function' ? await editor.onPasteVideo.apply(editor, [files[i]]) : true
+				const useDefault = typeof this.onPasteVideo == 'function' ? await this.onPasteVideo.apply(this, [files[i]]) : true
 				//走默认逻辑
 				if (useDefault) {
 					const url = await DapFile.dataFileToBase64(files[i])
@@ -192,12 +192,12 @@ const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) =
 							alt: files[i].name || ''
 						}
 					})
-					editor.insertNode(video)
+					this.insertNode(video)
 				}
 			}
 			//其他文件粘贴
-			else if (typeof editor.onPasteFile == 'function') {
-				editor.onPasteFile.apply(editor, [files[i]])
+			else if (typeof this.onPasteFile == 'function') {
+				this.onPasteFile.apply(this, [files[i]])
 			}
 		}
 	}
@@ -270,7 +270,7 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
 	else if (event.inputType == 'insertFromPaste') {
 		//存在粘贴数据且允许粘贴
 		if (event.dataTransfer && this.allowPaste) {
-			await handlerForPasteDrop(this, event.dataTransfer)
+			await handlerForPasteDrop.apply(this, [event.dataTransfer])
 			this.updateView()
 		}
 	}
@@ -280,7 +280,7 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
 		await delay()
 		//存在粘贴数据且允许粘贴
 		if (event.dataTransfer && this.allowPaste) {
-			await handlerForPasteDrop(this, event.dataTransfer)
+			await handlerForPasteDrop.apply(this, [event.dataTransfer])
 			this.updateView()
 		}
 	}
