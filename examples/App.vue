@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import Dap from 'dap-util'
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor, KNode,Extension } from '../src'
 
 const editor = ref<Editor | null>(null)
 
@@ -56,7 +56,6 @@ onMounted(async () => {
 			//	console.log('selection更新')
 		}
 	})
-	console.log(editor.value.stackNodes)
 })
 </script>
 <style lang="less">

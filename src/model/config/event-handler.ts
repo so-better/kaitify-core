@@ -2,7 +2,7 @@ import { file as DapFile } from 'dap-util'
 import { Editor } from '../Editor'
 import { isUndo, isRedo } from './keyboard'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
-import { delay, mergeObject } from '../../tools'
+import { delay } from '../../tools'
 
 /**
  * 粘贴时对非文本节点的标记和样式的保留处理
@@ -12,8 +12,8 @@ const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
 	nodes.forEach(node => {
 		//不是文本节点
 		if (!node.isText()) {
-			let marks: KNodeMarksType = {}
-			let styles: KNodeStylesType = {}
+			const marks: KNodeMarksType = {}
+			const styles: KNodeStylesType = {}
 			//处理需要保留的标记
 			if (node.hasMarks()) {
 				//contenteditable属性保留
@@ -98,11 +98,13 @@ const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
 			}
 			//自定义标记保留
 			if (typeof editor.pasteKeepMarks == 'function') {
-				marks = mergeObject(marks, editor.pasteKeepMarks.apply(editor, [node])) as KNodeMarksType
+				const extendMarks = editor.pasteKeepMarks.apply(editor, [node])
+				Object.assign(marks, extendMarks)
 			}
 			//自定义样式保留
 			if (typeof editor.pasteKeepStyles == 'function') {
-				styles = mergeObject(styles, editor.pasteKeepStyles.apply(editor, [node])) as KNodeStylesType
+				const extendStyles = editor.pasteKeepStyles.apply(editor, [node])
+				Object.assign(styles, extendStyles)
 			}
 			//将处理后的样式和标记给节点
 			node.marks = marks

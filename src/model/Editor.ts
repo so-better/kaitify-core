@@ -10,6 +10,7 @@ import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSe
 import { setDomObserve } from './config/dom-observe'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
+import { Extension } from '../extensions/Extension'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -64,6 +65,10 @@ export type EditorConfigureOptionType = {
 	 */
 	extraKeepTags?: string[]
 	/**
+	 * 自定义插件数组
+	 */
+	extensions?: Extension[]
+	/**
 	 * 自定义节点数组格式化规则
 	 */
 	formatRules?: RuleFunctionType[]
@@ -71,10 +76,6 @@ export type EditorConfigureOptionType = {
 	 * 自定义dom转为非文本节点的后续处理
 	 */
 	domParseNodeCallback?: (this: Editor, node: KNode) => KNode
-	/**
-	 * 合并块节点之前触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
-	 */
-	onMergeBlockNode?: (this: Editor, node: KNode, target: KNode) => boolean
 	/**
 	 * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图
 	 */
@@ -162,10 +163,6 @@ export type EditorConfigureOptionType = {
 	 * 是否使用默认css样式
 	 */
 	useDefaultCSS?: boolean
-	/**
-	 * 编辑器创建完成后触发的回调，在这里你可以增加额外的处理
-	 */
-	onCreated?: (this: Editor) => void
 }
 
 /**
@@ -213,6 +210,10 @@ export class Editor {
 	 */
 	extraKeepTags: string[] = []
 	/**
+	 * 插件数组
+	 */
+	extensions: Extension[] = []
+	/**
 	 * 编辑器的节点数组格式化规则
 	 */
 	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatPlaceholderMerge, formatSiblingNodesMerge, formatParentNodeMerge, formatZeroWidthTextMerge]
@@ -221,33 +222,29 @@ export class Editor {
 	 */
 	domParseNodeCallback?: (this: Editor, node: KNode) => KNode
 	/**
-	 * 合并块节点之前触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
-	 */
-	onMergeBlockNode?: (this: Editor, node: KNode, target: KNode) => boolean
-	/**
 	 * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图
 	 */
 	onUpdateView?: (this: Editor, init: boolean) => boolean | Promise<boolean>
 	/**
 	 * 编辑器粘贴纯文本时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
 	 */
-	onPasteText?: (text: string) => boolean | Promise<boolean>
+	onPasteText?: (this: Editor, text: string) => boolean | Promise<boolean>
 	/**
 	 * 编辑器粘贴html内容时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
 	 */
-	onPasteHtml?: (nodes: KNode[], html: string) => boolean | Promise<boolean>
+	onPasteHtml?: (this: Editor, nodes: KNode[], html: string) => boolean | Promise<boolean>
 	/**
 	 * 编辑器粘贴图片时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
 	 */
-	onPasteImage?: (file: File) => boolean | Promise<boolean>
+	onPasteImage?: (this: Editor, file: File) => boolean | Promise<boolean>
 	/**
 	 * 编辑器粘贴视频时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
 	 */
-	onPasteVideo?: (file: File) => boolean | Promise<boolean>
+	onPasteVideo?: (this: Editor, file: File) => boolean | Promise<boolean>
 	/**
 	 * 编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理
 	 */
-	onPasteFile?: (file: File) => void | Promise<void>
+	onPasteFile?: (this: Editor, file: File) => void | Promise<void>
 	/**
 	 * 编辑器内容改变触发
 	 */
@@ -588,20 +585,16 @@ export class Editor {
 		if (node.isEmpty() || target.isEmpty()) {
 			return
 		}
-		//是否使用默认逻辑
-		const useDefault = typeof this.onMergeBlockNode == 'function' ? this.onMergeBlockNode.apply(this, [node, target]) : true
-		if (useDefault) {
-			const uneditableNode = target.getUneditable()
-			if (uneditableNode) {
-				uneditableNode.toEmpty()
-			} else {
-				const nodes = target.children!.map(item => {
-					item.parent = node
-					return item
-				})
-				node.children!.push(...nodes)
-				target.children = []
-			}
+		const uneditableNode = target.getUneditable()
+		if (uneditableNode) {
+			uneditableNode.toEmpty()
+		} else {
+			const nodes = target.children!.map(item => {
+				item.parent = node
+				return item
+			})
+			node.children!.push(...nodes)
+			target.children = []
 		}
 	}
 
@@ -2258,6 +2251,49 @@ export class Editor {
 	}
 
 	/**
+	 * 注册插件
+	 */
+	registerExtension(extension: Extension) {
+		if (extension.registered) {
+			return
+		}
+		extension.registered = true
+		if (extension.extraKeepTags) {
+			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
+		}
+		if (extension.domParseNodeCallback) {
+			const fn = this.domParseNodeCallback
+			this.domParseNodeCallback = (node: KNode) => {
+				if (fn) node = fn.apply(this, [node])
+				node = extension.domParseNodeCallback!.apply(this, [node])
+				return node
+			}
+		}
+		if (extension.formatRule) {
+			this.formatRules = [...this.formatRules, extension.formatRule]
+		}
+		if (extension.pasteKeepMarks) {
+			const fn = this.pasteKeepMarks
+			this.pasteKeepMarks = (node: KNode) => {
+				const marks: KNodeMarksType = {}
+				if (fn) Object.assign(marks, fn.apply(this, [node]))
+				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
+				return marks
+			}
+		}
+		if (extension.pasteKeepStyles) {
+			const fn = this.pasteKeepStyles
+			this.pasteKeepStyles = (node: KNode) => {
+				const styles: KNodeStylesType = {}
+				if (fn) Object.assign(styles, fn.apply(this, [node]))
+				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
+				return styles
+			}
+		}
+		console.log(`${extension.name}插件注册完成！`)
+	}
+
+	/**
 	 * 配置编辑器，返回创建的编辑器
 	 */
 	static async configure(options: EditorConfigureOptionType) {
@@ -2277,9 +2313,9 @@ export class Editor {
 		if (options.voidRenderTags) editor.voidRenderTags = options.voidRenderTags
 		if (options.emptyRenderTags) editor.emptyRenderTags = options.emptyRenderTags
 		if (options.extraKeepTags) editor.extraKeepTags = options.extraKeepTags
+		if (options.extensions) editor.extensions = [...editor.extensions, ...options.extensions]
 		if (options.formatRules) editor.formatRules = [...editor.formatRules, ...options.formatRules]
 		if (options.domParseNodeCallback) editor.domParseNodeCallback = options.domParseNodeCallback
-		if (options.onMergeBlockNode) editor.onMergeBlockNode = options.onMergeBlockNode
 		if (options.onUpdateView) editor.onUpdateView = options.onUpdateView
 		if (options.onPasteText) editor.onPasteText = options.onPasteText
 		if (options.onPasteHtml) editor.onPasteHtml = options.onPasteHtml
@@ -2297,6 +2333,8 @@ export class Editor {
 		if (options.onBlur) editor.onBlur = options.onBlur
 		if (options.pasteKeepMarks) editor.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) editor.pasteKeepStyles = options.pasteKeepStyles
+		//注册插件
+		editor.extensions.forEach(item => editor.registerExtension(item))
 		//设置编辑器是否可编辑
 		editor.setEditable(typeof options.editable == 'boolean' ? options.editable : true)
 		//根据value设置节点数组
@@ -2340,8 +2378,6 @@ export class Editor {
 		DapEvent.on(editor.$el, 'blur.kaitify', onBlur.bind(editor))
 		//监听编辑器复制
 		DapEvent.on(editor.$el, 'copy.kaitify', onCopy.bind(editor))
-		//增加额外的回调处理
-		if (options.onCreated) options.onCreated.apply(editor)
 		//返回编辑器实例
 		return editor
 	}
