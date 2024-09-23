@@ -1,7 +1,8 @@
 <template>
 	<div style="padding: 20px">
 		<div id="toolbar">
-			<button @click="onClick">操作</button>
+			<button @click="onClick1">设置样式</button>
+      <button @click="onClick2">移除样式</button>
 		</div>
 		<div id="editor" style="height: 400px;"</div>
 	</div>
@@ -9,14 +10,19 @@
 <script lang="ts" setup>
 import Dap from 'dap-util'
 import { onMounted, ref } from 'vue'
-import { Editor, setTextStyle } from '../src'
+import { Editor, isTextStyle, removeTextStyle, setTextStyle } from '../src'
 
 const editor = ref<Editor | null>(null)
 
-const onClick = () => {
+const onClick1 = () => {
 	setTextStyle(editor.value!,{
     'color':'red'
   })
+	editor.value?.updateView()
+}
+
+const onClick2 = () => {
+	removeTextStyle(editor.value!,['color'])
 	editor.value?.updateView()
 }
 
@@ -25,6 +31,9 @@ onMounted(async () => {
 		value: `<h1 style="color:red;">我是一个段落</h1><h2>我是一个段落</h2><h3>我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
 		el: '#editor',
 		allowPasteHtml: true,
+    onSelectionUpdate(){
+      console.log(isTextStyle(this,'color'));
+    }
 	})
 })
 </script>

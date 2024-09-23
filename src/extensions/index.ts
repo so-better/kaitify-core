@@ -1,2 +1,2 @@
-export type { ExtensionCreateOptionType } from './Extension'
+export type { ExtensionCommandType, ExtensionCreateOptionType } from './Extension'
 export { Extension } from './Extension'
