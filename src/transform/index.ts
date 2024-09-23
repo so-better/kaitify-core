@@ -1,5 +1,1 @@
-import * as TextMarksStylesTransform from './text-marks-styles'
-
-export const Transform = {
-	...TextMarksStylesTransform
-}
+export * from './text-marks-styles'

@@ -8,21 +8,20 @@
 	</div>
 </template>
 <script lang="ts" setup>
-import Dap from 'dap-util'
 import { onMounted, ref } from 'vue'
-import { Editor, Transform } from '../src'
+import { Editor, setTextStyle,removeTextStyle,isTextStyle } from '../src'
 
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-	Transform.setTextStyle(editor.value!,{
+	setTextStyle(editor.value!,{
     'color':'red'
   })
 	editor.value?.updateView()
 }
 
 const onClick2 = () => {
-	Transform.removeTextStyle(editor.value!,['color'])
+	removeTextStyle(editor.value!,['color'])
 	editor.value?.updateView()
 }
 
@@ -32,7 +31,7 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(Transform.isTextStyle(this,'color'));
+      console.log(isTextStyle(this,'color'));
     }
 	})
 })
