@@ -1,5 +1,5 @@
 import { common as DapCommon, event as DapEvent, element as DapElement } from 'dap-util'
-import { KNode, KNodeCreateOptionType, KNodeStylesType } from './KNode'
+import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeStylesType } from './KNode'
 import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
@@ -135,6 +135,14 @@ export type EditorConfigureOptionType = {
 	 * 编辑器失焦时触发
 	 */
 	onBlur?: (this: Editor, event: FocusEvent) => void
+	/**
+	 * 节点粘贴保留标记的自定义方法
+	 */
+	pasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
+	/**
+	 * 节点粘贴保留样式的自定义方法
+	 */
+	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
 
 	/*--------------------------以下不作为编辑器内部属性-------------------------------*/
 
@@ -276,6 +284,14 @@ export class Editor {
 	 * 编辑器失焦时触发
 	 */
 	onBlur?: (this: Editor, event: FocusEvent) => void
+	/**
+	 * 节点粘贴保留标记的自定义方法
+	 */
+	pasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
+	/**
+	 * 节点粘贴保留样式的自定义方法
+	 */
+	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
 
 	/*---------------------下面的属性都是不属于创建编辑器的参数---------------------------*/
 
@@ -367,7 +383,7 @@ export class Editor {
 	 * 初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
 	 */
 	checkNodes() {
-		const nodes = KNode.flat(this.stackNodes).filter(item => {
+		const nodes = this.stackNodes.filter(item => {
 			return !item.isEmpty() && !this.voidRenderTags.includes(item.tag!)
 		})
 		if (nodes.length == 0) {
@@ -2149,6 +2165,8 @@ export class Editor {
 		if (options.onKeyup) editor.onKeyup = options.onKeyup
 		if (options.onFocus) editor.onFocus = options.onFocus
 		if (options.onBlur) editor.onBlur = options.onBlur
+		if (options.pasteKeepMarks) editor.pasteKeepMarks = options.pasteKeepMarks
+		if (options.pasteKeepStyles) editor.pasteKeepStyles = options.pasteKeepStyles
 		//设置编辑器是否可编辑
 		editor.setEditable(typeof options.editable == 'boolean' ? options.editable : true)
 		//根据value设置节点数组

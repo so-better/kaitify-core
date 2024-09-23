@@ -1,8 +1,119 @@
 import { file as DapFile } from 'dap-util'
 import { Editor } from '../Editor'
 import { isUndo, isRedo } from './keyboard'
-import { KNode } from '../KNode'
-import { delay } from '../../tools'
+import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
+import { delay, mergeObject } from '../../tools'
+
+/**
+ * 粘贴时对非文本节点的标记和样式的保留处理
+ */
+const handlerForPasteKeepMarksAndStyles = (editor: Editor, nodes: KNode[]) => {
+	//不是文本
+	nodes.forEach(node => {
+		//不是文本节点
+		if (!node.isText()) {
+			let marks: KNodeMarksType = {}
+			let styles: KNodeStylesType = {}
+			//处理需要保留的标记
+			if (node.hasMarks()) {
+				//contenteditable属性保留
+				if (node.marks!['contenteditable']) {
+					marks['contenteditable'] = node.marks!['contenteditable']
+				}
+				//name属性保留
+				if (node.marks!['name']) {
+					marks['name'] = node.marks!['name']
+				}
+				//disabled属性保留
+				if (node.marks!['disabled']) {
+					marks['disabled'] = node.marks!['disabled']
+				}
+				//图片的alt属性保留
+				if (node.tag == 'img' && node.marks!['alt']) {
+					marks['alt'] = node.marks!['alt']
+				}
+				//图片和视频的src属性保留
+				if (['img', 'video'].includes(node.tag!) && node.marks!['src']) {
+					marks['src'] = node.marks!['src']
+				}
+				//视频的autoplay属性保留
+				if (node.tag == 'video' && node.marks!['autoplay']) {
+					marks['autoplay'] = node.marks!['autoplay']
+				}
+				//视频的loop属性保留
+				if (node.tag == 'video' && node.marks!['loop']) {
+					marks['loop'] = node.marks!['loop']
+				}
+				//视频的muted属性保留
+				if (node.tag == 'video' && node.marks!['muted']) {
+					marks['muted'] = node.marks!['muted']
+				}
+				//视频的controls属性保留
+				if (node.tag == 'video' && node.marks!['controls']) {
+					marks['controls'] = node.marks!['controls']
+				}
+				//链接的href属性保留
+				if (node.tag == 'a' && node.marks!['href']) {
+					marks['href'] = node.marks!['href']
+				}
+				//链接的target属性保留
+				if (node.tag == 'a' && node.marks!['target']) {
+					marks['target'] = node.marks!['target']
+				}
+				//表格列宽属性保留
+				if (node.tag == 'col' && node.marks!['width']) {
+					marks['width'] = node.marks!['width']
+				}
+				//表格单元格colspan属性保留
+				if (['td', 'th'].includes(node.tag!) && node.marks!['colspan']) {
+					marks['colspan'] = node.marks!['colspan']
+				}
+				//表格单元格rowspan属性保留
+				if (['td', 'th'].includes(node.tag!) && node.marks!['rowspan']) {
+					marks['rowspan'] = node.marks!['rowspan']
+				}
+				//表格单元格被合并属性保留
+				if (['td', 'th'].includes(node.tag!) && node.marks!['data-editify-merged']) {
+					marks['data-editify-merged'] = node.marks!['data-editify-merged']
+				}
+			}
+			//处理需要保留的样式
+			if (node.hasStyles()) {
+				//图片和视频保留width样式
+				if (['img', 'video'].includes(node.tag!) && node.styles!['width']) {
+					styles['width'] = node.styles!['width']
+				}
+				//块元素保留text-indent样式
+				if (node.isBlock() && node.styles!['text-indent']) {
+					styles['text-indent'] = node.styles!['text-indent']
+				}
+				//块元素保留text-align样式
+				if (node.isBlock() && node.styles!['text-align']) {
+					styles['text-align'] = node.styles!['text-align']
+				}
+				//块元素保留line-height样式
+				if (node.isBlock() && node.styles!['line-height']) {
+					styles['line-height'] = node.styles!['line-height']
+				}
+			}
+			//自定义标记保留
+			if (typeof editor.pasteKeepMarks == 'function') {
+				marks = mergeObject(marks, editor.pasteKeepMarks.apply(editor, [node])) as KNodeMarksType
+			}
+			//自定义样式保留
+			if (typeof editor.pasteKeepStyles == 'function') {
+				styles = mergeObject(styles, editor.pasteKeepStyles.apply(editor, [node])) as KNodeStylesType
+			}
+			//将处理后的样式和标记给节点
+			node.marks = marks
+			node.styles = styles
+			//处理子节点
+			if (node.hasChildren()) {
+				handlerForPasteKeepMarksAndStyles(editor, node.children!)
+			}
+		}
+	})
+}
 
 /**
  * 粘贴处理
@@ -20,6 +131,8 @@ const handlerForPasteDrop = async (editor: Editor, dataTransfer: DataTransfer) =
 		const nodes = editor.htmlParseNode(html).filter(item => {
 			return !item.isEmpty()
 		})
+		//粘贴时对非文本节点的标记和样式的保留处理
+		handlerForPasteKeepMarksAndStyles(editor, nodes)
 		//是否走默认逻辑
 		const useDefault = typeof editor.onPasteHtml == 'function' ? await editor.onPasteHtml.apply(editor, [nodes, html]) : true
 		//走默认逻辑

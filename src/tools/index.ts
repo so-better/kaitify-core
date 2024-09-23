@@ -1,4 +1,4 @@
-import { data as DapData, element as DapElement } from 'dap-util'
+import { data as DapData, element as DapElement, common as DapCommon } from 'dap-util'
 import { KNodeMarksType, KNodeStylesType } from '../model'
 import { NODE_MARK } from '../view'
 /**
@@ -139,4 +139,27 @@ export const delay = (num: number | undefined = 0) => {
 			resolve()
 		}, num)
 	})
+}
+
+/**
+ * 对象平替值方法
+ * @param o1
+ * @param o2
+ * @returns
+ */
+export const mergeObject = (o1: { [key: string]: any }, o2: { [key: string]: any }) => {
+	if (!DapCommon.isObject(o1) && DapCommon.isObject(o2)) {
+		return null
+	}
+	for (let key in o2) {
+		//如果o1和o2的相同属性都是对象并且不是数组，则继续merge
+		if (DapCommon.isObject(o2[key]) && !Array.isArray(o2[key]) && DapCommon.isObject(o1[key]) && !Array.isArray(o1[key])) {
+			o1[key] = mergeObject(o1[key], o2[key])
+		}
+		//否则直接将o2的值给o1
+		else {
+			o1[key] = o2[key]
+		}
+	}
+	return o1
 }
