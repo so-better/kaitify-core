@@ -2240,17 +2240,6 @@ export class Editor {
 	}
 
 	/**
-	 * 销毁编辑器的方法
-	 */
-	destroy() {
-		//去除可编辑效果
-		this.setEditable(false)
-		//移除相关监听事件
-		DapEvent.off(document, `selectionchange.kaitify_${this.guid}`)
-		DapEvent.off(this.$el!, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')
-	}
-
-	/**
 	 * 注册插件
 	 */
 	registerExtension(extension: Extension) {
@@ -2291,6 +2280,17 @@ export class Editor {
 			}
 		}
 		console.log(`${extension.name}插件注册完成！`)
+	}
+
+	/**
+	 * 销毁编辑器的方法
+	 */
+	destroy() {
+		//去除可编辑效果
+		this.setEditable(false)
+		//移除相关监听事件
+		DapEvent.off(document, `selectionchange.kaitify_${this.guid}`)
+		DapEvent.off(this.$el!, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')
 	}
 
 	/**

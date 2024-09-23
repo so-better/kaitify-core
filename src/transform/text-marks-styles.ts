@@ -1,5 +1,5 @@
 import { common as DapCommon } from 'dap-util'
-import { Editor, EditorSelectedType, KNode, KNodeStylesType } from '../model'
+import { Editor, EditorSelectedType, KNode, KNodeMarksType, KNodeStylesType } from '../model'
 
 /**
  * 获取子孙节点中的文本节点
@@ -122,6 +122,26 @@ const removeTextNodeStyles = (node: KNode, styleNames?: string[]) => {
 }
 
 /**
+ * 移除单个文本节点的标记
+ */
+const removeTextNodeMarks = (node: KNode, markNames?: string[]) => {
+	//删除指定标记
+	if (markNames && node.hasMarks()) {
+		const marks: KNodeMarksType = {}
+		Object.keys(node.marks!).forEach(key => {
+			if (!markNames.includes(key)) {
+				marks[key] = node.marks![key]
+			}
+		})
+		node.marks = marks
+	}
+	//删除所有的标记
+	else {
+		node.marks = {}
+	}
+}
+
+/**
  * 判断单个文本节点是否拥有某个样式
  */
 const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | number) => {
@@ -130,6 +150,19 @@ const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | n
 			return node.styles![styleName] == styleValue
 		}
 		return node.styles!.hasOwnProperty(styleName)
+	}
+	return false
+}
+
+/**
+ * 判断单个文本节点是否拥有某个标记
+ */
+const isTextNodeMark = (node: KNode, markName: string, markValue?: string | number) => {
+	if (node.hasMarks()) {
+		if (markValue) {
+			return node.marks![markName] == markValue
+		}
+		return node.marks!.hasOwnProperty(markName)
 	}
 	return false
 }
@@ -192,6 +225,63 @@ export const setTextStyle = (editor: Editor, styles: KNodeStylesType) => {
 }
 
 /**
+ * 设置光标所在文本标记
+ */
+export const setTextMark = (editor: Editor, marks: KNodeMarksType) => {
+	if (!editor.selection.focused()) {
+		return
+	}
+	//起点和终点在一起
+	if (editor.selection.collapsed()) {
+		const node = editor.selection.start!.node
+		//空白文本节点直接设置标记
+		if (node.isZeroWidthText()) {
+			if (node.hasMarks()) {
+				Object.assign(node.marks!, DapCommon.clone(marks))
+			} else {
+				node.marks = DapCommon.clone(marks)
+			}
+		}
+		//文本节点
+		else if (node.isText()) {
+			//新建一个空白文本节点
+			const newTextNode = KNode.createZeroWidthText()
+			//继承文本节点的样式和标记
+			newTextNode.styles = DapCommon.clone(node.styles)
+			newTextNode.marks = DapCommon.clone(node.marks)
+			//设置标记
+			if (newTextNode.hasMarks()) {
+				Object.assign(newTextNode.marks!, DapCommon.clone(marks))
+			} else {
+				newTextNode.marks = DapCommon.clone(marks)
+			}
+			//插入空白文本节点
+			editor.insertNode(newTextNode)
+		}
+		//闭合节点
+		else {
+			//新建一个空白文本节点
+			const newTextNode = KNode.createZeroWidthText()
+			//设置样式
+			newTextNode.marks = DapCommon.clone(marks)
+			//插入空白文本节点
+			editor.insertNode(newTextNode)
+		}
+	}
+	//存在选区
+	else {
+		const selectedResult = editor.getSelectedNodes()
+		getSelectedTextNode(editor, selectedResult).forEach(item => {
+			if (item.hasMarks()) {
+				item.marks = { ...item.marks, ...marks }
+			} else {
+				item.marks = { ...marks }
+			}
+		})
+	}
+}
+
+/**
  * 移除光标所在文本样式
  */
 export const removeTextStyle = (editor: Editor, styleNames?: string[]) => {
@@ -227,6 +317,41 @@ export const removeTextStyle = (editor: Editor, styleNames?: string[]) => {
 }
 
 /**
+ * 移除光标所在文本标记
+ */
+export const removeTextMark = (editor: Editor, markNames?: string[]) => {
+	if (!editor.selection.focused()) {
+		return
+	}
+	//起点和终点在一起
+	if (editor.selection.collapsed()) {
+		const node = editor.selection.start!.node
+		//空白文本节点直接移除标记
+		if (node.isZeroWidthText()) {
+			removeTextNodeMarks(node, markNames)
+		}
+		//文本节点则新建一个空白文本节点
+		else if (node.isText()) {
+			const newTextNode = KNode.createZeroWidthText()
+			//继承文本节点的样式和标记
+			newTextNode.styles = DapCommon.clone(node.styles)
+			newTextNode.marks = DapCommon.clone(node.marks)
+			//移除标记
+			removeTextNodeMarks(newTextNode, markNames)
+			//插入
+			editor.insertNode(newTextNode)
+		}
+	}
+	//存在选区
+	else {
+		const selectedResult = editor.getSelectedNodes()
+		getSelectedTextNode(editor, selectedResult).forEach(item => {
+			removeTextNodeMarks(item, markNames)
+		})
+	}
+}
+
+/**
  * 判断光标所在文本是否具有某个样式
  */
 export const isTextStyle = (editor: Editor, styleName: string, styleValue?: string | number) => {
@@ -245,4 +370,25 @@ export const isTextStyle = (editor: Editor, styleName: string, styleValue?: stri
 	//存在选区
 	const selectedResult = editor.getSelectedNodes()
 	return getSelectedNodesWithoutSplit(editor, selectedResult).every(item => isTextNodeStyle(item, styleName, styleValue))
+}
+
+/**
+ * 判断光标所在文本是否具有某个标记
+ */
+export const isTextMark = (editor: Editor, markName: string, markValue?: string | number) => {
+	if (!editor.selection.focused()) {
+		return false
+	}
+	//起点和终点在一起
+	if (editor.selection.collapsed()) {
+		const node = editor.selection.start!.node
+		//文本节点
+		if (node.isText()) {
+			return isTextNodeMark(node, markName, markValue)
+		}
+		return false
+	}
+	//存在选区
+	const selectedResult = editor.getSelectedNodes()
+	return getSelectedNodesWithoutSplit(editor, selectedResult).every(item => isTextNodeMark(item, markName, markValue))
 }

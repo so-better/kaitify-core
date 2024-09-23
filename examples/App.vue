@@ -10,19 +10,19 @@
 <script lang="ts" setup>
 import Dap from 'dap-util'
 import { onMounted, ref } from 'vue'
-import { Editor, isTextStyle, removeTextStyle, setTextStyle } from '../src'
+import { Editor, Transform } from '../src'
 
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-	setTextStyle(editor.value!,{
+	Transform.setTextStyle(editor.value!,{
     'color':'red'
   })
 	editor.value?.updateView()
 }
 
 const onClick2 = () => {
-	removeTextStyle(editor.value!,['color'])
+	Transform.removeTextStyle(editor.value!,['color'])
 	editor.value?.updateView()
 }
 
@@ -32,7 +32,7 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(isTextStyle(this,'color'));
+      console.log(Transform.isTextStyle(this,'color'));
     }
 	})
 })

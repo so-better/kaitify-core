@@ -1,3 +1,5 @@
+export type { BlockParseType, InlineParseType, ClosedParseType } from './config/dom-parse'
+export type { NodePatchResultType } from './config/format-patch'
 export type { RuleFunctionType } from './config/format-rules'
 export type { EditorConfigureOptionType, EditorSelectedType } from './Editor'
 export type { HistoryRecordType } from './History'
