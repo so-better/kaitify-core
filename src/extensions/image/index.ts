@@ -95,12 +95,5 @@ export const imageExtension = Extension.create({
 		}
 		const images = this.$el!.querySelectorAll('img')
 		images.forEach(el => imageResizable(this, el))
-	},
-	setCommands() {
-		return {
-			setImage: () => {
-				console.log(1)
-			}
-		}
 	}
 })

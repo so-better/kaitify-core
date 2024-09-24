@@ -39,10 +39,6 @@ export type ExtensionCreateOptionType = {
 	 * 视图更新后回调
 	 */
 	afterUpdateView?: (this: Editor) => void
-	/**
-	 * 指令配置
-	 */
-	setCommands?: (this: Editor) => ExtensionCommandType
 }
 
 /**
@@ -81,14 +77,6 @@ export class Extension {
 	 * 视图更新后回调
 	 */
 	afterUpdateView?: (this: Editor) => void
-	/**
-	 * 指令配置
-	 */
-	setCommands?: (this: Editor) => ExtensionCommandType
-	/**
-	 * 指令集合
-	 */
-	commands?: ExtensionCommandType
 
 	constructor(name: string) {
 		this.name = name
@@ -105,7 +93,6 @@ export class Extension {
 		if (options.pasteKeepMarks) extension.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles
 		if (options.afterUpdateView) extension.afterUpdateView = options.afterUpdateView
-		if (options.setCommands) extension.setCommands = options.setCommands
 		return extension
 	}
 }

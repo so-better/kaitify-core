@@ -2297,9 +2297,6 @@ export class Editor {
 				extension.afterUpdateView!.apply(this)
 			}
 		}
-		if (extension.setCommands) {
-			extension.commands = extension.setCommands.apply(this)
-		}
 		console.log(`${extension.name}插件注册完成！`)
 	}
 
