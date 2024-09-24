@@ -1,11 +1,15 @@
 import interact from 'interactjs'
-import { KNodeMarksType, KNodeStylesType } from '../../model'
+import { event as DapEvent, element as DapElement } from 'dap-util'
+import { Editor, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
 /**
  * 设置图片拖拽
  */
-const imageResizable = (el: HTMLImageElement) => {
+const imageResizable = (editor: Editor, el: HTMLImageElement) => {
+	//获取父元素宽度
+	const parentWidth = DapElement.width(el.parentElement!)
+	//设置拖拽改变大小的功能
 	interact(el).unset()
 	interact(el).resizable({
 		//是否启用
@@ -21,13 +25,47 @@ const imageResizable = (el: HTMLImageElement) => {
 		//水平调整
 		axis: 'x',
 		listeners: {
-			//拖拽改变大小时触发
+			start(event) {
+				//禁用dragstart
+				DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
+			},
+			//拖拽
 			move(event) {
-				const { width } = event.rect
+				//获取宽度
+				let { width } = event.rect
+				//设置最小宽度
+				if (width < 50) width = 50
+				//设置最大宽度
+				if (width >= parentWidth) width = parentWidth
+				//设置dom的宽度
 				event.target.style.width = `${width}px`
 			},
+			//结束拖拽
 			end(event) {
-				console.log(event)
+				//恢复dragstart
+				DapEvent.off(event.target, 'dragstart')
+				//获取宽度
+				let { width } = event.rect
+				//设置最小宽度
+				if (width < 50) width = 50
+				//设置最大宽度
+				if (width >= parentWidth) width = parentWidth
+				//设置百分比宽度
+				const percentWidth = Number(((width / parentWidth) * 100).toFixed(2))
+				//查找对应的节点
+				const node = editor.findNode(event.target)
+				//设置节点的styles
+				if (node.hasStyles()) {
+					node.styles!.width = `${percentWidth}%`
+				} else {
+					node.styles = {
+						width: `${percentWidth}%`
+					}
+				}
+				//将光标定位到节点后
+				editor.setSelectionAfter(node)
+				//更新视图
+				editor.updateView()
 			}
 		}
 	})
@@ -50,27 +88,19 @@ export const imageExtension = Extension.create({
 		}
 		return styles
 	},
-	formatRule({ node }) {
-		if (node.tag == 'img' && node.isClosed()) {
-			const styles: KNodeStylesType = {
-				display: 'inline-flex',
-				maxWidth: '100%',
-				position: 'relative'
-			}
-			if (node.hasStyles()) {
-				node.styles = { ...node.styles, ...styles }
-			} else {
-				node.styles = { ...styles }
-			}
-		}
-	},
 	afterUpdateView() {
+		//编辑器不可编辑状态下不设置
+		if (!this.isEditable()) {
+			return
+		}
 		const images = this.$el!.querySelectorAll('img')
-		images.forEach(el => imageResizable(el))
+		images.forEach(el => imageResizable(this, el))
 	},
-	commands() {
+	setCommands() {
 		return {
-			setImage: () => {}
+			setImage: () => {
+				console.log(1)
+			}
 		}
 	}
 })

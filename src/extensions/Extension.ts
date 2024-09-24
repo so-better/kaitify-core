@@ -42,7 +42,7 @@ export type ExtensionCreateOptionType = {
 	/**
 	 * 指令配置
 	 */
-	commands?: (this: Editor) => ExtensionCommandType
+	setCommands?: (this: Editor) => ExtensionCommandType
 }
 
 /**
@@ -84,7 +84,11 @@ export class Extension {
 	/**
 	 * 指令配置
 	 */
-	commands?: (this: Editor) => ExtensionCommandType
+	setCommands?: (this: Editor) => ExtensionCommandType
+	/**
+	 * 指令集合
+	 */
+	commands?: ExtensionCommandType
 
 	constructor(name: string) {
 		this.name = name
@@ -101,7 +105,7 @@ export class Extension {
 		if (options.pasteKeepMarks) extension.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles
 		if (options.afterUpdateView) extension.afterUpdateView = options.afterUpdateView
-		if (options.commands) extension.commands = options.commands
+		if (options.setCommands) extension.setCommands = options.setCommands
 		return extension
 	}
 }
