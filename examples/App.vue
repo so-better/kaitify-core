@@ -18,9 +18,7 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-    editor.value?.commands.setTextStyle!({
-        color:'red'
-    })
+    editor.value!.commands.isBold!()? editor.value?.commands.unsetBold!():editor.value?.commands.setBold!()
 }
 
 onMounted(async () => {

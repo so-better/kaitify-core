@@ -1,4 +1,5 @@
 export * from './text'
 export * from './history'
 export * from './image'
+export * from './bold'
 export * from './Extension'
