@@ -1,12 +1,40 @@
 import interact from 'interactjs'
 import { event as DapEvent, element as DapElement } from 'dap-util'
-import { Editor, KNodeMarksType, KNodeStylesType } from '../../model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
+declare module '../../model' {
+	interface EditorCommandsType {
+		setImage?: (options: SetImageOptionsType) => void
+		canSetImage?: () => boolean
+		isInImage?: () => boolean
+	}
+}
+
+/**
+ * 插入图片方法入参类型
+ */
+type SetImageOptionsType = {
+	src: string
+	alt?: string
+	width?: string
+}
+
+/**
+ * 设置图片选中
+ */
+const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
+	DapEvent.off(el, 'click')
+	DapEvent.on(el, 'click', () => {
+		editor.setSelectionBefore(node, 'start')
+		editor.setSelectionAfter(node, 'end')
+		editor.updateRealSelection()
+	})
+}
 /**
  * 设置图片拖拽
  */
-const imageResizable = (editor: Editor, el: HTMLImageElement) => {
+const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 	//获取父元素宽度
 	const parentWidth = DapElement.width(el.parentElement!)
 	//设置拖拽改变大小的功能
@@ -52,8 +80,6 @@ const imageResizable = (editor: Editor, el: HTMLImageElement) => {
 				if (width >= parentWidth) width = parentWidth
 				//设置百分比宽度
 				const percentWidth = Number(((width / parentWidth) * 100).toFixed(2))
-				//查找对应的节点
-				const node = editor.findNode(event.target)
 				//设置节点的styles
 				if (node.hasStyles()) {
 					node.styles!.width = `${percentWidth}%`
@@ -94,6 +120,64 @@ export const imageExtension = Extension.create({
 			return
 		}
 		const images = this.$el!.querySelectorAll('img')
-		images.forEach(el => imageResizable(this, el))
+		images.forEach(el => {
+			//查找对应的节点
+			const node = this.findNode(el)
+			//图片选中
+			imageFocus(this, el, node)
+			//图片拖拽改变大小
+			imageResizable(this, el, node)
+		})
+	},
+	addCommands() {
+		/**
+		 * 是否不可设置图片
+		 */
+		const canSetImage = () => {
+			if (!this.selection.focused()) {
+				return false
+			}
+			const node = this.selection.start!.node
+			if (node.isInCodeBlockStyle()) {
+				return false
+			}
+			return true
+		}
+		/**
+		 * 插入图片
+		 */
+		const setImage = ({ src, alt, width }: SetImageOptionsType) => {
+			if (!src) {
+				return
+			}
+			if (!canSetImage()) {
+				return
+			}
+			const imageNode = KNode.create({
+				type: 'closed',
+				tag: 'img',
+				marks: {
+					src,
+					alt: alt || ''
+				},
+				styles: {
+					width: width || 'auto'
+				}
+			})
+			this.insertNode(imageNode)
+			this.setSelectionAfter(imageNode)
+			this.updateView()
+		}
+		/**
+		 * 光标是否都在图片上
+		 */
+		const isInImage = () => {
+			if (!this.selection.focused()) {
+				return false
+			}
+			return this.selection.start!.node.isEqual(this.selection.end!.node) && this.selection.start!.node.tag == 'img'
+		}
+
+		return { setImage, canSetImage, isInImage }
 	}
 })

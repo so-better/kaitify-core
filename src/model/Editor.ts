@@ -23,8 +23,8 @@ export type EditorSelectedType = {
 /**
  * 编辑器命令集合类型
  */
-export type EditorCommandsType = {
-	[name: string]: (...args: any[]) => void
+export interface EditorCommandsType {
+	[name: string]: ((...args: any[]) => void) | undefined
 }
 
 /**
@@ -861,6 +861,10 @@ export class Editor {
 				if (fn) fn.apply(this)
 				extension.afterUpdateView!.apply(this)
 			}
+		}
+		if (extension.addCommands) {
+			const commands = extension.addCommands.apply(this)
+			this.commands = { ...this.commands, ...commands }
 		}
 		console.log(`${extension.name}插件注册完成！`)
 	}

@@ -1,4 +1,4 @@
-import { Editor, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType } from '../model'
+import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType } from '../model'
 
 /**
  * 创建插件的入参类型
@@ -32,6 +32,10 @@ export type ExtensionCreateOptionType = {
 	 * 视图更新后回调
 	 */
 	afterUpdateView?: (this: Editor) => void
+	/**
+	 * 自定义命令
+	 */
+	addCommands?: (this: Editor) => EditorCommandsType
 }
 
 /**
@@ -70,6 +74,10 @@ export class Extension {
 	 * 视图更新后回调
 	 */
 	afterUpdateView?: (this: Editor) => void
+	/**
+	 * 自定义命令
+	 */
+	addCommands?: (this: Editor) => EditorCommandsType
 
 	constructor(name: string) {
 		this.name = name
@@ -86,6 +94,7 @@ export class Extension {
 		if (options.pasteKeepMarks) extension.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles
 		if (options.afterUpdateView) extension.afterUpdateView = options.afterUpdateView
+		if (options.addCommands) extension.addCommands = options.addCommands
 		return extension
 	}
 }
