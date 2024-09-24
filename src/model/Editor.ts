@@ -8,7 +8,7 @@ import { formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge,
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
-import { Extension, ImageExtension, TextExtension } from '../extensions'
+import { Extension, HistoryExtension, ImageExtension, TextExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 
@@ -223,7 +223,7 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [ImageExtension, TextExtension]
+	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
@@ -2264,30 +2264,6 @@ export class Editor {
 			}
 		}
 		return false
-	}
-
-	/**
-	 * 撤销【API】
-	 */
-	undo() {
-		const record = this.history.setUndo()
-		if (record) {
-			this.stackNodes = record.nodes
-			this.selection = record.selection
-			this.updateView(true)
-		}
-	}
-
-	/**
-	 * 重做【API】
-	 */
-	redo() {
-		const record = this.history.setRedo()
-		if (record) {
-			this.stackNodes = record.nodes
-			this.selection = record.selection
-			this.updateView(true)
-		}
 	}
 
 	/**

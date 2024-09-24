@@ -29,7 +29,7 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(this.commands.includeImage!());
+      console.log(this.commands.canRedo!());
     }
 	})
 })

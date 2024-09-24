@@ -353,12 +353,12 @@ export const onKeyboard = function (this: Editor, e: Event) {
 		//撤销
 		if (isUndo(event)) {
 			event.preventDefault()
-			this.undo()
+			this.commands.undo?.()
 		}
 		//重做
 		else if (isRedo(event)) {
 			event.preventDefault()
-			this.redo()
+			this.commands.redo?.()
 		}
 		//触发keydown
 		if (typeof this.onKeydown == 'function') {
