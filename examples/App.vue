@@ -18,6 +18,9 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
+    editor.value?.commands.setTextStyle!({
+        color:'red'
+    })
 }
 
 onMounted(async () => {
@@ -26,8 +29,7 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(this.commands.isInImage!());
-      
+      console.log(this.commands.includeImage!());
     }
 	})
 })
