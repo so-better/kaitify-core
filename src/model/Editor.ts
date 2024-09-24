@@ -21,6 +21,13 @@ export type EditorSelectedType = {
 }
 
 /**
+ * 编辑器命令集合类型
+ */
+export type EditorCommandsType = {
+	[name: string]: (...args: any[]) => void
+}
+
+/**
  * 编辑器配置入参类型
  */
 export type EditorConfigureOptionType = {
@@ -174,413 +181,168 @@ export type EditorConfigureOptionType = {
  */
 export class Editor {
 	/**
-	 * 编辑器的真实dom
+	 * 编辑器的真实dom【初始化后不可修改】
 	 */
 	$el?: HTMLElement
 	/**
-	 * 是否允许复制
+	 * 是否允许复制【初始化后可以修改】
 	 */
 	allowCopy: boolean = true
 	/**
-	 * 是否允许粘贴
+	 * 是否允许粘贴【初始化后可以修改】
 	 */
 	allowPaste: boolean = true
 	/**
-	 * 是否允许剪切
+	 * 是否允许剪切【初始化后可以修改】
 	 */
 	allowCut: boolean = true
 	/**
-	 * 是否允许粘贴html
+	 * 是否允许粘贴html【初始化后可以修改】
 	 */
 	allowPasteHtml: boolean = false
 	/**
-	 * 编辑器内渲染文本节点的真实标签
+	 * 编辑器内渲染文本节点的真实标签【初始化后不建议修改】
 	 */
 	textRenderTag: string = 'span'
 	/**
-	 * 编辑内渲染默认块级节点的真实标签，即段落标签
+	 * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】
 	 */
 	blockRenderTag: string = 'p'
 	/**
-	 * 编辑器内定义不显示的标签
+	 * 编辑器内定义不显示的标签【初始化后不建议修改】
 	 */
 	voidRenderTags: string[] = ['colgroup', 'col']
 	/**
-	 * 编辑器内定义需要置空的标签
+	 * 编辑器内定义需要置空的标签【初始化后不建议修改】
 	 */
 	emptyRenderTags: string[] = ['meta', 'link', 'style', 'script', 'title', 'base', 'noscript', 'template', 'annotation']
 	/**
-	 * 编辑器内额外保留的标签
+	 * 编辑器内额外保留的标签【初始化后不建议修改】
 	 */
 	extraKeepTags: string[] = []
 	/**
-	 * 插件数组
+	 * 插件数组【初始化后不可修改】
 	 */
 	extensions: Extension[] = [imageExtension]
 	/**
-	 * 编辑器的节点数组格式化规则
+	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
 	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatPlaceholderMerge, formatSiblingNodesMerge, formatParentNodeMerge, formatZeroWidthTextMerge]
 	/**
-	 * 自定义dom转为非文本节点的后续处理
+	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
 	domParseNodeCallback?: (this: Editor, node: KNode) => KNode
 	/**
-	 * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图
+	 * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图【初始化后不可修改】
 	 */
 	onUpdateView?: (this: Editor, init: boolean) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴纯文本时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
+	 * 编辑器粘贴纯文本时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理【初始化后不可修改】
 	 */
 	onPasteText?: (this: Editor, text: string) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴html内容时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
+	 * 编辑器粘贴html内容时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理【初始化后不可修改】
 	 */
 	onPasteHtml?: (this: Editor, nodes: KNode[], html: string) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴图片时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
+	 * 编辑器粘贴图片时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理【初始化后不可修改】
 	 */
 	onPasteImage?: (this: Editor, file: File) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴视频时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
+	 * 编辑器粘贴视频时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理【初始化后不可修改】
 	 */
 	onPasteVideo?: (this: Editor, file: File) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理
+	 * 编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理【初始化后不可修改】
 	 */
 	onPasteFile?: (this: Editor, file: File) => void | Promise<void>
 	/**
-	 * 编辑器内容改变触发
+	 * 编辑器内容改变触发【初始化后不可修改】
 	 */
 	onChange?: (this: Editor, newVal: string, oldVal: string) => void
 	/**
-	 * 编辑器光标发生变化
+	 * 编辑器光标发生变化【初始化后不可修改】
 	 */
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
-	 * 插入段落时触发
+	 * 插入段落时触发【初始化后不可修改】
 	 */
 	onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void
 	/**
-	 * 光标在编辑器起始位置执行删除时触发
+	 * 光标在编辑器起始位置执行删除时触发【初始化后不可修改】
 	 */
 	onDeleteInStart?: (this: Editor, blockNode: KNode) => void
 	/**
-	 * 完成删除时触发
+	 * 完成删除时触发【初始化后不可修改】
 	 */
 	onDeleteComplete?: (this: Editor) => void
 	/**
-	 * 光标在编辑器内时键盘按下触发
+	 * 光标在编辑器内时键盘按下触发【初始化后不可修改】
 	 */
 	onKeydown?: (this: Editor, event: KeyboardEvent) => void
 	/**
-	 * 光标在编辑器内时键盘松开触发
+	 * 光标在编辑器内时键盘松开触发【初始化后不可修改】
 	 */
 	onKeyup?: (this: Editor, event: KeyboardEvent) => void
 	/**
-	 * 编辑器聚焦时触发
+	 * 编辑器聚焦时触发【初始化后不可修改】
 	 */
 	onFocus?: (this: Editor, event: FocusEvent) => void
 	/**
-	 * 编辑器失焦时触发
+	 * 编辑器失焦时触发【初始化后不可修改】
 	 */
 	onBlur?: (this: Editor, event: FocusEvent) => void
 	/**
-	 * 节点粘贴保留标记的自定义方法
+	 * 节点粘贴保留标记的自定义方法【初始化后不可修改】
 	 */
 	pasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
 	/**
-	 * 节点粘贴保留样式的自定义方法
+	 * 节点粘贴保留样式的自定义方法【初始化后不可修改】
 	 */
 	pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
 	/**
-	 * 视图更新后回调方法
+	 * 视图更新后回调方法【初始化后不可修改】
 	 */
 	afterUpdateView?: (this: Editor) => void
 
 	/*---------------------下面的属性都是不属于创建编辑器的参数---------------------------*/
 
 	/**
-	 * 唯一id
+	 * 唯一id【不可修改】
 	 */
 	guid: number = createGuid()
 	/**
-	 * 虚拟光标
+	 * 虚拟光标【不建议修改】
 	 */
 	selection: Selection = new Selection()
 	/**
-	 * 历史记录
+	 * 历史记录【不建议修改】
 	 */
 	history: History = new History()
 	/**
-	 * 节点数组
+	 * 命令集合
+	 */
+	commands: EditorCommandsType = {}
+	/**
+	 * 节点数组【不建议修改】
 	 */
 	stackNodes: KNode[] = []
 	/**
-	 * 旧节点数组
+	 * 旧节点数组【不可修改】
 	 */
 	oldStackNodes: KNode[] = []
 	/**
-	 * 是否在输入中文
+	 * 是否在输入中文【不可修改】
 	 */
 	isComposition: boolean = false
 	/**
-	 * 是否编辑器内部渲染真实光标引起selctionChange事件
+	 * 是否编辑器内部渲染真实光标引起selctionChange事件【不可修改】
 	 */
 	internalCauseSelectionChange: boolean = false
 	/**
-	 * dom监听
+	 * dom监听【不可修改】
 	 */
 	domObserver: MutationObserver | null = null
-
-	/**
-	 * 根据dom查找到编辑内的对应节点
-	 */
-	findNode(dom: HTMLElement) {
-		if (!isContains(this.$el!, dom)) {
-			throw new Error(`The dom should be in the editor area, but what you provide is not`)
-		}
-		const key = dom.getAttribute(NODE_MARK)
-		if (!key) {
-			throw new Error(`The dom generated by editor should all have a ${NODE_MARK} attribute, but your dom does not. Check for "updateView" related issues`)
-		}
-		const node = KNode.searchByKey(key, this.stackNodes)
-		if (!node) {
-			throw new Error(`Unexpected error occurred: the knode was not found in the editor`)
-		}
-		return node
-	}
-
-	/**
-	 * 根据编辑器内的node查找真实dom
-	 */
-	findDom(node: KNode) {
-		let tag = node.tag
-		if (node.isText()) {
-			tag = this.textRenderTag
-		}
-		const dom = this.$el!.querySelector(`${tag}[${NODE_MARK}="${node.key}"]`)
-		if (!dom) {
-			throw new Error(`Unexpected error occurred: the dom was not found in the editor`)
-		}
-		return dom as HTMLElement
-	}
-
-	/**
-	 * 设置编辑器是否可编辑
-	 */
-	setEditable(editable: boolean) {
-		if (editable) {
-			this.$el?.setAttribute('contenteditable', 'true')
-		} else {
-			this.$el?.removeAttribute('contenteditable')
-		}
-		this.$el?.setAttribute('spellcheck', 'false')
-	}
-
-	/**
-	 * 判断编辑器是否可编辑
-	 */
-	isEditable() {
-		return this.$el?.getAttribute('contenteditable') == 'true'
-	}
-
-	/**
-	 * 初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
-	 */
-	checkNodes() {
-		const nodes = this.stackNodes.filter(item => {
-			return !item.isEmpty() && !this.voidRenderTags.includes(item.tag!)
-		})
-		if (nodes.length == 0) {
-			const node = KNode.create({
-				type: 'block',
-				tag: this.blockRenderTag
-			})
-			const placeholder = KNode.createPlaceholder()
-			this.addNode(placeholder, node)
-			this.stackNodes = [node]
-			if (this.selection.focused()) {
-				this.setSelectionBefore(placeholder)
-			}
-		}
-	}
-
-	/**
-	 * 将编辑器内的某个非块级节点转为默认块级节点
-	 */
-	convertToBlock(node: KNode) {
-		if (node.isBlock()) {
-			return
-		}
-		const newNode = node.clone(true)
-		//该节点是文本节点和闭合节点，处理光标问题
-		if (node.isText() || node.isClosed()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.selection.start!.node = newNode
-			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.selection.end!.node = newNode
-			}
-		}
-		node.type = 'block'
-		node.tag = this.blockRenderTag
-		node.marks = undefined
-		node.styles = undefined
-		node.textContent = undefined
-		node.children = [newNode]
-		newNode.parent = node
-	}
-
-	/**
-	 * dom转KNode
-	 */
-	domParseNode(dom: Node) {
-		if (dom.nodeType != 1 && dom.nodeType != 3) {
-			throw new Error('The argument must be an element node or text node')
-		}
-		//文本节点
-		if (dom.nodeType == 3) {
-			return KNode.create({
-				type: 'text',
-				textContent: dom.textContent || ''
-			})
-		}
-		//元素节点
-		const marks = getDomAttributes(dom as HTMLElement) //标记
-		const styles = getDomStyles(dom as HTMLElement) //样式
-		const tag = dom.nodeName.toLocaleLowerCase() //标签名称
-		const namespace = (dom as HTMLElement).namespaceURI //命名空间
-
-		//如果是需要置为空的标签返回空文本节点
-		if (this.voidRenderTags.includes(tag)) {
-			return KNode.create({
-				type: 'text'
-			})
-		}
-		//如果是默认的文本节点标签并且内部只有文本，则返回文本节点
-		if (tag == this.textRenderTag && dom.childNodes.length && Array.from(dom.childNodes).every(childNode => childNode.nodeType == 3)) {
-			return KNode.create({
-				type: 'text',
-				marks,
-				styles,
-				textContent: dom.textContent || ''
-			})
-		}
-		//默认配置
-		const block = blockParse.find(item => item.tag == tag)
-		const inline = inlineParse.find(item => item.tag == tag)
-		const closed = closedParse.find(item => item.tag == tag)
-		//构造参数
-		const config: KNodeCreateOptionType = {
-			type: 'inline',
-			tag,
-			marks,
-			styles,
-			namespace: namespace || ''
-		}
-		//默认的块节点
-		if (block) {
-			config.type = 'block'
-			config.children = []
-			if (block.parse) {
-				config.tag = this.blockRenderTag
-			}
-			if (block.fixed) {
-				config.fixed = block.fixed
-			}
-		}
-		//默认的行内节点
-		else if (inline) {
-			config.type = 'inline'
-			config.children = []
-			if (inline.parse) {
-				config.tag = this.textRenderTag
-				if (DapCommon.isObject(inline.parse)) {
-					const inlineParse = inline.parse as KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
-					for (let key in inlineParse) {
-						if (typeof inlineParse[key] == 'function') {
-							config.styles![key] = (inlineParse[key] as (element: HTMLElement) => string | number).apply(this, [dom as HTMLElement])
-						} else {
-							config.styles![key] = inlineParse[key] as string | number
-						}
-					}
-				}
-			}
-		}
-		//默认的自闭合节点
-		else if (closed) {
-			config.type = 'closed'
-		}
-		//其余元素如果不在extraKeepTags范围内则默认转为行内的默认文本节点标签
-		else if (!this.extraKeepTags.includes(tag)) {
-			config.type = 'inline'
-			config.tag = this.textRenderTag
-			config.namespace = ''
-			config.children = []
-		}
-		let node = KNode.create(config)
-		//如果不是闭合节点则设置子节点
-		if (!closed) {
-			Array.from(dom.childNodes).forEach(child => {
-				if (child.nodeType == 1 || child.nodeType == 3) {
-					const childNode = this.domParseNode(child)
-					childNode.parent = node
-					if (node.hasChildren()) {
-						node.children!.push(childNode)
-					} else {
-						node.children = [childNode]
-					}
-				}
-			})
-		}
-		//转换后的回调处理，在这里可以自定义处理节点
-		if (typeof this.domParseNodeCallback == 'function') {
-			node = this.domParseNodeCallback.apply(this, [node])
-		}
-		return node
-	}
-
-	/**
-	 * html转KNode
-	 */
-	htmlParseNode(html: string) {
-		const template = document.createElement('template')
-		template.innerHTML = html
-		const nodes: KNode[] = []
-		template.content.childNodes.forEach(item => {
-			if (item.nodeType == 1 || item.nodeType == 3) {
-				const node = this.domParseNode(item)
-				nodes.push(node)
-			}
-		})
-		return nodes
-	}
-
-	/**
-	 * 判断节点是否根级块节点，如果该节点在根部但不是块节点返回false
-	 */
-	isRootBlock(node: KNode): boolean {
-		const index = this.stackNodes.findIndex(item => item.isEqual(node))
-		if (index > -1) {
-			return node.isBlock()
-		}
-		return false
-	}
-
-	/**
-	 * 获取指定节点所在的根级块节点，如果该节点没有加入到编辑器内那么会返回null
-	 */
-	getRootBlock(node: KNode): KNode | null {
-		const index = this.stackNodes.findIndex(item => item.isEqual(node))
-		if (index > -1) {
-			return node.isBlock() ? node : null
-		}
-		if (!node.parent) {
-			return null
-		}
-		return this.getRootBlock(node.parent)
-	}
 
 	/**
 	 * 将后一个块节点与前一个块节点合并
@@ -604,342 +366,6 @@ export class Editor {
 			})
 			node.children!.push(...nodes)
 			target.children = []
-		}
-	}
-
-	/**
-	 * 将指定节点添加到某个节点的子节点数组里
-	 */
-	addNode(node: KNode, parentNode: KNode, index: number | undefined = 0) {
-		//排除空节点
-		if (node.isEmpty()) {
-			return
-		}
-		//父节点不能是文本节点或者闭合节点
-		if (parentNode.isText() || parentNode.isClosed()) {
-			return
-		}
-		//不存在子节点，初始为空数组
-		if (!parentNode.hasChildren()) {
-			parentNode.children = []
-		}
-		if (index >= parentNode.children!.length) {
-			parentNode.children!.push(node)
-		} else {
-			parentNode.children!.splice(index, 0, node)
-		}
-		node.parent = parentNode
-	}
-
-	/**
-	 * 将指定节点添加到某个节点前面
-	 */
-	addNodeBefore(node: KNode, target: KNode) {
-		if (target.parent) {
-			const index = target.parent!.children!.findIndex(item => {
-				return target.isEqual(item)
-			})
-			this.addNode(node, target.parent!, index)
-		} else {
-			const index = this.stackNodes.findIndex(item => {
-				return target.isEqual(item)
-			})
-			this.stackNodes.splice(index, 0, node)
-			node.parent = undefined
-		}
-	}
-
-	/**
-	 * 将指定节点添加到某个节点后面
-	 */
-	addNodeAfter(node: KNode, target: KNode) {
-		if (target.parent) {
-			const index = target.parent!.children!.findIndex(item => {
-				return target.isEqual(item)
-			})
-			this.addNode(node, target.parent!, index + 1)
-		} else {
-			const index = this.stackNodes.findIndex(item => {
-				return target.isEqual(item)
-			})
-			this.stackNodes.splice(index + 1, 0, node)
-			node.parent = undefined
-		}
-	}
-
-	/**
-	 * 获取某个节点内的最后一个可以设置光标点的节点
-	 */
-	getLastSelectionNodeInChildren(node: KNode): KNode | null {
-		//空节点
-		if (node.isEmpty()) {
-			return null
-		}
-		//子节点是不可见节点
-		if (node.tag && this.voidRenderTags.includes(node.tag)) {
-			return null
-		}
-		//文本节点和闭合节点返回自身
-		if (node.isText() || node.isClosed()) {
-			return node
-		}
-		let selectionNode = null
-		const length = node.children!.length
-		//遍历子节点
-		for (let i = length - 1; i >= 0; i--) {
-			const child = node.children![i]
-			selectionNode = this.getLastSelectionNodeInChildren(child)
-			//这里如果在子节点中找到了可以设置光标点的节点，一定要break直接终止for循环的执行
-			if (selectionNode) {
-				break
-			}
-		}
-		return selectionNode
-	}
-
-	/**
-	 * 获取某个节点内的第一个可以设置光标点的节点
-	 */
-	getFirstSelectionNodeInChildren(node: KNode): KNode | null {
-		//空节点
-		if (node.isEmpty()) {
-			return null
-		}
-		//子节点是不可见节点
-		if (node.tag && this.voidRenderTags.includes(node.tag)) {
-			return null
-		}
-		//文本节点和闭合节点返回自身
-		if (node.isText() || node.isClosed()) {
-			return node
-		}
-		let selectionNode = null
-		const length = node.children!.length
-		//遍历子节点
-		for (let i = 0; i < length; i++) {
-			const child = node.children![i]
-			selectionNode = this.getFirstSelectionNodeInChildren(child)
-			//这里如果在子节点中找到了可以设置光标点的节点，一定要break直接终止for循环的执行
-			if (selectionNode) {
-				break
-			}
-		}
-		return selectionNode
-	}
-
-	/**
-	 * 查找指定节点之前可以设置为光标点的非空节点
-	 */
-	getPreviousSelectionNode(node: KNode): KNode | null {
-		const nodes = node.parent ? node.parent.children! : this.stackNodes
-		//获取前一个节点
-		const previousNode = node.getPrevious(nodes)
-		//前一个节点存在
-		if (previousNode) {
-			//是空节点，则跳过继续向前
-			if (previousNode.isEmpty()) {
-				return this.getPreviousSelectionNode(previousNode)
-			}
-			//是不可见节点，则跳过继续向前
-			if (previousNode.tag && this.voidRenderTags.includes(previousNode.tag)) {
-				return this.getPreviousSelectionNode(previousNode)
-			}
-			//是文本节点或者闭合节点
-			if (previousNode.isText() || previousNode.isClosed()) {
-				return previousNode
-			}
-			//其他节点：查找子节点中的最后一个可以设置光标点的节点
-			return this.getLastSelectionNodeInChildren(previousNode)
-		}
-		//前一个节点不存在的情况，说明该节点是节点数组中的第一个节点
-		return node.parent ? this.getPreviousSelectionNode(node.parent) : null
-	}
-
-	/**
-	 * 查找指定节点之后可以设置为光标点的非空节点
-	 */
-	getNextSelectionNode(node: KNode): KNode | null {
-		const nodes = node.parent ? node.parent.children! : this.stackNodes
-		//获取后一个节点
-		const nextNode = node.getNext(nodes)
-		//后一个节点存在
-		if (nextNode) {
-			//是空节点，则跳过继续向后
-			if (nextNode.isEmpty()) {
-				return this.getNextSelectionNode(nextNode)
-			}
-			//是不可见节点，则跳过继续向后
-			if (nextNode.tag && this.voidRenderTags.includes(nextNode.tag)) {
-				return this.getNextSelectionNode(nextNode)
-			}
-			//是文本节点或者闭合节点
-			if (nextNode.isText() || nextNode.isClosed()) {
-				return nextNode
-			}
-			//其他节点：查找子节点中的第一个可以设置光标点的节点
-			return this.getFirstSelectionNodeInChildren(nextNode)
-		}
-		//后一个节点不存在的情况，说明该节点是节点数组中的最后一个节点
-		return node.parent ? this.getNextSelectionNode(node.parent) : null
-	}
-
-	/**
-	 * 设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
-	 */
-	setSelectionBefore(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
-		//指定到某个节点
-		if (node) {
-			const selectionNode = this.getFirstSelectionNodeInChildren(node)
-			if (selectionNode) {
-				if (type == 'start' || type == 'all') {
-					this.selection.start = {
-						node: selectionNode,
-						offset: 0
-					}
-				}
-				if (type == 'end' || type == 'all') {
-					this.selection.end = {
-						node: selectionNode,
-						offset: 0
-					}
-				}
-			}
-		}
-		//指定到文档前面
-		else {
-			//获取第一个节点
-			const firstNode = this.stackNodes[0]
-			//获取firstNode中的第一个可以设置光标点的节点
-			let selectionNode = this.getFirstSelectionNodeInChildren(firstNode)
-			//如果firstNode不能设置光标点，则向后查询
-			if (!selectionNode) selectionNode = this.getNextSelectionNode(firstNode)
-			//如果firstNode可以设置光标点
-			if (selectionNode) {
-				if (type == 'start' || type == 'all') {
-					this.selection.start = {
-						node: selectionNode,
-						offset: 0
-					}
-				}
-				if (type == 'end' || type == 'all') {
-					this.selection.end = {
-						node: selectionNode,
-						offset: 0
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
-	 */
-	setSelectionAfter(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
-		//指定到某个节点
-		if (node) {
-			const selectionNode = this.getLastSelectionNodeInChildren(node)
-			if (selectionNode) {
-				if (type == 'start' || type == 'all') {
-					this.selection.start = {
-						node: selectionNode,
-						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
-					}
-				}
-				if (type == 'end' || type == 'all') {
-					this.selection.end = {
-						node: selectionNode,
-						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
-					}
-				}
-			}
-		}
-		//指定到文档前面
-		else {
-			//获取最后一个节点
-			const lastNode = this.stackNodes[this.stackNodes.length - 1]
-			//获取lastNode中的最后一个可以设置光标点的节点
-			let selectionNode = this.getLastSelectionNodeInChildren(lastNode)
-			//如果lastNode不能设置光标点，则向前查询
-			if (!selectionNode) selectionNode = this.getPreviousSelectionNode(lastNode)
-			//如果lastNode可以设置光标点
-			if (selectionNode) {
-				if (type == 'start' || type == 'all') {
-					this.selection.start = {
-						node: selectionNode,
-						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
-					}
-				}
-				if (type == 'end' || type == 'all') {
-					this.selection.end = {
-						node: selectionNode,
-						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新
-	 */
-	updateSelectionRecently(type: 'all' | 'start' | 'end' | undefined = 'all') {
-		if (!this.selection.focused()) {
-			return
-		}
-		if (type == 'start' || type == 'all') {
-			const previousNode = this.getPreviousSelectionNode(this.selection.start!.node)
-			const nextNode = this.getNextSelectionNode(this.selection.start!.node)
-			const blockNode = this.selection.start!.node.getBlock()
-			if (previousNode && blockNode.isContains(previousNode)) {
-				this.selection.start!.node = previousNode
-				this.selection.start!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
-			} else if (nextNode && blockNode.isContains(nextNode)) {
-				this.selection.start!.node = nextNode
-				this.selection.start!.offset = 0
-			} else if (previousNode) {
-				this.selection.start!.node = previousNode
-				this.selection.start!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
-			} else if (nextNode) {
-				this.selection.start!.node = nextNode
-				this.selection.start!.offset = 0
-			}
-		}
-		if (type == 'end' || type == 'all') {
-			const previousNode = this.getPreviousSelectionNode(this.selection.end!.node)
-			const nextNode = this.getNextSelectionNode(this.selection.end!.node)
-			const blockNode = this.selection.end!.node.getBlock()
-			if (previousNode && blockNode.isContains(previousNode)) {
-				this.selection.end!.node = previousNode
-				this.selection.end!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
-			} else if (nextNode && blockNode.isContains(nextNode)) {
-				this.selection.end!.node = nextNode
-				this.selection.end!.offset = 0
-			} else if (previousNode) {
-				this.selection.end!.node = previousNode
-				this.selection.end!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
-			} else if (nextNode) {
-				this.selection.end!.node = nextNode
-				this.selection.end!.offset = 0
-			}
-		}
-	}
-
-	/**
-	 * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
-	 */
-	isSelectionInNode(node: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
-		//没有初始化设置光标
-		if (!this.selection.focused()) {
-			return false
-		}
-		if (type == 'start') {
-			return node.isContains(this.selection.start!.node)
-		}
-		if (type == 'end') {
-			return node.isContains(this.selection.end!.node)
-		}
-		if (type == 'all') {
-			return node.isContains(this.selection.start!.node) && node.isContains(this.selection.end!.node)
 		}
 	}
 
@@ -1281,7 +707,726 @@ export class Editor {
 	}
 
 	/**
-	 * 获取光标选区内的节点
+	 * 清空固定块节点的内容
+	 */
+	emptyFixedBlock(node: KNode) {
+		if (!node.isBlock()) {
+			return
+		}
+		if (node.hasChildren()) {
+			node.children!.forEach(item => {
+				//如果是固定的块节点
+				if (item.isBlock() && item.fixed) {
+					this.emptyFixedBlock(item)
+				}
+				//其他情况下
+				else {
+					item.toEmpty()
+					if (item.parent!.isEmpty()) {
+						const placeholderNode = KNode.createPlaceholder()
+						this.addNode(placeholderNode, item.parent!)
+					}
+				}
+			})
+		}
+	}
+
+	/**
+	 * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
+	 */
+	scrollViewToSelection() {
+		if (this.selection.focused()) {
+			const focusDom = this.findDom(this.selection.end!.node)
+			const scrollFunction = async (scrollEl: HTMLElement) => {
+				const scrollHeight = DapElement.getScrollHeight(scrollEl)
+				const scrollWidth = DapElement.getScrollWidth(scrollEl)
+				//存在横向或者垂直滚动条
+				if (scrollEl.clientHeight < scrollHeight || scrollEl.clientWidth < scrollWidth) {
+					const selection = window.getSelection()!
+					const range = selection.getRangeAt(0)
+					const rects = range.getClientRects()
+					let target: Range | HTMLElement = range
+					if (rects.length == 0) {
+						target = focusDom
+					}
+					const childRect = target.getBoundingClientRect()
+					const parentRect = scrollEl.getBoundingClientRect()
+					//存在垂直滚动条
+					if (scrollEl.clientHeight < scrollHeight) {
+						//如果光标所在节点不在视图内则滚动到视图内
+						if (childRect.top < parentRect.top) {
+							await DapElement.setScrollTop({
+								el: scrollEl,
+								number: 0
+							})
+							const tempChildRect = target.getBoundingClientRect()
+							const tempParentRect = scrollEl.getBoundingClientRect()
+							DapElement.setScrollTop({
+								el: scrollEl,
+								number: tempChildRect.top - tempParentRect.top
+							})
+						} else if (childRect.bottom > parentRect.bottom) {
+							await DapElement.setScrollTop({
+								el: scrollEl,
+								number: 0
+							})
+							const tempChildRect = target.getBoundingClientRect()
+							const tempParentRect = scrollEl.getBoundingClientRect()
+							DapElement.setScrollTop({
+								el: scrollEl,
+								number: tempChildRect.bottom - tempParentRect.bottom
+							})
+						}
+					}
+					//存在横向滚动条
+					if (scrollEl.clientWidth < scrollWidth) {
+						//如果光标所在节点不在视图内则滚动到视图内
+						if (childRect.left < parentRect.left) {
+							await DapElement.setScrollLeft({
+								el: scrollEl,
+								number: 0
+							})
+							const tempChildRect = target.getBoundingClientRect()
+							const tempParentRect = scrollEl.getBoundingClientRect()
+							DapElement.setScrollLeft({
+								el: scrollEl,
+								number: tempChildRect.left - tempParentRect.left + 20
+							})
+						} else if (childRect.right > parentRect.right) {
+							await DapElement.setScrollLeft({
+								el: scrollEl,
+								number: 0
+							})
+							const tempChildRect = target.getBoundingClientRect()
+							const tempParentRect = scrollEl.getBoundingClientRect()
+							DapElement.setScrollLeft({
+								el: scrollEl,
+								number: tempChildRect.right - tempParentRect.right + 20
+							})
+						}
+					}
+				}
+			}
+			let dom = focusDom
+			while (DapElement.isElement(dom) && dom != document.documentElement) {
+				scrollFunction(dom)
+				dom = dom.parentNode as HTMLElement
+			}
+		}
+	}
+
+	/**
+	 * 注册插件
+	 */
+	registerExtension(extension: Extension) {
+		if (extension.registered) {
+			return
+		}
+		extension.registered = true
+		if (extension.extraKeepTags) {
+			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
+		}
+		if (extension.domParseNodeCallback) {
+			const fn = this.domParseNodeCallback
+			this.domParseNodeCallback = (node: KNode) => {
+				if (fn) node = fn.apply(this, [node])
+				node = extension.domParseNodeCallback!.apply(this, [node])
+				return node
+			}
+		}
+		if (extension.formatRule) {
+			this.formatRules = [...this.formatRules, extension.formatRule]
+		}
+		if (extension.pasteKeepMarks) {
+			const fn = this.pasteKeepMarks
+			this.pasteKeepMarks = (node: KNode) => {
+				const marks: KNodeMarksType = {}
+				if (fn) Object.assign(marks, fn.apply(this, [node]))
+				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
+				return marks
+			}
+		}
+		if (extension.pasteKeepStyles) {
+			const fn = this.pasteKeepStyles
+			this.pasteKeepStyles = (node: KNode) => {
+				const styles: KNodeStylesType = {}
+				if (fn) Object.assign(styles, fn.apply(this, [node]))
+				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
+				return styles
+			}
+		}
+		if (extension.afterUpdateView) {
+			const fn = this.afterUpdateView
+			this.afterUpdateView = () => {
+				if (fn) fn.apply(this)
+				extension.afterUpdateView!.apply(this)
+			}
+		}
+		console.log(`${extension.name}插件注册完成！`)
+	}
+
+	/**
+	 * 根据dom查找到编辑内的对应节点【API】
+	 */
+	findNode(dom: HTMLElement) {
+		if (!isContains(this.$el!, dom)) {
+			throw new Error(`The dom should be in the editor area, but what you provide is not`)
+		}
+		const key = dom.getAttribute(NODE_MARK)
+		if (!key) {
+			throw new Error(`The dom generated by editor should all have a ${NODE_MARK} attribute, but your dom does not. Check for "updateView" related issues`)
+		}
+		const node = KNode.searchByKey(key, this.stackNodes)
+		if (!node) {
+			throw new Error(`Unexpected error occurred: the knode was not found in the editor`)
+		}
+		return node
+	}
+
+	/**
+	 * 根据编辑器内的node查找真实dom【API】
+	 */
+	findDom(node: KNode) {
+		let tag = node.tag
+		if (node.isText()) {
+			tag = this.textRenderTag
+		}
+		const dom = this.$el!.querySelector(`${tag}[${NODE_MARK}="${node.key}"]`)
+		if (!dom) {
+			throw new Error(`Unexpected error occurred: the dom was not found in the editor`)
+		}
+		return dom as HTMLElement
+	}
+
+	/**
+	 * 设置编辑器是否可编辑【API】
+	 */
+	setEditable(editable: boolean) {
+		if (editable) {
+			this.$el?.setAttribute('contenteditable', 'true')
+		} else {
+			this.$el?.removeAttribute('contenteditable')
+		}
+		this.$el?.setAttribute('spellcheck', 'false')
+	}
+
+	/**
+	 * 判断编辑器是否可编辑【API】
+	 */
+	isEditable() {
+		return this.$el?.getAttribute('contenteditable') == 'true'
+	}
+
+	/**
+	 * 初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落【API】
+	 */
+	checkNodes() {
+		const nodes = this.stackNodes.filter(item => {
+			return !item.isEmpty() && !this.voidRenderTags.includes(item.tag!)
+		})
+		if (nodes.length == 0) {
+			const node = KNode.create({
+				type: 'block',
+				tag: this.blockRenderTag
+			})
+			const placeholder = KNode.createPlaceholder()
+			this.addNode(placeholder, node)
+			this.stackNodes = [node]
+			if (this.selection.focused()) {
+				this.setSelectionBefore(placeholder)
+			}
+		}
+	}
+
+	/**
+	 * 将编辑器内的某个非块级节点转为默认块级节点【API】
+	 */
+	convertToBlock(node: KNode) {
+		if (node.isBlock()) {
+			return
+		}
+		const newNode = node.clone(true)
+		//该节点是文本节点和闭合节点，处理光标问题
+		if (node.isText() || node.isClosed()) {
+			if (this.isSelectionInNode(node, 'start')) {
+				this.selection.start!.node = newNode
+			}
+			if (this.isSelectionInNode(node, 'end')) {
+				this.selection.end!.node = newNode
+			}
+		}
+		node.type = 'block'
+		node.tag = this.blockRenderTag
+		node.marks = undefined
+		node.styles = undefined
+		node.textContent = undefined
+		node.children = [newNode]
+		newNode.parent = node
+	}
+
+	/**
+	 * dom转KNode【API】
+	 */
+	domParseNode(dom: Node) {
+		if (dom.nodeType != 1 && dom.nodeType != 3) {
+			throw new Error('The argument must be an element node or text node')
+		}
+		//文本节点
+		if (dom.nodeType == 3) {
+			return KNode.create({
+				type: 'text',
+				textContent: dom.textContent || ''
+			})
+		}
+		//元素节点
+		const marks = getDomAttributes(dom as HTMLElement) //标记
+		const styles = getDomStyles(dom as HTMLElement) //样式
+		const tag = dom.nodeName.toLocaleLowerCase() //标签名称
+		const namespace = (dom as HTMLElement).namespaceURI //命名空间
+
+		//如果是需要置为空的标签返回空文本节点
+		if (this.voidRenderTags.includes(tag)) {
+			return KNode.create({
+				type: 'text'
+			})
+		}
+		//如果是默认的文本节点标签并且内部只有文本，则返回文本节点
+		if (tag == this.textRenderTag && dom.childNodes.length && Array.from(dom.childNodes).every(childNode => childNode.nodeType == 3)) {
+			return KNode.create({
+				type: 'text',
+				marks,
+				styles,
+				textContent: dom.textContent || ''
+			})
+		}
+		//默认配置
+		const block = blockParse.find(item => item.tag == tag)
+		const inline = inlineParse.find(item => item.tag == tag)
+		const closed = closedParse.find(item => item.tag == tag)
+		//构造参数
+		const config: KNodeCreateOptionType = {
+			type: 'inline',
+			tag,
+			marks,
+			styles,
+			namespace: namespace || ''
+		}
+		//默认的块节点
+		if (block) {
+			config.type = 'block'
+			config.children = []
+			if (block.parse) {
+				config.tag = this.blockRenderTag
+			}
+			if (block.fixed) {
+				config.fixed = block.fixed
+			}
+		}
+		//默认的行内节点
+		else if (inline) {
+			config.type = 'inline'
+			config.children = []
+			if (inline.parse) {
+				config.tag = this.textRenderTag
+				if (DapCommon.isObject(inline.parse)) {
+					const inlineParse = inline.parse as KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
+					for (let key in inlineParse) {
+						if (typeof inlineParse[key] == 'function') {
+							config.styles![key] = (inlineParse[key] as (element: HTMLElement) => string | number).apply(this, [dom as HTMLElement])
+						} else {
+							config.styles![key] = inlineParse[key] as string | number
+						}
+					}
+				}
+			}
+		}
+		//默认的自闭合节点
+		else if (closed) {
+			config.type = 'closed'
+		}
+		//其余元素如果不在extraKeepTags范围内则默认转为行内的默认文本节点标签
+		else if (!this.extraKeepTags.includes(tag)) {
+			config.type = 'inline'
+			config.tag = this.textRenderTag
+			config.namespace = ''
+			config.children = []
+		}
+		let node = KNode.create(config)
+		//如果不是闭合节点则设置子节点
+		if (!closed) {
+			Array.from(dom.childNodes).forEach(child => {
+				if (child.nodeType == 1 || child.nodeType == 3) {
+					const childNode = this.domParseNode(child)
+					childNode.parent = node
+					if (node.hasChildren()) {
+						node.children!.push(childNode)
+					} else {
+						node.children = [childNode]
+					}
+				}
+			})
+		}
+		//转换后的回调处理，在这里可以自定义处理节点
+		if (typeof this.domParseNodeCallback == 'function') {
+			node = this.domParseNodeCallback.apply(this, [node])
+		}
+		return node
+	}
+
+	/**
+	 * html转KNode【API】
+	 */
+	htmlParseNode(html: string) {
+		const template = document.createElement('template')
+		template.innerHTML = html
+		const nodes: KNode[] = []
+		template.content.childNodes.forEach(item => {
+			if (item.nodeType == 1 || item.nodeType == 3) {
+				const node = this.domParseNode(item)
+				nodes.push(node)
+			}
+		})
+		return nodes
+	}
+
+	/**
+	 * 将指定节点添加到某个节点的子节点数组里【API】
+	 */
+	addNode(node: KNode, parentNode: KNode, index: number | undefined = 0) {
+		//排除空节点
+		if (node.isEmpty()) {
+			return
+		}
+		//父节点不能是文本节点或者闭合节点
+		if (parentNode.isText() || parentNode.isClosed()) {
+			return
+		}
+		//不存在子节点，初始为空数组
+		if (!parentNode.hasChildren()) {
+			parentNode.children = []
+		}
+		if (index >= parentNode.children!.length) {
+			parentNode.children!.push(node)
+		} else {
+			parentNode.children!.splice(index, 0, node)
+		}
+		node.parent = parentNode
+	}
+
+	/**
+	 * 将指定节点添加到某个节点前面【API】
+	 */
+	addNodeBefore(node: KNode, target: KNode) {
+		if (target.parent) {
+			const index = target.parent!.children!.findIndex(item => {
+				return target.isEqual(item)
+			})
+			this.addNode(node, target.parent!, index)
+		} else {
+			const index = this.stackNodes.findIndex(item => {
+				return target.isEqual(item)
+			})
+			this.stackNodes.splice(index, 0, node)
+			node.parent = undefined
+		}
+	}
+
+	/**
+	 * 将指定节点添加到某个节点后面【API】
+	 */
+	addNodeAfter(node: KNode, target: KNode) {
+		if (target.parent) {
+			const index = target.parent!.children!.findIndex(item => {
+				return target.isEqual(item)
+			})
+			this.addNode(node, target.parent!, index + 1)
+		} else {
+			const index = this.stackNodes.findIndex(item => {
+				return target.isEqual(item)
+			})
+			this.stackNodes.splice(index + 1, 0, node)
+			node.parent = undefined
+		}
+	}
+
+	/**
+	 * 获取某个节点内的最后一个可以设置光标点的节点【API】
+	 */
+	getLastSelectionNodeInChildren(node: KNode): KNode | null {
+		//空节点
+		if (node.isEmpty()) {
+			return null
+		}
+		//子节点是不可见节点
+		if (node.tag && this.voidRenderTags.includes(node.tag)) {
+			return null
+		}
+		//文本节点和闭合节点返回自身
+		if (node.isText() || node.isClosed()) {
+			return node
+		}
+		let selectionNode = null
+		const length = node.children!.length
+		//遍历子节点
+		for (let i = length - 1; i >= 0; i--) {
+			const child = node.children![i]
+			selectionNode = this.getLastSelectionNodeInChildren(child)
+			//这里如果在子节点中找到了可以设置光标点的节点，一定要break直接终止for循环的执行
+			if (selectionNode) {
+				break
+			}
+		}
+		return selectionNode
+	}
+
+	/**
+	 * 获取某个节点内的第一个可以设置光标点的节点【API】
+	 */
+	getFirstSelectionNodeInChildren(node: KNode): KNode | null {
+		//空节点
+		if (node.isEmpty()) {
+			return null
+		}
+		//子节点是不可见节点
+		if (node.tag && this.voidRenderTags.includes(node.tag)) {
+			return null
+		}
+		//文本节点和闭合节点返回自身
+		if (node.isText() || node.isClosed()) {
+			return node
+		}
+		let selectionNode = null
+		const length = node.children!.length
+		//遍历子节点
+		for (let i = 0; i < length; i++) {
+			const child = node.children![i]
+			selectionNode = this.getFirstSelectionNodeInChildren(child)
+			//这里如果在子节点中找到了可以设置光标点的节点，一定要break直接终止for循环的执行
+			if (selectionNode) {
+				break
+			}
+		}
+		return selectionNode
+	}
+
+	/**
+	 * 查找指定节点之前可以设置为光标点的非空节点【API】
+	 */
+	getPreviousSelectionNode(node: KNode): KNode | null {
+		const nodes = node.parent ? node.parent.children! : this.stackNodes
+		//获取前一个节点
+		const previousNode = node.getPrevious(nodes)
+		//前一个节点存在
+		if (previousNode) {
+			//是空节点，则跳过继续向前
+			if (previousNode.isEmpty()) {
+				return this.getPreviousSelectionNode(previousNode)
+			}
+			//是不可见节点，则跳过继续向前
+			if (previousNode.tag && this.voidRenderTags.includes(previousNode.tag)) {
+				return this.getPreviousSelectionNode(previousNode)
+			}
+			//是文本节点或者闭合节点
+			if (previousNode.isText() || previousNode.isClosed()) {
+				return previousNode
+			}
+			//其他节点：查找子节点中的最后一个可以设置光标点的节点
+			return this.getLastSelectionNodeInChildren(previousNode)
+		}
+		//前一个节点不存在的情况，说明该节点是节点数组中的第一个节点
+		return node.parent ? this.getPreviousSelectionNode(node.parent) : null
+	}
+
+	/**
+	 * 查找指定节点之后可以设置为光标点的非空节点【API】
+	 */
+	getNextSelectionNode(node: KNode): KNode | null {
+		const nodes = node.parent ? node.parent.children! : this.stackNodes
+		//获取后一个节点
+		const nextNode = node.getNext(nodes)
+		//后一个节点存在
+		if (nextNode) {
+			//是空节点，则跳过继续向后
+			if (nextNode.isEmpty()) {
+				return this.getNextSelectionNode(nextNode)
+			}
+			//是不可见节点，则跳过继续向后
+			if (nextNode.tag && this.voidRenderTags.includes(nextNode.tag)) {
+				return this.getNextSelectionNode(nextNode)
+			}
+			//是文本节点或者闭合节点
+			if (nextNode.isText() || nextNode.isClosed()) {
+				return nextNode
+			}
+			//其他节点：查找子节点中的第一个可以设置光标点的节点
+			return this.getFirstSelectionNodeInChildren(nextNode)
+		}
+		//后一个节点不存在的情况，说明该节点是节点数组中的最后一个节点
+		return node.parent ? this.getNextSelectionNode(node.parent) : null
+	}
+
+	/**
+	 * 设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置【API】
+	 */
+	setSelectionBefore(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
+		//指定到某个节点
+		if (node) {
+			const selectionNode = this.getFirstSelectionNodeInChildren(node)
+			if (selectionNode) {
+				if (type == 'start' || type == 'all') {
+					this.selection.start = {
+						node: selectionNode,
+						offset: 0
+					}
+				}
+				if (type == 'end' || type == 'all') {
+					this.selection.end = {
+						node: selectionNode,
+						offset: 0
+					}
+				}
+			}
+		}
+		//指定到文档前面
+		else {
+			//获取第一个节点
+			const firstNode = this.stackNodes[0]
+			//获取firstNode中的第一个可以设置光标点的节点
+			let selectionNode = this.getFirstSelectionNodeInChildren(firstNode)
+			//如果firstNode不能设置光标点，则向后查询
+			if (!selectionNode) selectionNode = this.getNextSelectionNode(firstNode)
+			//如果firstNode可以设置光标点
+			if (selectionNode) {
+				if (type == 'start' || type == 'all') {
+					this.selection.start = {
+						node: selectionNode,
+						offset: 0
+					}
+				}
+				if (type == 'end' || type == 'all') {
+					this.selection.end = {
+						node: selectionNode,
+						offset: 0
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置【API】
+	 */
+	setSelectionAfter(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
+		//指定到某个节点
+		if (node) {
+			const selectionNode = this.getLastSelectionNodeInChildren(node)
+			if (selectionNode) {
+				if (type == 'start' || type == 'all') {
+					this.selection.start = {
+						node: selectionNode,
+						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
+					}
+				}
+				if (type == 'end' || type == 'all') {
+					this.selection.end = {
+						node: selectionNode,
+						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
+					}
+				}
+			}
+		}
+		//指定到文档前面
+		else {
+			//获取最后一个节点
+			const lastNode = this.stackNodes[this.stackNodes.length - 1]
+			//获取lastNode中的最后一个可以设置光标点的节点
+			let selectionNode = this.getLastSelectionNodeInChildren(lastNode)
+			//如果lastNode不能设置光标点，则向前查询
+			if (!selectionNode) selectionNode = this.getPreviousSelectionNode(lastNode)
+			//如果lastNode可以设置光标点
+			if (selectionNode) {
+				if (type == 'start' || type == 'all') {
+					this.selection.start = {
+						node: selectionNode,
+						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
+					}
+				}
+				if (type == 'end' || type == 'all') {
+					this.selection.end = {
+						node: selectionNode,
+						offset: selectionNode.isText() ? selectionNode.textContent!.length : 1
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新【API】
+	 */
+	updateSelectionRecently(type: 'all' | 'start' | 'end' | undefined = 'all') {
+		if (!this.selection.focused()) {
+			return
+		}
+		if (type == 'start' || type == 'all') {
+			const previousNode = this.getPreviousSelectionNode(this.selection.start!.node)
+			const nextNode = this.getNextSelectionNode(this.selection.start!.node)
+			const blockNode = this.selection.start!.node.getBlock()
+			if (previousNode && blockNode.isContains(previousNode)) {
+				this.selection.start!.node = previousNode
+				this.selection.start!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
+			} else if (nextNode && blockNode.isContains(nextNode)) {
+				this.selection.start!.node = nextNode
+				this.selection.start!.offset = 0
+			} else if (previousNode) {
+				this.selection.start!.node = previousNode
+				this.selection.start!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
+			} else if (nextNode) {
+				this.selection.start!.node = nextNode
+				this.selection.start!.offset = 0
+			}
+		}
+		if (type == 'end' || type == 'all') {
+			const previousNode = this.getPreviousSelectionNode(this.selection.end!.node)
+			const nextNode = this.getNextSelectionNode(this.selection.end!.node)
+			const blockNode = this.selection.end!.node.getBlock()
+			if (previousNode && blockNode.isContains(previousNode)) {
+				this.selection.end!.node = previousNode
+				this.selection.end!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
+			} else if (nextNode && blockNode.isContains(nextNode)) {
+				this.selection.end!.node = nextNode
+				this.selection.end!.offset = 0
+			} else if (previousNode) {
+				this.selection.end!.node = previousNode
+				this.selection.end!.offset = previousNode.isText() ? previousNode.textContent!.length : 1
+			} else if (nextNode) {
+				this.selection.end!.node = nextNode
+				this.selection.end!.offset = 0
+			}
+		}
+	}
+
+	/**
+	 * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断【API】
+	 */
+	isSelectionInNode(node: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
+		//没有初始化设置光标
+		if (!this.selection.focused()) {
+			return false
+		}
+		if (type == 'start') {
+			return node.isContains(this.selection.start!.node)
+		}
+		if (type == 'end') {
+			return node.isContains(this.selection.end!.node)
+		}
+		if (type == 'all') {
+			return node.isContains(this.selection.start!.node) && node.isContains(this.selection.end!.node)
+		}
+	}
+
+	/**
+	 * 获取光标选区内的节点【API】
 	 */
 	getSelectedNodes(): EditorSelectedType[] {
 		//没有聚焦或者没有选区
@@ -1392,32 +1537,7 @@ export class Editor {
 	}
 
 	/**
-	 * 清空固定块节点的内容
-	 */
-	emptyFixedBlock(node: KNode) {
-		if (!node.isBlock()) {
-			return
-		}
-		if (node.hasChildren()) {
-			node.children!.forEach(item => {
-				//如果是固定的块节点
-				if (item.isBlock() && item.fixed) {
-					this.emptyFixedBlock(item)
-				}
-				//其他情况下
-				else {
-					item.toEmpty()
-					if (item.parent!.isEmpty()) {
-						const placeholderNode = KNode.createPlaceholder()
-						this.addNode(placeholderNode, item.parent!)
-					}
-				}
-			})
-		}
-	}
-
-	/**
-	 * 向选区插入文本
+	 * 向选区插入文本【API】
 	 */
 	insertText(text: string) {
 		if (!text) {
@@ -1463,7 +1583,7 @@ export class Editor {
 	}
 
 	/**
-	 * 向选区进行换行
+	 * 向选区进行换行【API】
 	 */
 	insertParagraph() {
 		if (!this.selection.focused()) {
@@ -1681,7 +1801,7 @@ export class Editor {
 	}
 
 	/**
-	 * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
+	 * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去【API】
 	 */
 	insertNode(node: KNode, cover: boolean | undefined = false) {
 		//未聚焦不处理
@@ -1760,7 +1880,7 @@ export class Editor {
 	}
 
 	/**
-	 * 对选区进行删除
+	 * 对选区进行删除【API】
 	 */
 	delete() {
 		if (!this.selection.focused()) {
@@ -1946,7 +2066,7 @@ export class Editor {
 	}
 
 	/**
-	 * 更新编辑器视图
+	 * 更新编辑器视图【API】
 	 */
 	async updateView(unPushHistory: boolean | undefined = false) {
 		if (!this.$el) {
@@ -2006,7 +2126,7 @@ export class Editor {
 	}
 
 	/**
-	 * 根据selection更新编辑器真实光标
+	 * 根据selection更新编辑器真实光标【API】
 	 */
 	async updateRealSelection() {
 		const realSelection = window.getSelection()
@@ -2051,7 +2171,7 @@ export class Editor {
 	}
 
 	/**
-	 * 根据真实光标更新selection，返回布尔值表示是否更新成功
+	 * 根据真实光标更新selection，返回布尔值表示是否更新成功【API】
 	 */
 	updateSelection() {
 		if (!this.$el) {
@@ -2143,91 +2263,7 @@ export class Editor {
 	}
 
 	/**
-	 * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
-	 */
-	scrollViewToSelection() {
-		if (this.selection.focused()) {
-			const focusDom = this.findDom(this.selection.end!.node)
-			const scrollFunction = async (scrollEl: HTMLElement) => {
-				const scrollHeight = DapElement.getScrollHeight(scrollEl)
-				const scrollWidth = DapElement.getScrollWidth(scrollEl)
-				//存在横向或者垂直滚动条
-				if (scrollEl.clientHeight < scrollHeight || scrollEl.clientWidth < scrollWidth) {
-					const selection = window.getSelection()!
-					const range = selection.getRangeAt(0)
-					const rects = range.getClientRects()
-					let target: Range | HTMLElement = range
-					if (rects.length == 0) {
-						target = focusDom
-					}
-					const childRect = target.getBoundingClientRect()
-					const parentRect = scrollEl.getBoundingClientRect()
-					//存在垂直滚动条
-					if (scrollEl.clientHeight < scrollHeight) {
-						//如果光标所在节点不在视图内则滚动到视图内
-						if (childRect.top < parentRect.top) {
-							await DapElement.setScrollTop({
-								el: scrollEl,
-								number: 0
-							})
-							const tempChildRect = target.getBoundingClientRect()
-							const tempParentRect = scrollEl.getBoundingClientRect()
-							DapElement.setScrollTop({
-								el: scrollEl,
-								number: tempChildRect.top - tempParentRect.top
-							})
-						} else if (childRect.bottom > parentRect.bottom) {
-							await DapElement.setScrollTop({
-								el: scrollEl,
-								number: 0
-							})
-							const tempChildRect = target.getBoundingClientRect()
-							const tempParentRect = scrollEl.getBoundingClientRect()
-							DapElement.setScrollTop({
-								el: scrollEl,
-								number: tempChildRect.bottom - tempParentRect.bottom
-							})
-						}
-					}
-					//存在横向滚动条
-					if (scrollEl.clientWidth < scrollWidth) {
-						//如果光标所在节点不在视图内则滚动到视图内
-						if (childRect.left < parentRect.left) {
-							await DapElement.setScrollLeft({
-								el: scrollEl,
-								number: 0
-							})
-							const tempChildRect = target.getBoundingClientRect()
-							const tempParentRect = scrollEl.getBoundingClientRect()
-							DapElement.setScrollLeft({
-								el: scrollEl,
-								number: tempChildRect.left - tempParentRect.left + 20
-							})
-						} else if (childRect.right > parentRect.right) {
-							await DapElement.setScrollLeft({
-								el: scrollEl,
-								number: 0
-							})
-							const tempChildRect = target.getBoundingClientRect()
-							const tempParentRect = scrollEl.getBoundingClientRect()
-							DapElement.setScrollLeft({
-								el: scrollEl,
-								number: tempChildRect.right - tempParentRect.right + 20
-							})
-						}
-					}
-				}
-			}
-			let dom = focusDom
-			while (DapElement.isElement(dom) && dom != document.documentElement) {
-				scrollFunction(dom)
-				dom = dom.parentNode as HTMLElement
-			}
-		}
-	}
-
-	/**
-	 * 撤销
+	 * 撤销【API】
 	 */
 	undo() {
 		const record = this.history.setUndo()
@@ -2239,7 +2275,7 @@ export class Editor {
 	}
 
 	/**
-	 * 重做
+	 * 重做【API】
 	 */
 	redo() {
 		const record = this.history.setRedo()
@@ -2251,57 +2287,7 @@ export class Editor {
 	}
 
 	/**
-	 * 注册插件
-	 */
-	registerExtension(extension: Extension) {
-		if (extension.registered) {
-			return
-		}
-		extension.registered = true
-		if (extension.extraKeepTags) {
-			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
-		}
-		if (extension.domParseNodeCallback) {
-			const fn = this.domParseNodeCallback
-			this.domParseNodeCallback = (node: KNode) => {
-				if (fn) node = fn.apply(this, [node])
-				node = extension.domParseNodeCallback!.apply(this, [node])
-				return node
-			}
-		}
-		if (extension.formatRule) {
-			this.formatRules = [...this.formatRules, extension.formatRule]
-		}
-		if (extension.pasteKeepMarks) {
-			const fn = this.pasteKeepMarks
-			this.pasteKeepMarks = (node: KNode) => {
-				const marks: KNodeMarksType = {}
-				if (fn) Object.assign(marks, fn.apply(this, [node]))
-				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
-				return marks
-			}
-		}
-		if (extension.pasteKeepStyles) {
-			const fn = this.pasteKeepStyles
-			this.pasteKeepStyles = (node: KNode) => {
-				const styles: KNodeStylesType = {}
-				if (fn) Object.assign(styles, fn.apply(this, [node]))
-				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
-				return styles
-			}
-		}
-		if (extension.afterUpdateView) {
-			const fn = this.afterUpdateView
-			this.afterUpdateView = () => {
-				if (fn) fn.apply(this)
-				extension.afterUpdateView!.apply(this)
-			}
-		}
-		console.log(`${extension.name}插件注册完成！`)
-	}
-
-	/**
-	 * 销毁编辑器的方法
+	 * 销毁编辑器的方法【API】
 	 */
 	destroy() {
 		//去除可编辑效果

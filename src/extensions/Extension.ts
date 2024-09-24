@@ -1,13 +1,6 @@
 import { Editor, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType } from '../model'
 
 /**
- * 插件的指令方法类型
- */
-export type ExtensionCommandType = {
-	[name: string]: (...args: any[]) => void
-}
-
-/**
  * 创建插件的入参类型
  */
 export type ExtensionCreateOptionType = {
