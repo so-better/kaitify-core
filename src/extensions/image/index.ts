@@ -131,7 +131,7 @@ export const imageExtension = Extension.create({
 	},
 	addCommands() {
 		/**
-		 * 是否不可设置图片
+		 * 是否可以插入图片
 		 */
 		const canSetImage = () => {
 			if (!this.selection.focused()) {
