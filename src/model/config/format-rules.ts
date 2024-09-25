@@ -33,6 +33,90 @@ export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
 }
 
 /**
+ * 处理一些需要转为文本节点的特殊节点
+ */
+export const formatInlineNodeParseText: RuleFunctionType = ({ editor, node }) => {
+	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font'].includes(node.tag)) {
+		if (node.tag == 'b' || node.tag == 'strong') {
+			if (node.hasStyles()) {
+				node.styles!.fontWeight = 'bold'
+			} else {
+				node.styles = {
+					fontWeight: 'bold'
+				}
+			}
+		} else if (node.tag == 'sup') {
+			if (node.hasStyles()) {
+				node.styles!.verticalAlign = 'super'
+			} else {
+				node.styles = {
+					verticalAlign: 'super'
+				}
+			}
+		} else if (node.tag == 'sub') {
+			if (node.hasStyles()) {
+				node.styles!.verticalAlign = 'sub'
+			} else {
+				node.styles = {
+					verticalAlign: 'sub'
+				}
+			}
+		} else if (node.tag == 'i') {
+			if (node.hasStyles()) {
+				node.styles!.fontStyle = 'italic'
+			} else {
+				node.styles = {
+					fontStyle: 'italic'
+				}
+			}
+		} else if (node.tag == 'u') {
+			if (node.hasStyles()) {
+				node.styles!.textDecoration = 'underline'
+			} else {
+				node.styles = {
+					textDecorationLine: 'underline'
+				}
+			}
+		} else if (node.tag == 'del') {
+			if (node.hasStyles()) {
+				node.styles!.textDecorationLine = 'line-through'
+			} else {
+				node.styles = {
+					textDecorationLine: 'line-through'
+				}
+			}
+		} else if (node.tag == 'font') {
+			if (node.hasStyles()) {
+				node.styles!.fontFamily = (node.hasMarks() ? node.marks!.face || '' : '') as string
+			} else {
+				node.styles = {
+					fontFamily: (node.hasMarks() ? node.marks!.face || '' : '') as string
+				}
+			}
+		}
+		node.tag = editor.textRenderTag
+	}
+}
+
+/**
+ * 处理标签为行内的默认文本节点标签且子节点都是文本节点的行内节点
+ */
+export const formatTextRenderInlineNode: RuleFunctionType = ({ editor, node }) => {
+	//非空行内节点没有标记，且tag是默认文本节点标签的
+	if (node.isInline() && node.tag == editor.textRenderTag && node.hasChildren() && !node.isEmpty() && !node.hasMarks()) {
+		//该节点的子节点都是文本节点，直接把父节点拆分成这几个子节点，并把样式传递给子节点
+		if (node.children!.every(item => item.isText())) {
+			const styles = node.hasStyles() ? node.styles! : {}
+			node.children!.reverse().forEach(item => {
+				item.styles = item.hasStyles() ? { ...item.styles!, ...styles } : { ...styles }
+				editor.addNodeAfter(item, node)
+			})
+			node.children = []
+		}
+	}
+}
+
+/**
  * 处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）
  */
 export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {

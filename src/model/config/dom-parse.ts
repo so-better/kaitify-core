@@ -1,5 +1,3 @@
-import { KNodeStylesType } from '../KNode'
-
 /**
  * 块节点的转换类型
  */
@@ -27,9 +25,8 @@ export type InlineParseType = {
 	tag: string
 	/**
 	 * 如果是true表示会将该dom转为编辑器配置的默认行内节点
-	 * 如果是对象值的话则表示不仅会将该dom转为编辑器配置的默认行内节点，而且会设置固定的style样式，对象的value支持函数，会在将dom转为编辑器配置的默认行内节点时自动执行该函数获取结果，该函数参数分别是编辑器实例和dom
 	 */
-	parse?: boolean | KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
+	parse?: boolean
 }
 /**
  * 闭合节点的转换类型
@@ -152,66 +149,28 @@ export const inlineParse: InlineParseType[] = [
 		tag: 'code'
 	},
 	{
-		tag: 'b',
-		parse: {
-			fontWeight: 'bold'
-		}
+		tag: 'b'
 	},
 	{
-		tag: 'strong',
-		parse: {
-			fontWeight: 'bold'
-		}
+		tag: 'strong'
 	},
 	{
-		tag: 'sup',
-		parse: {
-			verticalAlign: 'super'
-		}
+		tag: 'sup'
 	},
 	{
-		tag: 'sub',
-		parse: {
-			verticalAlign: 'sub'
-		}
+		tag: 'sub'
 	},
 	{
-		tag: 'i',
-		parse: {
-			fontStyle: 'italic'
-		}
+		tag: 'i'
 	},
 	{
-		tag: 'u',
-		parse: {
-			textDecorationLine: 'underline'
-		}
+		tag: 'u'
 	},
 	{
-		tag: 'del',
-		parse: {
-			textDecorationLine: 'line-through'
-		}
+		tag: 'del'
 	},
 	{
-		tag: 'abbr',
-		parse: true
-	},
-	{
-		tag: 'acronym',
-		parse: true
-	},
-	{
-		tag: 'bdo',
-		parse: true
-	},
-	{
-		tag: 'font',
-		parse: {
-			fontFamily: (element: HTMLElement) => {
-				return element.getAttribute('face') || ''
-			}
-		}
+		tag: 'font'
 	}
 ]
 /**

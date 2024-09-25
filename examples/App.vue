@@ -9,32 +9,23 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor } from '../src'
 
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value?.insertNode(KNode.create({
-    type:'inline',
-    tag:'u',
-    children:[
-      {
-        type:'text',
-        textContent:'hello'
-      }
-    ]
-  }))
-  editor.value?.updateView()
+  editor.value?.commands.setImage!({src:'https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp',alt:'图片加载失败',width:'30%'})
 }
 
 const onClick2 = () => {
-    editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
+    // editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
+    console.log(editor.value!.commands.isCode!());
     
 }
 
 onMounted(async () => {
 	editor.value = await Editor.configure({
-		value: `<p><code>kai ling</code><b>我是加粗的</b></p><pre>const a = b</pre></pre><h1 style="color:red;">我是一个段落</h1><h2>我是一个段落</h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
+		value: `<p><code>kai ling</code><b>我是加粗的<span style="color:red;">红色加粗</span></b></p><pre>const a = b</pre></pre><h1 style="color:red;">我是一个段落</h1><h2>我是一个段落</h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){

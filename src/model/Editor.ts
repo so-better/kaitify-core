@@ -4,11 +4,11 @@ import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isCon
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge } from './config/format-rules'
+import { formatInlineNodeParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatTextRenderInlineNode } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
-import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension } from '../extensions'
+import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 
@@ -223,11 +223,11 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension]
+	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
-	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
+	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineNodeParseText, formatTextRenderInlineNode, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -1025,19 +1025,7 @@ export class Editor {
 		else if (inline) {
 			config.type = 'inline'
 			config.children = []
-			if (inline.parse) {
-				config.tag = this.textRenderTag
-				if (DapCommon.isObject(inline.parse)) {
-					const currentInlineParse = inline.parse as KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
-					for (let key in currentInlineParse) {
-						if (typeof currentInlineParse[key] == 'function') {
-							config.styles![key] = (currentInlineParse[key] as (element: HTMLElement) => string | number).apply(this, [dom as HTMLElement])
-						} else {
-							config.styles![key] = currentInlineParse[key] as string | number
-						}
-					}
-				}
-			}
+			if (inline.parse) config.tag = this.textRenderTag
 		}
 		//默认的自闭合节点
 		else if (closed) {
