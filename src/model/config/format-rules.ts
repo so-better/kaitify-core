@@ -77,6 +77,38 @@ export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
+ * 将文本节点内连续的零宽度无断空白字符合并（光标可能会更新）
+ */
+export const formatZeroWidthTextMerge: RuleFunctionType = ({ editor, node }) => {
+	//非空文本节点存在空白字符
+	if (node.isText() && !node.isEmpty() && node.textContent!.split('').some(item => isZeroWidthText(item))) {
+		let val = node.textContent!
+		let i = 0
+		while (i < val.length) {
+			//获取当前字符串
+			const chart = val.charAt(i)
+			//如果当前字符是空白字符并且前一个字符也是空白字符
+			if (i > 0 && isZeroWidthText(chart) && isZeroWidthText(val.charAt(i - 1))) {
+				//如果起点在节点上并且起点在当前这个空白字符上或者后面
+				if (editor.isSelectionInNode(node, 'start') && editor.selection.start!.offset >= i + 1) {
+					editor.selection.start!.offset -= 1
+				}
+				//如果终点在节点上并且终点在当前这个空白字符上或者后面
+				if (editor.isSelectionInNode(node, 'end') && editor.selection.end!.offset >= i + 1) {
+					editor.selection.end!.offset -= 1
+				}
+				//删除空白字符
+				val = DapString.delete(val, i, 1)
+				//跳过后续
+				continue
+			}
+			i++
+		}
+		node.textContent = val
+	}
+}
+
+/**
  * 兄弟节点合并策略（光标可能会更新）
  */
 export const formatSiblingNodesMerge: RuleFunctionType = ({ editor, node }) => {
@@ -115,37 +147,5 @@ export const formatParentNodeMerge: RuleFunctionType = ({ editor, node }) => {
 				editor.applyMergeNode(node, 'nextSibling')
 			}
 		}
-	}
-}
-
-/**
- * 将文本节点内连续的零宽度无断空白字符合并（光标可能会更新）
- */
-export const formatZeroWidthTextMerge: RuleFunctionType = ({ editor, node }) => {
-	//非空文本节点存在空白字符
-	if (node.isText() && !node.isEmpty() && node.textContent!.split('').some(item => isZeroWidthText(item))) {
-		let val = node.textContent!
-		let i = 0
-		while (i < val.length) {
-			//获取当前字符串
-			const chart = val.charAt(i)
-			//如果当前字符是空白字符并且前一个字符也是空白字符
-			if (i > 0 && isZeroWidthText(chart) && isZeroWidthText(val.charAt(i - 1))) {
-				//如果起点在节点上并且起点在当前这个空白字符上或者后面
-				if (editor.isSelectionInNode(node, 'start') && editor.selection.start!.offset >= i + 1) {
-					editor.selection.start!.offset -= 1
-				}
-				//如果终点在节点上并且终点在当前这个空白字符上或者后面
-				if (editor.isSelectionInNode(node, 'end') && editor.selection.end!.offset >= i + 1) {
-					editor.selection.end!.offset -= 1
-				}
-				//删除空白字符
-				val = DapString.delete(val, i, 1)
-				//跳过后续
-				continue
-			}
-			i++
-		}
-		node.textContent = val
 	}
 }

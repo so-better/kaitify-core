@@ -9,12 +9,22 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor } from '../src'
+import { Editor, KNode } from '../src'
 
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value?.commands.setImage!({src:'https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp',alt:'图片加载失败',width:'30%'})
+  editor.value?.insertNode(KNode.create({
+    type:'inline',
+    tag:'u',
+    children:[
+      {
+        type:'text',
+        textContent:'hello'
+      }
+    ]
+  }))
+  editor.value?.updateView()
 }
 
 const onClick2 = () => {

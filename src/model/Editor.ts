@@ -227,7 +227,7 @@ export class Editor {
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
-	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatPlaceholderMerge, formatSiblingNodesMerge, formatParentNodeMerge, formatZeroWidthTextMerge]
+	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -593,7 +593,7 @@ export class Editor {
 						targetNode.styles = DapCommon.clone(node.styles!)
 					}
 				}
-				targetNode.textContent = targetNode.textContent
+				targetNode.textContent = node.textContent
 				targetNode.children = undefined
 				//如果起点在子节点上则更新到父节点上
 				if (this.isSelectionInNode(node, 'start')) {
@@ -987,7 +987,6 @@ export class Editor {
 		const styles = getDomStyles(dom as HTMLElement) //样式
 		const tag = dom.nodeName.toLocaleLowerCase() //标签名称
 		const namespace = (dom as HTMLElement).namespaceURI //命名空间
-
 		//如果是需要置为空的标签返回空文本节点
 		if (this.voidRenderTags.includes(tag)) {
 			return KNode.create({
@@ -1019,12 +1018,8 @@ export class Editor {
 		if (block) {
 			config.type = 'block'
 			config.children = []
-			if (block.parse) {
-				config.tag = this.blockRenderTag
-			}
-			if (block.fixed) {
-				config.fixed = block.fixed
-			}
+			if (block.parse) config.tag = this.blockRenderTag
+			if (block.fixed) config.fixed = block.fixed
 		}
 		//默认的行内节点
 		else if (inline) {
@@ -1033,12 +1028,12 @@ export class Editor {
 			if (inline.parse) {
 				config.tag = this.textRenderTag
 				if (DapCommon.isObject(inline.parse)) {
-					const inlineParse = inline.parse as KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
-					for (let key in inlineParse) {
-						if (typeof inlineParse[key] == 'function') {
-							config.styles![key] = (inlineParse[key] as (element: HTMLElement) => string | number).apply(this, [dom as HTMLElement])
+					const currentInlineParse = inline.parse as KNodeStylesType | { [style: string]: string | number | ((element: HTMLElement) => string | number) }
+					for (let key in currentInlineParse) {
+						if (typeof currentInlineParse[key] == 'function') {
+							config.styles![key] = (currentInlineParse[key] as (element: HTMLElement) => string | number).apply(this, [dom as HTMLElement])
 						} else {
-							config.styles![key] = inlineParse[key] as string | number
+							config.styles![key] = currentInlineParse[key] as string | number
 						}
 					}
 				}
