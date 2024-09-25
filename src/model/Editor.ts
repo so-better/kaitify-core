@@ -1524,9 +1524,9 @@ export class Editor {
 	}
 
 	/**
-	 * 判断光标范围内的节点是否在同一个符合条件的节点下，如果是返回那个符合条件的节点，否则返回null
+	 * 判断光标范围内的节点是否在同一个符合条件的非文本节点下，如果是返回那个符合条件的节点，否则返回null【API】
 	 */
-	getMatchNodeBySelection = (config: KNodeMatchOptionType) => {
+	getMatchNodeBySelection(config: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return null
@@ -1563,6 +1563,124 @@ export class Editor {
 		}
 		//不相等
 		return null
+	}
+
+	/**
+	 * 判断某个节点下是否含有符合条件的非文本节点，包括自身【API】
+	 */
+	isIncludesMatchNode(node: KNode, config: KNodeMatchOptionType): boolean {
+		if (node.isMatch(config)) {
+			return true
+		}
+		if (node.hasChildren()) {
+			const length = node.children!.length
+			let isMatch = false
+			for (let i = 0; i < length; i++) {
+				const flag = this.isIncludesMatchNode(node.children![i], config)
+				if (flag) {
+					isMatch = true
+					break
+				}
+			}
+			return isMatch
+		}
+		return false
+	}
+
+	/**
+	 * 判断光标范围内是否包含符合条件的非文本节点【API】
+	 */
+	isSelectionIncludesMatchNode(config: KNodeMatchOptionType) {
+		//没有聚焦
+		if (!this.selection.focused()) {
+			return false
+		}
+		//起点和终点在一起
+		if (this.selection.collapsed()) {
+			return this.isIncludesMatchNode(this.selection.start!.node, config)
+		}
+		//起点和终点不在一起
+		const result = this.getSelectedNodes()
+		return result.some(item => this.isIncludesMatchNode(item.node, config))
+	}
+
+	/**
+	 * 获取所有在光标范围内的文本节点，该方法拿到的文本节点可能部分区域不在光标范围内【API】
+	 */
+	getTextNodesBySelection() {
+		if (!this.selection.focused()) {
+			return []
+		}
+		if (this.selection.collapsed()) {
+			return this.selection.start!.node.isText() ? [this.selection.start!.node] : []
+		}
+		const textNodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			textNodes.push(...item.node.getTextNodes())
+		})
+		return textNodes
+	}
+
+	/**
+	 * 获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置【API】
+	 */
+	getSplitedTextNodesBySelection() {
+		if (!this.selection.focused() || this.selection.collapsed()) {
+			return []
+		}
+		const textNodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			//文本节点
+			if (item.node.isText()) {
+				//选择部分文本
+				if (item.offset) {
+					const textContent = item.node.textContent!
+					//选中了文本的前半段
+					if (item.offset[0] == 0) {
+						const newTextNode = item.node.clone(true)
+						this.addNodeAfter(newTextNode, item.node)
+						item.node.textContent = textContent.substring(0, item.offset[1])
+						newTextNode.textContent = textContent.substring(item.offset[1])
+						textNodes.push(item.node)
+					}
+					//选中了文本的后半段
+					else if (item.offset[1] == textContent.length) {
+						const newTextNode = item.node.clone(true)
+						this.addNodeBefore(newTextNode, item.node)
+						newTextNode.textContent = textContent.substring(0, item.offset[0])
+						item.node.textContent = textContent.substring(item.offset[0])
+						textNodes.push(item.node)
+					}
+					//选中文本中间部分
+					else {
+						const newBeforeTextNode = item.node.clone(true)
+						const newAfterTextNode = item.node.clone(true)
+						this.addNodeBefore(newBeforeTextNode, item.node)
+						this.addNodeAfter(newAfterTextNode, item.node)
+						newBeforeTextNode.textContent = textContent.substring(0, item.offset[0])
+						item.node.textContent = textContent.substring(item.offset[0], item.offset[1])
+						newAfterTextNode.textContent = textContent.substring(item.offset[1])
+						textNodes.push(item.node)
+					}
+					//重置光标位置
+					if (this.isSelectionInNode(item.node, 'start')) {
+						this.setSelectionBefore(item.node, 'start')
+					}
+					if (this.isSelectionInNode(item.node, 'end')) {
+						this.setSelectionAfter(item.node, 'end')
+					}
+				}
+				//选择整个文本
+				else {
+					textNodes.push(item.node)
+				}
+			}
+			//非文本节点存在子节点数组
+			else if (item.node.hasChildren()) {
+				textNodes.push(...item.node.getTextNodes())
+			}
+		})
+		return textNodes
 	}
 
 	/**

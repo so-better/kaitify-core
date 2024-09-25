@@ -1,11 +1,10 @@
 import interact from 'interactjs'
 import { event as DapEvent, element as DapElement } from 'dap-util'
-import { Editor, EditorSelectedType, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		canSetImage?: () => boolean
 		inImage?: () => boolean
 		includeImage?: () => boolean
 		setImage?: (options: SetImageOptionsType) => Promise<void>
@@ -19,54 +18,6 @@ type SetImageOptionsType = {
 	src: string
 	alt?: string
 	width?: string
-}
-
-/**
- * 判断子孙节点中是否含有图片节点
- */
-const isChildrenHasImageNode = (editor: Editor, nodes: KNode[]): boolean => {
-	const length = nodes.length
-	let hasImage = false
-	let i = 0
-	while (i < length) {
-		if (nodes[i].isClosed() && nodes[i].tag == 'img') {
-			hasImage = true
-			break
-		} else if (nodes[i].hasChildren()) {
-			hasImage = isChildrenHasImageNode(editor, nodes[i].children!)
-			if (hasImage) {
-				break
-			}
-		}
-		i++
-	}
-	return hasImage
-}
-
-/**
- * 根据选区结果判断是否含有图片
- */
-const isSelectedHasImageNode = (editor: Editor, selectedResult: EditorSelectedType[]) => {
-	const length = selectedResult.length
-	let hasImage = false
-	let i = 0
-	while (i < length) {
-		const item = selectedResult[i]
-		//图片节点
-		if (item.node.isClosed() && item.node.tag == 'img') {
-			hasImage = true
-			break
-		}
-		//存在子节点数组
-		else if (item.node.hasChildren()) {
-			hasImage = isChildrenHasImageNode(editor, item.node.children!)
-			if (hasImage) {
-				break
-			}
-		}
-		i++
-	}
-	return hasImage
 }
 
 /**
@@ -180,26 +131,26 @@ export const ImageExtension = Extension.create({
 	},
 	addCommands() {
 		/**
-		 * 是否可以插入图片
+		 * 光标是否在同一个图片内
 		 */
-		const canSetImage = () => {
-			if (!this.selection.focused()) {
-				return false
-			}
-			const node = this.selection.start!.node
-			if (node.isInCodeBlockStyle()) {
-				return false
-			}
-			return true
+		const inImage = () => {
+			return !!this.getMatchNodeBySelection({
+				tag: 'img'
+			})
+		}
+		/**
+		 * 光标范围内是否包含图片
+		 */
+		const includeImage = () => {
+			return this.isSelectionIncludesMatchNode({
+				tag: 'img'
+			})
 		}
 		/**
 		 * 插入图片
 		 */
 		const setImage = async ({ src, alt, width }: SetImageOptionsType) => {
 			if (!src) {
-				return
-			}
-			if (!canSetImage()) {
 				return
 			}
 			const imageNode = KNode.create({
@@ -217,30 +168,7 @@ export const ImageExtension = Extension.create({
 			this.setSelectionAfter(imageNode)
 			await this.updateView()
 		}
-		/**
-		 * 光标是否都在图片上
-		 */
-		const inImage = () => {
-			if (!this.selection.focused()) {
-				return false
-			}
-			return this.selection.start!.node.isEqual(this.selection.end!.node) && this.selection.start!.node.tag == 'img'
-		}
 
-		/**
-		 * 光标范围内是否包含图片
-		 */
-		const includeImage = () => {
-			if (!this.selection.focused()) {
-				return false
-			}
-			if (this.selection.collapsed()) {
-				return this.selection.start!.node.tag == 'img'
-			}
-			const selectedResult = this.getSelectedNodes()
-			return isSelectedHasImageNode(this, selectedResult)
-		}
-
-		return { canSetImage, inImage, includeImage, setImage }
+		return { inImage, includeImage, setImage }
 	}
 })

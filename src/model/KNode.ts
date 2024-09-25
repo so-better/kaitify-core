@@ -164,35 +164,35 @@ export class KNode {
 	parent?: KNode
 
 	/**
-	 * 是否块节点
+	 * 是否块节点【API】
 	 */
 	isBlock() {
 		return this.type == 'block'
 	}
 
 	/**
-	 * 是否行内节点
+	 * 是否行内节点【API】
 	 */
 	isInline() {
 		return this.type == 'inline'
 	}
 
 	/**
-	 * 是否闭合节点
+	 * 是否闭合节点【API】
 	 */
 	isClosed() {
 		return this.type == 'closed'
 	}
 
 	/**
-	 * 是否文本节点
+	 * 是否文本节点【API】
 	 */
 	isText() {
 		return this.type == 'text'
 	}
 
 	/**
-	 * 获取所在块级节点
+	 * 获取所在块级节点【API】
 	 */
 	getBlock(): KNode {
 		if (this.isBlock()) {
@@ -202,7 +202,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取所在行内节点
+	 * 获取所在行内节点【API】
 	 */
 	getInline(): KNode | null {
 		if (this.isInline()) {
@@ -215,7 +215,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否有子节点
+	 * 是否有子节点【API】
 	 */
 	hasChildren() {
 		if (this.isText() || this.isClosed()) {
@@ -225,7 +225,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否空节点
+	 * 是否空节点【API】
 	 */
 	isEmpty(): boolean {
 		if (this.isText()) {
@@ -243,21 +243,21 @@ export class KNode {
 	}
 
 	/**
-	 * 是否零宽度无断空白文本节点
+	 * 是否零宽度无断空白文本节点【API】
 	 */
 	isZeroWidthText() {
 		return this.isText() && !this.isEmpty() && isZeroWidthText(this.textContent!)
 	}
 
 	/**
-	 * 是否占位符
+	 * 是否占位符【API】
 	 */
 	isPlaceholder() {
 		return this.isClosed() && this.tag == 'br'
 	}
 
 	/**
-	 * 是否含有标记
+	 * 是否含有标记【API】
 	 */
 	hasMarks() {
 		if (!this.marks) {
@@ -270,7 +270,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否含有样式
+	 * 是否含有样式【API】
 	 */
 	hasStyles() {
 		if (!this.styles) {
@@ -283,7 +283,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null
+	 * 判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null【API】
 	 */
 	getUneditable(): KNode | null {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
@@ -296,7 +296,7 @@ export class KNode {
 	}
 
 	/**
-	 * 当前节点是否只包含占位符
+	 * 当前节点是否只包含占位符【API】
 	 */
 	allIsPlaceholder() {
 		if (this.hasChildren()) {
@@ -307,7 +307,7 @@ export class KNode {
 	}
 
 	/**
-	 * 设置为空节点
+	 * 设置为空节点【API】
 	 */
 	toEmpty() {
 		if (this.isEmpty()) {
@@ -330,7 +330,7 @@ export class KNode {
 	}
 
 	/**
-	 * 比较当前节点和另一个节点的styles是否一致
+	 * 比较当前节点和另一个节点的styles是否一致【API】
 	 
 	 */
 	isEqualStyles(node: KNode) {
@@ -344,7 +344,7 @@ export class KNode {
 	}
 
 	/**
-	 * 比较当前节点和另一个节点的marks是否一致
+	 * 比较当前节点和另一个节点的marks是否一致【API】
 	 
 	 */
 	isEqualMarks(node: KNode) {
@@ -358,7 +358,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否在拥有代码块样式的块级节点内（包括自身）
+	 * 判断当前节点是否在拥有代码块样式的块级节点内（包括自身）【API】
 	 */
 	isInCodeBlockStyle(): boolean {
 		const block = this.getBlock()
@@ -373,7 +373,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否与另一个节点相同
+	 * 判断当前节点是否与另一个节点相同【API】
 	 
 	 */
 	isEqual(node: KNode) {
@@ -384,7 +384,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否包含指定节点
+	 * 判断当前节点是否包含指定节点【API】
 	 */
 	isContains(node: KNode): boolean {
 		if (this.isEqual(node)) {
@@ -400,7 +400,7 @@ export class KNode {
 	}
 
 	/**
-	 * 复制节点，deep 为true表示深度复制，即复制子节点，否则只会复制自身
+	 * 复制节点，deep 为true表示深度复制，即复制子节点，否则只会复制自身【API】
 	 */
 	clone = (deep: boolean | undefined = true) => {
 		const newNode = KNode.create({
@@ -457,7 +457,7 @@ export class KNode {
 	}
 
 	/**
-	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
+	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个【API】
 	 */
 	firstTextClosedInNode = (node: KNode) => {
 		//如果不是闭合节点和文本节点则返回false
@@ -477,7 +477,7 @@ export class KNode {
 	}
 
 	/**
-	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个
+	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个【API】
 	 */
 	lastTextClosedInNode(node: KNode) {
 		//如果不是闭合节点和文本节点则返回false
@@ -497,7 +497,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取当前节点在某个节点数组中的前一个非空节点
+	 * 获取当前节点在某个节点数组中的前一个非空节点【API】
 	 */
 	getPrevious(nodes: KNode[]): KNode | null {
 		const index = nodes.findIndex(item => item.isEqual(this))
@@ -516,7 +516,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取当前节点在某个节点数组中的后一个非空节点
+	 * 获取当前节点在某个节点数组中的后一个非空节点【API】
 	 */
 	getNext(nodes: KNode[]): KNode | null {
 		const index = nodes.findIndex(item => item.isEqual(this))
@@ -535,7 +535,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值
+	 * 判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值【API】
 	 */
 	isMatch(config: KNodeMatchOptionType) {
 		//如果存在tag判断并且tag不一样
@@ -578,7 +578,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null
+	 * 判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null【API】
 	 */
 	getMatchNodeUp = (config: KNodeMatchOptionType): KNode | null => {
 		if (this.isMatch(config)) {
@@ -588,6 +588,26 @@ export class KNode {
 			return this.parent.getMatchNodeUp(config)
 		}
 		return null
+	}
+
+	/**
+	 * 获取当前节点下的所有文本节点，如果自身是文本节点也会包括在内【API】
+	 */
+	getTextNodes = () => {
+		if (this.isText()) {
+			return [this]
+		}
+		if (this.isClosed()) {
+			return []
+		}
+		if (this.hasChildren()) {
+			const textNodes: KNode[] = []
+			this.children!.forEach(item => {
+				textNodes.push(...item.getTextNodes())
+			})
+			return textNodes
+		}
+		return []
 	}
 
 	/**

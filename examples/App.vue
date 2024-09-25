@@ -19,7 +19,7 @@ const onClick1 = () => {
 
 const onClick2 = () => {
     // editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
-    console.log(editor.value!.commands.isCode!());
+    editor.value!.commands.setCode!()
     
 }
 
@@ -29,7 +29,9 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(this.commands.canRedo!());
+      console.log(this.isSelectionIncludesMatchNode({
+        tag:'img'
+      }));
     }
 	})
 })
