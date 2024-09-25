@@ -1,5 +1,5 @@
 import { common as DapCommon, event as DapEvent, element as DapElement } from 'dap-util'
-import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeStylesType } from './KNode'
+import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNodeStylesType } from './KNode'
 import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
@@ -1521,6 +1521,48 @@ export class Editor {
 			break
 		}
 		return result
+	}
+
+	/**
+	 * 判断光标范围内的节点是否在同一个符合条件的节点下，如果是返回那个符合条件的节点，否则返回null
+	 */
+	getMatchNodeBySelection = (config: KNodeMatchOptionType) => {
+		//没有聚焦
+		if (!this.selection.focused()) {
+			return null
+		}
+		//起点和终点在一起
+		if (this.selection.collapsed()) {
+			return this.selection.start!.node.getMatchNodeUp(config)
+		}
+		//起点和终点不在一起的情况
+		const result = this.getSelectedNodes().map(item => {
+			return item.node.getMatchNodeUp(config)
+		})
+		//如果只有一个结果，则返回结果
+		if (result.length == 1) {
+			return result[0]
+		}
+		//多个结果的情况下判断是否有null
+		let hasNull = result.some(item => !item)
+		//选区内有节点不在符合条件的节点下
+		if (hasNull) {
+			return null
+		}
+		//默认数组中的节点都相等
+		let flag = true
+		for (let i = 1; i < result.length; i++) {
+			if (!result[i]!.isEqual(result[0]!)) {
+				flag = false
+				break
+			}
+		}
+		//如果相等，则返回该节点
+		if (flag) {
+			return result[0]
+		}
+		//不相等
+		return null
 	}
 
 	/**

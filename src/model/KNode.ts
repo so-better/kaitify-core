@@ -20,6 +20,28 @@ export type KNodeStylesType = CSS.Properties<string | number> & {
 }
 
 /**
+ * 节点匹配入参类型
+ */
+export type KNodeMatchOptionType = {
+	/**
+	 * 节点对应的dom标签
+	 */
+	tag?: string
+	/**
+	 * 节点标记集合
+	 */
+	marks?: KNodeMarksType & {
+		[key: string]: boolean
+	}
+	/**
+	 * 节点样式集合
+	 */
+	styles?: KNodeStylesType & {
+		[key: string]: boolean
+	}
+}
+
+/**
  * 创建节点的入参类型
  */
 export type KNodeCreateOptionType = {
@@ -510,6 +532,62 @@ export class KNode {
 			return index + 1 == nodes.length - 1 ? null : nextNode.getNext(nodes)
 		}
 		return nextNode
+	}
+
+	/**
+	 * 判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值
+	 */
+	isMatch(config: KNodeMatchOptionType) {
+		//如果存在tag判断并且tag不一样
+		if (config.tag && (this.isText() || config.tag != this.tag)) {
+			return false
+		}
+		//如果存在marks判断
+		if (config.marks) {
+			const hasMarks = Object.keys(config.marks).every(key => {
+				if (this.hasMarks()) {
+					if (config.marks![key] === true) {
+						return this.marks!.hasOwnProperty(key)
+					}
+					return this.marks![key] == config.marks![key]
+				}
+				return false
+			})
+			//如果不是所有的mark都有
+			if (!hasMarks) {
+				return false
+			}
+		}
+		//如果存在styles判断
+		if (config.styles) {
+			const hasStyles = Object.keys(config.styles).every(key => {
+				if (this.hasStyles()) {
+					if (config.styles![key] === true) {
+						return this.styles!.hasOwnProperty(key)
+					}
+					return this.styles![key] == config.styles![key]
+				}
+				return false
+			})
+			//如果不是所有的styles都有
+			if (!hasStyles) {
+				return false
+			}
+		}
+		return true
+	}
+
+	/**
+	 * 判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null
+	 */
+	getMatchNodeUp = (config: KNodeMatchOptionType): KNode | null => {
+		if (this.isMatch(config)) {
+			return this
+		}
+		if (this.parent) {
+			return this.parent.getMatchNodeUp(config)
+		}
+		return null
 	}
 
 	/**
