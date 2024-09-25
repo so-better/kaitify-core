@@ -8,7 +8,7 @@ import { formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge,
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
-import { BoldExtension, Extension, HistoryExtension, ImageExtension, TextExtension } from '../extensions'
+import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 
@@ -223,7 +223,7 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension]
+	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */

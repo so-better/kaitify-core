@@ -96,10 +96,10 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 				else if (item.update == 'styles') {
 					const { addStyles, removeStyles } = getDifferentStyles(item.newNode!, item.oldNode!)
 					for (let key in removeStyles) {
-						dom.style.removeProperty(key)
+						dom.style.removeProperty(camelToKebab(key))
 					}
 					for (let key in addStyles) {
-						dom.style.setProperty(key, `${addStyles[key]}`)
+						dom.style.setProperty(camelToKebab(key), `${addStyles[key]}`)
 					}
 				}
 				//更新属性

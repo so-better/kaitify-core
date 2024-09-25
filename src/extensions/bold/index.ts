@@ -15,21 +15,27 @@ export const BoldExtension = Extension.create({
 		 * 光标所在文本是否加粗
 		 */
 		const isBold = () => {
-			return this.commands.isTextStyle!('font-weight', 'bold') || this.commands.isTextStyle!('font-weight', '700')
+			return this.commands.isTextStyle!('fontWeight', 'bold') || this.commands.isTextStyle!('fontWeight', '700')
 		}
 		/**
-		 * 加粗
+		 * 设置加粗
 		 */
 		const setBold = () => {
+			if (isBold()) {
+				return
+			}
 			this.commands.setTextStyle!({
-				'font-weight': 'bold'
+				fontWeight: 'bold'
 			})
 		}
 		/**
 		 * 取消加粗
 		 */
 		const unsetBold = () => {
-			this.commands.removeTextStyle!(['font-weight'])
+			if (!isBold()) {
+				return
+			}
+			this.commands.removeTextStyle!(['fontWeight'])
 		}
 
 		return {
