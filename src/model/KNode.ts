@@ -116,83 +116,83 @@ export type ZeroWidthTextKNodeCreateOptionType = {
  */
 export class KNode {
 	/**
-	 * 唯一key
+	 * 唯一key【不可修改】
 	 */
 	key: number = createUniqueKey()
 	/**
-	 * 类型
+	 * 类型【可以修改】
 	 */
 	type?: KNodeType
 	/**
-	 * 渲染标签
+	 * 渲染标签【可以修改】
 	 */
 	tag?: string
 	/**
-	 * 文本值
+	 * 文本值【可以修改】
 	 */
 	textContent?: string
 	/**
-	 * 标记集合
+	 * 标记集合【可以修改】
 	 */
 	marks?: KNodeMarksType
 	/**
-	 * 样式集合，样式名称请使用驼峰写法，虽然在渲染时兼容处理了中划线格式的样式名称，但是在其他地方可能会出现问题并且编辑器内部在样式相关的判断都是以驼峰写法为主
+	 * 样式集合，样式名称请使用驼峰写法，虽然在渲染时兼容处理了中划线格式的样式名称，但是在其他地方可能会出现问题并且编辑器内部在样式相关的判断都是以驼峰写法为主【可以修改】
 	 */
 	styles?: KNodeStylesType
 	/**
-	 * 是否锁定节点
+	 * 是否锁定节点【可以修改】
 	 * 针对块节点，在符合合并条件的情况下不允许编辑器将其与父节点或者子节点进行合并
 	 * 针对行内节点，在符合合并条件的情况下是否允许编辑器将其与相邻节点或者父节点或者子节点进行合并
 	 * 针对文本节点，在符合合并的条件下是否允许编辑器将其与相邻节点或者父节点进行合并
 	 */
 	locked: boolean = false
 	/**
-	 * 是否为固定块节点，值为true时：当光标在节点起始处或者光标在节点内只有占位符时，执行删除操作不会删除此节点，会再次创建一个占位符进行处理；当光标在节点内且节点不是代码块样式，不会进行换行
+	 * 是否为固定块节点，值为true时：当光标在节点起始处或者光标在节点内只有占位符时，执行删除操作不会删除此节点，会再次创建一个占位符进行处理；当光标在节点内且节点不是代码块样式，不会进行换行【可以修改】
 	 */
 	fixed: boolean = false
 	/**
-	 * 命名空间
+	 * 命名空间【可以修改】
 	 */
 	namespace?: string
 	/**
-	 * 子节点数组
+	 * 子节点数组【可以修改】
 	 */
 	children?: KNode[]
 	/**
-	 * 父节点
+	 * 父节点【可以修改】
 	 */
 	parent?: KNode
 
 	/**
-	 * 是否块节点【API】
+	 * 【API】是否块节点
 	 */
 	isBlock() {
 		return this.type == 'block'
 	}
 
 	/**
-	 * 是否行内节点【API】
+	 * 【API】是否行内节点
 	 */
 	isInline() {
 		return this.type == 'inline'
 	}
 
 	/**
-	 * 是否闭合节点【API】
+	 * 【API】是否闭合节点
 	 */
 	isClosed() {
 		return this.type == 'closed'
 	}
 
 	/**
-	 * 是否文本节点【API】
+	 * 【API】是否文本节点
 	 */
 	isText() {
 		return this.type == 'text'
 	}
 
 	/**
-	 * 获取所在块级节点【API】
+	 * 【API】获取所在块级节点
 	 */
 	getBlock(): KNode {
 		if (this.isBlock()) {
@@ -202,7 +202,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取所在行内节点【API】
+	 * 【API】获取所在行内节点
 	 */
 	getInline(): KNode | null {
 		if (this.isInline()) {
@@ -215,7 +215,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否有子节点【API】
+	 * 【API】是否有子节点
 	 */
 	hasChildren() {
 		if (this.isText() || this.isClosed()) {
@@ -225,7 +225,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否空节点【API】
+	 * 【API】是否空节点
 	 */
 	isEmpty(): boolean {
 		if (this.isText()) {
@@ -243,21 +243,21 @@ export class KNode {
 	}
 
 	/**
-	 * 是否零宽度无断空白文本节点【API】
+	 * 【API】是否零宽度无断空白文本节点
 	 */
 	isZeroWidthText() {
 		return this.isText() && !this.isEmpty() && isZeroWidthText(this.textContent!)
 	}
 
 	/**
-	 * 是否占位符【API】
+	 * 【API】是否占位符
 	 */
 	isPlaceholder() {
 		return this.isClosed() && this.tag == 'br'
 	}
 
 	/**
-	 * 是否含有标记【API】
+	 * 【API】是否含有标记
 	 */
 	hasMarks() {
 		if (!this.marks) {
@@ -270,7 +270,7 @@ export class KNode {
 	}
 
 	/**
-	 * 是否含有样式【API】
+	 * 【API】是否含有样式
 	 */
 	hasStyles() {
 		if (!this.styles) {
@@ -283,7 +283,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null【API】
+	 * 【API】判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null
 	 */
 	getUneditable(): KNode | null {
 		if (this.hasMarks() && this.marks!['contenteditable'] == 'false') {
@@ -296,7 +296,7 @@ export class KNode {
 	}
 
 	/**
-	 * 当前节点是否只包含占位符【API】
+	 * 【API】当前节点是否只包含占位符
 	 */
 	allIsPlaceholder() {
 		if (this.hasChildren()) {
@@ -307,7 +307,7 @@ export class KNode {
 	}
 
 	/**
-	 * 设置为空节点【API】
+	 * 【API】设置为空节点
 	 */
 	toEmpty() {
 		if (this.isEmpty()) {
@@ -330,8 +330,7 @@ export class KNode {
 	}
 
 	/**
-	 * 比较当前节点和另一个节点的styles是否一致【API】
-	 
+	 * 【API】比较当前节点和另一个节点的styles是否一致
 	 */
 	isEqualStyles(node: KNode) {
 		if (!this.hasStyles() && !node.hasStyles()) {
@@ -344,8 +343,7 @@ export class KNode {
 	}
 
 	/**
-	 * 比较当前节点和另一个节点的marks是否一致【API】
-	 
+	 * 【API】比较当前节点和另一个节点的marks是否一致
 	 */
 	isEqualMarks(node: KNode) {
 		if (!this.hasMarks() && !node.hasMarks()) {
@@ -358,7 +356,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否在拥有代码块样式的块级节点内（包括自身）【API】
+	 * 【API】判断当前节点是否在拥有代码块样式的块级节点内（包括自身）
 	 */
 	isInCodeBlockStyle(): boolean {
 		const block = this.getBlock()
@@ -373,8 +371,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否与另一个节点相同【API】
-	 
+	 * 【API】判断当前节点是否与另一个节点相同
 	 */
 	isEqual(node: KNode) {
 		if (!KNode.isKNode(node)) {
@@ -384,7 +381,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否包含指定节点【API】
+	 * 【API】判断当前节点是否包含指定节点
 	 */
 	isContains(node: KNode): boolean {
 		if (this.isEqual(node)) {
@@ -400,7 +397,7 @@ export class KNode {
 	}
 
 	/**
-	 * 复制节点，deep 为true表示深度复制，即复制子节点，否则只会复制自身【API】
+	 * 【API】复制节点，deep 为true表示深度复制，即复制子节点，否则只会复制自身
 	 */
 	clone = (deep: boolean | undefined = true) => {
 		const newNode = KNode.create({
@@ -457,7 +454,7 @@ export class KNode {
 	}
 
 	/**
-	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个【API】
+	 * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
 	 */
 	firstTextClosedInNode = (node: KNode) => {
 		//如果不是闭合节点和文本节点则返回false
@@ -477,7 +474,7 @@ export class KNode {
 	}
 
 	/**
-	 * 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个【API】
+	 * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个
 	 */
 	lastTextClosedInNode(node: KNode) {
 		//如果不是闭合节点和文本节点则返回false
@@ -497,7 +494,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取当前节点在某个节点数组中的前一个非空节点【API】
+	 * 【API】获取当前节点在某个节点数组中的前一个非空节点
 	 */
 	getPrevious(nodes: KNode[]): KNode | null {
 		const index = nodes.findIndex(item => item.isEqual(this))
@@ -516,7 +513,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取当前节点在某个节点数组中的后一个非空节点【API】
+	 * 【API】获取当前节点在某个节点数组中的后一个非空节点
 	 */
 	getNext(nodes: KNode[]): KNode | null {
 		const index = nodes.findIndex(item => item.isEqual(this))
@@ -535,7 +532,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值【API】
+	 * 【API】判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值
 	 */
 	isMatch(config: KNodeMatchOptionType) {
 		//如果存在tag判断并且tag不一样
@@ -578,7 +575,7 @@ export class KNode {
 	}
 
 	/**
-	 * 判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null【API】
+	 * 【API】判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null
 	 */
 	getMatchNodeUp = (config: KNodeMatchOptionType): KNode | null => {
 		if (this.isMatch(config)) {
@@ -591,7 +588,7 @@ export class KNode {
 	}
 
 	/**
-	 * 获取当前节点下的所有文本节点，如果自身是文本节点也会包括在内【API】
+	 * 【API】获取当前节点下的所有文本节点，如果自身是文本节点也会包括在内
 	 */
 	getTextNodes = () => {
 		if (this.isText()) {
@@ -611,7 +608,7 @@ export class KNode {
 	}
 
 	/**
-	 * 创建节点
+	 * 【API】创建节点
 	 */
 	static create(options: KNodeCreateOptionType) {
 		const knode = new KNode()
@@ -632,7 +629,7 @@ export class KNode {
 	}
 
 	/**
-	 * 创建零宽度无断空白文本节点
+	 * 【API】创建零宽度无断空白文本节点
 	 */
 	static createZeroWidthText(options?: ZeroWidthTextKNodeCreateOptionType) {
 		return KNode.create({
@@ -646,7 +643,7 @@ export class KNode {
 	}
 
 	/**
-	 * 创建占位符
+	 * 【API】创建占位符
 	 */
 	static createPlaceholder() {
 		return KNode.create({
@@ -656,14 +653,14 @@ export class KNode {
 	}
 
 	/**
-	 * 判断参数是否节点
+	 * 【API】判断参数是否节点
 	 */
 	static isKNode(val: any) {
 		return val instanceof KNode
 	}
 
 	/**
-	 * 将某个节点数组扁平化处理后返回
+	 * 【API】将某个节点数组扁平化处理后返回
 	 */
 	static flat(nodes: KNode[]) {
 		const newNodes: KNode[] = []
@@ -679,7 +676,7 @@ export class KNode {
 	}
 
 	/**
-	 * 在指定的节点数组中根据key查找节点
+	 * 【API】在指定的节点数组中根据key查找节点
 	 */
 	static searchByKey(key: string | number, nodes: KNode[]): KNode | null {
 		let node: KNode | null = null

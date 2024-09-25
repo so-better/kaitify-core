@@ -1,6 +1,12 @@
 import { data as DapData, element as DapElement } from 'dap-util'
 import { KNodeMarksType, KNodeStylesType } from '../model'
 import { NODE_MARK } from '../view'
+
+/**
+ * 行内代码特殊标记
+ */
+export const NODE_CODE_MARK = 'data-kaitify-code'
+
 /**
  * 用于KNode生成唯一的key
  */

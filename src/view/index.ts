@@ -4,13 +4,13 @@ import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../model'
 /**
  * 渲染参数类型
  */
-export type KNodeRenderOptionsType = {
+export type KNodeRenderOptionType = {
 	tag: string
 	attrs: KNodeMarksType
 	styles: KNodeStylesType
 	namespace?: string
 	textContent?: string
-	children?: KNodeRenderOptionsType[]
+	children?: KNodeRenderOptionType[]
 }
 
 /**
@@ -21,7 +21,7 @@ export const NODE_MARK = 'data-kaitify-node'
 /**
  * 获取节点的渲染参数
  */
-export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOptionsType => {
+export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOptionType => {
 	//文本节点
 	if (node.isText()) {
 		return {

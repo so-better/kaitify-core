@@ -3,21 +3,21 @@ import { event as DapEvent, element as DapElement } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
+/**
+ * 插入图片方法入参类型
+ */
+type SetImageOptionType = {
+	src: string
+	alt?: string
+	width?: string
+}
+
 declare module '../../model' {
 	interface EditorCommandsType {
 		inImage?: () => boolean
 		includeImage?: () => boolean
-		setImage?: (options: SetImageOptionsType) => Promise<void>
+		setImage?: (options: SetImageOptionType) => Promise<void>
 	}
-}
-
-/**
- * 插入图片方法入参类型
- */
-type SetImageOptionsType = {
-	src: string
-	alt?: string
-	width?: string
 }
 
 /**
@@ -134,22 +134,24 @@ export const ImageExtension = Extension.create({
 		 * 光标是否在同一个图片内
 		 */
 		const inImage = () => {
-			return !!this.getMatchNodeBySelection({
+			return !!this.getMatchNodeUpBySelection({
 				tag: 'img'
 			})
 		}
+
 		/**
-		 * 光标范围内是否包含图片
+		 * 光标范围内是否包含图片，可能不只有图片
 		 */
 		const includeImage = () => {
 			return this.isSelectionIncludesMatchNode({
 				tag: 'img'
 			})
 		}
+
 		/**
 		 * 插入图片
 		 */
-		const setImage = async ({ src, alt, width }: SetImageOptionsType) => {
+		const setImage = async ({ src, alt, width }: SetImageOptionType) => {
 			if (!src) {
 				return
 			}

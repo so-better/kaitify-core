@@ -1,5 +1,5 @@
 import { string as DapString } from 'dap-util'
-import { isZeroWidthText } from '../../tools'
+import { isZeroWidthText, NODE_CODE_MARK } from '../../tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
 
@@ -36,7 +36,7 @@ export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
  * 处理一些需要转为文本节点的特殊节点
  */
 export const formatInlineNodeParseText: RuleFunctionType = ({ editor, node }) => {
-	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font'].includes(node.tag)) {
+	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font', 'code'].includes(node.tag)) {
 		if (node.tag == 'b' || node.tag == 'strong') {
 			if (node.hasStyles()) {
 				node.styles!.fontWeight = 'bold'
@@ -91,6 +91,14 @@ export const formatInlineNodeParseText: RuleFunctionType = ({ editor, node }) =>
 			} else {
 				node.styles = {
 					fontFamily: (node.hasMarks() ? node.marks!.face || '' : '') as string
+				}
+			}
+		} else if (node.tag == 'code') {
+			if (node.hasMarks()) {
+				node.marks![NODE_CODE_MARK] = 'true'
+			} else {
+				node.marks = {
+					[NODE_CODE_MARK]: 'true'
 				}
 			}
 		}

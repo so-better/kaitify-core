@@ -732,7 +732,61 @@ export class Editor {
 	}
 
 	/**
-	 * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
+	 * 注册插件
+	 */
+	registerExtension(extension: Extension) {
+		if (extension.registered) {
+			return
+		}
+		extension.registered = true
+		if (extension.extraKeepTags) {
+			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
+		}
+		if (extension.domParseNodeCallback) {
+			const fn = this.domParseNodeCallback
+			this.domParseNodeCallback = (node: KNode) => {
+				if (fn) node = fn.apply(this, [node])
+				node = extension.domParseNodeCallback!.apply(this, [node])
+				return node
+			}
+		}
+		if (extension.formatRule) {
+			this.formatRules = [...this.formatRules, extension.formatRule]
+		}
+		if (extension.pasteKeepMarks) {
+			const fn = this.pasteKeepMarks
+			this.pasteKeepMarks = (node: KNode) => {
+				const marks: KNodeMarksType = {}
+				if (fn) Object.assign(marks, fn.apply(this, [node]))
+				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
+				return marks
+			}
+		}
+		if (extension.pasteKeepStyles) {
+			const fn = this.pasteKeepStyles
+			this.pasteKeepStyles = (node: KNode) => {
+				const styles: KNodeStylesType = {}
+				if (fn) Object.assign(styles, fn.apply(this, [node]))
+				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
+				return styles
+			}
+		}
+		if (extension.afterUpdateView) {
+			const fn = this.afterUpdateView
+			this.afterUpdateView = () => {
+				if (fn) fn.apply(this)
+				extension.afterUpdateView!.apply(this)
+			}
+		}
+		if (extension.addCommands) {
+			const commands = extension.addCommands.apply(this)
+			this.commands = { ...this.commands, ...commands }
+		}
+		console.log(`${extension.name}插件注册完成！`)
+	}
+
+	/**
+	 * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
 	 */
 	scrollViewToSelection() {
 		if (this.selection.focused()) {
@@ -816,61 +870,7 @@ export class Editor {
 	}
 
 	/**
-	 * 注册插件
-	 */
-	registerExtension(extension: Extension) {
-		if (extension.registered) {
-			return
-		}
-		extension.registered = true
-		if (extension.extraKeepTags) {
-			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
-		}
-		if (extension.domParseNodeCallback) {
-			const fn = this.domParseNodeCallback
-			this.domParseNodeCallback = (node: KNode) => {
-				if (fn) node = fn.apply(this, [node])
-				node = extension.domParseNodeCallback!.apply(this, [node])
-				return node
-			}
-		}
-		if (extension.formatRule) {
-			this.formatRules = [...this.formatRules, extension.formatRule]
-		}
-		if (extension.pasteKeepMarks) {
-			const fn = this.pasteKeepMarks
-			this.pasteKeepMarks = (node: KNode) => {
-				const marks: KNodeMarksType = {}
-				if (fn) Object.assign(marks, fn.apply(this, [node]))
-				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
-				return marks
-			}
-		}
-		if (extension.pasteKeepStyles) {
-			const fn = this.pasteKeepStyles
-			this.pasteKeepStyles = (node: KNode) => {
-				const styles: KNodeStylesType = {}
-				if (fn) Object.assign(styles, fn.apply(this, [node]))
-				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
-				return styles
-			}
-		}
-		if (extension.afterUpdateView) {
-			const fn = this.afterUpdateView
-			this.afterUpdateView = () => {
-				if (fn) fn.apply(this)
-				extension.afterUpdateView!.apply(this)
-			}
-		}
-		if (extension.addCommands) {
-			const commands = extension.addCommands.apply(this)
-			this.commands = { ...this.commands, ...commands }
-		}
-		console.log(`${extension.name}插件注册完成！`)
-	}
-
-	/**
-	 * 根据dom查找到编辑内的对应节点【API】
+	 * 【API】根据dom查找到编辑内的对应节点
 	 */
 	findNode(dom: HTMLElement) {
 		if (!isContains(this.$el!, dom)) {
@@ -888,7 +888,7 @@ export class Editor {
 	}
 
 	/**
-	 * 根据编辑器内的node查找真实dom【API】
+	 * 【API】根据编辑器内的node查找真实dom
 	 */
 	findDom(node: KNode) {
 		let tag = node.tag
@@ -903,7 +903,7 @@ export class Editor {
 	}
 
 	/**
-	 * 设置编辑器是否可编辑【API】
+	 * 【API】设置编辑器是否可编辑
 	 */
 	setEditable(editable: boolean) {
 		if (editable) {
@@ -915,14 +915,14 @@ export class Editor {
 	}
 
 	/**
-	 * 判断编辑器是否可编辑【API】
+	 * 【API】判断编辑器是否可编辑
 	 */
 	isEditable() {
 		return this.$el?.getAttribute('contenteditable') == 'true'
 	}
 
 	/**
-	 * 初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落【API】
+	 * 【API】初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
 	 */
 	checkNodes() {
 		const nodes = this.stackNodes.filter(item => {
@@ -943,7 +943,7 @@ export class Editor {
 	}
 
 	/**
-	 * 将编辑器内的某个非块级节点转为默认块级节点【API】
+	 * 【API】将编辑器内的某个非块级节点转为默认块级节点
 	 */
 	convertToBlock(node: KNode) {
 		if (node.isBlock()) {
@@ -969,7 +969,7 @@ export class Editor {
 	}
 
 	/**
-	 * dom转KNode【API】
+	 * 【API】dom转KNode
 	 */
 	domParseNode(dom: Node) {
 		if (dom.nodeType != 1 && dom.nodeType != 3) {
@@ -1061,7 +1061,7 @@ export class Editor {
 	}
 
 	/**
-	 * html转KNode【API】
+	 * 【API】html转KNode
 	 */
 	htmlParseNode(html: string) {
 		const template = document.createElement('template')
@@ -1077,7 +1077,7 @@ export class Editor {
 	}
 
 	/**
-	 * 将指定节点添加到某个节点的子节点数组里【API】
+	 * 【API】将指定节点添加到某个节点的子节点数组里
 	 */
 	addNode(node: KNode, parentNode: KNode, index: number | undefined = 0) {
 		//排除空节点
@@ -1101,7 +1101,7 @@ export class Editor {
 	}
 
 	/**
-	 * 将指定节点添加到某个节点前面【API】
+	 * 【API】将指定节点添加到某个节点前面
 	 */
 	addNodeBefore(node: KNode, target: KNode) {
 		if (target.parent) {
@@ -1119,7 +1119,7 @@ export class Editor {
 	}
 
 	/**
-	 * 将指定节点添加到某个节点后面【API】
+	 * 【API】将指定节点添加到某个节点后面
 	 */
 	addNodeAfter(node: KNode, target: KNode) {
 		if (target.parent) {
@@ -1137,7 +1137,7 @@ export class Editor {
 	}
 
 	/**
-	 * 获取某个节点内的最后一个可以设置光标点的节点【API】
+	 * 【API】获取某个节点内的最后一个可以设置光标点的节点
 	 */
 	getLastSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -1167,7 +1167,7 @@ export class Editor {
 	}
 
 	/**
-	 * 获取某个节点内的第一个可以设置光标点的节点【API】
+	 * 【API】获取某个节点内的第一个可以设置光标点的节点
 	 */
 	getFirstSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -1197,7 +1197,7 @@ export class Editor {
 	}
 
 	/**
-	 * 查找指定节点之前可以设置为光标点的非空节点【API】
+	 * 【API】查找指定节点之前可以设置为光标点的非空节点
 	 */
 	getPreviousSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -1225,7 +1225,7 @@ export class Editor {
 	}
 
 	/**
-	 * 查找指定节点之后可以设置为光标点的非空节点【API】
+	 * 【API】查找指定节点之后可以设置为光标点的非空节点
 	 */
 	getNextSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -1253,7 +1253,7 @@ export class Editor {
 	}
 
 	/**
-	 * 设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置【API】
+	 * 【API】设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionBefore(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -1301,7 +1301,7 @@ export class Editor {
 	}
 
 	/**
-	 * 设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置【API】
+	 * 【API】设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionAfter(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -1349,7 +1349,7 @@ export class Editor {
 	}
 
 	/**
-	 * 更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新【API】
+	 * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新
 	 */
 	updateSelectionRecently(type: 'all' | 'start' | 'end' | undefined = 'all') {
 		if (!this.selection.focused()) {
@@ -1394,7 +1394,7 @@ export class Editor {
 	}
 
 	/**
-	 * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断【API】
+	 * 【API】判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
 	 */
 	isSelectionInNode(node: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//没有初始化设置光标
@@ -1413,7 +1413,7 @@ export class Editor {
 	}
 
 	/**
-	 * 获取光标选区内的节点【API】
+	 * 【API】获取光标选区内的节点
 	 */
 	getSelectedNodes(): EditorSelectedType[] {
 		//没有聚焦或者没有选区
@@ -1524,20 +1524,20 @@ export class Editor {
 	}
 
 	/**
-	 * 判断光标范围内的节点是否在同一个符合条件的非文本节点下，如果是返回那个符合条件的节点，否则返回null【API】
+	 * 【API】判断光标范围内的节点是否在同一个符合条件节点下，如果是返回那个符合条件的节点，否则返回null
 	 */
-	getMatchNodeBySelection(config: KNodeMatchOptionType) {
+	getMatchNodeUpBySelection(options: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return null
 		}
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
-			return this.selection.start!.node.getMatchNodeUp(config)
+			return this.selection.start!.node.getMatchNodeUp(options)
 		}
 		//起点和终点不在一起的情况
 		const result = this.getSelectedNodes().map(item => {
-			return item.node.getMatchNodeUp(config)
+			return item.node.getMatchNodeUp(options)
 		})
 		//如果只有一个结果，则返回结果
 		if (result.length == 1) {
@@ -1566,17 +1566,35 @@ export class Editor {
 	}
 
 	/**
-	 * 判断某个节点下是否含有符合条件的非文本节点，包括自身【API】
+	 * 【API】判断光标范围内的节点是否都在符合条件的节点下（不一定是同一个节点）
 	 */
-	isIncludesMatchNode(node: KNode, config: KNodeMatchOptionType): boolean {
-		if (node.isMatch(config)) {
+	isSelectionMatchNodesUp(options: KNodeMatchOptionType) {
+		//没有聚焦
+		if (!this.selection.focused()) {
+			return false
+		}
+		//起点和终点在一起
+		if (this.selection.collapsed()) {
+			return !!this.selection.start!.node.getMatchNodeUp(options)
+		}
+		//起点和终点不在一起的情况
+		return this.getSelectedNodes().every(item => {
+			return !!item.node.getMatchNodeUp(options)
+		})
+	}
+
+	/**
+	 * 【API】判断某个节点下是否含有符合条件的节点，包括自身
+	 */
+	isIncludesMatchNode(node: KNode, options: KNodeMatchOptionType): boolean {
+		if (node.isMatch(options)) {
 			return true
 		}
 		if (node.hasChildren()) {
 			const length = node.children!.length
 			let isMatch = false
 			for (let i = 0; i < length; i++) {
-				const flag = this.isIncludesMatchNode(node.children![i], config)
+				const flag = this.isIncludesMatchNode(node.children![i], options)
 				if (flag) {
 					isMatch = true
 					break
@@ -1588,24 +1606,23 @@ export class Editor {
 	}
 
 	/**
-	 * 判断光标范围内是否包含符合条件的非文本节点【API】
+	 * 【API】判断光标范围内是否包含符合条件的节点
 	 */
-	isSelectionIncludesMatchNode(config: KNodeMatchOptionType) {
+	isSelectionIncludesMatchNode(options: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return false
 		}
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
-			return this.isIncludesMatchNode(this.selection.start!.node, config)
+			return this.isIncludesMatchNode(this.selection.start!.node, options)
 		}
 		//起点和终点不在一起
-		const result = this.getSelectedNodes()
-		return result.some(item => this.isIncludesMatchNode(item.node, config))
+		return this.getSelectedNodes().some(item => this.isIncludesMatchNode(item.node, options))
 	}
 
 	/**
-	 * 获取所有在光标范围内的文本节点，该方法拿到的文本节点可能部分区域不在光标范围内【API】
+	 * 【API】获取所有在光标范围内的文本节点，该方法拿到的文本节点可能部分区域不在光标范围内
 	 */
 	getTextNodesBySelection() {
 		if (!this.selection.focused()) {
@@ -1622,7 +1639,7 @@ export class Editor {
 	}
 
 	/**
-	 * 获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置【API】
+	 * 【API】获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置
 	 */
 	getSplitedTextNodesBySelection() {
 		if (!this.selection.focused() || this.selection.collapsed()) {
@@ -1684,7 +1701,7 @@ export class Editor {
 	}
 
 	/**
-	 * 向选区插入文本【API】
+	 * 【API】向选区插入文本
 	 */
 	insertText(text: string) {
 		if (!text) {
@@ -1730,7 +1747,7 @@ export class Editor {
 	}
 
 	/**
-	 * 向选区进行换行【API】
+	 * 【API】向选区进行换行
 	 */
 	insertParagraph() {
 		if (!this.selection.focused()) {
@@ -1948,7 +1965,7 @@ export class Editor {
 	}
 
 	/**
-	 * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去【API】
+	 * 【API】向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
 	 */
 	insertNode(node: KNode, cover: boolean | undefined = false) {
 		//未聚焦不处理
@@ -2027,7 +2044,7 @@ export class Editor {
 	}
 
 	/**
-	 * 对选区进行删除【API】
+	 * 【API】对选区进行删除
 	 */
 	delete() {
 		if (!this.selection.focused()) {
@@ -2213,7 +2230,7 @@ export class Editor {
 	}
 
 	/**
-	 * 更新编辑器视图【API】
+	 * 【API】更新编辑器视图
 	 */
 	async updateView(unPushHistory: boolean | undefined = false) {
 		if (!this.$el) {
@@ -2273,7 +2290,7 @@ export class Editor {
 	}
 
 	/**
-	 * 根据selection更新编辑器真实光标【API】
+	 * 【API】根据selection更新编辑器真实光标
 	 */
 	async updateRealSelection() {
 		const realSelection = window.getSelection()
@@ -2318,7 +2335,7 @@ export class Editor {
 	}
 
 	/**
-	 * 根据真实光标更新selection，返回布尔值表示是否更新成功【API】
+	 * 【API】根据真实光标更新selection，返回布尔值表示是否更新成功
 	 */
 	updateSelection() {
 		if (!this.$el) {
@@ -2410,7 +2427,7 @@ export class Editor {
 	}
 
 	/**
-	 * 销毁编辑器的方法【API】
+	 * 【API】销毁编辑器的方法
 	 */
 	destroy() {
 		//去除可编辑效果
@@ -2421,7 +2438,7 @@ export class Editor {
 	}
 
 	/**
-	 * 配置编辑器，返回创建的编辑器
+	 * 【API】配置编辑器，返回创建的编辑器
 	 */
 	static async configure(options: EditorConfigureOptionType) {
 		//创建编辑器

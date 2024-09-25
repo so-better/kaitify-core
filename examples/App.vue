@@ -19,7 +19,7 @@ const onClick1 = () => {
 
 const onClick2 = () => {
     // editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
-    editor.value!.commands.setCode!()
+    editor.value!.commands.isCode!() ? editor.value!.commands.unsetCode!():editor.value!.commands.setCode!()
     
 }
 
@@ -29,9 +29,7 @@ onMounted(async () => {
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log(this.isSelectionIncludesMatchNode({
-        tag:'img'
-      }));
+      console.log('是否在图片上：'  + this.commands.inImage!(),'是否包含图片：'+this.commands.includeImage!());
     }
 	})
 })

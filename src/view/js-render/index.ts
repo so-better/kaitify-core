@@ -1,12 +1,12 @@
 import { Editor } from '../../model'
 import { camelToKebab } from '../../tools'
-import { getNodeRenderOptions, KNodeRenderOptionsType } from '../index'
+import { getNodeRenderOptions, KNodeRenderOptionType } from '../index'
 import { getDifferentMarks, getDifferentStyles, patchNodes } from './dom-patch'
 
 /**
  * 渲染单个节点
  */
-export const renderNode = (editor: Editor, opts: KNodeRenderOptionsType) => {
+export const renderNode = (editor: Editor, opts: KNodeRenderOptionType) => {
 	const element = opts.namespace ? (document.createElementNS(opts.namespace, opts.tag) as HTMLElement) : document.createElement(opts.tag)
 	//渲染文本
 	if (opts.textContent) {
@@ -141,10 +141,15 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 				const parentDom = parentNode ? this.findDom(parentNode) : this.$el!
 				//如果前一个兄弟节点存在
 				if (previousNode) {
-					//获取前一个兄弟节点的dom
-					const previousDom = this.findDom(previousNode)
-					//插到前一个兄弟节点对应的真实dom之后
-					previousDom.nextElementSibling ? parentDom.insertBefore(dom, previousDom.nextElementSibling) : parentDom.appendChild(dom)
+					//获取前一个兄弟节点的dom，如果前一个兄弟节点不存在，可能是该节点从前面往后挪了，也就是前一个兄弟节点是刚插入的还没渲染过dom
+					try {
+						const previousDom = this.findDom(previousNode)
+						//插到前一个兄弟节点对应的真实dom之后
+						previousDom.nextElementSibling ? parentDom.insertBefore(dom, previousDom.nextElementSibling) : parentDom.appendChild(dom)
+					} catch (error) {
+						//插到父节点对应的真实dom的第一个子节点
+						parentDom.firstElementChild ? parentDom.insertBefore(dom, parentDom.firstElementChild) : parentDom.appendChild(dom)
+					}
 				}
 				//如果前一个兄弟节点不存在
 				else {
