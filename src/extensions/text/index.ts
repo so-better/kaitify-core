@@ -4,10 +4,10 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		setTextStyle?: (styles: KNodeStylesType) => void
-		setTextMark?: (marks: KNodeMarksType) => void
-		removeTextStyle?: (styleNames?: string[]) => void
-		removeTextMark?: (markNames?: string[]) => void
+		setTextStyle?: (styles: KNodeStylesType) => Promise<void>
+		setTextMark?: (marks: KNodeMarksType) => Promise<void>
+		removeTextStyle?: (styleNames?: string[]) => Promise<void>
+		removeTextMark?: (markNames?: string[]) => Promise<void>
 		isTextStyle?: (styleName: string, styleValue?: string | number) => boolean
 		isTextMark?: (markName: string, markValue?: string | number) => boolean
 	}
@@ -185,7 +185,7 @@ export const TextExtension = Extension.create({
 		/**
 		 * 设置光标所在文本样式
 		 */
-		const setTextStyle = (styles: KNodeStylesType) => {
+		const setTextStyle = async (styles: KNodeStylesType) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -238,13 +238,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			this.updateView()
+			await this.updateView()
 		}
 
 		/**
 		 * 设置光标所在文本标记
 		 */
-		const setTextMark = (marks: KNodeMarksType) => {
+		const setTextMark = async (marks: KNodeMarksType) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -297,13 +297,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			this.updateView()
+			await this.updateView()
 		}
 
 		/**
 		 * 移除光标所在文本样式
 		 */
-		const removeTextStyle = (styleNames?: string[]) => {
+		const removeTextStyle = async (styleNames?: string[]) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -334,13 +334,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			this.updateView()
+			await this.updateView()
 		}
 
 		/**
 		 * 移除光标所在文本标记
 		 */
-		const removeTextMark = (markNames?: string[]) => {
+		const removeTextMark = async (markNames?: string[]) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -371,7 +371,7 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			this.updateView()
+			await this.updateView()
 		}
 
 		/**
@@ -417,12 +417,12 @@ export const TextExtension = Extension.create({
 		}
 
 		return {
+			isTextStyle,
+			isTextMark,
 			setTextStyle,
 			setTextMark,
 			removeTextStyle,
-			removeTextMark,
-			isTextStyle,
-			isTextMark
+			removeTextMark
 		}
 	}
 })

@@ -114,7 +114,7 @@ export class KNode {
 	 */
 	marks?: KNodeMarksType
 	/**
-	 * 样式集合
+	 * 样式集合，样式名称请使用驼峰写法，虽然在渲染时兼容处理了中划线格式的样式名称，但是在其他地方可能会出现问题并且编辑器内部在样式相关的判断都是以驼峰写法为主
 	 */
 	styles?: KNodeStylesType
 	/**

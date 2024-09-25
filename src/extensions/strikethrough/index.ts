@@ -3,13 +3,13 @@ import { Extension } from '../Extension'
 declare module '../../model' {
 	interface EditorCommandsType {
 		isStrikethrough?: () => boolean
-		setStrikethrough?: () => void
-		unsetStrikethrough?: () => void
+		setStrikethrough?: () => Promise<void>
+		unsetStrikethrough?: () => Promise<void>
 	}
 }
 
 export const StrikethroughExtension = Extension.create({
-	name: 'Strikethrough',
+	name: 'strikethrough',
 	addCommands() {
 		/**
 		 * 光标所在文本是否删除线
@@ -20,28 +20,28 @@ export const StrikethroughExtension = Extension.create({
 		/**
 		 * 设置删除线
 		 */
-		const setStrikethrough = () => {
+		const setStrikethrough = async () => {
 			if (isStrikethrough()) {
 				return
 			}
-			this.commands.setTextStyle!({
+			await this.commands.setTextStyle!({
 				textDecorationLine: 'line-through'
 			})
 		}
 		/**
 		 * 取消删除线
 		 */
-		const unsetStrikethrough = () => {
+		const unsetStrikethrough = async () => {
 			if (!isStrikethrough()) {
 				return
 			}
-			this.commands.removeTextStyle!(['textDecorationLine'])
+			await this.commands.removeTextStyle!(['textDecoration', 'textDecorationLine'])
 		}
 
 		return {
 			isStrikethrough,
-			unsetStrikethrough,
-			setStrikethrough
+			setStrikethrough,
+			unsetStrikethrough
 		}
 	}
 })

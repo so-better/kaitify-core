@@ -4,8 +4,8 @@ declare module '../../model' {
 	interface EditorCommandsType {
 		canUndo?: () => boolean
 		canRedo?: () => boolean
-		undo?: () => void
-		redo?: () => void
+		undo?: () => Promise<void>
+		redo?: () => Promise<void>
 	}
 }
 
@@ -29,24 +29,24 @@ export const HistoryExtension = Extension.create({
 		/**
 		 * 撤销
 		 */
-		const undo = () => {
+		const undo = async () => {
 			const record = this.history.setUndo()
 			if (record) {
 				this.stackNodes = record.nodes
 				this.selection = record.selection
-				this.updateView(true)
+				await this.updateView(true)
 			}
 		}
 
 		/**
 		 * 重做
 		 */
-		const redo = () => {
+		const redo = async () => {
 			const record = this.history.setRedo()
 			if (record) {
 				this.stackNodes = record.nodes
 				this.selection = record.selection
-				this.updateView(true)
+				await this.updateView(true)
 			}
 		}
 

@@ -3,13 +3,13 @@ import { Extension } from '../Extension'
 declare module '../../model' {
 	interface EditorCommandsType {
 		isItalic?: () => boolean
-		setItalic?: () => void
-		unsetItalic?: () => void
+		setItalic?: () => Promise<void>
+		unsetItalic?: () => Promise<void>
 	}
 }
 
 export const ItalicExtension = Extension.create({
-	name: 'Italic',
+	name: 'italic',
 	addCommands() {
 		/**
 		 * 光标所在文本是否斜体
@@ -20,28 +20,28 @@ export const ItalicExtension = Extension.create({
 		/**
 		 * 设置斜体
 		 */
-		const setItalic = () => {
+		const setItalic = async () => {
 			if (isItalic()) {
 				return
 			}
-			this.commands.setTextStyle!({
+			await this.commands.setTextStyle!({
 				fontStyle: 'italic'
 			})
 		}
 		/**
 		 * 取消斜体
 		 */
-		const unsetItalic = () => {
+		const unsetItalic = async () => {
 			if (!isItalic()) {
 				return
 			}
-			this.commands.removeTextStyle!(['fontStyle'])
+			await this.commands.removeTextStyle!(['fontStyle'])
 		}
 
 		return {
 			isItalic,
-			unsetItalic,
-			setItalic
+			setItalic,
+			unsetItalic
 		}
 	}
 })

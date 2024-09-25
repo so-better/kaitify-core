@@ -64,24 +64,20 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 				if (['td', 'th'].includes(node.tag!) && node.marks!['rowspan']) {
 					marks['rowspan'] = node.marks!['rowspan']
 				}
-				//表格单元格被合并属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!['data-editify-merged']) {
-					marks['data-editify-merged'] = node.marks!['data-editify-merged']
-				}
 			}
 			//处理需要保留的样式
 			if (node.hasStyles()) {
-				//块元素保留text-indent样式
-				if (node.isBlock() && node.styles!['text-indent']) {
-					styles['text-indent'] = node.styles!['text-indent']
+				//块元素保留textIndent样式
+				if (node.isBlock() && node.styles!.textIndent) {
+					styles.textIndent = node.styles!.textIndent
 				}
-				//块元素保留text-align样式
-				if (node.isBlock() && node.styles!['text-align']) {
-					styles['text-align'] = node.styles!['text-align']
+				//块元素保留textAlign样式
+				if (node.isBlock() && node.styles!.textAlign) {
+					styles.textAlign = node.styles!.textAlign
 				}
-				//块元素保留line-height样式
-				if (node.isBlock() && node.styles!['line-height']) {
-					styles['line-height'] = node.styles!['line-height']
+				//块元素保留lineHeight样式
+				if (node.isBlock() && node.styles!.lineHeight) {
+					styles.lineHeight = node.styles!.lineHeight
 				}
 			}
 			//自定义标记保留

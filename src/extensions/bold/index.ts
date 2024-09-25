@@ -3,13 +3,13 @@ import { Extension } from '../Extension'
 declare module '../../model' {
 	interface EditorCommandsType {
 		isBold?: () => boolean
-		setBold?: () => void
-		unsetBold?: () => void
+		setBold?: () => Promise<void>
+		unsetBold?: () => Promise<void>
 	}
 }
 
 export const BoldExtension = Extension.create({
-	name: 'Bold',
+	name: 'bold',
 	addCommands() {
 		/**
 		 * 光标所在文本是否加粗
@@ -20,22 +20,22 @@ export const BoldExtension = Extension.create({
 		/**
 		 * 设置加粗
 		 */
-		const setBold = () => {
+		const setBold = async () => {
 			if (isBold()) {
 				return
 			}
-			this.commands.setTextStyle!({
+			await this.commands.setTextStyle!({
 				fontWeight: 'bold'
 			})
 		}
 		/**
 		 * 取消加粗
 		 */
-		const unsetBold = () => {
+		const unsetBold = async () => {
 			if (!isBold()) {
 				return
 			}
-			this.commands.removeTextStyle!(['fontWeight'])
+			await this.commands.removeTextStyle!(['fontWeight'])
 		}
 
 		return {

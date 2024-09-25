@@ -5,10 +5,10 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		setImage?: (options: SetImageOptionsType) => void
 		canSetImage?: () => boolean
 		inImage?: () => boolean
 		includeImage?: () => boolean
+		setImage?: (options: SetImageOptionsType) => Promise<void>
 	}
 }
 
@@ -195,7 +195,7 @@ export const ImageExtension = Extension.create({
 		/**
 		 * 插入图片
 		 */
-		const setImage = ({ src, alt, width }: SetImageOptionsType) => {
+		const setImage = async ({ src, alt, width }: SetImageOptionsType) => {
 			if (!src) {
 				return
 			}
@@ -215,7 +215,7 @@ export const ImageExtension = Extension.create({
 			})
 			this.insertNode(imageNode)
 			this.setSelectionAfter(imageNode)
-			this.updateView()
+			await this.updateView()
 		}
 		/**
 		 * 光标是否都在图片上
@@ -241,6 +241,6 @@ export const ImageExtension = Extension.create({
 			return isSelectedHasImageNode(this, selectedResult)
 		}
 
-		return { setImage, canSetImage, inImage, includeImage }
+		return { canSetImage, inImage, includeImage, setImage }
 	}
 })
