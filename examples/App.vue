@@ -19,7 +19,7 @@ const onClick1 = () => {
 
 const onClick2 = () => {
     // editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
-    editor.value!.commands.isActiveFontSize!('30px') ? editor.value!.commands.unsetFontSize!('30px'):editor.value!.commands.setFontSize!('30px')
+    editor.value!.commands.isFontFamily!('楷体-简') ? editor.value!.commands.unsetFontFamily!('楷体-简'):editor.value!.commands.setFontFamily!('楷体-简')
     
 }
 

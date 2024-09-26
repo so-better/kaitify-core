@@ -1,5 +1,5 @@
 import { string as DapString } from 'dap-util'
-import { isZeroWidthText, NODE_CODE_MARK } from '../../tools'
+import { isZeroWidthText } from '../../tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
 
@@ -35,8 +35,8 @@ export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
 /**
  * 处理一些需要转为文本节点的特殊节点
  */
-export const formatInlineNodeParseText: RuleFunctionType = ({ editor, node }) => {
-	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font', 'code'].includes(node.tag)) {
+export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
+	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font'].includes(node.tag)) {
 		if (node.tag == 'b' || node.tag == 'strong') {
 			if (node.hasStyles()) {
 				node.styles!.fontWeight = 'bold'
@@ -93,34 +93,23 @@ export const formatInlineNodeParseText: RuleFunctionType = ({ editor, node }) =>
 					fontFamily: (node.hasMarks() ? node.marks!.face || '' : '') as string
 				}
 			}
-		} else if (node.tag == 'code') {
-			if (node.hasMarks()) {
-				node.marks![NODE_CODE_MARK] = 'true'
-			} else {
-				node.marks = {
-					[NODE_CODE_MARK]: 'true'
-				}
-			}
 		}
 		node.tag = editor.textRenderTag
 	}
 }
 
 /**
- * 处理标签为行内的默认文本节点标签且子节点都是文本节点的行内节点
+ * 处理标签为行内默认标签且子节点都是文本节点的行内节点
  */
-export const formatTextRenderInlineNode: RuleFunctionType = ({ editor, node }) => {
-	//非空行内节点没有标记，且tag是默认文本节点标签的
-	if (node.isInline() && node.tag == editor.textRenderTag && node.hasChildren() && !node.isEmpty() && !node.hasMarks()) {
-		//该节点的子节点都是文本节点，直接把父节点拆分成这几个子节点，并把样式传递给子节点
-		if (node.children!.every(item => item.isText())) {
-			const styles = node.hasStyles() ? node.styles! : {}
-			node.children!.reverse().forEach(item => {
-				item.styles = item.hasStyles() ? { ...item.styles!, ...styles } : { ...styles }
-				editor.addNodeAfter(item, node)
-			})
-			node.children = []
-		}
+export const formatInlineTextRender: RuleFunctionType = ({ editor, node }) => {
+	//非空行内节点没有标记，该节点的子节点都是文本节点，直接把父节点拆分成这几个子节点，并把样式传递给子节点
+	if (node.isInline() && node.tag == editor.textRenderTag && node.hasChildren() && !node.isEmpty() && !node.hasMarks() && node.children!.every(item => item.isText())) {
+		const styles = node.hasStyles() ? node.styles! : {}
+		node.children!.reverse().forEach(item => {
+			item.styles = item.hasStyles() ? { ...item.styles!, ...styles } : { ...styles }
+			editor.addNodeAfter(item, node)
+		})
+		node.children = []
 	}
 }
 

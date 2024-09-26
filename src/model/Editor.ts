@@ -4,13 +4,14 @@ import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isCon
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatInlineNodeParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatTextRenderInlineNode } from './config/format-rules'
+import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatInlineTextRender } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
+import { FontFamilyExtension } from '../extensions/fontFamily'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -223,11 +224,11 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension]
+	extensions: Extension[] = [ImageExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, FontFamilyExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
-	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineNodeParseText, formatTextRenderInlineNode, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
+	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineParseText, formatInlineTextRender, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -751,7 +752,7 @@ export class Editor {
 			}
 		}
 		if (extension.formatRule) {
-			this.formatRules = [...this.formatRules, extension.formatRule]
+			this.formatRules = [extension.formatRule, ...this.formatRules]
 		}
 		if (extension.pasteKeepMarks) {
 			const fn = this.pasteKeepMarks
@@ -2458,7 +2459,7 @@ export class Editor {
 		if (options.emptyRenderTags) editor.emptyRenderTags = options.emptyRenderTags
 		if (options.extraKeepTags) editor.extraKeepTags = options.extraKeepTags
 		if (options.extensions) editor.extensions = [...editor.extensions, ...options.extensions]
-		if (options.formatRules) editor.formatRules = [...editor.formatRules, ...options.formatRules]
+		if (options.formatRules) editor.formatRules = [...options.formatRules, ...editor.formatRules]
 		if (options.domParseNodeCallback) editor.domParseNodeCallback = options.domParseNodeCallback
 		if (options.onUpdateView) editor.onUpdateView = options.onUpdateView
 		if (options.onPasteText) editor.onPasteText = options.onPasteText

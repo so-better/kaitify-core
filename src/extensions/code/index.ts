@@ -11,6 +11,18 @@ declare module '../../model' {
 
 export const CodeExtension = Extension.create({
 	name: 'code',
+	formatRule: ({ editor, node }) => {
+		if (node.tag == 'code') {
+			node.tag = editor.textRenderTag
+			if (node.hasMarks()) {
+				node.marks![NODE_CODE_MARK] = 'true'
+			} else {
+				node.marks = {
+					[NODE_CODE_MARK]: 'true'
+				}
+			}
+		}
+	},
 	addCommands() {
 		/**
 		 * 光标所在文本是否行内代码
