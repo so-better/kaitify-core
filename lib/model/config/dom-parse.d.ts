@@ -1,4 +1,3 @@
-import { KNodeStylesType } from '../KNode';
 /**
  * 块节点的转换类型
  */
@@ -26,11 +25,8 @@ export type InlineParseType = {
     tag: string;
     /**
      * 如果是true表示会将该dom转为编辑器配置的默认行内节点
-     * 如果是对象值的话则表示不仅会将该dom转为编辑器配置的默认行内节点，而且会设置固定的style样式，对象的value支持函数，会在将dom转为编辑器配置的默认行内节点时自动执行该函数获取结果，该函数参数分别是编辑器实例和dom
      */
-    parse?: boolean | KNodeStylesType | {
-        [style: string]: string | number | ((element: HTMLElement) => string | number);
-    };
+    parse?: boolean;
 };
 /**
  * 闭合节点的转换类型

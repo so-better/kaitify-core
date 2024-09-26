@@ -1,4 +1,5 @@
 import { Editor } from '../Editor';
+
 /**
  * 监听selection
  */
