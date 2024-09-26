@@ -168,7 +168,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				this.getTextNodesBySelection().forEach(item => {
+				this.getFocusSplitNodesBySelection('text').forEach(item => {
 					if (item.hasStyles()) {
 						item.styles = { ...item.styles, ...styles }
 					} else {
@@ -226,7 +226,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				this.getTextNodesBySelection().forEach(item => {
+				this.getFocusSplitNodesBySelection('text').forEach(item => {
 					if (item.hasMarks()) {
 						item.marks = { ...item.marks, ...marks }
 					} else {
@@ -266,7 +266,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				this.getTextNodesBySelection().forEach(item => {
+				this.getFocusSplitNodesBySelection('text').forEach(item => {
 					removeTextNodeStyles(item, styleNames)
 				})
 			}
@@ -302,7 +302,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				this.getTextNodesBySelection().forEach(item => {
+				this.getFocusSplitNodesBySelection('text').forEach(item => {
 					removeTextNodeMarks(item, markNames)
 				})
 			}

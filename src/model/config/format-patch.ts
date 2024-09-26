@@ -61,27 +61,21 @@ export const patchNodes = (newNodes: KNode[], oldNodes: (KNode | null)[]) => {
 			}
 			//起点新指针对应的节点与终点旧指针对应的节点，如果key一致，说明进行了移动
 			else if (newNodes[newStartIndex].key == oldNodes[oldEndIndex]!.key) {
-				result.push(
-					{
-						type: 'move',
-						newNode: newNodes[newStartIndex],
-						oldNode: oldNodes[oldEndIndex]
-					},
-					...patchNode(newNodes[newStartIndex], oldNodes[oldEndIndex]!)
-				)
+				result.push(...patchNode(newNodes[newStartIndex], oldNodes[oldEndIndex]!), {
+					type: 'move',
+					newNode: newNodes[newStartIndex],
+					oldNode: oldNodes[oldEndIndex]
+				})
 				newStartIndex++
 				oldEndIndex--
 			}
 			//终点新指针对应的节点与起点旧指针对应的节点，如果key一致，则进行比对
 			else if (newNodes[newEndIndex].key == oldNodes[oldStartIndex]!.key) {
-				result.push(
-					{
-						type: 'move',
-						newNode: newNodes[newEndIndex],
-						oldNode: oldNodes[oldStartIndex]
-					},
-					...patchNode(newNodes[newEndIndex], oldNodes[oldStartIndex]!)
-				)
+				result.push(...patchNode(newNodes[newEndIndex], oldNodes[oldStartIndex]!), {
+					type: 'move',
+					newNode: newNodes[newEndIndex],
+					oldNode: oldNodes[oldStartIndex]
+				})
 				newEndIndex--
 				oldStartIndex++
 			}
@@ -91,14 +85,11 @@ export const patchNodes = (newNodes: KNode[], oldNodes: (KNode | null)[]) => {
 				let idxInOld = oldNodes.findIndex(item => item && item.key === newNodes[newStartIndex].key)
 				//存在同key节点
 				if (idxInOld >= 0) {
-					result.push(
-						{
-							type: 'move',
-							newNode: newNodes[newStartIndex],
-							oldNode: oldNodes[idxInOld]
-						},
-						...patchNode(newNodes[newStartIndex], oldNodes[idxInOld]!)
-					)
+					result.push(...patchNode(newNodes[newStartIndex], oldNodes[idxInOld]!), {
+						type: 'move',
+						newNode: newNodes[newStartIndex],
+						oldNode: oldNodes[idxInOld]
+					})
 					//此时将节点置为null表示节点已处理过
 					oldNodes[idxInOld] = null
 				}

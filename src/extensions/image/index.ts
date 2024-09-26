@@ -152,6 +152,9 @@ export const ImageExtension = Extension.create({
 		 * 插入图片
 		 */
 		const setImage = async ({ src, alt, width }: SetImageOptionType) => {
+			if (!this.selection.focused()) {
+				return
+			}
 			if (!src) {
 				return
 			}

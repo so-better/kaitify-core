@@ -888,11 +888,7 @@ export class Editor {
 	 * 【API】根据编辑器内的node查找真实dom
 	 */
 	findDom(node: KNode) {
-		let tag = node.tag
-		if (node.isText()) {
-			tag = this.textRenderTag
-		}
-		const dom = this.$el!.querySelector(`${tag}[${NODE_MARK}="${node.key}"]`)
+		const dom = this.$el!.querySelector(`[${NODE_MARK}="${node.key}"]`)
 		if (!dom) {
 			throw new Error(`Unexpected error occurred: the dom was not found in the editor`)
 		}
@@ -1579,11 +1575,8 @@ export class Editor {
 	 * 【API】获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
 	 */
 	getFocusNodesBySelection(type: 'all' | 'closed' | 'text' | undefined = 'all') {
-		if (!this.selection.focused()) {
+		if (!this.selection.focused() || this.selection.collapsed()) {
 			return []
-		}
-		if (this.selection.collapsed()) {
-			return this.selection.start!.node.getFocusNodes(type)
 		}
 		const nodes: KNode[] = []
 		this.getSelectedNodes().forEach(item => {
@@ -1593,16 +1586,16 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置
+	 * 【API】获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
 	 */
-	getTextNodesBySelection() {
+	getFocusSplitNodesBySelection(type: 'all' | 'closed' | 'text' | undefined = 'all') {
 		if (!this.selection.focused() || this.selection.collapsed()) {
 			return []
 		}
-		const textNodes: KNode[] = []
+		const nodes: KNode[] = []
 		this.getSelectedNodes().forEach(item => {
 			//文本节点
-			if (item.node.isText()) {
+			if (item.node.isText() && (type == 'all' || type == 'text')) {
 				//选择部分文本
 				if (item.offset) {
 					const textContent = item.node.textContent!
@@ -1612,7 +1605,7 @@ export class Editor {
 						this.addNodeAfter(newTextNode, item.node)
 						item.node.textContent = textContent.substring(0, item.offset[1])
 						newTextNode.textContent = textContent.substring(item.offset[1])
-						textNodes.push(item.node)
+						nodes.push(item.node)
 					}
 					//选中了文本的后半段
 					else if (item.offset[1] == textContent.length) {
@@ -1620,7 +1613,7 @@ export class Editor {
 						this.addNodeBefore(newTextNode, item.node)
 						newTextNode.textContent = textContent.substring(0, item.offset[0])
 						item.node.textContent = textContent.substring(item.offset[0])
-						textNodes.push(item.node)
+						nodes.push(item.node)
 					}
 					//选中文本中间部分
 					else {
@@ -1631,7 +1624,7 @@ export class Editor {
 						newBeforeTextNode.textContent = textContent.substring(0, item.offset[0])
 						item.node.textContent = textContent.substring(item.offset[0], item.offset[1])
 						newAfterTextNode.textContent = textContent.substring(item.offset[1])
-						textNodes.push(item.node)
+						nodes.push(item.node)
 					}
 					//重置光标位置
 					if (this.isSelectionInNode(item.node, 'start')) {
@@ -1643,15 +1636,19 @@ export class Editor {
 				}
 				//选择整个文本
 				else {
-					textNodes.push(item.node)
+					nodes.push(item.node)
 				}
+			}
+			//闭合节点
+			else if (item.node.isClosed() && (type == 'all' || type == 'closed')) {
+				nodes.push(item.node)
 			}
 			//非文本节点存在子节点数组
 			else if (item.node.hasChildren()) {
-				textNodes.push(...item.node.getFocusNodes('text'))
+				nodes.push(...item.node.getFocusNodes(type))
 			}
 		})
-		return textNodes
+		return nodes
 	}
 
 	/**
