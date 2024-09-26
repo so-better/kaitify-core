@@ -14,8 +14,8 @@ type SetImageOptionType = {
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		inImage?: () => boolean
-		includeImage?: () => boolean
+		getImage?: () => KNode | null
+		hasImage?: () => boolean
 		setImage?: (options: SetImageOptionType) => Promise<void>
 	}
 }
@@ -131,19 +131,19 @@ export const ImageExtension = Extension.create({
 	},
 	addCommands() {
 		/**
-		 * 光标是否在同一个图片内
+		 * 获取光标所在的图片，如果光标不在一张图片内，返回null
 		 */
-		const inImage = () => {
-			return !!this.getMatchNodeUpBySelection({
+		const getImage = () => {
+			return this.getMatchNodeBySelection({
 				tag: 'img'
 			})
 		}
 
 		/**
-		 * 光标范围内是否包含图片，可能不只有图片
+		 * 判断光标范围内是否有图片
 		 */
-		const includeImage = () => {
-			return this.isSelectionIncludesMatchNode({
+		const hasImage = () => {
+			return this.isSelectionNodesSomeMatch({
 				tag: 'img'
 			})
 		}
@@ -171,6 +171,6 @@ export const ImageExtension = Extension.create({
 			await this.updateView()
 		}
 
-		return { inImage, includeImage, setImage }
+		return { getImage, hasImage, setImage }
 	}
 })

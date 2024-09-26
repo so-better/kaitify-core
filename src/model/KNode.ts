@@ -534,19 +534,19 @@ export class KNode {
 	/**
 	 * 【API】判断当前节点是否符合指定的条件，marks和styles参数中的属性值可以是true表示只判断是否拥有该标记或者样式，而不关心是什么值
 	 */
-	isMatch(config: KNodeMatchOptionType) {
+	isMatch(options: KNodeMatchOptionType) {
 		//如果存在tag判断并且tag不一样
-		if (config.tag && (this.isText() || config.tag != this.tag)) {
+		if (options.tag && (this.isText() || options.tag != this.tag)) {
 			return false
 		}
 		//如果存在marks判断
-		if (config.marks) {
-			const hasMarks = Object.keys(config.marks).every(key => {
+		if (options.marks) {
+			const hasMarks = Object.keys(options.marks).every(key => {
 				if (this.hasMarks()) {
-					if (config.marks![key] === true) {
+					if (options.marks![key] === true) {
 						return this.marks!.hasOwnProperty(key)
 					}
-					return this.marks![key] == config.marks![key]
+					return this.marks![key] == options.marks![key]
 				}
 				return false
 			})
@@ -556,13 +556,13 @@ export class KNode {
 			}
 		}
 		//如果存在styles判断
-		if (config.styles) {
-			const hasStyles = Object.keys(config.styles).every(key => {
+		if (options.styles) {
+			const hasStyles = Object.keys(options.styles).every(key => {
 				if (this.hasStyles()) {
-					if (config.styles![key] === true) {
+					if (options.styles![key] === true) {
 						return this.styles!.hasOwnProperty(key)
 					}
-					return this.styles![key] == config.styles![key]
+					return this.styles![key] == options.styles![key]
 				}
 				return false
 			})
@@ -575,36 +575,35 @@ export class KNode {
 	}
 
 	/**
-	 * 【API】判断当前节点是否在符合条件的节点下，包含自身，如果是返回符合条件的节点，否则返回null
+	 * 【API】判断当前节点是否存在于符合条件的节点内，包含自身，如果是返回符合条件的节点，否则返回null
 	 */
-	getMatchNodeUp = (config: KNodeMatchOptionType): KNode | null => {
-		if (this.isMatch(config)) {
+	getMatchNode(options: KNodeMatchOptionType): KNode | null {
+		if (this.isMatch(options)) {
 			return this
 		}
 		if (this.parent) {
-			return this.parent.getMatchNodeUp(config)
+			return this.parent.getMatchNode(options)
 		}
 		return null
 	}
 
 	/**
-	 * 【API】获取当前节点下的所有文本节点，如果自身是文本节点也会包括在内
+	 * 【API】获取当前节点下的所有可聚焦的节点，如果自身符合也会包括在内，type是all获取闭合节点和文本节点，type是closed获取闭合节点，type是text获取文本节点
 	 */
-	getTextNodes = () => {
-		if (this.isText()) {
-			return [this]
+	getFocusNodes = (type: 'all' | 'closed' | 'text' | undefined = 'all') => {
+		const nodes: KNode[] = []
+		if (this.isClosed() && (type == 'all' || type == 'closed')) {
+			nodes.push(this)
 		}
-		if (this.isClosed()) {
-			return []
+		if (this.isText() && (type == 'all' || type == 'text')) {
+			nodes.push(this)
 		}
 		if (this.hasChildren()) {
-			const textNodes: KNode[] = []
 			this.children!.forEach(item => {
-				textNodes.push(...item.getTextNodes())
+				nodes.push(...item.getFocusNodes(type))
 			})
-			return textNodes
 		}
-		return []
+		return nodes
 	}
 
 	/**

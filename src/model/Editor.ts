@@ -105,7 +105,7 @@ export type EditorConfigureOptionType = {
 	 */
 	onPasteVideo?: (this: Editor, file: File) => boolean | Promise<boolean>
 	/**
-	 * 编辑器粘贴除了图片和视频以外的文件时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要进行自定义处理
+	 * 编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理
 	 */
 	onPasteFile?: (this: Editor, file: File) => void | Promise<void>
 	/**
@@ -736,18 +736,19 @@ export class Editor {
 	 * 注册插件
 	 */
 	registerExtension(extension: Extension) {
-		if (extension.registered) {
-			return
-		}
+		//是否已注册
+		if (extension.registered) return
+		//设置已注册
 		extension.registered = true
+
 		if (extension.extraKeepTags) {
-			this.extraKeepTags = [...this.extraKeepTags, ...extension.extraKeepTags]
+			this.extraKeepTags = [...extension.extraKeepTags, ...this.extraKeepTags]
 		}
 		if (extension.domParseNodeCallback) {
 			const fn = this.domParseNodeCallback
 			this.domParseNodeCallback = (node: KNode) => {
-				if (fn) node = fn.apply(this, [node])
 				node = extension.domParseNodeCallback!.apply(this, [node])
+				if (fn) node = fn.apply(this, [node])
 				return node
 			}
 		}
@@ -757,33 +758,30 @@ export class Editor {
 		if (extension.pasteKeepMarks) {
 			const fn = this.pasteKeepMarks
 			this.pasteKeepMarks = (node: KNode) => {
-				const marks: KNodeMarksType = {}
+				const marks = extension.pasteKeepMarks!.apply(this, [node])
 				if (fn) Object.assign(marks, fn.apply(this, [node]))
-				Object.assign(marks, extension.pasteKeepMarks!.apply(this, [node]))
 				return marks
 			}
 		}
 		if (extension.pasteKeepStyles) {
 			const fn = this.pasteKeepStyles
 			this.pasteKeepStyles = (node: KNode) => {
-				const styles: KNodeStylesType = {}
+				const styles = extension.pasteKeepStyles!.apply(this, [node])
 				if (fn) Object.assign(styles, fn.apply(this, [node]))
-				Object.assign(styles, extension.pasteKeepStyles!.apply(this, [node]))
 				return styles
 			}
 		}
 		if (extension.afterUpdateView) {
 			const fn = this.afterUpdateView
 			this.afterUpdateView = () => {
-				if (fn) fn.apply(this)
 				extension.afterUpdateView!.apply(this)
+				if (fn) fn.apply(this)
 			}
 		}
 		if (extension.addCommands) {
 			const commands = extension.addCommands.apply(this)
 			this.commands = { ...this.commands, ...commands }
 		}
-		console.log(`${extension.name}插件注册完成！`)
 	}
 
 	/**
@@ -1525,124 +1523,92 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标范围内的节点是否在同一个符合条件节点下，如果是返回那个符合条件的节点，否则返回null
+	 * 【API】判断光标范围内的可聚焦节点是否全都在同一个符合条件节点内，如果是返回那个符合条件的节点，否则返回null
 	 */
-	getMatchNodeUpBySelection(options: KNodeMatchOptionType) {
+	getMatchNodeBySelection(options: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return null
 		}
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
-			return this.selection.start!.node.getMatchNodeUp(options)
+			return this.selection.start!.node.getMatchNode(options)
 		}
-		//起点和终点不在一起的情况
-		const result = this.getSelectedNodes().map(item => {
-			return item.node.getMatchNodeUp(options)
+		//起点和终点不在一起的情况，获取所有可聚焦的节点
+		const nodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			nodes.push(...item.node.getFocusNodes('all'))
 		})
-		//如果只有一个结果，则返回结果
-		if (result.length == 1) {
-			return result[0]
+		//获取第一个可聚焦节点所在的符合条件的节点
+		const matchNode = nodes[0].getMatchNode(options)
+		//如果后续每个可聚焦节点都在该节点内，返回该节点
+		if (matchNode && nodes.every(item => matchNode.isContains(item))) {
+			return matchNode
 		}
-		//多个结果的情况下判断是否有null
-		let hasNull = result.some(item => !item)
-		//选区内有节点不在符合条件的节点下
-		if (hasNull) {
-			return null
-		}
-		//默认数组中的节点都相等
-		let flag = true
-		for (let i = 1; i < result.length; i++) {
-			if (!result[i]!.isEqual(result[0]!)) {
-				flag = false
-				break
-			}
-		}
-		//如果相等，则返回该节点
-		if (flag) {
-			return result[0]
-		}
-		//不相等
 		return null
 	}
 
 	/**
-	 * 【API】判断光标范围内的节点是否都在符合条件的节点下（不一定是同一个节点）
+	 * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的节点内（不一定是同一个节点）
 	 */
-	isSelectionMatchNodesUp(options: KNodeMatchOptionType) {
+	isSelectionNodesAllMatch(options: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return false
 		}
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
-			return !!this.selection.start!.node.getMatchNodeUp(options)
+			return !!this.selection.start!.node.getMatchNode(options)
 		}
-		//起点和终点不在一起的情况
-		return this.getSelectedNodes().every(item => {
-			return !!item.node.getMatchNodeUp(options)
+		//起点和终点不在一起的情况，获取所有可聚焦的节点
+		const nodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			nodes.push(...item.node.getFocusNodes('all'))
 		})
+		return nodes.every(item => !!item.getMatchNode(options))
 	}
 
 	/**
-	 * 【API】判断某个节点下是否含有符合条件的节点，包括自身
+	 * 【API】判断光标范围内是否有可聚焦节点在符合条件的节点内
 	 */
-	isIncludesMatchNode(node: KNode, options: KNodeMatchOptionType): boolean {
-		if (node.isMatch(options)) {
-			return true
-		}
-		if (node.hasChildren()) {
-			const length = node.children!.length
-			let isMatch = false
-			for (let i = 0; i < length; i++) {
-				const flag = this.isIncludesMatchNode(node.children![i], options)
-				if (flag) {
-					isMatch = true
-					break
-				}
-			}
-			return isMatch
-		}
-		return false
-	}
-
-	/**
-	 * 【API】判断光标范围内是否包含符合条件的节点
-	 */
-	isSelectionIncludesMatchNode(options: KNodeMatchOptionType) {
+	isSelectionNodesSomeMatch(options: KNodeMatchOptionType) {
 		//没有聚焦
 		if (!this.selection.focused()) {
 			return false
 		}
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
-			return this.isIncludesMatchNode(this.selection.start!.node, options)
+			return !!this.selection.start!.node.getMatchNode(options)
 		}
-		//起点和终点不在一起
-		return this.getSelectedNodes().some(item => this.isIncludesMatchNode(item.node, options))
+		//起点和终点不在一起的情况，获取所有可聚焦的节点
+		const nodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			nodes.push(...item.node.getFocusNodes('all'))
+		})
+		return nodes.some(item => !!item.getMatchNode(options))
 	}
 
 	/**
-	 * 【API】获取所有在光标范围内的文本节点，该方法拿到的文本节点可能部分区域不在光标范围内
+	 * 【API】获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
 	 */
-	getTextNodesBySelection() {
+	getFocusNodesBySelection(type: 'all' | 'closed' | 'text' | undefined = 'all') {
 		if (!this.selection.focused()) {
 			return []
 		}
 		if (this.selection.collapsed()) {
-			return this.selection.start!.node.isText() ? [this.selection.start!.node] : []
+			return this.selection.start!.node.getFocusNodes(type)
 		}
-		const textNodes: KNode[] = []
+		const nodes: KNode[] = []
 		this.getSelectedNodes().forEach(item => {
-			textNodes.push(...item.node.getTextNodes())
+			nodes.push(...item.node.getFocusNodes(type))
 		})
-		return textNodes
+		return nodes
 	}
 
 	/**
 	 * 【API】获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置
 	 */
-	getSplitedTextNodesBySelection() {
+	getTextNodesBySelection() {
 		if (!this.selection.focused() || this.selection.collapsed()) {
 			return []
 		}
@@ -1695,7 +1661,7 @@ export class Editor {
 			}
 			//非文本节点存在子节点数组
 			else if (item.node.hasChildren()) {
-				textNodes.push(...item.node.getTextNodes())
+				textNodes.push(...item.node.getFocusNodes('text'))
 			}
 		})
 		return textNodes

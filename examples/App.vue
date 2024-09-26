@@ -25,11 +25,11 @@ const onClick2 = () => {
 
 onMounted(async () => {
 	editor.value = await Editor.configure({
-		value: `<p><code>kai ling</code><b>我是加粗的<span style="color:red;">红色加粗</span></b></p><pre>const a = b</pre></pre><h1 style="color:red;">我是一个段落</h1><h2>我是一个段落</h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
+		value: `<p><code>kai ling</code><code>我是加粗的<span style="color:red;">红色加粗</span></code></p><pre>const a = b</pre></pre><h1 style="color:red;">我是一个段落</h1><h2>我是一个段落</h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5>我是一个段落</h5><h6>我是一个段落</h6><p>我是一个段落</p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video controls src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
 		el: '#editor',
 		allowPasteHtml: true,
     onSelectionUpdate(){
-      console.log('是否在图片上：'  + this.commands.inImage!(),'是否包含图片：'+this.commands.includeImage!());
+      console.log('是否在行内代码上：'  + !!this.commands.getCode!(),'选区是否有行内代码：'+this.commands.hasCode!(),'选区是否都是行内代码：'+this.commands.allCode!());
     }
 	})
 })

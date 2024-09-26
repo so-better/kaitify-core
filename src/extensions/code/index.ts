@@ -1,9 +1,11 @@
-import { NODE_CODE_MARK } from '../../tools'
+import { KNode } from '../../model'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		isCode?: () => boolean
+		getCode?: () => KNode | null
+		hasCode?: () => boolean
+		allCode?: () => boolean
 		setCode?: () => Promise<void>
 		unsetCode?: () => Promise<void>
 	}
@@ -11,48 +13,48 @@ declare module '../../model' {
 
 export const CodeExtension = Extension.create({
 	name: 'code',
-	formatRule: ({ editor, node }) => {
-		if (node.tag == 'code') {
-			node.tag = editor.textRenderTag
-			if (node.hasMarks()) {
-				node.marks![NODE_CODE_MARK] = 'true'
-			} else {
-				node.marks = {
-					[NODE_CODE_MARK]: 'true'
-				}
-			}
-		}
-	},
 	addCommands() {
 		/**
-		 * 光标所在文本是否行内代码
+		 * 获取光标所在的行内代码，如果光标不在一个行内代码内，返回null
 		 */
-		const isCode = () => {
-			return this.commands.isTextMark!(NODE_CODE_MARK)
+		const getCode = () => {
+			return this.getMatchNodeBySelection({
+				tag: 'code'
+			})
 		}
+
+		/**
+		 * 判断光标范围内是否有行内代码
+		 */
+		const hasCode = () => {
+			return this.isSelectionNodesSomeMatch({
+				tag: 'code'
+			})
+		}
+
+		/**
+		 * 光标范围内是否都是行内代码
+		 */
+		const allCode = () => {
+			return this.isSelectionNodesAllMatch({
+				tag: 'code'
+			})
+		}
+
 		/**
 		 * 设置行内代码
 		 */
-		const setCode = async () => {
-			if (isCode()) {
-				return
-			}
-			await this.commands.setTextMark!({
-				[NODE_CODE_MARK]: 'true'
-			})
-		}
+		const setCode = async () => {}
+
 		/**
 		 * 取消行内代码
 		 */
-		const unsetCode = async () => {
-			if (!isCode()) {
-				return
-			}
-			await this.commands.removeTextMark!([NODE_CODE_MARK])
-		}
+		const unsetCode = async () => {}
 
 		return {
-			isCode,
+			getCode,
+			hasCode,
+			allCode,
 			setCode,
 			unsetCode
 		}
