@@ -14,8 +14,9 @@ declare module '../../model' {
 export const CodeExtension = Extension.create({
 	name: 'code',
 	formatRule({ editor, node }) {
-		//行内代码里只能有文本节点
+		//行内代码里只能有文本节点和闭合节点
 		if (node.tag == 'code' && node.hasChildren()) {
+			node.children!.forEach(item => {})
 		}
 	},
 	addCommands() {
@@ -69,10 +70,10 @@ export const CodeExtension = Extension.create({
 			}
 			//起点和终点不在一起
 			else {
-				const textNodes = this.getFocusSplitNodesBySelection('text')
-				const length = textNodes.length
+				const focusNodes = this.getFocusSplitNodesBySelection('all')
+				const length = focusNodes.length
 				for (let i = 0; i < length; i++) {
-					const node = textNodes[i]
+					const node = focusNodes[i]
 					const isExsitInCode = !!node.getMatchNode({
 						tag: 'code'
 					})
@@ -81,21 +82,21 @@ export const CodeExtension = Extension.create({
 						continue
 					}
 					//复制该节点
-					const newTexNode = node.clone(true)
+					const newNode = node.clone(true)
 					//节点改为行内代码
 					node.type = 'inline'
 					node.tag = 'code'
 					node.marks = {}
 					node.styles = {}
 					node.textContent = undefined
-					node.children = [newTexNode]
-					newTexNode.parent = node
+					node.children = [newNode]
+					newNode.parent = node
 					//重置光标位置
 					if (this.isSelectionInNode(node, 'start')) {
-						this.selection.start!.node = newTexNode
+						this.selection.start!.node = newNode
 					}
 					if (this.isSelectionInNode(node, 'end')) {
-						this.selection.end!.node = newTexNode
+						this.selection.end!.node = newNode
 					}
 				}
 			}
@@ -147,16 +148,16 @@ export const CodeExtension = Extension.create({
 						type: 'inline',
 						tag: 'code'
 					})
-					//获取选区内的文本节点并遍历
-					this.getFocusSplitNodesBySelection('text').forEach((item, i) => {
-						//获取文本节点在父节点中的位置
-						const index = item.parent!.children!.findIndex(n => n.isEqual(item))
+					//获取选区内的可聚焦节点并遍历
+					this.getFocusSplitNodesBySelection('all').forEach((item, i) => {
+						//获取可聚焦节点在父节点中的位置
+						const index = codeNode.children!.findIndex(n => n.isEqual(item))
 						//从父节点中移除
-						item.parent!.children!.splice(index, 1)
+						codeNode.children!.splice(index, 1)
 						//加入到新的行内代码里
 						this.addNode(item, newCodeNode, i)
 					})
-					//新的行内代码加入到当前行内代码前面
+					//新的行内代码插入到当前行内代码前面
 					this.addNodeBefore(newCodeNode, codeNode)
 					//创建一个空白文本节点
 					const zeroWidthText = KNode.createZeroWidthText()
@@ -174,33 +175,71 @@ export const CodeExtension = Extension.create({
 				const endCodeNode = endNode.getMatchNode({ tag: 'code' })!
 				//起点和终点在一个行内代码内
 				if (startCodeNode.isEqual(endCodeNode)) {
-					//获取选区内的文本节点
-					const textNodes = this.getFocusSplitNodesBySelection('text')
-					//获取选区内第一个文本节点的序列
-					const firstIndex = startCodeNode.children!.findIndex(item => item.isEqual(textNodes[0]))
-					//获取选区内最后一个文本节点的序列
-					const lastIndex = startCodeNode.children!.findIndex(item => item.isEqual(textNodes[textNodes.length - 1]))
-					//创建新的行内节点
-					const newCodeNode = KNode.create({ type: 'inline', tag: 'code' })
-					//将选区前的行内节点部份给新的行内节点
-					startCodeNode.children!.splice(0, firstIndex).forEach((item, index) => {
-						this.addNode(item, newCodeNode, index)
-					})
-					//将新的行内代码节点插入到原行内代码节点前
-					this.addNodeBefore(newCodeNode, startCodeNode)
-					//将选区内文本节点抽出并插入到原行内代码节点前
-					debugger
-					startCodeNode.children!.splice(0, lastIndex - firstIndex)
-					textNodes.forEach((item, index) => {
-						if (index == 0) {
+					//获取选区内的可聚焦节点
+					const focusNodes = this.getFocusSplitNodesBySelection('all')
+					//获取选区内第一个可聚焦节点在行内代码中的序列
+					const firstIndex = startCodeNode.children!.findIndex(item => item.isEqual(focusNodes[0]))
+					//获取选区内最后一个可聚焦节点在行内代码中的序列
+					const lastIndex = startCodeNode.children!.findIndex(item => item.isEqual(focusNodes[focusNodes.length - 1]))
+					//行内代码的子节点数量
+					const length = startCodeNode.children!.length
+					//是第一个可聚焦节点和最后一个可聚焦节点，说明选区是整个行内代码
+					if (firstIndex == 0 && lastIndex == length - 1) {
+						startCodeNode.children!.forEach(item => {
 							this.addNodeBefore(item, startCodeNode)
-						} else {
-							this.addNodeAfter(item, textNodes[0])
-						}
-					})
+						})
+						startCodeNode.children = []
+					}
+					//是第一个可聚焦节点
+					else if (firstIndex == 0 && lastIndex == 0) {
+						const node = startCodeNode.children![0]
+						startCodeNode.children!.splice(0, 1)
+						this.addNodeBefore(node, startCodeNode)
+					}
+					//是最后一个可聚焦节点
+					else if (firstIndex == length - 1 && lastIndex == length - 1) {
+						const node = startCodeNode.children![length - 1]
+						startCodeNode.children!.splice(length - 1, 1)
+						this.addNodeAfter(node, startCodeNode)
+					}
+					//是同一个可聚焦节点但是在中间位置
+					else if (firstIndex == lastIndex) {
+						//获取该可聚焦节点
+						const node = startCodeNode.children![firstIndex]
+						//创建新的行内节点
+						const newCodeNode = KNode.create({ type: 'inline', tag: 'code' })
+						//将选区前的行内节点部份给新的行内节点
+						startCodeNode.children!.splice(0, firstIndex).forEach((item, index) => {
+							this.addNode(item, newCodeNode, index)
+						})
+						//将新的行内代码节点插入到原行内代码节点前
+						this.addNodeBefore(newCodeNode, startCodeNode)
+						//将选区内的节点插入到原来的行内节点前面
+						this.addNodeBefore(node, startCodeNode)
+						//从原来的行内代码中移出该节点
+						startCodeNode.children!.splice(0, 1)
+					}
+					//不是同一个可聚焦节点
+					else {
+						//创建新的行内节点
+						const newCodeNode = KNode.create({ type: 'inline', tag: 'code' })
+						//将选区前的行内节点部份给新的行内节点
+						startCodeNode.children!.splice(0, firstIndex).forEach((item, index) => {
+							this.addNode(item, newCodeNode, index)
+						})
+						//将新的行内代码节点插入到原行内代码节点前
+						this.addNodeBefore(newCodeNode, startCodeNode)
+						//将选区内的节点插入到原行内节点的前面
+						focusNodes.forEach(item => {
+							this.addNodeBefore(item, startCodeNode)
+						})
+						startCodeNode.children!.splice(0, lastIndex - firstIndex + 1)
+					}
 				}
 				//起点和终点不在一个行内代码里
 				else {
+					// todo
+					// 光标范围内是多个行内代码
 				}
 			}
 			await this.updateView()

@@ -106,7 +106,7 @@ export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 		}
 		//将节点标签转为默认的文本标签
 		node.tag = editor.textRenderTag
-		//如果这些节点有子节点，说明不是文本节点，需要进行拆分
+		//有子节点的节点进行拆分
 		splitInlineParseNode(editor, node)
 	}
 }
