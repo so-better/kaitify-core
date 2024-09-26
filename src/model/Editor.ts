@@ -1533,10 +1533,7 @@ export class Editor {
 			return this.selection.start!.node.getMatchNode(options)
 		}
 		//起点和终点不在一起的情况，获取所有可聚焦的节点
-		const nodes: KNode[] = []
-		this.getSelectedNodes().forEach(item => {
-			nodes.push(...item.node.getFocusNodes('all'))
-		})
+		const nodes = this.getFocusNodesBySelection('all')
 		//获取第一个可聚焦节点所在的符合条件的节点
 		const matchNode = nodes[0].getMatchNode(options)
 		//如果后续每个可聚焦节点都在该节点内，返回该节点
@@ -1558,12 +1555,8 @@ export class Editor {
 		if (this.selection.collapsed()) {
 			return !!this.selection.start!.node.getMatchNode(options)
 		}
-		//起点和终点不在一起的情况，获取所有可聚焦的节点
-		const nodes: KNode[] = []
-		this.getSelectedNodes().forEach(item => {
-			nodes.push(...item.node.getFocusNodes('all'))
-		})
-		return nodes.every(item => !!item.getMatchNode(options))
+		//起点和终点不在一起的情况，获取所有可聚焦的节点进行判断
+		return this.getFocusNodesBySelection('all').every(item => !!item.getMatchNode(options))
 	}
 
 	/**
@@ -1578,12 +1571,8 @@ export class Editor {
 		if (this.selection.collapsed()) {
 			return !!this.selection.start!.node.getMatchNode(options)
 		}
-		//起点和终点不在一起的情况，获取所有可聚焦的节点
-		const nodes: KNode[] = []
-		this.getSelectedNodes().forEach(item => {
-			nodes.push(...item.node.getFocusNodes('all'))
-		})
-		return nodes.some(item => !!item.getMatchNode(options))
+		//起点和终点不在一起的情况，获取所有可聚焦的节点进行判断
+		return this.getFocusNodesBySelection('all').some(item => !!item.getMatchNode(options))
 	}
 
 	/**
@@ -1601,6 +1590,68 @@ export class Editor {
 			nodes.push(...item.node.getFocusNodes(type))
 		})
 		return nodes
+	}
+
+	/**
+	 * 【API】获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置
+	 */
+	getTextNodesBySelection() {
+		if (!this.selection.focused() || this.selection.collapsed()) {
+			return []
+		}
+		const textNodes: KNode[] = []
+		this.getSelectedNodes().forEach(item => {
+			//文本节点
+			if (item.node.isText()) {
+				//选择部分文本
+				if (item.offset) {
+					const textContent = item.node.textContent!
+					//选中了文本的前半段
+					if (item.offset[0] == 0) {
+						const newTextNode = item.node.clone(true)
+						this.addNodeAfter(newTextNode, item.node)
+						item.node.textContent = textContent.substring(0, item.offset[1])
+						newTextNode.textContent = textContent.substring(item.offset[1])
+						textNodes.push(item.node)
+					}
+					//选中了文本的后半段
+					else if (item.offset[1] == textContent.length) {
+						const newTextNode = item.node.clone(true)
+						this.addNodeBefore(newTextNode, item.node)
+						newTextNode.textContent = textContent.substring(0, item.offset[0])
+						item.node.textContent = textContent.substring(item.offset[0])
+						textNodes.push(item.node)
+					}
+					//选中文本中间部分
+					else {
+						const newBeforeTextNode = item.node.clone(true)
+						const newAfterTextNode = item.node.clone(true)
+						this.addNodeBefore(newBeforeTextNode, item.node)
+						this.addNodeAfter(newAfterTextNode, item.node)
+						newBeforeTextNode.textContent = textContent.substring(0, item.offset[0])
+						item.node.textContent = textContent.substring(item.offset[0], item.offset[1])
+						newAfterTextNode.textContent = textContent.substring(item.offset[1])
+						textNodes.push(item.node)
+					}
+					//重置光标位置
+					if (this.isSelectionInNode(item.node, 'start')) {
+						this.setSelectionBefore(item.node, 'start')
+					}
+					if (this.isSelectionInNode(item.node, 'end')) {
+						this.setSelectionAfter(item.node, 'end')
+					}
+				}
+				//选择整个文本
+				else {
+					textNodes.push(item.node)
+				}
+			}
+			//非文本节点存在子节点数组
+			else if (item.node.hasChildren()) {
+				textNodes.push(...item.node.getFocusNodes('text'))
+			}
+		})
+		return textNodes
 	}
 
 	/**

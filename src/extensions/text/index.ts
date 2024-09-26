@@ -1,5 +1,5 @@
 import { common as DapCommon } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -77,68 +77,6 @@ const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | n
 		return node.styles!.hasOwnProperty(styleName)
 	}
 	return false
-}
-
-/**
- * 获取所有在光标范围内的文本节点，该方法可能会切割部分文本节点，摒弃其不再光标范围内的部分，所以也可能会更新光标的位置
- */
-const getTextNodesBySelection = (editor: Editor) => {
-	if (!editor.selection.focused() || editor.selection.collapsed()) {
-		return []
-	}
-	const textNodes: KNode[] = []
-	editor.getSelectedNodes().forEach(item => {
-		//文本节点
-		if (item.node.isText()) {
-			//选择部分文本
-			if (item.offset) {
-				const textContent = item.node.textContent!
-				//选中了文本的前半段
-				if (item.offset[0] == 0) {
-					const newTextNode = item.node.clone(true)
-					editor.addNodeAfter(newTextNode, item.node)
-					item.node.textContent = textContent.substring(0, item.offset[1])
-					newTextNode.textContent = textContent.substring(item.offset[1])
-					textNodes.push(item.node)
-				}
-				//选中了文本的后半段
-				else if (item.offset[1] == textContent.length) {
-					const newTextNode = item.node.clone(true)
-					editor.addNodeBefore(newTextNode, item.node)
-					newTextNode.textContent = textContent.substring(0, item.offset[0])
-					item.node.textContent = textContent.substring(item.offset[0])
-					textNodes.push(item.node)
-				}
-				//选中文本中间部分
-				else {
-					const newBeforeTextNode = item.node.clone(true)
-					const newAfterTextNode = item.node.clone(true)
-					editor.addNodeBefore(newBeforeTextNode, item.node)
-					editor.addNodeAfter(newAfterTextNode, item.node)
-					newBeforeTextNode.textContent = textContent.substring(0, item.offset[0])
-					item.node.textContent = textContent.substring(item.offset[0], item.offset[1])
-					newAfterTextNode.textContent = textContent.substring(item.offset[1])
-					textNodes.push(item.node)
-				}
-				//重置光标位置
-				if (editor.isSelectionInNode(item.node, 'start')) {
-					editor.setSelectionBefore(item.node, 'start')
-				}
-				if (editor.isSelectionInNode(item.node, 'end')) {
-					editor.setSelectionAfter(item.node, 'end')
-				}
-			}
-			//选择整个文本
-			else {
-				textNodes.push(item.node)
-			}
-		}
-		//非文本节点存在子节点数组
-		else if (item.node.hasChildren()) {
-			textNodes.push(...item.node.getFocusNodes('text'))
-		}
-	})
-	return textNodes
 }
 
 export const TextExtension = Extension.create({
@@ -230,7 +168,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				getTextNodesBySelection(this).forEach(item => {
+				this.getTextNodesBySelection().forEach(item => {
 					if (item.hasStyles()) {
 						item.styles = { ...item.styles, ...styles }
 					} else {
@@ -288,7 +226,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				getTextNodesBySelection(this).forEach(item => {
+				this.getTextNodesBySelection().forEach(item => {
 					if (item.hasMarks()) {
 						item.marks = { ...item.marks, ...marks }
 					} else {
@@ -328,7 +266,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				getTextNodesBySelection(this).forEach(item => {
+				this.getTextNodesBySelection().forEach(item => {
 					removeTextNodeStyles(item, styleNames)
 				})
 			}
@@ -364,7 +302,7 @@ export const TextExtension = Extension.create({
 			}
 			//存在选区
 			else {
-				getTextNodesBySelection(this).forEach(item => {
+				this.getTextNodesBySelection().forEach(item => {
 					removeTextNodeMarks(item, markNames)
 				})
 			}

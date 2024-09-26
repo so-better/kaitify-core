@@ -44,7 +44,10 @@ export const CodeExtension = Extension.create({
 		/**
 		 * 设置行内代码
 		 */
-		const setCode = async () => {}
+		const setCode = async () => {
+			const focusNodes = this.getTextNodesBySelection()
+			focusNodes.forEach(item => {})
+		}
 
 		/**
 		 * 取消行内代码
