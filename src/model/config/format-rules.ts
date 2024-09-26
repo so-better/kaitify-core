@@ -1,7 +1,24 @@
 import { string as DapString } from 'dap-util'
 import { isZeroWidthText } from '../../tools'
 import { Editor } from '../Editor'
-import { KNode } from '../KNode'
+import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
+
+/**
+ * 打散特殊行内标签节点
+ */
+const splitInlineParseNode = (editor: Editor, node: KNode) => {
+	if (node.hasChildren()) {
+		node.children!.forEach(item => {
+			if (!item.isClosed()) {
+				item.marks = { ...(item.marks || {}), ...(node.marks || {}) }
+				item.styles = { ...(item.styles || {}), ...(node.styles || {}) }
+			}
+			editor.addNodeBefore(item, node)
+			splitInlineParseNode(editor, item)
+		})
+		node.children = []
+	}
+}
 
 /**
  * 格式化函数类型
@@ -37,79 +54,60 @@ export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
  */
 export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font'].includes(node.tag)) {
-		if (node.tag == 'b' || node.tag == 'strong') {
-			if (node.hasStyles()) {
-				node.styles!.fontWeight = 'bold'
-			} else {
+		//针对这些特殊的节点设置对应的样式
+		const styles: KNodeStylesType = node.styles || {}
+		const marks: KNodeMarksType = node.marks || {}
+		switch (node.tag) {
+			case 'b':
+			case 'strong':
 				node.styles = {
+					...styles,
 					fontWeight: 'bold'
 				}
-			}
-		} else if (node.tag == 'sup') {
-			if (node.hasStyles()) {
-				node.styles!.verticalAlign = 'super'
-			} else {
+				break
+			case 'sup':
 				node.styles = {
+					...styles,
 					verticalAlign: 'super'
 				}
-			}
-		} else if (node.tag == 'sub') {
-			if (node.hasStyles()) {
-				node.styles!.verticalAlign = 'sub'
-			} else {
+				break
+			case 'sub':
 				node.styles = {
+					...styles,
 					verticalAlign: 'sub'
 				}
-			}
-		} else if (node.tag == 'i') {
-			if (node.hasStyles()) {
-				node.styles!.fontStyle = 'italic'
-			} else {
+				break
+			case 'i':
 				node.styles = {
+					...styles,
 					fontStyle: 'italic'
 				}
-			}
-		} else if (node.tag == 'u') {
-			if (node.hasStyles()) {
-				node.styles!.textDecoration = 'underline'
-			} else {
+				break
+			case 'u':
 				node.styles = {
+					...styles,
 					textDecorationLine: 'underline'
 				}
-			}
-		} else if (node.tag == 'del') {
-			if (node.hasStyles()) {
-				node.styles!.textDecorationLine = 'line-through'
-			} else {
+				break
+			case 'del':
 				node.styles = {
+					...styles,
 					textDecorationLine: 'line-through'
 				}
-			}
-		} else if (node.tag == 'font') {
-			if (node.hasStyles()) {
-				node.styles!.fontFamily = (node.hasMarks() ? node.marks!.face || '' : '') as string
-			} else {
+				break
+			case 'font':
 				node.styles = {
-					fontFamily: (node.hasMarks() ? node.marks!.face || '' : '') as string
+					...styles,
+					fontFamily: (marks.face as string) || ''
 				}
-			}
+				delete marks.face
+				node.marks = marks
+				break
 		}
+		//将节点标签转为默认的文本标签
 		node.tag = editor.textRenderTag
-	}
-}
-
-/**
- * 处理标签为行内默认标签且子节点都是文本节点的行内节点
- */
-export const formatInlineTextRender: RuleFunctionType = ({ editor, node }) => {
-	//非空行内节点没有标记，该节点的子节点都是文本节点，直接把父节点拆分成这几个子节点，并把样式传递给子节点
-	if (node.isInline() && node.tag == editor.textRenderTag && node.hasChildren() && !node.isEmpty() && !node.hasMarks() && node.children!.every(item => item.isText())) {
-		const styles = node.hasStyles() ? node.styles! : {}
-		node.children!.reverse().forEach(item => {
-			item.styles = item.hasStyles() ? { ...item.styles!, ...styles } : { ...styles }
-			editor.addNodeAfter(item, node)
-		})
-		node.children = []
+		//如果这些节点有子节点，说明不是文本节点，需要进行拆分
+		splitInlineParseNode(editor, node)
 	}
 }
 

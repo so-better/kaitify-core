@@ -4,7 +4,7 @@ import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isCon
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatInlineTextRender } from './config/format-rules'
+import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { setDomObserve } from './config/dom-observe'
@@ -228,7 +228,7 @@ export class Editor {
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
-	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineParseText, formatInlineTextRender, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
+	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineParseText, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -648,62 +648,60 @@ export class Editor {
 	}
 
 	/**
-	 * 对编辑器内的某个节点使用指定规则进行格式化
+	 * 对节点数组使用指定规则进行格式化
 	 */
-	formatNode(node: KNode, rule: RuleFunctionType, receiver: KNode[]) {
-		//获取节点在源数组中的位置
-		const index = receiver.findIndex(item => item.isEqual(node))
-		//节点不在源数组中
-		if (index < 0) {
-			return
-		}
-		//空节点直接删除
-		if (node.isEmpty()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.updateSelectionRecently('start')
+	formatNodes(rule: RuleFunctionType, nodes: KNode[]) {
+		let i = 0
+		while (i < nodes.length) {
+			const node = nodes[i]
+			//空节点直接删除并且跳过本次循环
+			if (node.isEmpty()) {
+				if (this.isSelectionInNode(node, 'start')) {
+					this.updateSelectionRecently('start')
+				}
+				if (this.isSelectionInNode(node, 'end')) {
+					this.updateSelectionRecently('end')
+				}
+				nodes.splice(i, 1)
+				continue
 			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.updateSelectionRecently('end')
+			//对节点使用该规则进行格式化
+			rule({ editor: this, node })
+			//格式化后变成空节点，进行删除，并且跳过本次循环
+			if (node.isEmpty()) {
+				if (this.isSelectionInNode(node, 'start')) {
+					this.updateSelectionRecently('start')
+				}
+				if (this.isSelectionInNode(node, 'end')) {
+					this.updateSelectionRecently('end')
+				}
+				//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
+				const index = nodes.findIndex(item => item.isEqual(node))
+				nodes.splice(index, 1)
+				continue
 			}
-			receiver.splice(index, 1)
-			return
-		}
-		//对节点使用该规则进行格式化
-		rule({ editor: this, node: node })
-		//格式化后变成空节点，进行删除
-		if (node.isEmpty()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.updateSelectionRecently('start')
+			//如果当前节点不是块节点，但是却是在根部，则转为块节点
+			if (!node.isBlock() && this.stackNodes === nodes) {
+				this.convertToBlock(node)
 			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.updateSelectionRecently('end')
+			//对子节点进行格式化
+			if (node.hasChildren()) {
+				this.formatNodes(rule, node.children!)
 			}
-			//因为在格式化过程中可能会改变节点在源数组中的序列位置，所以重新获取序列
-			const findIndex = receiver.findIndex(item => item.isEqual(node))
-			receiver.splice(findIndex, 1)
-			return
-		}
-		//如果当前节点不是块节点，但是却是在根部，则转为块节点
-		if (!node.isBlock() && receiver === this.stackNodes) {
-			this.convertToBlock(node)
-		}
-		//对子节点进行格式化
-		if (node.hasChildren()) {
-			node.children!.forEach(child => {
-				this.formatNode(child, rule, node.children!)
-			})
-		}
-		//子节点格式化后，如果变成空节点，则需要删除该节点
-		if (node.isEmpty()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.updateSelectionRecently('start')
+			//子节点格式化后变成空节点，需要删除该节点，并且跳过本次循环
+			if (node.isEmpty()) {
+				if (this.isSelectionInNode(node, 'start')) {
+					this.updateSelectionRecently('start')
+				}
+				if (this.isSelectionInNode(node, 'end')) {
+					this.updateSelectionRecently('end')
+				}
+				//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
+				const index = nodes.findIndex(item => item.isEqual(node))
+				nodes.splice(index, 1)
+				continue
 			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.updateSelectionRecently('end')
-			}
-			//因为在格式化过程中可能会改变节点在源数组中的序列位置，所以重新获取序列
-			const findIndex = receiver.findIndex(item => item.isEqual(node))
-			receiver.splice(findIndex, 1)
+			i++
 		}
 	}
 
@@ -2222,7 +2220,7 @@ export class Editor {
 			//最终判断是否有需要格式化的节点进行格式化
 			if (node) {
 				this.formatRules.forEach(rule => {
-					this.formatNode(node, rule, node.parent ? node.parent.children! : this.stackNodes)
+					this.formatNodes(rule, node.parent ? node.parent.children! : this.stackNodes)
 				})
 			}
 		})
@@ -2452,10 +2450,8 @@ export class Editor {
 		//根据value设置节点数组
 		editor.stackNodes = editor.htmlParseNode(options.value || '')
 		//将节点数组进行格式化
-		editor.stackNodes.forEach(node => {
-			editor.formatRules.forEach(rule => {
-				editor.formatNode(node, rule, editor.stackNodes)
-			})
+		editor.formatRules.forEach(rule => {
+			editor.formatNodes(rule, editor.stackNodes)
 		})
 		//初始化检查节点数组
 		editor.checkNodes()

@@ -18,7 +18,7 @@ export const renderNode = (editor: Editor, opts: KNodeRenderOptionType) => {
 	}
 	//设置属性
 	Object.keys(opts.attrs).forEach(attr => {
-		if (!/(^on)|(^style$)|(^face$)/g.test(attr)) {
+		if (!/(^on)|(^style$)/g.test(attr)) {
 			element.setAttribute(attr, `${opts.attrs[attr]}`)
 		}
 	})
@@ -109,7 +109,7 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 						dom.removeAttribute(key)
 					}
 					for (let key in addMarks) {
-						if (!/(^on)|(^style$)|(^face$)/g.test(key)) {
+						if (!/(^on)|(^style$)/g.test(key)) {
 							dom.setAttribute(key, `${addMarks[key]}`)
 						}
 					}

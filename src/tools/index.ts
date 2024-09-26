@@ -59,7 +59,7 @@ export const getDomAttributes = (dom: HTMLElement) => {
 	const length = dom.attributes.length
 	for (let i = 0; i < length; i++) {
 		const attribute = dom.attributes[i]
-		const regExp = new RegExp(`(^on)|(^style$)|(^face$)|(^${NODE_MARK}$)`, 'g')
+		const regExp = new RegExp(`(^on)|(^style$)|(^${NODE_MARK}$)`, 'g')
 		//匹配事件、样式和face外的属性
 		if (!regExp.test(attribute.nodeName)) {
 			o[attribute.nodeName] = attribute.nodeValue || ''
