@@ -18,9 +18,7 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-    // editor.value!.commands.isSubscript!()? editor.value?.commands.unsetSubscript!():editor.value?.commands.setSubscript!()
     editor.value!.commands.allCode!() ? editor.value!.commands.unsetCode!():editor.value!.commands.setCode!()
-    
 }
 
 onMounted(async () => {

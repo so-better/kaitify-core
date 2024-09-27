@@ -5,6 +5,7 @@ import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../model'
  * 渲染参数类型
  */
 export type KNodeRenderOptionType = {
+	key: number
 	tag: string
 	attrs: KNodeMarksType
 	styles: KNodeStylesType
@@ -25,6 +26,7 @@ export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOp
 	//文本节点
 	if (node.isText()) {
 		return {
+			key: node.key,
 			tag: editor.textRenderTag,
 			namespace: node.namespace,
 			attrs: node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key },
@@ -34,6 +36,7 @@ export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOp
 	}
 	//其他节点
 	return {
+		key: node.key,
 		tag: node.tag!,
 		namespace: node.namespace,
 		attrs: node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key },
