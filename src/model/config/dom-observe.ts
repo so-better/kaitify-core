@@ -90,7 +90,7 @@ export const setDomObserve = (editor: Editor) => {
 				//不是文本节点
 				else if (!parentNode.isText()) {
 					//子元素在父元素中的位置
-					const index = Array.from(parentElement.childNodes).findIndex(item => item.isEqualNode(mutationRecord.target))
+					const index = Array.from(parentElement.childNodes).findIndex(item => item === mutationRecord.target)
 					//将子元素转为节点
 					const node = editor.domParseNode(mutationRecord.target)
 					//添加到编辑器内
@@ -114,10 +114,10 @@ export const setDomObserve = (editor: Editor) => {
 					//非法元素的父元素
 					const parentElement = mutationRecord.target as HTMLElement
 					//父元素是编辑器容器
-					if (parentElement.isEqualNode(editor.$el!)) {
+					if (parentElement === editor.$el!) {
 						elements.forEach(el => {
 							//子元素在父元素中的位置
-							const index = Array.from(parentElement.childNodes).findIndex(item => item.isEqualNode(el))
+							const index = Array.from(parentElement.childNodes).findIndex(item => item === el)
 							//将子元素转为节点
 							const node = editor.domParseNode(el)
 							//添加到编辑器内
@@ -138,7 +138,7 @@ export const setDomObserve = (editor: Editor) => {
 						const parentNode = editor.findNode(parentElement)
 						elements.forEach(el => {
 							//子元素在父元素中的位置
-							const index = Array.from(parentElement.childNodes).findIndex(item => item.isEqualNode(el))
+							const index = Array.from(parentElement.childNodes).findIndex(item => item === el)
 							//将子元素转为节点
 							const node = editor.domParseNode(el)
 							//添加到编辑器内

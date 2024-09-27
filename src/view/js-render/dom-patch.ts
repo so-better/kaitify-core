@@ -110,125 +110,139 @@ export const getDifferentStyles = (newNode: KNode, oldNode: KNode): StylePatchRe
  * 对新旧两个节点数组进行比对
  */
 export const patchNodes = (newNodes: KNode[], oldNodes: (KNode | null)[]) => {
-	//比对结果数组
-	let result: NodePatchResultType[] = []
-	if (newNodes.length && oldNodes.length) {
-		//起点新指针
-		let newStartIndex = 0
-		//起点旧指针
-		let oldStartIndex = 0
-		//终点新指针
-		let newEndIndex = newNodes.length - 1
-		//终点旧指针
-		let oldEndIndex = oldNodes.length - 1
-		//遍历
-		while (newStartIndex <= newEndIndex && oldStartIndex <= oldEndIndex) {
-			//起点旧指针对应的节点不存在则跳过，说明该节点已被处理
-			if (!oldNodes[oldStartIndex]) {
-				oldStartIndex++
-			}
-			//终点旧指针对应的节点不存在则跳过，说明该节点已被处理
-			else if (!oldNodes[oldEndIndex]) {
-				oldEndIndex--
-			}
-			//如果起点新指针对应的节点与起点旧指针对应的节点key一致，则进行比对
-			else if (newNodes[newStartIndex].key == oldNodes[oldStartIndex]!.key) {
-				result.push(...patchNode(newNodes[newStartIndex], oldNodes[oldStartIndex]!))
-				newStartIndex++
-				oldStartIndex++
-			}
-			//终点新指针对应的节点与终点旧指针对应的节点，如果key一致，则进行比对
-			else if (newNodes[newEndIndex].key == oldNodes[oldEndIndex]!.key) {
-				result.push(...patchNode(newNodes[newEndIndex], oldNodes[oldEndIndex]!))
-				newEndIndex--
-				oldEndIndex--
-			}
-			//起点新指针对应的节点与终点旧指针对应的节点，如果key一致，说明进行了移动
-			else if (newNodes[newStartIndex].key == oldNodes[oldEndIndex]!.key) {
-				result.push(...patchNode(newNodes[newStartIndex], oldNodes[oldEndIndex]!), {
-					type: 'move',
-					newNode: newNodes[newStartIndex],
-					oldNode: oldNodes[oldEndIndex]
-				})
-				newStartIndex++
-				oldEndIndex--
-			}
-			//终点新指针对应的节点与起点旧指针对应的节点，如果key一致，则进行比对
-			else if (newNodes[newEndIndex].key == oldNodes[oldStartIndex]!.key) {
-				result.push(...patchNode(newNodes[newEndIndex], oldNodes[oldStartIndex]!), {
-					type: 'move',
-					newNode: newNodes[newEndIndex],
-					oldNode: oldNodes[oldStartIndex]
-				})
-				newEndIndex--
-				oldStartIndex++
-			}
-			//其他情况，判断是移动还是新增
-			else {
-				//在旧数组里查找新节点同key节点
-				let idxInOld = oldNodes.findIndex(item => item && item.key === newNodes[newStartIndex].key)
-				//存在同key节点
-				if (idxInOld >= 0) {
-					result.push(...patchNode(newNodes[newStartIndex], oldNodes[idxInOld]!), {
-						type: 'move',
-						newNode: newNodes[newStartIndex],
-						oldNode: oldNodes[idxInOld]
-					})
-					//此时将节点置为null表示节点已处理过
-					oldNodes[idxInOld] = null
-				}
-				//不存在同key的节点
-				else {
-					result.push({
-						type: 'insert',
-						newNode: newNodes[newStartIndex],
-						oldNode: null
-					})
-				}
-				newStartIndex++
-			}
-
-			//旧指针遍历结束
-			if (oldStartIndex > oldEndIndex) {
-				//新指针还没结束，则剩下的都是新插入的节点，进行处理
-				for (; newStartIndex <= newEndIndex; newStartIndex++) {
-					result.push({
-						type: 'insert',
-						newNode: newNodes[newStartIndex],
-						oldNode: null
-					})
-				}
-			}
-			//新指针遍历结束
-			else if (newStartIndex > newEndIndex) {
-				//旧指针还没结束，则是需要移除的，进行处理
-				for (; oldStartIndex <= oldEndIndex; oldStartIndex++) {
-					if (oldNodes[oldStartIndex]) {
-						result.push({
-							type: 'remove',
-							oldNode: oldNodes[oldStartIndex],
-							newNode: null
-						})
-					}
-				}
-			}
-		}
-	} else if (newNodes.length) {
-		result = newNodes.map(item => {
-			return {
-				type: 'insert',
-				newNode: item,
-				oldNode: null
-			}
-		})
-	} else if (oldNodes.length) {
-		result = oldNodes.map(item => {
-			return {
+	//两个数组都为空，无需操作
+	if (newNodes.length == 0 && oldNodes.length == 0) {
+		return []
+	}
+	//旧节点全部移除
+	if (newNodes.length === 0) {
+		return oldNodes
+			.filter(node => !node)
+			.map(oldNode => ({
 				type: 'remove',
-				oldNode: item,
+				oldNode,
 				newNode: null
+			})) as NodePatchResultType[]
+	}
+	//新节点全部插入
+	if (oldNodes.length === 0) {
+		return newNodes.map(newNode => ({
+			type: 'insert',
+			newNode,
+			oldNode: null
+		})) as NodePatchResultType[]
+	}
+	//比对结果数组
+	const result: NodePatchResultType[] = []
+	// 创建一个 Map 存储旧节点 key 对应的索引，提升查找效率
+	const oldKeyMap = new Map<number, number>()
+	oldNodes.forEach((node, index) => {
+		if (node) {
+			oldKeyMap.set(node.key, index)
+		}
+	})
+	// 双端遍历
+	let newStartIndex = 0
+	let oldStartIndex = 0
+	let newEndIndex = newNodes.length - 1
+	let oldEndIndex = oldNodes.length - 1
+	while (newStartIndex <= newEndIndex && oldStartIndex <= oldEndIndex) {
+		const newStartNode = newNodes[newStartIndex]
+		const oldStartNode = oldNodes[oldStartIndex]
+		const newEndNode = newNodes[newEndIndex]
+		const oldEndNode = oldNodes[oldEndIndex]
+		//跳过已被处理的旧节点
+		if (!oldStartNode) {
+			oldStartIndex++
+		}
+		//跳过已被处理的旧节点
+		else if (!oldEndNode) {
+			oldEndIndex--
+		}
+		//起始节点 key 匹配，进行比对
+		else if (newStartNode.key == oldStartNode!.key) {
+			result.push(...patchNode(newStartNode, oldStartNode!))
+			newStartIndex++
+			oldStartIndex++
+		}
+		//终点节点 key 匹配，进行比对
+		else if (newEndNode.key == oldEndNode!.key) {
+			result.push(...patchNode(newEndNode, oldEndNode!))
+			newEndIndex--
+			oldEndIndex--
+		}
+		//新起点和旧终点匹配，说明节点被移动
+		else if (newStartNode.key == oldEndNode!.key) {
+			result.push(
+				{
+					type: 'move',
+					newNode: newStartNode,
+					oldNode: oldEndNode
+				},
+				...patchNode(newStartNode, oldEndNode!)
+			)
+			newStartIndex++
+			oldEndIndex--
+		}
+		//新终点和旧起点匹配，说明节点被移动
+		else if (newEndNode.key == oldStartNode!.key) {
+			result.push(
+				{
+					type: 'move',
+					newNode: newEndNode,
+					oldNode: oldStartNode
+				},
+				...patchNode(newEndNode, oldStartNode!)
+			)
+			newEndIndex--
+			oldStartIndex++
+		}
+		//其他情况
+		else {
+			//查找新起点节点在旧节点数组中的位置
+			const idxInOld = oldKeyMap.get(newStartNode.key)
+			if (idxInOld !== undefined) {
+				//说明找到了同key节点，进行移动
+				result.push(
+					{
+						type: 'move',
+						newNode: newStartNode,
+						oldNode: oldNodes[idxInOld]
+					},
+					...patchNode(newStartNode, oldNodes[idxInOld]!)
+				)
+				//标记节点已处理
+				oldNodes[idxInOld] = null
+			} else {
+				//没有找到相同 key，则是新插入的节点
+				result.push({
+					type: 'insert',
+					newNode: newStartNode,
+					oldNode: null
+				})
 			}
+			newStartIndex++
+		}
+	}
+	//处理剩余的新节点（全部为插入）
+	while (newStartIndex <= newEndIndex) {
+		result.push({
+			type: 'insert',
+			newNode: newNodes[newStartIndex],
+			oldNode: null
 		})
+		newStartIndex++
+	}
+	//处理剩余的旧节点（全部为移除）
+	while (oldStartIndex <= oldEndIndex) {
+		if (oldNodes[oldStartIndex]) {
+			result.push({
+				type: 'remove',
+				oldNode: oldNodes[oldStartIndex]!,
+				newNode: null
+			})
+		}
+		oldStartIndex++
 	}
 	return result
 }

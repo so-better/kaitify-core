@@ -1,12 +1,25 @@
-import { Editor } from '../../model'
-import { camelToKebab } from '../../tools'
+import { Editor, KNode } from '../../model'
+import { camelToKebab, isContains } from '../../tools'
 import { getNodeRenderOptions, KNodeRenderOptionType } from '../index'
 import { getDifferentMarks, getDifferentStyles, patchNodes } from './dom-patch'
 
 /**
+ * 封装findDom
+ */
+const findDom = (editor: Editor, node: KNode) => {
+	let dom: HTMLElement | null = null
+	try {
+		dom = editor.findDom(node)
+	} catch (error) {
+		console.log(`errir: ${(error as Error).message}`)
+	}
+	return dom
+}
+
+/**
  * 渲染单个节点
  */
-export const renderNode = (editor: Editor, opts: KNodeRenderOptionType) => {
+const renderNode = (editor: Editor, opts: KNodeRenderOptionType) => {
 	const element = opts.namespace ? (document.createElementNS(opts.namespace, opts.tag) as HTMLElement) : document.createElement(opts.tag)
 	//渲染文本
 	if (opts.textContent) {
@@ -27,6 +40,97 @@ export const renderNode = (editor: Editor, opts: KNodeRenderOptionType) => {
 		element.style.setProperty(camelToKebab(style), `${opts.styles[style]}`)
 	})
 	return element
+}
+
+/**
+ * 插入新dom
+ */
+const insertDom = (editor: Editor, newNode: KNode) => {
+	//生成dom
+	const options = getNodeRenderOptions(editor, newNode)
+	const newDom = renderNode(editor, options)
+	//获取父节点
+	const parentNode = newNode.parent
+	//获取新dom的父元素
+	const parentDom = parentNode ? findDom(editor, parentNode)! : editor.$el!
+	//获取前一个兄弟节点
+	const previousNode = newNode.getPrevious(parentNode ? parentNode.children! : editor.stackNodes)
+	//获取前一个dom
+	const previousDom = previousNode ? findDom(editor, previousNode) : null
+	//获取后一个兄弟节点
+	const nextNode = newNode.getNext(parentNode ? parentNode.children! : editor.stackNodes)
+	//获取后一个dom
+	const nextDom = nextNode ? findDom(editor, nextNode) : null
+	//前一个dom存在则插入到前一个dom之后
+	if (previousDom && Array.from(parentDom.childNodes).some(item => item === previousDom)) {
+		previousDom.nextElementSibling ? parentDom.insertBefore(newDom, previousDom.nextElementSibling) : parentDom.appendChild(newDom)
+	}
+	//后一个dom存在则插入到后一个dom之前
+	else if (nextDom && Array.from(parentDom.childNodes).some(item => item === nextDom)) {
+		parentDom.insertBefore(newDom, nextDom)
+	}
+	//其他情况
+	else {
+		//获取节点在父节点内的位置
+		const idx = (parentNode ? parentNode.children! : editor.stackNodes).findIndex(item => item.isEqual(newNode))
+		const currentDom = parentDom.childNodes[idx]
+		currentDom ? parentDom.insertBefore(newDom, currentDom) : parentDom.appendChild(newDom)
+	}
+}
+
+/**
+ * 移除旧dom
+ */
+const removeDom = (editor: Editor, oldNode: KNode) => {
+	const oldDom = findDom(editor, oldNode)
+	oldDom && oldDom.remove()
+}
+
+/**
+ * 移动dom
+ */
+const moveDom = (editor: Editor, node: KNode) => {
+	//需要移动的dom
+	const dom = findDom(editor, node)!
+	//获取父节点
+	const parentNode = node.parent
+	//获取新dom的父元素
+	const parentDom = parentNode ? findDom(editor, parentNode)! : editor.$el!
+	//获取前一个兄弟节点
+	const previousNode = node.getPrevious(parentNode ? parentNode.children! : editor.stackNodes)
+	//获取前一个dom
+	const previousDom = previousNode ? findDom(editor, previousNode) : null
+	//获取后一个兄弟节点
+	const nextNode = node.getNext(parentNode ? parentNode.children! : editor.stackNodes)
+	//获取后一个dom
+	const nextDom = nextNode ? findDom(editor, nextNode) : null
+	//前一个dom存在则插入到前一个dom之后
+	if (previousDom && isContains(parentDom, previousDom)) {
+		previousDom.nextElementSibling ? parentDom.insertBefore(dom, previousDom.nextElementSibling) : parentDom.appendChild(dom)
+	}
+	//后一个dom存在则插入到后一个dom之前
+	else if (nextDom && isContains(parentDom, nextDom)) {
+		parentDom.insertBefore(dom, nextDom)
+	}
+	//其他情况
+	else {
+		//获取节点在父节点内的位置
+		const idx = (parentNode ? parentNode.children! : editor.stackNodes).findIndex(item => item.isEqual(node))
+		const currentDom = parentDom.childNodes[idx]
+		currentDom ? parentDom.insertBefore(dom, currentDom) : parentDom.appendChild(dom)
+	}
+}
+
+/**
+ * 替换dom
+ */
+const replaceDom = (editor: Editor, newNode: KNode, oldNode: KNode) => {
+	//旧节点对应的dom
+	const oldDom = findDom(editor, oldNode)!
+	//插入新节点
+	insertDom(editor, newNode)
+	//移除旧dom
+	oldDom && oldDom.remove()
 }
 
 /**
@@ -57,37 +161,23 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 		patchNodes(this.stackNodes, this.oldStackNodes).forEach(item => {
 			//插入dom
 			if (item.type == 'insert') {
-				//渲染dom
-				const options = getNodeRenderOptions(this, item.newNode!)
-				const newDom = renderNode(this, options)
-				//获取父节点
-				const parentNode = item.newNode!.parent
-				//获取前一个兄弟节点
-				const previousNode = item.newNode!.getPrevious(parentNode ? parentNode.children! : this.stackNodes)
-				//获取父节点的真实dom
-				const parentDom = parentNode ? this.findDom(parentNode) : this.$el!
-				//如果前一个兄弟节点存在
-				if (previousNode) {
-					//获取前一个兄弟节点的真实dom
-					const previousDom = this.findDom(previousNode)
-					//插入到前一个兄弟节点的后面
-					previousDom.nextElementSibling ? parentDom.insertBefore(newDom, previousDom.nextElementSibling) : parentDom.appendChild(newDom)
-				}
-				//如果前一个兄弟节点不存在
-				else {
-					//插到父节点的真实dom的第一个
-					parentDom.firstElementChild ? parentDom.insertBefore(newDom, parentDom.firstElementChild) : parentDom.appendChild(newDom)
-				}
+				insertDom(this, item.newNode!)
 			}
 			//移除dom
 			else if (item.type == 'remove') {
-				try {
-					this.findDom(item.oldNode!).remove()
-				} catch (error) {}
+				removeDom(this, item.oldNode!)
+			}
+			//替换dom
+			else if (item.type == 'replace') {
+				replaceDom(this, item.newNode!, item.oldNode!)
+			}
+			//移动dom
+			else if (item.type == 'move') {
+				moveDom(this, item.newNode!)
 			}
 			//更新dom
 			else if (item.type == 'update') {
-				const dom = this.findDom(item.newNode!)
+				const dom = findDom(this, item.newNode!)!
 				//更新文本
 				if (item.update == 'textContent') {
 					dom.textContent = item.newNode!.textContent || ''
@@ -113,48 +203,6 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 							dom.setAttribute(key, `${addMarks[key]}`)
 						}
 					}
-				}
-			}
-			//替换dom
-			else if (item.type == 'replace') {
-				//渲染新dom
-				const options = getNodeRenderOptions(this, item.newNode!)
-				const newDom = renderNode(this, options)
-				//旧节点对应的dom
-				const oldDom = this.findDom(item.oldNode!)
-				//父节点对应的dom
-				const parentDom = item.oldNode!.parent ? this.findDom(item.oldNode!.parent!) : this.$el!
-				//插入新dom
-				parentDom.insertBefore(newDom, oldDom)
-				//移除旧dom
-				oldDom.remove()
-			}
-			//移动dom
-			else if (item.type == 'move') {
-				//新节点对应的dom
-				const dom = this.findDom(item.newNode!)
-				//新节点的父节点
-				const parentNode = item.newNode!.parent
-				//获取新节点的前一个兄弟节点
-				const previousNode = item.newNode!.getPrevious(parentNode ? parentNode.children! : this.stackNodes)
-				//获取父节点的dom
-				const parentDom = parentNode ? this.findDom(parentNode) : this.$el!
-				//如果前一个兄弟节点存在
-				if (previousNode) {
-					//获取前一个兄弟节点的dom，如果前一个兄弟节点不存在，可能是该节点从前面往后挪了，也就是前一个兄弟节点是刚插入的还没渲染过dom
-					try {
-						const previousDom = this.findDom(previousNode)
-						//插到前一个兄弟节点对应的真实dom之后
-						previousDom.nextElementSibling ? parentDom.insertBefore(dom, previousDom.nextElementSibling) : parentDom.appendChild(dom)
-					} catch (error) {
-						//插到父节点对应的真实dom的第一个子节点
-						parentDom.firstElementChild ? parentDom.insertBefore(dom, parentDom.firstElementChild) : parentDom.appendChild(dom)
-					}
-				}
-				//如果前一个兄弟节点不存在
-				else {
-					//插到父节点对应的真实dom的第一个子节点
-					parentDom.firstElementChild ? parentDom.insertBefore(dom, parentDom.firstElementChild) : parentDom.appendChild(dom)
 				}
 			}
 		})

@@ -7,7 +7,7 @@ import { History } from './History'
 import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
-import { setDomObserve } from './config/dom-observe'
+import { removeDomObserve, setDomObserve } from './config/dom-observe'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
@@ -2198,8 +2198,10 @@ export class Editor {
 		if (!this.$el) {
 			return
 		}
+		//克隆旧节点数组，防止在patch过程中this.oldStackNodes中存在null
+		const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
 		//对编辑器的新旧节点数组进行比对，遍历比对的结果进行动态格式化
-		patchNodes(this.stackNodes, this.oldStackNodes).forEach(item => {
+		patchNodes(this.stackNodes, oldStackNodes).forEach(item => {
 			//需要进行格式化的节点
 			let node: KNode | null = null
 			//有新节点表示insert、update、replace、move和empty
@@ -2226,11 +2228,13 @@ export class Editor {
 		//旧的html值
 		const oldHtml = this.$el.innerHTML
 		//此处进行视图的渲染
+		removeDomObserve(this) //取消dom监听
 		const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [false]) : true
 		//使用默认逻辑
 		if (useDefault) {
 			defaultUpdateView.apply(this, [false])
 		}
+		setDomObserve(this) //重新设置dom监听
 		//新的html值
 		const newHtml = this.$el.innerHTML
 		//html值发生变化

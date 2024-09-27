@@ -312,7 +312,7 @@ export const onComposition = async function (this: Editor, e: Event) {
 		//不是文本节点
 		else if (!parentNode.isText()) {
 			//子元素在父元素中的位置
-			const index = Array.from(parentElement.childNodes).findIndex(item => item.isEqualNode(element))
+			const index = Array.from(parentElement.childNodes).findIndex(item => item === element)
 			//将子元素转为节点
 			const node = this.domParseNode(element)
 			//添加到编辑器内
