@@ -2227,14 +2227,16 @@ export class Editor {
 		this.checkNodes()
 		//旧的html值
 		const oldHtml = this.$el.innerHTML
-		//此处进行视图的渲染
-		removeDomObserve(this) //取消dom监听
+		//视图更新之前取消dom监听，以免干扰更新dom
+		removeDomObserve(this)
+		//此处进行视图的更新
 		const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [false]) : true
 		//使用默认逻辑
 		if (useDefault) {
 			defaultUpdateView.apply(this, [false])
 		}
-		setDomObserve(this) //重新设置dom监听
+		//视图更新完毕后重新设置dom监听
+		setDomObserve(this)
 		//新的html值
 		const newHtml = this.$el.innerHTML
 		//html值发生变化

@@ -4,9 +4,9 @@ import { Editor } from '../Editor'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
 
 /**
- * 打散特殊行内标签节点
+ * 打散指定的节点，将其分裂成多个节点，如果子孙节点还有子节点则继续打散
  */
-const splitInlineParseNode = (editor: Editor, node: KNode) => {
+export const splitNodeToNodes = (editor: Editor, node: KNode) => {
 	if (node.hasChildren()) {
 		node.children!.forEach(item => {
 			if (!item.isClosed()) {
@@ -14,7 +14,7 @@ const splitInlineParseNode = (editor: Editor, node: KNode) => {
 				item.styles = { ...(item.styles || {}), ...(node.styles || {}) }
 			}
 			editor.addNodeBefore(item, node)
-			splitInlineParseNode(editor, item)
+			splitNodeToNodes(editor, item)
 		})
 		node.children = []
 	}
@@ -107,7 +107,7 @@ export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 		//将节点标签转为默认的文本标签
 		node.tag = editor.textRenderTag
 		//有子节点的节点进行拆分
-		splitInlineParseNode(editor, node)
+		splitNodeToNodes(editor, node)
 	}
 }
 
