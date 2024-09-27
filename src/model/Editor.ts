@@ -1530,6 +1530,9 @@ export class Editor {
 		}
 		//起点和终点不在一起的情况，获取所有可聚焦的节点
 		const nodes = this.getFocusNodesBySelection('all')
+		if (nodes.length == 0) {
+			return null
+		}
 		//获取第一个可聚焦节点所在的符合条件的节点
 		const matchNode = nodes[0].getMatchNode(options)
 		//如果后续每个可聚焦节点都在该节点内，返回该节点
@@ -1552,7 +1555,11 @@ export class Editor {
 			return !!this.selection.start!.node.getMatchNode(options)
 		}
 		//起点和终点不在一起的情况，获取所有可聚焦的节点进行判断
-		return this.getFocusNodesBySelection('all').every(item => !!item.getMatchNode(options))
+		const focusNodes = this.getFocusNodesBySelection('all')
+		if (focusNodes.length == 0) {
+			return false
+		}
+		return focusNodes.every(item => !!item.getMatchNode(options))
 	}
 
 	/**
@@ -1568,7 +1575,11 @@ export class Editor {
 			return !!this.selection.start!.node.getMatchNode(options)
 		}
 		//起点和终点不在一起的情况，获取所有可聚焦的节点进行判断
-		return this.getFocusNodesBySelection('all').some(item => !!item.getMatchNode(options))
+		const focusNodes = this.getFocusNodesBySelection('all')
+		if (focusNodes.length == 0) {
+			return false
+		}
+		return focusNodes.some(item => !!item.getMatchNode(options))
 	}
 
 	/**
@@ -2370,6 +2381,12 @@ export class Editor {
 							offset: 1
 						}
 					}
+				}
+				//如果起点和终点是相邻的两个节点并且位置紧邻
+				const nextNode = this.getNextSelectionNode(this.selection.start!.node)
+				if (nextNode && nextNode.isEqual(this.selection.end!.node) && this.selection.start!.offset == (this.selection.start!.node.isText() ? this.selection.start!.node.textContent!.length : 1) && this.selection.end!.offset == 0) {
+					this.selection.end!.node = this.selection.start!.node
+					this.selection.end!.offset = this.selection.start!.offset
 				}
 				return true
 			}

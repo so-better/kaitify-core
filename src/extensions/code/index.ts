@@ -238,8 +238,38 @@ export const CodeExtension = Extension.create({
 				}
 				//起点和终点不在一个行内代码里
 				else {
-					// todo
-					// 光标范围内是多个行内代码
+					const startOffset = this.selection.start!.offset
+					//起点所在的行内代码内第一个可设置光标的节点
+					const firstStartSelectionNode = this.getFirstSelectionNodeInChildren(startCodeNode)!
+					//获取选区内的可聚焦节点
+					const focusNodes = this.getFocusSplitNodesBySelection('all')
+					const length = focusNodes.length
+					const map: { [key: number]: { nodes: KNode[]; code: KNode } } = {}
+					for (let i = 0; i < length; i++) {
+						const codeNode = focusNodes[i].getMatchNode({ tag: 'code' })!
+						const index = codeNode.children!.findIndex(item => item.isEqual(focusNodes[i]))
+						codeNode.children!.splice(index, 1)
+						//是起点所在的行内代码并且起点不在行内代码的起始处
+						if (codeNode.isEqual(startCodeNode) && !(firstStartSelectionNode.isEqual(startNode) && startOffset == 0)) {
+							if (map[codeNode.key]) {
+								map[codeNode.key].nodes.push(focusNodes[i])
+							} else {
+								map[codeNode.key] = {
+									code: codeNode,
+									nodes: [focusNodes[i]]
+								}
+							}
+						}
+						//其他
+						else {
+							this.addNodeBefore(focusNodes[i], codeNode)
+						}
+					}
+					Object.values(map).forEach(item => {
+						item.nodes.reverse().forEach(node => {
+							this.addNodeAfter(node, item.code)
+						})
+					})
 				}
 			}
 			await this.updateView()
