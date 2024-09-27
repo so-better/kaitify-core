@@ -11,7 +11,7 @@ const findDom = (editor: Editor, node: KNode) => {
 	try {
 		dom = editor.findDom(node)
 	} catch (error) {
-		console.log(`errir: ${(error as Error).message}`)
+		console.warn(`error: ${(error as Error).message}`)
 	}
 	return dom
 }
