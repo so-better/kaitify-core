@@ -117,8 +117,8 @@ export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 	const uneditableNode = node.getUneditable()
 	if (uneditableNode && !uneditableNode.isEmpty()) {
+		//非块节点处理
 		if (!uneditableNode.isBlock()) {
-			//非块节点处理
 			const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
 			const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
 			//前一个节点不存在或者不是零宽度空白文本节点
@@ -130,6 +130,14 @@ export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 			if (!nextNode || !nextNode.isZeroWidthText()) {
 				const zeroWidthText = KNode.createZeroWidthText()
 				editor.addNodeAfter(zeroWidthText, uneditableNode)
+			}
+			//起点在不可编辑的节点里，则更新起点位置
+			if (editor.isSelectionInNode(uneditableNode, 'start')) {
+				editor.updateSelectionRecently('start')
+			}
+			//终点在不可编辑的节点里，则更新终点位置
+			if (editor.isSelectionInNode(uneditableNode, 'end')) {
+				editor.updateSelectionRecently('end')
 			}
 		}
 	}

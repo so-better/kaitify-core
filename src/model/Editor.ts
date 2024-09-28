@@ -2137,108 +2137,117 @@ export class Editor {
 		//起点和终点在一起
 		if (this.selection.collapsed()) {
 			const node = this.selection.start!.node
-			const offset = this.selection.start!.offset
-			//前一个可设置光标的节点
-			const previousSelectionNode = this.getPreviousSelectionNode(node)
-			//光标所在的块节点
-			const blockNode = node.getBlock()
-			//光标在节点的起始处
-			if (offset == 0) {
-				//前一个可设置光标的节点存在
-				if (previousSelectionNode) {
-					//获取前一个可设置光标的节点所在的块节点
-					const previousBlock = previousSelectionNode.getBlock()
-					//前一个可设置光标的节点和光标所在节点都属于一个块节点，则表示当前光标所在节点不是块节点的起始处，则将光标移动到前一个可设置光标的节点的末尾处再执行一次删除
-					if (previousBlock.isEqual(blockNode)) {
-						this.setSelectionAfter(previousSelectionNode, 'all')
-						this.delete()
-						return
-					}
-					//光标在块节点的开始处并且块节点不是固定的
-					else if (!blockNode.fixed) {
-						this.mergeBlock(previousBlock, blockNode)
-					}
-				}
-				//前一个可设置光标的节点不存在，说明在编辑器开始处
-				else {
-					//转为段落
-					this.toParagraph(blockNode)
-				}
+			const uneditableNode = node.getUneditable()
+			//在不可编辑的节点里直接删除该不可编辑的节点
+			if (uneditableNode) {
+				uneditableNode.toEmpty()
 			}
-			//光标在所在节点的内部
+			//在正常节点内
 			else {
-				//在空白文本节点内
-				if (node.isZeroWidthText()) {
-					//置空节点
-					node.toEmpty()
-					//在清除空白文本节点后判断块节点是否为空，是则建立占位符
-					if (blockNode.isEmpty()) {
-						const placeholderNode = KNode.createPlaceholder()
-						this.addNode(placeholderNode, blockNode)
-						this.setSelectionBefore(placeholderNode)
-					}
-					//块节点不是空，说明块内前面有可以设为光标的节点，则将光标移动到它后面
-					else {
-						this.setSelectionAfter(previousSelectionNode!, 'all')
-					}
-					//再执行一次删除
-					this.delete()
-					return
-				}
-				//在文本节点内
-				else if (node.isText()) {
-					//获取删除的字符
-					const deleteChart = node.textContent!.substring(offset - 1, offset)
-					//进行删除
-					node.textContent = node.textContent!.substring(0, offset - 1) + node.textContent!.substring(offset)
-					//更新光标到删除后的位置
-					this.selection.start!.offset = offset - 1
-					this.selection.end!.offset = offset - 1
-					//删除的是空白字符，再次删除
-					if (isZeroWidthText(deleteChart)) {
-						this.delete()
-						return
-					}
-					//块节点为空，创建占位符
-					if (blockNode.isEmpty()) {
-						const placeholderNode = KNode.createPlaceholder()
-						this.addNode(placeholderNode, blockNode)
-						this.setSelectionBefore(placeholderNode)
-					}
-				}
-				//在闭合节点内
-				else if (node.isClosed()) {
-					//是否占位符
-					const isPlaceholder = node.isPlaceholder()
-					//删除闭合节点
-					node.toEmpty()
-					//块节点为空
-					if (blockNode.isEmpty()) {
-						//删除的是占位符
-						if (isPlaceholder) {
-							//块节点是固定状态的，则创建占位符；
-							if (blockNode.fixed) {
-								const placeholderNode = KNode.createPlaceholder()
-								this.addNode(placeholderNode, blockNode)
-								this.setSelectionBefore(placeholderNode)
-							}
-							//块节点不是固定状态的，且前一个可获取光标的节点不存在则说明光标在编辑器起始处，创建占位符
-							else if (!blockNode.fixed && !previousSelectionNode) {
-								const placeholderNode = KNode.createPlaceholder()
-								this.addNode(placeholderNode, blockNode)
-								this.setSelectionBefore(placeholderNode)
-								//转为段落
-								blockNode.tag = this.blockRenderTag
-								blockNode.marks = {}
-								blockNode.styles = {}
-							}
-							//其余情况就是块节点被删除，光标自动更新到附近位置
+				const offset = this.selection.start!.offset
+				//前一个可设置光标的节点
+				const previousSelectionNode = this.getPreviousSelectionNode(node)
+				//光标所在的块节点
+				const blockNode = node.getBlock()
+				//光标在节点的起始处
+				if (offset == 0) {
+					//前一个可设置光标的节点存在
+					if (previousSelectionNode) {
+						//获取前一个可设置光标的节点所在的块节点
+						const previousBlock = previousSelectionNode.getBlock()
+						//前一个可设置光标的节点和光标所在节点都属于一个块节点，则表示当前光标所在节点不是块节点的起始处，则将光标移动到前一个可设置光标的节点的末尾处再执行一次删除
+						if (previousBlock.isEqual(blockNode)) {
+							this.setSelectionAfter(previousSelectionNode, 'all')
+							this.delete()
+							return
 						}
-						//删除的不是占位符
-						else {
+						//光标在块节点的开始处并且块节点不是固定的
+						else if (!blockNode.fixed) {
+							this.mergeBlock(previousBlock, blockNode)
+						}
+					}
+					//前一个可设置光标的节点不存在，说明在编辑器开始处
+					else {
+						//转为段落
+						this.toParagraph(blockNode)
+					}
+				}
+				//光标在所在节点的内部
+				else {
+					//在空白文本节点内
+					if (node.isZeroWidthText()) {
+						//置空节点
+						node.toEmpty()
+						//在清除空白文本节点后判断块节点是否为空，是则建立占位符
+						if (blockNode.isEmpty()) {
 							const placeholderNode = KNode.createPlaceholder()
 							this.addNode(placeholderNode, blockNode)
 							this.setSelectionBefore(placeholderNode)
+						}
+						//块节点不是空，将光标移动到该节点前面
+						else {
+							this.selection.start!.node = this.selection.end!.node = node
+							this.selection.start!.offset = this.selection.end!.offset = 0
+						}
+						//再执行一次删除
+						this.delete()
+						return
+					}
+					//在文本节点内
+					else if (node.isText()) {
+						//获取删除的字符
+						const deleteChart = node.textContent!.substring(offset - 1, offset)
+						//进行删除
+						node.textContent = node.textContent!.substring(0, offset - 1) + node.textContent!.substring(offset)
+						//更新光标到删除后的位置
+						this.selection.start!.offset = offset - 1
+						this.selection.end!.offset = offset - 1
+						//删除的是空白字符，再次删除
+						if (isZeroWidthText(deleteChart)) {
+							this.delete()
+							return
+						}
+						//块节点为空，创建占位符
+						if (blockNode.isEmpty()) {
+							const placeholderNode = KNode.createPlaceholder()
+							this.addNode(placeholderNode, blockNode)
+							this.setSelectionBefore(placeholderNode)
+						}
+					}
+					//在闭合节点内
+					else if (node.isClosed()) {
+						//是否占位符
+						const isPlaceholder = node.isPlaceholder()
+						//删除闭合节点
+						node.toEmpty()
+						//块节点为空
+						if (blockNode.isEmpty()) {
+							//删除的是占位符
+							if (isPlaceholder) {
+								//块节点是固定状态的，则创建占位符；
+								if (blockNode.fixed) {
+									const placeholderNode = KNode.createPlaceholder()
+									this.addNode(placeholderNode, blockNode)
+									this.setSelectionBefore(placeholderNode)
+								}
+								//块节点不是固定状态的，且前一个可获取光标的节点不存在则说明光标在编辑器起始处，创建占位符
+								else if (!blockNode.fixed && !previousSelectionNode) {
+									const placeholderNode = KNode.createPlaceholder()
+									this.addNode(placeholderNode, blockNode)
+									this.setSelectionBefore(placeholderNode)
+									//转为段落
+									blockNode.tag = this.blockRenderTag
+									blockNode.marks = {}
+									blockNode.styles = {}
+								}
+								//其余情况就是块节点被删除，光标自动更新到附近位置
+							}
+							//删除的不是占位符
+							else {
+								const placeholderNode = KNode.createPlaceholder()
+								this.addNode(placeholderNode, blockNode)
+								this.setSelectionBefore(placeholderNode)
+							}
 						}
 					}
 				}
@@ -2309,11 +2318,6 @@ export class Editor {
 		//合并起点和终点
 		this.selection.end!.node = this.selection.start!.node
 		this.selection.end!.offset = this.selection.start!.offset
-		//删除完成后光标在不可编辑的节点内，直接清除该不可编辑的节点
-		const uneditableNode = this.selection.start!.node.getUneditable()
-		if (uneditableNode) {
-			uneditableNode.toEmpty()
-		}
 		//触发事件
 		if (typeof this.onDeleteComplete == 'function') {
 			this.onDeleteComplete.apply(this)
