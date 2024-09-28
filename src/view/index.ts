@@ -17,7 +17,7 @@ export type KNodeRenderOptionType = {
 /**
  * 节点渲染成dom后在dom上生成的一个特殊标记名称，它的值是节点的key值
  */
-export const NODE_MARK = 'data-kaitify-node'
+export const NODE_MARK = 'kaitify-node'
 
 /**
  * 获取节点的渲染参数

@@ -124,6 +124,18 @@ export const VideoExtension = Extension.create({
 	},
 	formatRule({ editor, node }) {
 		if (node.tag == 'video') {
+			if (node.parent && node.parent.hasMarks() && node.parent.marks!.hasOwnProperty('kaitify-video')) {
+				return
+			}
+			const video = node.clone(true)
+			node.type = 'inline'
+			node.tag = 'div'
+			node.marks = {
+				'kaitify-video': '',
+				contenteditable: 'false'
+			}
+			node.children = [video]
+			video.parent = node
 		}
 	},
 	afterUpdateView() {

@@ -174,7 +174,7 @@ const handlerForPasteDrop = async function (this: Editor, dataTransfer: DataTran
 /**
  * 监听selection
  */
-export const onSelectionChange = function (this: Editor) {
+export const onSelectionChange = async function (this: Editor) {
 	if (!this.$el) {
 		return
 	}
@@ -187,7 +187,7 @@ export const onSelectionChange = function (this: Editor) {
 		return
 	}
 	//更新selection
-	const flag = this.updateSelection()
+	const flag = await this.updateSelection()
 	//没有更新成功
 	if (!flag) {
 		return

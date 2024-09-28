@@ -785,7 +785,7 @@ export class Editor {
 	/**
 	 * 根据真实光标更新selection，返回布尔值表示是否更新成功
 	 */
-	updateSelection() {
+	async updateSelection() {
 		if (!this.$el) {
 			return false
 		}
@@ -868,11 +868,12 @@ export class Editor {
 						}
 					}
 				}
-				//如果起点和终点是相邻的两个节点并且位置紧邻
+				//如果起点和终点是相邻的两个节点并且位置紧邻则纠正光标位置
 				const nextNode = this.getNextSelectionNode(this.selection.start!.node)
 				if (nextNode && nextNode.isEqual(this.selection.end!.node) && this.selection.start!.offset == (this.selection.start!.node.isText() ? this.selection.start!.node.textContent!.length : 1) && this.selection.end!.offset == 0) {
 					this.selection.end!.node = this.selection.start!.node
 					this.selection.end!.offset = this.selection.start!.offset
+					await this.updateRealSelection()
 				}
 				return true
 			}

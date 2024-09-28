@@ -6,9 +6,9 @@ import { NODE_MARK } from '../view'
  * 用于KNode生成唯一的key
  */
 export const createUniqueKey = (): number => {
-	let key = DapData.get(window, 'data-kaitify-knode-key') || 0
+	let key = DapData.get(window, 'kaitify-node-key') || 0
 	key++
-	DapData.set(window, 'data-kaitify-knode-key', key)
+	DapData.set(window, 'kaitify-node-key', key)
 	return key
 }
 
@@ -17,9 +17,9 @@ export const createUniqueKey = (): number => {
  */
 export const createGuid = function (): number {
 	//获取唯一id
-	let key = DapData.get(window, 'data-kaitify-guid') || 0
+	let key = DapData.get(window, 'kaitify-guid') || 0
 	key++
-	DapData.set(window, 'data-kaitify-guid', key)
+	DapData.set(window, 'kaitify-guid', key)
 	return key
 }
 
@@ -113,11 +113,11 @@ export const initEditorDom = (dom: HTMLElement | string) => {
 		throw new Error('You must specify a dom container to initialize the editor')
 	}
 	//如果已经初始化过了则抛出异常
-	if (DapData.get(dom, 'data-kaitify-init')) {
+	if (DapData.get(dom, 'kaitify-init')) {
 		throw new Error('The element node has been initialized to the editor')
 	}
 	//添加初始化的标记
-	DapData.set(dom, 'data-kaitify-init', true)
+	DapData.set(dom, 'kaitify-init', true)
 	return dom
 }
 
