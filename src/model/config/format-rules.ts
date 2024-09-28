@@ -112,6 +112,30 @@ export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
+ * 处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符
+ */
+export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
+	const uneditableNode = node.getUneditable()
+	if (uneditableNode && !uneditableNode.isEmpty()) {
+		if (!uneditableNode.isBlock()) {
+			//非块节点处理
+			const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
+			const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
+			//前一个节点不存在或者不是零宽度空白文本节点
+			if (!previousNode || !previousNode.isZeroWidthText()) {
+				const zeroWidthText = KNode.createZeroWidthText()
+				editor.addNodeBefore(zeroWidthText, uneditableNode)
+			}
+			//后一个节点不存在或者不是零宽度空白文本节点
+			if (!nextNode || !nextNode.isZeroWidthText()) {
+				const zeroWidthText = KNode.createZeroWidthText()
+				editor.addNodeAfter(zeroWidthText, uneditableNode)
+			}
+		}
+	}
+}
+
+/**
  * 处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）
  */
 export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {

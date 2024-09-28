@@ -4,7 +4,7 @@ import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isCon
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge } from './config/format-rules'
+import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { removeDomObserve, setDomObserve } from './config/dom-observe'
@@ -228,7 +228,7 @@ export class Editor {
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
-	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineParseText, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
+	formatRules: RuleFunctionType[] = [formatBlockInChildren, formatInlineParseText, formatUneditableNoodes, formatPlaceholderMerge, formatZeroWidthTextMerge, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -357,7 +357,8 @@ export class Editor {
 		if (node.isEmpty() || target.isEmpty()) {
 			return
 		}
-		const uneditableNode = target.getUneditable()
+		//前一个块节点是不可编辑的则直接删除前一个块节点
+		const uneditableNode = node.getUneditable()
 		if (uneditableNode) {
 			uneditableNode.toEmpty()
 		} else {
