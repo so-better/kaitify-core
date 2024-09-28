@@ -776,6 +776,13 @@ export class Editor {
 				if (fn) fn.apply(this)
 			}
 		}
+		if (extension.onSelectionUpdate) {
+			const fn = this.onSelectionUpdate
+			this.onSelectionUpdate = (selection: Selection) => {
+				extension.onSelectionUpdate!.apply(this, [selection])
+				if (fn) fn.apply(this, [selection])
+			}
+		}
 		if (extension.addCommands) {
 			const commands = extension.addCommands.apply(this)
 			this.commands = { ...this.commands, ...commands }
@@ -2310,7 +2317,7 @@ export class Editor {
 	/**
 	 * 【API】更新编辑器视图
 	 */
-	async updateView(unPushHistory: boolean | undefined = false) {
+	async updateView(updateRealSelection: boolean | undefined = true, unPushHistory: boolean | undefined = false) {
 		if (!this.$el) {
 			return
 		}
@@ -2366,7 +2373,7 @@ export class Editor {
 		//更新旧节点数组
 		this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
 		//此处进行光标的渲染
-		await this.updateRealSelection()
+		if (updateRealSelection) await this.updateRealSelection()
 		//视图更新后回调
 		if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
 	}
@@ -2490,9 +2497,7 @@ export class Editor {
 		//进行视图的渲染
 		const useDefault = typeof editor.onUpdateView == 'function' ? await editor.onUpdateView.apply(editor, [true]) : true
 		//使用默认逻辑
-		if (useDefault) {
-			defaultUpdateView.apply(editor, [true])
-		}
+		if (useDefault) defaultUpdateView.apply(editor, [true])
 		//初始设置历史记录
 		editor.history.setState(editor.stackNodes, editor.selection)
 		//更新旧节点数组
