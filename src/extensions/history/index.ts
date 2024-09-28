@@ -34,7 +34,7 @@ export const HistoryExtension = Extension.create({
 			if (record) {
 				this.stackNodes = record.nodes
 				this.selection = record.selection
-				await this.updateView(true)
+				await this.updateView(true, true)
 			}
 		}
 
@@ -46,7 +46,7 @@ export const HistoryExtension = Extension.create({
 			if (record) {
 				this.stackNodes = record.nodes
 				this.selection = record.selection
-				await this.updateView(true)
+				await this.updateView(true, true)
 			}
 		}
 
