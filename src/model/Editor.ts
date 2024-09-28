@@ -783,6 +783,104 @@ export class Editor {
 	}
 
 	/**
+	 * 根据真实光标更新selection，返回布尔值表示是否更新成功
+	 */
+	updateSelection() {
+		if (!this.$el) {
+			return false
+		}
+		const realSelection = window.getSelection()
+		if (realSelection && realSelection.rangeCount) {
+			const range = realSelection.getRangeAt(0)
+			//光标在编辑器内
+			if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
+				//如果光标起点是文本
+				if (range.startContainer.nodeType == 3) {
+					this.selection.start = {
+						node: this.findNode(range.startContainer.parentNode as HTMLElement),
+						offset: range.startOffset
+					}
+				}
+				//如果光标起点是元素
+				else if (range.startContainer.nodeType == 1) {
+					const childDoms = Array.from(range.startContainer.childNodes)
+					//存在子元素
+					if (childDoms.length) {
+						const dom = childDoms[range.startOffset] ? childDoms[range.startOffset] : childDoms[range.startOffset - 1]
+						//元素
+						if (dom.nodeType == 1) {
+							if (childDoms[range.startOffset]) {
+								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'start')
+							} else {
+								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'start')
+							}
+						}
+						//文本
+						else if (dom.nodeType == 3) {
+							this.selection.start = {
+								node: this.findNode(dom.parentNode as HTMLElement),
+								offset: childDoms[range.startOffset] ? 0 : dom.textContent!.length
+							}
+						}
+					}
+					//没有子元素，应当是闭合节点
+					else {
+						this.selection.start = {
+							node: this.findNode(range.startContainer as HTMLElement),
+							offset: 0
+						}
+					}
+				}
+				//如果光标终点是文本
+				if (range.endContainer.nodeType == 3) {
+					this.selection.end = {
+						node: this.findNode(range.endContainer.parentNode as HTMLElement),
+						offset: range.endOffset
+					}
+				}
+				//如果光标终点是元素
+				else if (range.endContainer.nodeType == 1) {
+					const childDoms = Array.from(range.endContainer.childNodes)
+					//存在子元素
+					if (childDoms.length) {
+						const dom = childDoms[range.endOffset] ? childDoms[range.endOffset] : childDoms[range.endOffset - 1]
+						//元素
+						if (dom.nodeType == 1) {
+							if (childDoms[range.endOffset]) {
+								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'end')
+							} else {
+								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'end')
+							}
+						}
+						//文本
+						else if (dom.nodeType == 3) {
+							this.selection.end = {
+								node: this.findNode(dom.parentNode as HTMLElement),
+								offset: childDoms[range.endOffset] ? 0 : dom.textContent!.length
+							}
+						}
+					}
+					//没有子元素，应当是闭合节点
+					else {
+						this.selection.end = {
+							node: this.findNode(range.endContainer as HTMLElement),
+							offset: 1
+						}
+					}
+				}
+				//如果起点和终点是相邻的两个节点并且位置紧邻
+				const nextNode = this.getNextSelectionNode(this.selection.start!.node)
+				if (nextNode && nextNode.isEqual(this.selection.end!.node) && this.selection.start!.offset == (this.selection.start!.node.isText() ? this.selection.start!.node.textContent!.length : 1) && this.selection.end!.offset == 0) {
+					this.selection.end!.node = this.selection.start!.node
+					this.selection.end!.offset = this.selection.start!.offset
+				}
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
 	 * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
 	 */
 	scrollViewToSelection() {
@@ -1709,7 +1807,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】向选区进行换行
+	 * 【API】向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
 	 */
 	insertParagraph() {
 		if (!this.selection.focused()) {
@@ -2198,7 +2296,7 @@ export class Editor {
 		if (!this.$el) {
 			return
 		}
-		//克隆旧节点数组，防止在patch过程中this.oldStackNodes中存在null
+		//克隆旧节点数组，防止在patch过程中旧节点数组中存在null，影响后续的视图更新
 		const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
 		//对编辑器的新旧节点数组进行比对，遍历比对的结果进行动态格式化
 		patchNodes(this.stackNodes, oldStackNodes).forEach(item => {
@@ -2232,9 +2330,7 @@ export class Editor {
 		//此处进行视图的更新
 		const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [false]) : true
 		//使用默认逻辑
-		if (useDefault) {
-			defaultUpdateView.apply(this, [false])
-		}
+		useDefault && defaultUpdateView.apply(this, [false])
 		//视图更新完毕后重新设置dom监听
 		setDomObserve(this)
 		//新的html值
@@ -2300,104 +2396,6 @@ export class Editor {
 		if (typeof this.onSelectionUpdate == 'function') {
 			this.onSelectionUpdate.apply(this, [this.selection])
 		}
-	}
-
-	/**
-	 * 【API】根据真实光标更新selection，返回布尔值表示是否更新成功
-	 */
-	updateSelection() {
-		if (!this.$el) {
-			return false
-		}
-		const realSelection = window.getSelection()
-		if (realSelection && realSelection.rangeCount) {
-			const range = realSelection.getRangeAt(0)
-			//光标在编辑器内
-			if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
-				//如果光标起点是文本
-				if (range.startContainer.nodeType == 3) {
-					this.selection.start = {
-						node: this.findNode(range.startContainer.parentNode as HTMLElement),
-						offset: range.startOffset
-					}
-				}
-				//如果光标起点是元素
-				else if (range.startContainer.nodeType == 1) {
-					const childDoms = Array.from(range.startContainer.childNodes)
-					//存在子元素
-					if (childDoms.length) {
-						const dom = childDoms[range.startOffset] ? childDoms[range.startOffset] : childDoms[range.startOffset - 1]
-						//元素
-						if (dom.nodeType == 1) {
-							if (childDoms[range.startOffset]) {
-								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'start')
-							} else {
-								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'start')
-							}
-						}
-						//文本
-						else if (dom.nodeType == 3) {
-							this.selection.start = {
-								node: this.findNode(dom.parentNode as HTMLElement),
-								offset: childDoms[range.startOffset] ? 0 : dom.textContent!.length
-							}
-						}
-					}
-					//没有子元素，应当是闭合节点
-					else {
-						this.selection.start = {
-							node: this.findNode(range.startContainer as HTMLElement),
-							offset: 0
-						}
-					}
-				}
-				//如果光标终点是文本
-				if (range.endContainer.nodeType == 3) {
-					this.selection.end = {
-						node: this.findNode(range.endContainer.parentNode as HTMLElement),
-						offset: range.endOffset
-					}
-				}
-				//如果光标终点是元素
-				else if (range.endContainer.nodeType == 1) {
-					const childDoms = Array.from(range.endContainer.childNodes)
-					//存在子元素
-					if (childDoms.length) {
-						const dom = childDoms[range.endOffset] ? childDoms[range.endOffset] : childDoms[range.endOffset - 1]
-						//元素
-						if (dom.nodeType == 1) {
-							if (childDoms[range.endOffset]) {
-								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'end')
-							} else {
-								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'end')
-							}
-						}
-						//文本
-						else if (dom.nodeType == 3) {
-							this.selection.end = {
-								node: this.findNode(dom.parentNode as HTMLElement),
-								offset: childDoms[range.endOffset] ? 0 : dom.textContent!.length
-							}
-						}
-					}
-					//没有子元素，应当是闭合节点
-					else {
-						this.selection.end = {
-							node: this.findNode(range.endContainer as HTMLElement),
-							offset: 1
-						}
-					}
-				}
-				//如果起点和终点是相邻的两个节点并且位置紧邻
-				const nextNode = this.getNextSelectionNode(this.selection.start!.node)
-				if (nextNode && nextNode.isEqual(this.selection.end!.node) && this.selection.start!.offset == (this.selection.start!.node.isText() ? this.selection.start!.node.textContent!.length : 1) && this.selection.end!.offset == 0) {
-					this.selection.end!.node = this.selection.start!.node
-					this.selection.end!.offset = this.selection.start!.offset
-				}
-				return true
-			}
-		}
-		return false
 	}
 
 	/**

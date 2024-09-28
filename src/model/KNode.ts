@@ -33,14 +33,16 @@ export type KNodeMatchOptionType = {
 	marks?:
 		| KNodeMarksType
 		| {
-				[key: string]: boolean
+				[mark: string]: boolean
 		  }
 	/**
 	 * 节点样式集合
 	 */
-	styles?: KNodeStylesType & {
-		[key: string]: boolean
-	}
+	styles?:
+		| KNodeStylesType
+		| {
+				[style: string]: boolean
+		  }
 }
 
 /**

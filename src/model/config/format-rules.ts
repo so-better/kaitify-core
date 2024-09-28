@@ -4,6 +4,11 @@ import { Editor } from '../Editor'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
 
 /**
+ * 格式化函数类型
+ */
+export type RuleFunctionType = (opts: { editor: Editor; node: KNode }) => void
+
+/**
  * 打散指定的节点，将其分裂成多个节点，如果子孙节点还有子节点则继续打散
  */
 export const splitNodeToNodes = (editor: Editor, node: KNode) => {
@@ -19,11 +24,6 @@ export const splitNodeToNodes = (editor: Editor, node: KNode) => {
 		node.children = []
 	}
 }
-
-/**
- * 格式化函数类型
- */
-export type RuleFunctionType = (opts: { editor: Editor; node: KNode }) => void
 
 /**
  * 处理子节点中的块节点，如果父节点是行内节点则将块节点转为行内节点，如果块节点和其他节点并存亦将块节点转为行内节点
