@@ -17,66 +17,50 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 			//处理需要保留的标记
 			if (node.hasMarks()) {
 				//contenteditable属性保留
-				if (node.marks!['contenteditable']) {
+				if (node.marks!.hasOwnProperty('contenteditable')) {
 					marks['contenteditable'] = node.marks!['contenteditable']
 				}
 				//name属性保留
-				if (node.marks!['name']) {
+				if (node.marks!.hasOwnProperty('name')) {
 					marks['name'] = node.marks!['name']
 				}
 				//disabled属性保留
-				if (node.marks!['disabled']) {
+				if (node.marks!.hasOwnProperty('disabled')) {
 					marks['disabled'] = node.marks!['disabled']
 				}
-				//视频的autoplay属性保留
-				if (node.tag == 'video' && node.marks!['autoplay']) {
-					marks['autoplay'] = node.marks!['autoplay']
-				}
-				//视频的loop属性保留
-				if (node.tag == 'video' && node.marks!['loop']) {
-					marks['loop'] = node.marks!['loop']
-				}
-				//视频的muted属性保留
-				if (node.tag == 'video' && node.marks!['muted']) {
-					marks['muted'] = node.marks!['muted']
-				}
-				//视频的controls属性保留
-				if (node.tag == 'video' && node.marks!['controls']) {
-					marks['controls'] = node.marks!['controls']
-				}
 				//链接的href属性保留
-				if (node.tag == 'a' && node.marks!['href']) {
+				if (node.tag == 'a' && node.marks!.hasOwnProperty('href')) {
 					marks['href'] = node.marks!['href']
 				}
 				//链接的target属性保留
-				if (node.tag == 'a' && node.marks!['target']) {
+				if (node.tag == 'a' && node.marks!.hasOwnProperty('target')) {
 					marks['target'] = node.marks!['target']
 				}
 				//表格列宽属性保留
-				if (node.tag == 'col' && node.marks!['width']) {
+				if (node.tag == 'col' && node.marks!.hasOwnProperty('width')) {
 					marks['width'] = node.marks!['width']
 				}
 				//表格单元格colspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!['colspan']) {
+				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('colspan')) {
 					marks['colspan'] = node.marks!['colspan']
 				}
 				//表格单元格rowspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!['rowspan']) {
+				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('rowspan')) {
 					marks['rowspan'] = node.marks!['rowspan']
 				}
 			}
 			//处理需要保留的样式
 			if (node.hasStyles()) {
 				//块元素保留textIndent样式
-				if (node.isBlock() && node.styles!.textIndent) {
+				if (node.isBlock() && node.styles!.hasOwnProperty('textIndent')) {
 					styles.textIndent = node.styles!.textIndent
 				}
 				//块元素保留textAlign样式
-				if (node.isBlock() && node.styles!.textAlign) {
+				if (node.isBlock() && node.styles!.hasOwnProperty('textAlign')) {
 					styles.textAlign = node.styles!.textAlign
 				}
 				//块元素保留lineHeight样式
-				if (node.isBlock() && node.styles!.lineHeight) {
+				if (node.isBlock() && node.styles!.hasOwnProperty('lineHeight')) {
 					styles.lineHeight = node.styles!.lineHeight
 				}
 			}

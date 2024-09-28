@@ -102,8 +102,8 @@ export const ImageExtension = Extension.create({
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.tag == 'img' && node.hasMarks()) {
-			marks['alt'] = node.marks!['alt'] || ''
-			marks['src'] = node.marks!['src'] || ''
+			if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
+			if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
 		}
 		return marks
 	},
