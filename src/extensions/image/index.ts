@@ -88,8 +88,6 @@ const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 						width: `${percentWidth}%`
 					}
 				}
-				//将光标定位到节点后
-				editor.setSelectionAfter(node)
 				//更新视图
 				editor.updateView()
 			}

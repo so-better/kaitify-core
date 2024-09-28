@@ -785,7 +785,7 @@ export class Editor {
 	/**
 	 * 根据真实光标更新selection，返回布尔值表示是否更新成功
 	 */
-	async updateSelection() {
+	updateSelection() {
 		if (!this.$el) {
 			return false
 		}
@@ -868,15 +868,32 @@ export class Editor {
 						}
 					}
 				}
-				//如果起点和终点是相邻的两个节点并且位置紧邻则纠正光标位置
-				const nextNode = this.getNextSelectionNode(this.selection.start!.node)
-				if (nextNode && nextNode.isEqual(this.selection.end!.node) && this.selection.start!.offset == (this.selection.start!.node.isText() ? this.selection.start!.node.textContent!.length : 1) && this.selection.end!.offset == 0) {
-					this.selection.end!.node = this.selection.start!.node
-					this.selection.end!.offset = this.selection.start!.offset
-					await this.updateRealSelection()
-				}
 				return true
 			}
+		}
+		return false
+	}
+
+	/**
+	 * 纠正光标位置，返回布尔值表示是否存在纠正行为
+	 */
+	redressSelection() {
+		if (!this.selection.focused()) {
+			return false
+		}
+		let startNode = this.selection.start!.node
+		let endNode = this.selection.end!.node
+		let startOffset = this.selection.start!.offset
+		let endOffset = this.selection.end!.offset
+
+		//起点和终点是相邻的两个节点并且位置紧邻则纠正光标位置
+		const startNextNode = this.getNextSelectionNode(startNode)
+		if (startNextNode && startNextNode.isEqual(endNode) && startOffset == (startNode.isText() ? startNode.textContent!.length : 1) && endOffset == 0) {
+			endNode = startNode
+			endOffset = startOffset
+			this.selection.end!.node = endNode
+			this.selection.end!.offset = endOffset
+			return true
 		}
 		return false
 	}
@@ -2362,8 +2379,12 @@ export class Editor {
 		if (!realSelection) {
 			return
 		}
+		this.internalCauseSelectionChange = true
+		//聚焦情况下
 		if (this.selection.focused()) {
-			this.internalCauseSelectionChange = true
+			//先进行纠正
+			this.redressSelection()
+			//更新真实光标
 			const range = document.createRange()
 			const startDom = this.findDom(this.selection.start!.node)
 			const endDom = this.findDom(this.selection.end!.node)
@@ -2385,9 +2406,12 @@ export class Editor {
 				const index = this.selection.end!.node.parent!.children!.findIndex(item => this.selection.end!.node.isEqual(item))
 				range.setEnd(endDom.parentNode!, this.selection.end!.offset + index)
 			}
+			//设置真实光标
 			realSelection.removeAllRanges()
 			realSelection.addRange(range)
-		} else {
+		}
+		//没有聚焦
+		else {
 			realSelection.removeAllRanges()
 		}
 		await delay()

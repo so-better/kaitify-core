@@ -187,9 +187,17 @@ export const onSelectionChange = async function (this: Editor) {
 		return
 	}
 	//更新selection
-	const flag = await this.updateSelection()
-	//没有更新成功
-	if (!flag) {
+	const hasUpdate = this.updateSelection()
+	//没有更新
+	if (!hasUpdate) {
+		return
+	}
+	//进行纠正
+	const hasRedress = this.redressSelection()
+	//有纠正
+	if (hasRedress) {
+		//则渲染真实光标
+		await this.updateRealSelection()
 		return
 	}
 	//更新记录的selection

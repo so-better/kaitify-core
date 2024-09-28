@@ -8,7 +8,6 @@ import { Extension } from '../Extension'
  */
 type SetVideoOptionType = {
 	src: string
-	alt?: string
 	width?: string
 	controls?: boolean
 	autoplay?: boolean
@@ -27,7 +26,7 @@ declare module '../../model' {
 /**
  * 设置视频选中
  */
-const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
+const videoFocus = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
 	DapEvent.off(el, 'click')
 	DapEvent.on(el, 'click', () => {
 		editor.setSelectionBefore(node, 'start')
@@ -38,7 +37,7 @@ const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 /**
  * 设置视频拖拽
  */
-const videoResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
+const videoResizable = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
 	//获取父元素宽度
 	const parentWidth = DapElement.width(el.parentElement!)
 	//设置拖拽改变大小的功能
@@ -52,7 +51,7 @@ const videoResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 		inertia: false,
 		//调整大小时的自动滚动功能
 		autoScroll: true,
-		//保持图片的宽高比
+		//保持视频的宽高比
 		preserveAspectRatio: true,
 		//水平调整
 		axis: 'x',
@@ -92,8 +91,6 @@ const videoResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 						width: `${percentWidth}%`
 					}
 				}
-				//将光标定位到节点后
-				editor.setSelectionAfter(node)
 				//更新视图
 				editor.updateView()
 			}
@@ -106,7 +103,6 @@ export const VideoExtension = Extension.create({
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.tag == 'video' && node.hasMarks()) {
-			if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
 			if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
 			if (node.marks!.hasOwnProperty('autoplay')) marks['autoplay'] = node.marks!['autoplay']
 			if (node.marks!.hasOwnProperty('loop')) marks['loop'] = node.marks!['loop']
@@ -124,18 +120,18 @@ export const VideoExtension = Extension.create({
 	},
 	formatRule({ editor, node }) {
 		if (node.tag == 'video') {
-			if (node.parent && node.parent.hasMarks() && node.parent.marks!.hasOwnProperty('kaitify-video')) {
-				return
+			const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+			const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+			//前一个节点不存在或者不是零宽度空白文本节点
+			if (!previousNode || !previousNode.isZeroWidthText()) {
+				const zeroWidthText = KNode.createZeroWidthText()
+				editor.addNodeBefore(zeroWidthText, node)
 			}
-			const video = node.clone(true)
-			node.type = 'inline'
-			node.tag = 'div'
-			node.marks = {
-				'kaitify-video': '',
-				contenteditable: 'false'
+			//后一个节点不存在或者不是零宽度空白文本节点
+			if (!nextNode || !nextNode.isZeroWidthText()) {
+				const zeroWidthText = KNode.createZeroWidthText()
+				editor.addNodeAfter(zeroWidthText, node)
 			}
-			node.children = [video]
-			video.parent = node
 		}
 	},
 	afterUpdateView() {
@@ -143,58 +139,62 @@ export const VideoExtension = Extension.create({
 		if (!this.isEditable()) {
 			return
 		}
-		// const images = this.$el!.querySelectorAll('img')
-		// images.forEach(el => {
-		// 	//查找对应的节点
-		// 	const node = this.findNode(el)
-		// 	//图片选中
-		// 	imageFocus(this, el, node)
-		// 	//图片拖拽改变大小
-		// 	imageResizable(this, el, node)
-		// })
+		const videos = this.$el!.querySelectorAll('video')
+		videos.forEach(el => {
+			//查找对应的节点
+			const node = this.findNode(el)
+			//视频选中
+			videoFocus(this, el, node)
+			//视频拖拽改变大小
+			videoResizable(this, el, node)
+		})
+	},
+	addCommands() {
+		/**
+		 * 获取光标所在的视频，如果光标不在一个视频内，返回null
+		 */
+		const getVideo = () => {
+			return this.getMatchNodeBySelection({
+				tag: 'video'
+			})
+		}
+		/**
+		 * 判断光标范围内是否有视频
+		 */
+		const hasVideo = () => {
+			return this.isSelectionNodesSomeMatch({
+				tag: 'video'
+			})
+		}
+		/**
+		 * 插入视频
+		 */
+		const setVideo = async ({ src, width, controls, loop, muted, autoplay }: SetVideoOptionType) => {
+			if (!this.selection.focused()) {
+				return
+			}
+			if (!src) {
+				return
+			}
+			const marks: KNodeMarksType = {
+				src
+			}
+			if (controls) marks['controls'] = 'controls'
+			if (loop) marks['loop'] = 'loop'
+			if (muted) marks['muted'] = 'muted'
+			if (autoplay) marks['autoplay'] = 'autoplay'
+			const videoNode = KNode.create({
+				type: 'closed',
+				tag: 'video',
+				marks: marks,
+				styles: {
+					width: width || 'auto'
+				}
+			})
+			this.insertNode(videoNode)
+			this.setSelectionAfter(videoNode)
+			await this.updateView()
+		}
+		return { getVideo, hasVideo, setVideo }
 	}
-	//addCommands() {
-	/**
-	 * 获取光标所在的图片，如果光标不在一张图片内，返回null
-	 */
-	// const getImage = () => {
-	// 	return this.getMatchNodeBySelection({
-	// 		tag: 'img'
-	// 	})
-	// }
-	/**
-	 * 判断光标范围内是否有图片
-	 */
-	// const hasImage = () => {
-	// 	return this.isSelectionNodesSomeMatch({
-	// 		tag: 'img'
-	// 	})
-	// }
-	/**
-	 * 插入图片
-	 */
-	// const setImage = async ({ src, alt, width }: SetImageOptionType) => {
-	// 	if (!this.selection.focused()) {
-	// 		return
-	// 	}
-	// 	if (!src) {
-	// 		return
-	// 	}
-	// 	const imageNode = KNode.create({
-	// 		type: 'closed',
-	// 		tag: 'img',
-	// 		marks: {
-	// 			src,
-	// 			alt: alt || ''
-	// 		},
-	// 		styles: {
-	// 			width: width || 'auto'
-	// 		}
-	// 	})
-	// 	this.insertNode(imageNode)
-	// 	this.setSelectionAfter(imageNode)
-	// 	await this.updateView()
-	// }
-	//return { getImage, hasImage, setImage }
-	//}
 })
