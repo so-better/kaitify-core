@@ -112,7 +112,7 @@ export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
- * 处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符
+ * 处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符 & 重置不可编辑节点内的光标位置
  */
 export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 	const uneditableNode = node.getUneditable()
@@ -131,13 +131,37 @@ export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 				const zeroWidthText = KNode.createZeroWidthText()
 				editor.addNodeAfter(zeroWidthText, uneditableNode)
 			}
+			//起点和终点都在不可编辑的节点里
+			if (editor.isSelectionInNode(uneditableNode, 'all')) {
+				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
+				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
+				//起点和终点在一起
+				if (editor.selection.collapsed()) {
+					//如果光标在不可编辑节点的最后面，则移动到后一个可设置光标的节点的前面
+					const lastNode = editor.getLastSelectionNodeInChildren(uneditableNode)!
+					if (lastNode.isEqual(editor.selection.start!.node)) {
+						editor.setSelectionBefore(nexteSelectionNode, 'all')
+					}
+					//否则一律设置到前一个可设置光标的节点的后面
+					else {
+						editor.setSelectionAfter(previousSelectionNode, 'all')
+					}
+				}
+				//起点和终点不在一起，则选中该不可编辑的节点
+				else {
+					editor.setSelectionAfter(previousSelectionNode, 'start')
+					editor.setSelectionBefore(nexteSelectionNode, 'end')
+				}
+			}
 			//起点在不可编辑的节点里，则更新起点位置
-			if (editor.isSelectionInNode(uneditableNode, 'start')) {
-				editor.updateSelectionRecently('start')
+			else if (editor.isSelectionInNode(uneditableNode, 'start')) {
+				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
+				editor.setSelectionAfter(previousSelectionNode, 'start')
 			}
 			//终点在不可编辑的节点里，则更新终点位置
-			if (editor.isSelectionInNode(uneditableNode, 'end')) {
-				editor.updateSelectionRecently('end')
+			else if (editor.isSelectionInNode(uneditableNode, 'end')) {
+				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
+				editor.setSelectionBefore(nexteSelectionNode, 'end')
 			}
 		}
 	}
