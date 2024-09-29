@@ -1,5 +1,6 @@
-import { KNodeStylesType, splitNodeToNodes } from '../../model'
+import { KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
+import { splitNodeToNodes } from '../../model/config/function'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -19,7 +20,7 @@ export const BoldExtension = Extension.create({
 				fontWeight: 'bold'
 			}
 			node.tag = editor.textRenderTag
-			splitNodeToNodes(editor, node)
+			splitNodeToNodes.apply(editor, [node])
 		}
 	},
 	addCommands() {

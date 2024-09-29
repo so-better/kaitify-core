@@ -1,154 +1,7 @@
-import { file as DapFile } from 'dap-util'
 import { Editor } from '../Editor'
 import { isUndo, isRedo } from './keyboard'
-import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
 import { delay } from '../../tools'
-
-/**
- * 粘贴时对非文本节点的标记和样式的保留处理
- */
-const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]) {
-	//不是文本
-	nodes.forEach(node => {
-		//不是文本节点
-		if (!node.isText()) {
-			const marks: KNodeMarksType = {}
-			const styles: KNodeStylesType = {}
-			//处理需要保留的标记
-			if (node.hasMarks()) {
-				//contenteditable属性保留
-				if (node.marks!.hasOwnProperty('contenteditable')) {
-					marks['contenteditable'] = node.marks!['contenteditable']
-				}
-				//name属性保留
-				if (node.marks!.hasOwnProperty('name')) {
-					marks['name'] = node.marks!['name']
-				}
-				//disabled属性保留
-				if (node.marks!.hasOwnProperty('disabled')) {
-					marks['disabled'] = node.marks!['disabled']
-				}
-				//表格列宽属性保留
-				if (node.tag == 'col' && node.marks!.hasOwnProperty('width')) {
-					marks['width'] = node.marks!['width']
-				}
-				//表格单元格colspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('colspan')) {
-					marks['colspan'] = node.marks!['colspan']
-				}
-				//表格单元格rowspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('rowspan')) {
-					marks['rowspan'] = node.marks!['rowspan']
-				}
-			}
-			//处理需要保留的样式
-			// if (node.hasStyles()) {}
-			//自定义标记保留
-			if (typeof this.pasteKeepMarks == 'function') {
-				const extendMarks = this.pasteKeepMarks.apply(this, [node])
-				Object.assign(marks, extendMarks)
-			}
-			//自定义样式保留
-			if (typeof this.pasteKeepStyles == 'function') {
-				const extendStyles = this.pasteKeepStyles.apply(this, [node])
-				Object.assign(styles, extendStyles)
-			}
-			//将处理后的样式和标记给节点
-			node.marks = marks
-			node.styles = styles
-			//处理子节点
-			if (node.hasChildren()) {
-				handlerForPasteKeepMarksAndStyles.apply(this, [node.children!])
-			}
-		}
-	})
-}
-
-/**
- * 粘贴处理
- */
-const handlerForPasteDrop = async function (this: Editor, dataTransfer: DataTransfer) {
-	//html内容
-	const html = dataTransfer.getData('text/html')
-	//文本内容
-	const text = dataTransfer.getData('text/plain')
-	//文件数组
-	const files = dataTransfer.files
-	//有html内容并且允许粘贴html
-	if (html && this.allowPasteHtml) {
-		//将html转为节点数组
-		const nodes = this.htmlParseNode(html).filter(item => {
-			return !item.isEmpty()
-		})
-		//粘贴时对非文本节点的标记和样式的保留处理
-		handlerForPasteKeepMarksAndStyles.apply(this, [nodes])
-		//是否走默认逻辑
-		const useDefault = typeof this.onPasteHtml == 'function' ? await this.onPasteHtml.apply(this, [nodes, html]) : true
-		//走默认逻辑
-		if (useDefault) {
-			this.insertNode(nodes[0])
-			for (let i = nodes.length - 1; i >= 1; i--) {
-				this.addNodeAfter(nodes[i], nodes[0])
-			}
-			this.setSelectionAfter(nodes[nodes.length - 1], 'all')
-		}
-	}
-	//有文本内容
-	else if (text) {
-		//是否走默认逻辑
-		const useDefault = typeof this.onPasteText == 'function' ? await this.onPasteText.apply(this, [text]) : true
-		//走默认逻辑
-		if (useDefault) {
-			this.insertText(text)
-		}
-	}
-	//有文件
-	else if (files.length) {
-		const length = files.length
-		for (let i = 0; i < length; i++) {
-			//图片粘贴
-			if (files[i].type.startsWith('image/')) {
-				//是否走默认逻辑
-				const useDefault = typeof this.onPasteImage == 'function' ? await this.onPasteImage.apply(this, [files[i]]) : true
-				//走默认逻辑
-				if (useDefault) {
-					const url = await DapFile.dataFileToBase64(files[i])
-					const image = KNode.create({
-						type: 'closed',
-						tag: 'img',
-						marks: {
-							src: url,
-							alt: files[i].name || ''
-						}
-					})
-					this.insertNode(image)
-				}
-			}
-			//视频粘贴
-			else if (files[i].type.startsWith('video/')) {
-				//是否走默认逻辑
-				const useDefault = typeof this.onPasteVideo == 'function' ? await this.onPasteVideo.apply(this, [files[i]]) : true
-				//走默认逻辑
-				if (useDefault) {
-					const url = await DapFile.dataFileToBase64(files[i])
-					const video = KNode.create({
-						type: 'closed',
-						tag: 'video',
-						marks: {
-							src: url,
-							alt: files[i].name || ''
-						}
-					})
-					this.insertNode(video)
-				}
-			}
-			//其他文件粘贴
-			else if (typeof this.onPasteFile == 'function') {
-				this.onPasteFile.apply(this, [files[i]])
-			}
-		}
-	}
-}
+import { handlerForPasteDrop, redressSelection, updateSelection } from './function'
 
 /**
  * 监听selection
@@ -166,13 +19,13 @@ export const onSelectionChange = async function (this: Editor) {
 		return
 	}
 	//更新selection
-	const hasUpdate = this.updateSelection()
+	const hasUpdate = updateSelection.apply(this)
 	//没有更新
 	if (!hasUpdate) {
 		return
 	}
 	//进行纠正
-	const hasRedress = this.redressSelection()
+	const hasRedress = redressSelection.apply(this)
 	//有纠正
 	if (hasRedress) {
 		//则渲染真实光标
@@ -275,7 +128,7 @@ export const onComposition = async function (this: Editor, e: Event) {
 			parentNode.textContent = element.textContent || ''
 			//更新光标
 			if (this.isSelectionInNode(parentNode)) {
-				this.updateSelection()
+				updateSelection.apply(this)
 			}
 			//移除非法的文本
 			element.textContent = textContent

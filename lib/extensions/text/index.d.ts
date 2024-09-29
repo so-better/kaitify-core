@@ -1,6 +1,5 @@
 import { KNodeMarksType, KNodeStylesType } from '../../model';
 import { Extension } from '../Extension';
-
 declare module '../../model' {
     interface EditorCommandsType {
         setTextStyle?: (styles: KNodeStylesType) => Promise<void>;

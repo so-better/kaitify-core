@@ -1,4 +1,5 @@
-import { KNodeMarksType, KNodeStylesType, splitNodeToNodes } from '../../model'
+import { KNodeMarksType, KNodeStylesType } from '../../model'
+import { splitNodeToNodes } from '../../model/config/function'
 import { deleteProperty } from '../../tools'
 import { Extension } from '../Extension'
 
@@ -22,7 +23,7 @@ export const FontFamilyExtension = Extension.create({
 			}
 			node.marks = deleteProperty(marks, 'face')
 			node.tag = editor.textRenderTag
-			splitNodeToNodes(editor, node)
+			splitNodeToNodes.apply(editor, [node])
 		}
 	},
 	addCommands() {

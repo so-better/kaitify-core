@@ -3,7 +3,7 @@ import { Selection } from './Selection';
 import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
-
+import '../extensions/fontFamily';
 /**
  * 编辑器获取光标范围内节点数据的类型
  */
@@ -109,10 +109,6 @@ export type EditorConfigureOptionType = {
      * 插入段落时触发
      */
     onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void;
-    /**
-     * 光标在编辑器起始位置执行删除时触发
-     */
-    onDeleteInStart?: (this: Editor, blockNode: KNode) => void;
     /**
      * 完成删除时触发
      */
@@ -255,10 +251,6 @@ export declare class Editor {
      */
     onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void;
     /**
-     * 光标在编辑器起始位置执行删除时触发【初始化后不可修改】
-     */
-    onDeleteInStart?: (this: Editor, blockNode: KNode) => void;
-    /**
      * 完成删除时触发【初始化后不可修改】
      */
     onDeleteComplete?: (this: Editor) => void;
@@ -323,33 +315,13 @@ export declare class Editor {
      */
     internalCauseSelectionChange: boolean;
     /**
+     * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑
+     */
+    isUserDelection: boolean;
+    /**
      * dom监听【不可修改】
      */
     domObserver: MutationObserver | null;
-    /**
-     * 将后一个块节点与前一个块节点合并
-     */
-    mergeBlock(node: KNode, target: KNode): void;
-    /**
-     * 判断编辑器内的指定节点是否可以进行合并操作，parent表示和父节点进行合并，sibling表示和相邻节点进行合并，如果可以返回合并的对象节点
-     */
-    getAllowMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling'): KNode | null;
-    /**
-     * 对编辑器内的某个节点执行合并操作，parent表示和父节点进行合并，sibling表示和相邻节点进行合并（可能会更新光标）
-     */
-    applyMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling'): void;
-    /**
-     * 对节点数组使用指定规则进行格式化
-     */
-    formatNodes(rule: RuleFunctionType, nodes: KNode[]): void;
-    /**
-     * 清空固定块节点的内容
-     */
-    emptyFixedBlock(node: KNode): void;
-    /**
-     * 注册插件
-     */
-    registerExtension(extension: Extension): void;
     /**
      * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
      */
@@ -371,14 +343,6 @@ export declare class Editor {
      */
     isEditable(): boolean;
     /**
-     * 【API】初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
-     */
-    checkNodes(): void;
-    /**
-     * 【API】将编辑器内的某个非块级节点转为默认块级节点
-     */
-    convertToBlock(node: KNode): void;
-    /**
      * 【API】dom转KNode
      */
     domParseNode(dom: Node): KNode;
@@ -386,6 +350,10 @@ export declare class Editor {
      * 【API】html转KNode
      */
     htmlParseNode(html: string): KNode[];
+    /**
+     * 【API】将指定节点所在的块节点转为段落
+     */
+    toParagraph(node: KNode): void;
     /**
      * 【API】将指定节点添加到某个节点的子节点数组里
      */
@@ -399,31 +367,31 @@ export declare class Editor {
      */
     addNodeAfter(node: KNode, target: KNode): void;
     /**
-     * 【API】获取某个节点内的最后一个可以设置光标点的节点
+     * 【API】获取某个节点内的最后一个可以设置光标点的节点，包括自身
      */
     getLastSelectionNodeInChildren(node: KNode): KNode | null;
     /**
-     * 【API】获取某个节点内的第一个可以设置光标点的节点
+     * 【API】获取某个节点内的第一个可以设置光标点的节点，包括自身
      */
     getFirstSelectionNodeInChildren(node: KNode): KNode | null;
     /**
-     * 【API】查找指定节点之前可以设置为光标点的非空节点
+     * 【API】查找指定节点之前可以设置为光标点的非空节点，不包括自身
      */
     getPreviousSelectionNode(node: KNode): KNode | null;
     /**
-     * 【API】查找指定节点之后可以设置为光标点的非空节点
+     * 【API】查找指定节点之后可以设置为光标点的非空节点，不包括自身
      */
     getNextSelectionNode(node: KNode): KNode | null;
     /**
-     * 【API】设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+     * 【API】设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
      */
     setSelectionBefore(node?: KNode, type?: 'all' | 'start' | 'end' | undefined): void;
     /**
-     * 【API】设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+     * 【API】设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
      */
     setSelectionAfter(node?: KNode, type?: 'all' | 'start' | 'end' | undefined): void;
     /**
-     * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新
+     * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
      */
     updateSelectionRecently(type?: 'all' | 'start' | 'end' | undefined): void;
     /**
@@ -431,7 +399,7 @@ export declare class Editor {
      */
     isSelectionInNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean | undefined;
     /**
-     * 【API】获取光标选区内的节点
+     * 【API】获取光标选区内的节点数据
      */
     getSelectedNodes(): EditorSelectedType[];
     /**
@@ -439,7 +407,7 @@ export declare class Editor {
      */
     getMatchNodeBySelection(options: KNodeMatchOptionType): KNode | null;
     /**
-     * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的节点内（不一定是同一个节点）
+     * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
      */
     isSelectionNodesAllMatch(options: KNodeMatchOptionType): boolean;
     /**
@@ -451,11 +419,15 @@ export declare class Editor {
      */
     getFocusNodesBySelection(type?: 'all' | 'closed' | 'text' | undefined): KNode[];
     /**
+     * 【API】获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
+     */
+    getFocusSplitNodesBySelection(type?: 'all' | 'closed' | 'text' | undefined): KNode[];
+    /**
      * 【API】向选区插入文本
      */
     insertText(text: string): void;
     /**
-     * 【API】向选区进行换行
+     * 【API】向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
      */
     insertParagraph(): void;
     /**
@@ -469,15 +441,11 @@ export declare class Editor {
     /**
      * 【API】更新编辑器视图
      */
-    updateView(unPushHistory?: boolean | undefined): Promise<void>;
+    updateView(updateRealSelection?: boolean | undefined, unPushHistory?: boolean | undefined): Promise<void>;
     /**
      * 【API】根据selection更新编辑器真实光标
      */
     updateRealSelection(): Promise<void>;
-    /**
-     * 【API】根据真实光标更新selection，返回布尔值表示是否更新成功
-     */
-    updateSelection(): boolean;
     /**
      * 【API】销毁编辑器的方法
      */

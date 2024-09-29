@@ -1,4 +1,5 @@
-import { KNode, splitNodeToNodes } from '../../model'
+import { KNode } from '../../model'
+import { splitNodeToNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -17,7 +18,7 @@ export const CodeExtension = Extension.create({
 		//行内代码里只能有文本节点和闭合节点
 		if (node.isMatch({ tag: 'code' }) && node.hasChildren()) {
 			node.children!.forEach(item => {
-				splitNodeToNodes(editor, item)
+				splitNodeToNodes.apply(editor, [item])
 			})
 		}
 	},

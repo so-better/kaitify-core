@@ -1,5 +1,4 @@
-import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType } from '../model';
-
+import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType, Selection } from '../model';
 /**
  * 创建插件的入参类型
  */
@@ -32,6 +31,10 @@ export type ExtensionCreateOptionType = {
      * 视图更新后回调
      */
     afterUpdateView?: (this: Editor) => void;
+    /**
+     * 光标变化回调
+     */
+    onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
      * 自定义命令
      */
@@ -73,6 +76,10 @@ export declare class Extension {
      * 视图更新后回调
      */
     afterUpdateView?: (this: Editor) => void;
+    /**
+     * 光标变化回调
+     */
+    onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
      * 自定义命令
      */

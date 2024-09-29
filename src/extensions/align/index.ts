@@ -1,6 +1,7 @@
-import { getSelectionBlockNodes, KNode, KNodeStylesType } from '../../model'
+import { KNode, KNodeStylesType } from '../../model'
 import { deleteProperty } from '../../tools'
 import { Extension } from '../Extension'
+import { getSelectionBlockNodes } from '../../model/config/function'
 
 type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
@@ -46,7 +47,7 @@ export const AlignExtension = Extension.create({
 				return !!block.getMatchNode({ styles: { textAlign: val } })
 			}
 			//起点和终点不在一起
-			const blockNodes = getSelectionBlockNodes(this)
+			const blockNodes = getSelectionBlockNodes.apply(this)
 			return blockNodes.every(item => {
 				return item.getMatchNode({ styles: { textAlign: val } })
 			})
@@ -70,7 +71,7 @@ export const AlignExtension = Extension.create({
 			}
 			//起点和终点不在一起
 			else {
-				const blockNodes = getSelectionBlockNodes(this)
+				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
 					const styles: KNodeStylesType = item.hasStyles() ? item.styles! : {}
 					item.styles = {
@@ -96,7 +97,7 @@ export const AlignExtension = Extension.create({
 			}
 			//起点和终点不在一起
 			else {
-				const blockNodes = getSelectionBlockNodes(this)
+				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
 					clearAlign(item, val)
 				})

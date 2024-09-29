@@ -1,9 +1,8 @@
 import { Editor } from '../Editor';
-
 /**
  * 监听selection
  */
-export declare const onSelectionChange: (this: Editor) => void;
+export declare const onSelectionChange: (this: Editor) => Promise<void>;
 /**
  * 监听beforeinput
  */

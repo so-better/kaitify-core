@@ -1,4 +1,5 @@
-import { KNodeStylesType, splitNodeToNodes } from '../../model'
+import { KNodeStylesType } from '../../model'
+import { splitNodeToNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -19,7 +20,7 @@ export const ItalicExtension = Extension.create({
 				fontStyle: 'italic'
 			}
 			node.tag = editor.textRenderTag
-			splitNodeToNodes(editor, node)
+			splitNodeToNodes.apply(editor, [node])
 		}
 	},
 	addCommands() {

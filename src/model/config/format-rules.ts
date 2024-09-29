@@ -2,11 +2,12 @@ import { string as DapString } from 'dap-util'
 import { isZeroWidthText } from '../../tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
+import { applyMergeNode, getAllowMergeNode } from './function'
 
 /**
  * 格式化函数类型
  */
-export type RuleFunctionType = (opts: { editor: Editor; node: KNode }) => void
+export type RuleFunctionType = (state: { editor: Editor; node: KNode }) => void
 
 /**
  * 处理子节点中的块节点，如果父节点是行内节点则将块节点转为行内节点，如果块节点和其他节点并存亦将块节点转为行内节点
@@ -176,15 +177,15 @@ export const formatSiblingNodesMerge: RuleFunctionType = ({ editor, node }) => {
 		let index = 0
 		//因为父子节点的合并操作会导致children没有，此时判断一下hasChildren
 		while (node.hasChildren() && index <= node.children!.length - 2) {
-			const newTargetNode = editor.getAllowMergeNode(node.children![index], 'nextSibling')
+			const newTargetNode = getAllowMergeNode.apply(editor, [node.children![index], 'nextSibling'])
 			if (newTargetNode) {
 				//兄弟节点合并
-				editor.applyMergeNode(node.children![index], 'nextSibling')
+				applyMergeNode.apply(editor, [node.children![index], 'nextSibling'])
 				//合并完成后执行合并空白文本
 				formatZeroWidthTextMerge({ editor, node: node.children![index] })
 				//子节点合并后可能只有一个子节点了，此时进行父子节点合并操作
 				if (node.hasChildren() && node.children!.length == 1) {
-					editor.applyMergeNode(node.children![0], 'parent')
+					applyMergeNode.apply(editor, [node.children![0], 'parent'])
 				}
 				continue
 			}
@@ -200,13 +201,13 @@ export const formatParentNodeMerge: RuleFunctionType = ({ editor, node }) => {
 	//只有一个子节点
 	if ((node.isBlock() || node.isInline()) && node.hasChildren() && node.children!.length == 1) {
 		//父子节点进行合并
-		if (editor.getAllowMergeNode(node.children![0], 'parent')) {
-			editor.applyMergeNode(node.children![0], 'parent')
+		if (getAllowMergeNode.apply(editor, [node.children![0], 'parent'])) {
+			applyMergeNode.apply(editor, [node.children![0], 'parent'])
 			//父子节点合并后，可能父节点需要再和兄弟节点进行合并
-			if (editor.getAllowMergeNode(node, 'prevSibling')) {
-				editor.applyMergeNode(node, 'prevSibling')
-			} else if (editor.getAllowMergeNode(node, 'nextSibling')) {
-				editor.applyMergeNode(node, 'nextSibling')
+			if (getAllowMergeNode.apply(editor, [node, 'prevSibling'])) {
+				applyMergeNode.apply(editor, [node, 'prevSibling'])
+			} else if (getAllowMergeNode.apply(editor, [node, 'nextSibling'])) {
+				applyMergeNode.apply(editor, [node, 'nextSibling'])
 			}
 		}
 	}

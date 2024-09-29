@@ -1,4 +1,5 @@
 import { Editor } from '../Editor'
+import { updateSelection } from './function'
 
 /**
  * 判断是否合法dom
@@ -77,7 +78,7 @@ export const setDomObserve = (editor: Editor) => {
 					parentNode.textContent = mutationRecord.target.textContent || ''
 					//更新光标
 					if (editor.isSelectionInNode(parentNode)) {
-						editor.updateSelection()
+						updateSelection.apply(editor)
 					}
 					//这里先取消dom监听
 					removeDomObserve(editor)

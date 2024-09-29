@@ -1,5 +1,4 @@
 import { KNodeMarksType, KNodeStylesType } from '../model';
-
 /**
  * 用于KNode生成唯一的key
  */
@@ -44,3 +43,7 @@ export declare const isContains: (parent: Node, child: Node) => boolean;
  * 延迟指定时间
  */
 export declare const delay: (num?: number | undefined) => Promise<void>;
+/**
+ * 删除对象的某个属性
+ */
+export declare const deleteProperty: <T>(val: any, propertyName: string) => T;

@@ -1,4 +1,4 @@
-import { common as DapCommon, event as DapEvent, element as DapElement } from 'dap-util'
+import { event as DapEvent, element as DapElement } from 'dap-util'
 import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNodeStylesType } from './KNode'
 import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { blockParse, inlineParse, closedParse } from './config/dom-parse'
@@ -12,6 +12,7 @@ import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtensi
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
+import { checkNodes, emptyFixedBlock, formatNodes, mergeBlock, redressSelection, registerExtension } from './config/function'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -342,569 +343,6 @@ export class Editor {
 	domObserver: MutationObserver | null = null
 
 	/**
-	 * 该方法目前只为delete方法内部使用：将后一个块节点与前一个块节点合并
-	 */
-	mergeBlock(node: KNode, target: KNode) {
-		//不是块节点则不处理
-		if (!node.isBlock() || !target.isBlock()) {
-			return
-		}
-		//空节点不处理
-		if (node.isEmpty() || target.isEmpty()) {
-			return
-		}
-		const uneditableNode = node.getUneditable()
-		//是用户操作的删除行为并且前一个块节点是不可编辑的，则直接删除前一个块节点
-		if (this.isUserDelection && uneditableNode) {
-			uneditableNode.toEmpty()
-		}
-		//否则走正常删除逻辑
-		else {
-			const nodes = target.children!.map(item => {
-				item.parent = node
-				return item
-			})
-			node.children!.push(...nodes)
-			target.children = []
-		}
-	}
-
-	/**
-	 * 判断编辑器内的指定节点是否可以进行合并操作，parent表示和父节点进行合并，prevSibling表示和前一个兄弟节点进行合并，nextSibling表示和下一个兄弟节点合并，如果可以返回合并的对象节点
-	 */
-	getAllowMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling') {
-		//排除空节点
-		if (node.isEmpty()) {
-			return null
-		}
-		//排除没有父节点的节点
-		if (!node.parent) {
-			return null
-		}
-		//排除锁定的节点
-		if (node.locked) {
-			return null
-		}
-		//与前一个兄弟节点合并
-		if (type == 'prevSibling') {
-			const previousNode = node.getPrevious(node.parent.children!)
-			//没有兄弟节点
-			if (!previousNode) {
-				return null
-			}
-			//文本节点
-			if (node.isText()) {
-				//可以和前一个节点合并
-				if (previousNode.isText() && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
-					return previousNode
-				}
-				return null
-			}
-			//行内节点
-			if (node.isInline()) {
-				//可以和前一个节点合并
-				if (previousNode.isInline() && previousNode.tag == node.tag && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
-					return previousNode
-				}
-				return null
-			}
-			return null
-		}
-		//与后一个兄弟节点合并
-		if (type == 'nextSibling') {
-			const nextNode = node.getNext(node.parent.children!)
-			//没有兄弟节点
-			if (!nextNode) {
-				return null
-			}
-			//文本节点
-			if (node.isText()) {
-				//可以和后一个节点合并
-				if (nextNode.isText() && nextNode.isEqualMarks(node) && nextNode.isEqualStyles(node)) {
-					return nextNode
-				}
-				return null
-			}
-			//行内节点
-			if (node.isInline()) {
-				//可以和后一个节点合并
-				if (nextNode.isInline() && nextNode.tag == node.tag && nextNode.isEqualMarks(node) && nextNode.isEqualStyles(node)) {
-					return nextNode
-				}
-				return null
-			}
-			return null
-		}
-		//父子节点合并
-		if (type == 'parent') {
-			//父节点不止一个子节点
-			if (node.parent!.children!.length > 1) {
-				return null
-			}
-			//文本节点
-			if (node.isText()) {
-				//父节点是行内节点，并且渲染标签是文本标签
-				if (node.parent!.isInline() && node.parent!.tag == this.textRenderTag) {
-					return node.parent!
-				}
-				return null
-			}
-			//行内节点和块节点，如果渲染标签一致并且类型一致
-			if (node.type == node.parent!.type && node.tag == node.parent!.tag) {
-				return node.parent!
-			}
-			return null
-		}
-		return null
-	}
-
-	/**
-	 * 对编辑器内的某个节点执行合并操作，parent表示和父节点进行合并，prevSibling表示和前一个兄弟节点进行合并，nextSibling表示和下一个兄弟节点合并（可能会更新光标）
-	 */
-	applyMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling') {
-		//合并的对象节点
-		const targetNode = this.getAllowMergeNode(node, type)
-		if (!targetNode) {
-			return
-		}
-		//和前一个兄弟节点合并
-		if (type == 'prevSibling') {
-			//文本节点
-			if (node.isText()) {
-				//起点在前一个节点上
-				if (this.isSelectionInNode(targetNode, 'start')) {
-					this.selection.start!.node = node
-				}
-				//终点在前一个节点上
-				if (this.isSelectionInNode(targetNode, 'end')) {
-					this.selection.end!.node = node
-				}
-				//将前一个节点的文本内容给后一个节点
-				node.textContent = targetNode.textContent! + node.textContent!
-				//删除被合并的节点
-				const index = targetNode.parent!.children!.findIndex(item => {
-					return targetNode.isEqual(item)
-				})
-				targetNode.parent!.children!.splice(index, 1)
-			}
-			//行内节点
-			else if (node.isInline()) {
-				//合并前一个节点的子节点数组
-				node.children = [...targetNode.children!, ...node.children!].map(item => {
-					item.parent = node
-					return item
-				})
-				//删除被合并的节点
-				const index = targetNode.parent!.children!.findIndex(item => {
-					return targetNode.isEqual(item)
-				})
-				targetNode.parent!.children!.splice(index, 1)
-				//继续对子节点进行合并
-				if (node.hasChildren() && node.children!.length > 1) {
-					let index = 0
-					//因为父子节点的合并操作会导致children没有，此时判断一下hasChildren
-					while (node.hasChildren() && index <= node.children!.length - 2) {
-						const newTargetNode = this.getAllowMergeNode(node.children![index], 'nextSibling')
-						if (newTargetNode) {
-							this.applyMergeNode(node.children![index], 'nextSibling')
-							//子节点合并后可能只有一个子节点了，此时进行父子节点合并操作
-							if (node.hasChildren() && node.children!.length == 1) {
-								this.applyMergeNode(node.children![0], 'parent')
-							}
-							continue
-						}
-						index++
-					}
-				}
-			}
-		}
-		//和后一个节点合并
-		if (type == 'nextSibling') {
-			//文本节点
-			if (node.isText()) {
-				//起点在后一个节点上
-				if (this.isSelectionInNode(targetNode, 'start')) {
-					this.selection.start!.node = node
-					this.selection.start!.offset = node.textContent!.length + this.selection.start!.offset
-				}
-				//终点在后一个节点上
-				if (this.isSelectionInNode(targetNode, 'end')) {
-					this.selection.end!.node = node
-					this.selection.end!.offset = node.textContent!.length + this.selection.end!.offset
-				}
-				//将后一个节点的文本内容给前一个节点
-				node.textContent! += targetNode.textContent!
-				//删除被合并的节点
-				const index = targetNode.parent!.children!.findIndex(item => {
-					return targetNode.isEqual(item)
-				})
-				targetNode.parent!.children!.splice(index, 1)
-			}
-			//行内节点
-			else if (node.isInline()) {
-				//合并后一个节点的子节点数组
-				node.children = [...node.children!, ...targetNode.children!].map(item => {
-					item.parent = node
-					return item
-				})
-				//删除被合并的节点
-				const index = targetNode.parent!.children!.findIndex(item => {
-					return targetNode.isEqual(item)
-				})
-				targetNode.parent!.children!.splice(index, 1)
-				//继续对子节点进行合并
-				if (node.hasChildren() && node.children!.length > 1) {
-					let index = 0
-					//因为父子节点的合并操作会导致children没有，此时判断一下hasChildren
-					while (node.hasChildren() && index <= node.children!.length - 2) {
-						const newTargetNode = this.getAllowMergeNode(node.children![index], 'nextSibling')
-						if (newTargetNode) {
-							this.applyMergeNode(node.children![index], 'nextSibling')
-							//子节点合并后可能只有一个子节点了，此时进行父子节点合并操作
-							if (node.hasChildren() && node.children!.length == 1) {
-								this.applyMergeNode(node.children![0], 'parent')
-							}
-							continue
-						}
-						index++
-					}
-				}
-			}
-		}
-		//父子节点合并
-		if (type == 'parent') {
-			//文本节点
-			if (node.isText()) {
-				targetNode.type = 'text'
-				targetNode.tag = undefined
-				//如果子节点有标记
-				if (node.hasMarks()) {
-					if (targetNode.hasMarks()) {
-						Object.assign(targetNode.marks!, DapCommon.clone(node.marks!))
-					} else {
-						targetNode.marks = DapCommon.clone(node.marks!)
-					}
-				}
-				//如果子节点有样式
-				if (node.hasStyles()) {
-					if (targetNode.hasStyles()) {
-						Object.assign(targetNode.styles!, DapCommon.clone(node.styles!))
-					} else {
-						targetNode.styles = DapCommon.clone(node.styles!)
-					}
-				}
-				targetNode.textContent = node.textContent
-				targetNode.children = undefined
-				//如果起点在子节点上则更新到父节点上
-				if (this.isSelectionInNode(node, 'start')) {
-					this.selection.start!.node = targetNode
-				}
-				//如果终点在子节点上则更新到父节点上
-				if (this.isSelectionInNode(node, 'end')) {
-					this.selection.end!.node = targetNode
-				}
-			}
-			//行内节点或者块节点
-			else {
-				//如果子节点有标记
-				if (node.hasMarks()) {
-					if (targetNode.hasMarks()) {
-						Object.assign(targetNode.marks!, DapCommon.clone(node.marks))
-					} else {
-						targetNode.marks = DapCommon.clone(node.marks)
-					}
-				}
-				//如果子节点有样式
-				if (node.hasStyles()) {
-					if (targetNode.hasStyles()) {
-						Object.assign(targetNode.styles!, DapCommon.clone(node.styles))
-					} else {
-						targetNode.styles = DapCommon.clone(node.styles)
-					}
-				}
-				//如果子节点也有子节点
-				if (node.hasChildren()) {
-					targetNode.children = [...node.children!]
-					targetNode.children.forEach(item => {
-						item.parent = targetNode
-					})
-				}
-				//子节点与父节点合并后再对父节点进行处理
-				if (targetNode.hasChildren() && targetNode.children!.length == 1) {
-					//再次父子节点进行合并
-					if (this.getAllowMergeNode(targetNode.children![0], 'parent')) {
-						this.applyMergeNode(targetNode.children![0], 'parent')
-						//父子节点合并后，可能父节点需要再和兄弟节点进行合并
-						if (this.getAllowMergeNode(targetNode, 'prevSibling')) {
-							this.applyMergeNode(targetNode, 'prevSibling')
-						} else if (this.getAllowMergeNode(targetNode, 'nextSibling')) {
-							this.applyMergeNode(targetNode, 'nextSibling')
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 对节点数组使用指定规则进行格式化
-	 */
-	formatNodes(rule: RuleFunctionType, nodes: KNode[]) {
-		let i = 0
-		while (i < nodes.length) {
-			const node = nodes[i]
-			//空节点直接删除并且跳过本次循环
-			if (node.isEmpty()) {
-				if (this.isSelectionInNode(node, 'start')) {
-					this.updateSelectionRecently('start')
-				}
-				if (this.isSelectionInNode(node, 'end')) {
-					this.updateSelectionRecently('end')
-				}
-				nodes.splice(i, 1)
-				continue
-			}
-			//对节点使用该规则进行格式化
-			rule({ editor: this, node })
-			//格式化后变成空节点，进行删除，并且跳过本次循环
-			if (node.isEmpty()) {
-				if (this.isSelectionInNode(node, 'start')) {
-					this.updateSelectionRecently('start')
-				}
-				if (this.isSelectionInNode(node, 'end')) {
-					this.updateSelectionRecently('end')
-				}
-				//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
-				const index = nodes.findIndex(item => item.isEqual(node))
-				nodes.splice(index, 1)
-				continue
-			}
-			//如果当前节点不是块节点，但是却是在根部，则转为块节点
-			if (!node.isBlock() && this.stackNodes === nodes) {
-				this.convertToBlock(node)
-			}
-			//对子节点进行格式化
-			if (node.hasChildren()) {
-				this.formatNodes(rule, node.children!)
-			}
-			//子节点格式化后变成空节点，需要删除该节点，并且跳过本次循环
-			if (node.isEmpty()) {
-				if (this.isSelectionInNode(node, 'start')) {
-					this.updateSelectionRecently('start')
-				}
-				if (this.isSelectionInNode(node, 'end')) {
-					this.updateSelectionRecently('end')
-				}
-				//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
-				const index = nodes.findIndex(item => item.isEqual(node))
-				nodes.splice(index, 1)
-				continue
-			}
-			i++
-		}
-	}
-
-	/**
-	 * 清空固定块节点的内容
-	 */
-	emptyFixedBlock(node: KNode) {
-		if (!node.isBlock()) {
-			return
-		}
-		if (node.hasChildren()) {
-			node.children!.forEach(item => {
-				//如果是固定的块节点
-				if (item.isBlock() && item.fixed) {
-					this.emptyFixedBlock(item)
-				}
-				//其他情况下
-				else {
-					item.toEmpty()
-					if (item.parent!.isEmpty()) {
-						const placeholderNode = KNode.createPlaceholder()
-						this.addNode(placeholderNode, item.parent!)
-					}
-				}
-			})
-		}
-	}
-
-	/**
-	 * 注册插件
-	 */
-	registerExtension(extension: Extension) {
-		//是否已注册
-		if (extension.registered) return
-		//设置已注册
-		extension.registered = true
-
-		if (extension.extraKeepTags) {
-			this.extraKeepTags = [...extension.extraKeepTags, ...this.extraKeepTags]
-		}
-		if (extension.domParseNodeCallback) {
-			const fn = this.domParseNodeCallback
-			this.domParseNodeCallback = (node: KNode) => {
-				node = extension.domParseNodeCallback!.apply(this, [node])
-				if (fn) node = fn.apply(this, [node])
-				return node
-			}
-		}
-		if (extension.formatRule) {
-			this.formatRules = [extension.formatRule, ...this.formatRules]
-		}
-		if (extension.pasteKeepMarks) {
-			const fn = this.pasteKeepMarks
-			this.pasteKeepMarks = (node: KNode) => {
-				const marks = extension.pasteKeepMarks!.apply(this, [node])
-				if (fn) Object.assign(marks, fn.apply(this, [node]))
-				return marks
-			}
-		}
-		if (extension.pasteKeepStyles) {
-			const fn = this.pasteKeepStyles
-			this.pasteKeepStyles = (node: KNode) => {
-				const styles = extension.pasteKeepStyles!.apply(this, [node])
-				if (fn) Object.assign(styles, fn.apply(this, [node]))
-				return styles
-			}
-		}
-		if (extension.afterUpdateView) {
-			const fn = this.afterUpdateView
-			this.afterUpdateView = () => {
-				extension.afterUpdateView!.apply(this)
-				if (fn) fn.apply(this)
-			}
-		}
-		if (extension.onSelectionUpdate) {
-			const fn = this.onSelectionUpdate
-			this.onSelectionUpdate = (selection: Selection) => {
-				extension.onSelectionUpdate!.apply(this, [selection])
-				if (fn) fn.apply(this, [selection])
-			}
-		}
-		if (extension.addCommands) {
-			const commands = extension.addCommands.apply(this)
-			this.commands = { ...this.commands, ...commands }
-		}
-	}
-
-	/**
-	 * 根据真实光标更新selection，返回布尔值表示是否更新成功
-	 */
-	updateSelection() {
-		if (!this.$el) {
-			return false
-		}
-		const realSelection = window.getSelection()
-		if (realSelection && realSelection.rangeCount) {
-			const range = realSelection.getRangeAt(0)
-			//光标在编辑器内
-			if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
-				//如果光标起点是文本
-				if (range.startContainer.nodeType == 3) {
-					this.selection.start = {
-						node: this.findNode(range.startContainer.parentNode as HTMLElement),
-						offset: range.startOffset
-					}
-				}
-				//如果光标起点是元素
-				else if (range.startContainer.nodeType == 1) {
-					const childDoms = Array.from(range.startContainer.childNodes)
-					//存在子元素
-					if (childDoms.length) {
-						const dom = childDoms[range.startOffset] ? childDoms[range.startOffset] : childDoms[range.startOffset - 1]
-						//元素
-						if (dom.nodeType == 1) {
-							if (childDoms[range.startOffset]) {
-								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'start')
-							} else {
-								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'start')
-							}
-						}
-						//文本
-						else if (dom.nodeType == 3) {
-							this.selection.start = {
-								node: this.findNode(dom.parentNode as HTMLElement),
-								offset: childDoms[range.startOffset] ? 0 : dom.textContent!.length
-							}
-						}
-					}
-					//没有子元素，应当是闭合节点
-					else {
-						this.selection.start = {
-							node: this.findNode(range.startContainer as HTMLElement),
-							offset: 0
-						}
-					}
-				}
-				//如果光标终点是文本
-				if (range.endContainer.nodeType == 3) {
-					this.selection.end = {
-						node: this.findNode(range.endContainer.parentNode as HTMLElement),
-						offset: range.endOffset
-					}
-				}
-				//如果光标终点是元素
-				else if (range.endContainer.nodeType == 1) {
-					const childDoms = Array.from(range.endContainer.childNodes)
-					//存在子元素
-					if (childDoms.length) {
-						const dom = childDoms[range.endOffset] ? childDoms[range.endOffset] : childDoms[range.endOffset - 1]
-						//元素
-						if (dom.nodeType == 1) {
-							if (childDoms[range.endOffset]) {
-								this.setSelectionBefore(this.findNode(dom as HTMLElement), 'end')
-							} else {
-								this.setSelectionAfter(this.findNode(dom as HTMLElement), 'end')
-							}
-						}
-						//文本
-						else if (dom.nodeType == 3) {
-							this.selection.end = {
-								node: this.findNode(dom.parentNode as HTMLElement),
-								offset: childDoms[range.endOffset] ? 0 : dom.textContent!.length
-							}
-						}
-					}
-					//没有子元素，应当是闭合节点
-					else {
-						this.selection.end = {
-							node: this.findNode(range.endContainer as HTMLElement),
-							offset: 1
-						}
-					}
-				}
-				return true
-			}
-		}
-		return false
-	}
-
-	/**
-	 * 纠正光标位置，返回布尔值表示是否存在纠正行为
-	 */
-	redressSelection() {
-		if (!this.selection.focused()) {
-			return false
-		}
-		let startNode = this.selection.start!.node
-		let endNode = this.selection.end!.node
-		let startOffset = this.selection.start!.offset
-		let endOffset = this.selection.end!.offset
-
-		//起点和终点是相邻的两个节点并且位置紧邻则纠正光标位置
-		const startNextNode = this.getNextSelectionNode(startNode)
-		if (startNextNode && startNextNode.isEqual(endNode) && startOffset == (startNode.isText() ? startNode.textContent!.length : 1) && endOffset == 0) {
-			endNode = startNode
-			endOffset = startOffset
-			this.selection.end!.node = endNode
-			this.selection.end!.offset = endOffset
-			return true
-		}
-		return false
-	}
-
-	/**
 	 * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
 	 */
 	scrollViewToSelection() {
@@ -1034,53 +472,6 @@ export class Editor {
 	 */
 	isEditable() {
 		return this.$el?.getAttribute('contenteditable') == 'true'
-	}
-
-	/**
-	 * 【API】初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
-	 */
-	checkNodes() {
-		const nodes = this.stackNodes.filter(item => {
-			return !item.isEmpty() && !this.voidRenderTags.includes(item.tag!)
-		})
-		if (nodes.length == 0) {
-			const node = KNode.create({
-				type: 'block',
-				tag: this.blockRenderTag
-			})
-			const placeholder = KNode.createPlaceholder()
-			this.addNode(placeholder, node)
-			this.stackNodes = [node]
-			if (this.selection.focused()) {
-				this.setSelectionBefore(placeholder)
-			}
-		}
-	}
-
-	/**
-	 * 【API】将编辑器内的某个非块级节点转为默认块级节点
-	 */
-	convertToBlock(node: KNode) {
-		if (node.isBlock()) {
-			return
-		}
-		const newNode = node.clone(true)
-		//该节点是文本节点和闭合节点，处理光标问题
-		if (node.isText() || node.isClosed()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.selection.start!.node = newNode
-			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.selection.end!.node = newNode
-			}
-		}
-		node.type = 'block'
-		node.tag = this.blockRenderTag
-		node.marks = undefined
-		node.styles = undefined
-		node.textContent = undefined
-		node.children = [newNode]
-		newNode.parent = node
 	}
 
 	/**
@@ -1264,7 +655,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取某个节点内的最后一个可以设置光标点的节点
+	 * 【API】获取某个节点内的最后一个可以设置光标点的节点，包括自身
 	 */
 	getLastSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -1294,7 +685,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取某个节点内的第一个可以设置光标点的节点
+	 * 【API】获取某个节点内的第一个可以设置光标点的节点，包括自身
 	 */
 	getFirstSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -1324,7 +715,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】查找指定节点之前可以设置为光标点的非空节点
+	 * 【API】查找指定节点之前可以设置为光标点的非空节点，不包括自身
 	 */
 	getPreviousSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -1352,7 +743,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】查找指定节点之后可以设置为光标点的非空节点
+	 * 【API】查找指定节点之后可以设置为光标点的非空节点，不包括自身
 	 */
 	getNextSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -1380,7 +771,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】设置光标到指定节点头部，如果没有指定节点则设置光标到编辑器头部，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+	 * 【API】设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionBefore(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -1428,7 +819,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】设置光标到指定节点的末尾，如果没有指定节点则设置光标到编辑器末尾，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+	 * 【API】设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionAfter(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -1476,7 +867,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新
+	 * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
 	 */
 	updateSelectionRecently(type: 'all' | 'start' | 'end' | undefined = 'all') {
 		if (!this.selection.focused()) {
@@ -1540,7 +931,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取光标选区内的节点
+	 * 【API】获取光标选区内的节点数据
 	 */
 	getSelectedNodes(): EditorSelectedType[] {
 		//没有聚焦或者没有选区
@@ -1677,7 +1068,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的节点内（不一定是同一个节点）
+	 * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
 	 */
 	isSelectionNodesAllMatch(options: KNodeMatchOptionType) {
 		//没有聚焦
@@ -2169,7 +1560,7 @@ export class Editor {
 						}
 						//光标在块节点的开始处并且块节点不是固定的
 						else if (!blockNode.fixed) {
-							this.mergeBlock(previousBlock, blockNode)
+							mergeBlock.apply(this, [previousBlock, blockNode])
 						}
 					}
 					//前一个可设置光标的节点不存在，说明在编辑器开始处
@@ -2280,7 +1671,7 @@ export class Editor {
 				else {
 					//固定状态的块节点，进行清空处理
 					if (node.isBlock() && node.fixed) {
-						this.emptyFixedBlock(node)
+						emptyFixedBlock.apply(this, [node])
 					}
 					//其他节点置空进行删除
 					else {
@@ -2313,7 +1704,7 @@ export class Editor {
 				}
 				//不是固定的块节点
 				if (!endBlockNode.fixed) {
-					this.mergeBlock(startBlockNode, endBlockNode)
+					mergeBlock.apply(this, [startBlockNode, endBlockNode])
 				}
 			}
 		}
@@ -2358,12 +1749,12 @@ export class Editor {
 			//最终判断是否有需要格式化的节点进行格式化
 			if (node) {
 				this.formatRules.forEach(rule => {
-					this.formatNodes(rule, node.parent ? node.parent.children! : this.stackNodes)
+					formatNodes.apply(this, [rule, node.parent ? node.parent.children! : this.stackNodes])
 				})
 			}
 		})
 		//判断节点数组是否为空进行初始化
-		this.checkNodes()
+		checkNodes.apply(this)
 		//旧的html值
 		const oldHtml = this.$el.innerHTML
 		//视图更新之前取消dom监听，以免干扰更新dom
@@ -2406,7 +1797,7 @@ export class Editor {
 		//聚焦情况下
 		if (this.selection.focused()) {
 			//先进行纠正
-			this.redressSelection()
+			redressSelection.apply(this)
 			//更新真实光标
 			const range = document.createRange()
 			const startDom = this.findDom(this.selection.start!.node)
@@ -2498,17 +1889,17 @@ export class Editor {
 		if (options.pasteKeepStyles) editor.pasteKeepStyles = options.pasteKeepStyles
 		if (options.afterUpdateView) editor.afterUpdateView = options.afterUpdateView
 		//注册插件
-		editor.extensions.forEach(item => editor.registerExtension(item))
+		editor.extensions.forEach(item => registerExtension.apply(editor, [item]))
 		//设置编辑器是否可编辑
 		editor.setEditable(typeof options.editable == 'boolean' ? options.editable : true)
 		//根据value设置节点数组
 		editor.stackNodes = editor.htmlParseNode(options.value || '')
 		//将节点数组进行格式化
 		editor.formatRules.forEach(rule => {
-			editor.formatNodes(rule, editor.stackNodes)
+			formatNodes.apply(editor, [rule, editor.stackNodes])
 		})
 		//初始化检查节点数组
-		editor.checkNodes()
+		checkNodes.apply(editor)
 		//进行视图的渲染
 		const useDefault = typeof editor.onUpdateView == 'function' ? await editor.onUpdateView.apply(editor, [true]) : true
 		//使用默认逻辑

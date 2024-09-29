@@ -1,4 +1,5 @@
-import { KNode, KNodeMarksType, splitNodeToNodes } from '../../model'
+import { KNode, KNodeMarksType } from '../../model'
+import { splitNodeToNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
 
 /**
@@ -42,7 +43,7 @@ export const LinkExtension = Extension.create({
 		//链接里只能有文本节点和闭合节点
 		if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
 			node.children!.forEach(item => {
-				splitNodeToNodes(editor, item)
+				splitNodeToNodes.apply(editor, [item])
 			})
 		}
 	},

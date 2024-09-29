@@ -1,10 +1,9 @@
 import { Editor } from '../Editor';
 import { KNode } from '../KNode';
-
 /**
  * 格式化函数类型
  */
-export type RuleFunctionType = (opts: {
+export type RuleFunctionType = (state: {
     editor: Editor;
     node: KNode;
 }) => void;
@@ -13,9 +12,9 @@ export type RuleFunctionType = (opts: {
  */
 export declare const formatBlockInChildren: RuleFunctionType;
 /**
- * 处理一些需要转为文本节点的特殊节点
+ * 处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符 & 重置不可编辑节点内的光标位置
  */
-export declare const formatInlineParseText: RuleFunctionType;
+export declare const formatUneditableNoodes: RuleFunctionType;
 /**
  * 处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）
  */
