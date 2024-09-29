@@ -3,6 +3,7 @@ import { Extension } from '../Extension'
 
 export const BlockExtension = Extension.create({
 	name: 'block',
+	//块节点粘贴时保留的样式
 	pasteKeepStyles(node) {
 		const styles: KNodeStylesType = {}
 		if (node.isBlock() && node.hasStyles()) {
@@ -12,7 +13,9 @@ export const BlockExtension = Extension.create({
 		}
 		return styles
 	},
-	//处理子节点中的块节点，如果父节点是行内节点则将块节点转为行内节点，如果块节点和其他节点并存亦将块节点转为行内节点
+	//处理子节点中的块节点
+	//父节点是行内节点则将块节点转为行内节点
+	//块节点和其他节点并存亦将块节点转为行内节点
 	formatRule({ node }) {
 		//当前节点存在子节点
 		if (node.hasChildren() && !node.isEmpty()) {
