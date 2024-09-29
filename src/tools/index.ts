@@ -1,5 +1,5 @@
 import { data as DapData, element as DapElement } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../model'
+import { KNodeMarksType, KNodeStylesType } from '../model'
 import { NODE_MARK } from '../view'
 
 /**
@@ -143,18 +143,14 @@ export const delay = (num: number | undefined = 0) => {
 }
 
 /**
- * 打散指定的节点，将其分裂成多个节点，如果子孙节点还有子节点则继续打散
+ * 删除对象的某个属性
  */
-export const splitNodeToNodes = (editor: Editor, node: KNode) => {
-	if (node.hasChildren()) {
-		node.children!.forEach(item => {
-			if (!item.isClosed()) {
-				item.marks = { ...(item.marks || {}), ...(node.marks || {}) }
-				item.styles = { ...(item.styles || {}), ...(node.styles || {}) }
-			}
-			editor.addNodeBefore(item, node)
-			splitNodeToNodes(editor, item)
-		})
-		node.children = []
-	}
+export const deleteProperty = <T>(val: any, propertyName: string) => {
+	const newObj: any = {}
+	Object.keys(val).forEach(key => {
+		if (key != propertyName) {
+			newObj[key] = val[key]
+		}
+	})
+	return newObj as T
 }
