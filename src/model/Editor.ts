@@ -364,7 +364,7 @@ export class Editor {
 	}
 
 	/**
-	 * 判断编辑器内的指定节点是否可以进行合并操作，parent表示和父节点进行合并，sibling表示和相邻节点进行合并，如果可以返回合并的对象节点
+	 * 判断编辑器内的指定节点是否可以进行合并操作，parent表示和父节点进行合并，prevSibling表示和前一个兄弟节点进行合并，nextSibling表示和下一个兄弟节点合并，如果可以返回合并的对象节点
 	 */
 	getAllowMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling') {
 		//排除空节点
@@ -453,7 +453,7 @@ export class Editor {
 	}
 
 	/**
-	 * 对编辑器内的某个节点执行合并操作，parent表示和父节点进行合并，sibling表示和相邻节点进行合并（可能会更新光标）
+	 * 对编辑器内的某个节点执行合并操作，parent表示和父节点进行合并，prevSibling表示和前一个兄弟节点进行合并，nextSibling表示和下一个兄弟节点合并（可能会更新光标）
 	 */
 	applyMergeNode(node: KNode, type: 'parent' | 'prevSibling' | 'nextSibling') {
 		//合并的对象节点

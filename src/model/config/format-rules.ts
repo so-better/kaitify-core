@@ -254,7 +254,10 @@ export const formatSiblingNodesMerge: RuleFunctionType = ({ editor, node }) => {
 		while (node.hasChildren() && index <= node.children!.length - 2) {
 			const newTargetNode = editor.getAllowMergeNode(node.children![index], 'nextSibling')
 			if (newTargetNode) {
+				//兄弟节点合并
 				editor.applyMergeNode(node.children![index], 'nextSibling')
+				//合并完成后执行合并空白文本
+				formatZeroWidthTextMerge({ editor, node: node.children![index] })
 				//子节点合并后可能只有一个子节点了，此时进行父子节点合并操作
 				if (node.hasChildren() && node.children!.length == 1) {
 					editor.applyMergeNode(node.children![0], 'parent')

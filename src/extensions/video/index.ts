@@ -149,33 +149,6 @@ export const VideoExtension = Extension.create({
 			videoResizable(this, el, node)
 		})
 	},
-	// onSelectionUpdate(selection) {
-	// 	//没有聚焦
-	// 	if (!selection.focused() || selection.collapsed()) {
-	// 		return
-	// 	}
-	// 	//起点和终点不在一起的情况，获取所有闭合节点进行判断
-	// 	const focusNodes = this.getFocusNodesBySelection('closed')
-	// 	if (focusNodes.length == 0) {
-	// 		return
-	// 	}
-	// 	let hasUpdate = false
-	// 	focusNodes.forEach(node => {
-	// 		if (node.isMatch({ tag: 'video' })) {
-	// 			if (node.hasMarks()) {
-	// 				node.marks!['kaitify-selection'] = ''
-	// 			} else {
-	// 				node.marks = {
-	// 					'kaitify-selection': ''
-	// 				}
-	// 			}
-	// 			hasUpdate = true
-	// 		}
-	// 	})
-	// 	if (hasUpdate) {
-	// 		this.updateView(false)
-	// 	}
-	// },
 	addCommands() {
 		/**
 		 * 获取光标所在的视频，如果光标不在一个视频内，返回null

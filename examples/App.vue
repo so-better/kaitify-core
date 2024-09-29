@@ -23,7 +23,7 @@ const onClick2 = () => {
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<h2><span contenteditable="false">我是一个不可编辑的文本</span><span contenteditable="false" style="font-size:20px;">我是一个不可编辑的文本</span></h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5 contenteditable="false">我是一个<span style="color:red;">333</span>不可编辑的段落</h5><h6>我是一个段落</h6><p>我是一个段落<code>Kaitify Editor</code></p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video autoplay loop muted src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
+    value: `<h2><span contenteditable="false">我是一个不可编辑的文本</span><span contenteditable="false" style="font-size:20px;">我是一个不可编辑的文本</span></h2><h3 style="text-align:right;">我是一个段落</h3><h4>我是一个段落</h4><h5 contenteditable="false">我是一个<span style="color:red;">333</span>不可编辑的段落</h5><h6>我是一个段落</h6><p>我是一个段落<code>Kaitify Editor</code></p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video autoplay loop muted src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" controls alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
