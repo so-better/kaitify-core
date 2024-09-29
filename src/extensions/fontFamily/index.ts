@@ -1,5 +1,5 @@
-import { KNodeMarksType, KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../tools'
+import { KNodeMarksType, KNodeStylesType, splitNodeToNodes } from '../../model'
+import { deleteProperty } from '../../tools'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -20,8 +20,7 @@ export const FontFamilyExtension = Extension.create({
 				...styles,
 				fontFamily: (marks.face as string) || ''
 			}
-			delete marks.face
-			node.marks = marks
+			node.marks = deleteProperty(marks, 'face')
 			node.tag = editor.textRenderTag
 			splitNodeToNodes(editor, node)
 		}

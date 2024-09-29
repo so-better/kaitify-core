@@ -1,5 +1,4 @@
-import { KNode, KNodeMarksType } from '../../model'
-import { splitNodeToNodes } from '../../tools'
+import { KNode, KNodeMarksType, splitNodeToNodes } from '../../model'
 import { Extension } from '../Extension'
 
 /**

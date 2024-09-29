@@ -1,4 +1,4 @@
-import { common as DapCommon } from 'dap-util'
+import { common as DapCommon, string as DapString, color as DapColor } from 'dap-util'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 
@@ -72,7 +72,31 @@ const isTextNodeMark = (node: KNode, markName: string, markValue?: string | numb
 const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | number) => {
 	if (node.hasStyles()) {
 		if (styleValue) {
-			return node.styles![styleName] == styleValue
+			let ownValue = node.styles![styleName]
+			//是字符串先将值转为小写
+			if (typeof styleValue == 'string') {
+				styleValue = styleValue.toLocaleLowerCase()
+			}
+			if (typeof ownValue == 'string') {
+				ownValue = ownValue.toLocaleLowerCase()
+			}
+			//是rgb或者rgba格式，则去除空格
+			if (typeof styleValue == 'string' && styleValue && (DapCommon.matchingText(styleValue, 'rgb') || DapCommon.matchingText(styleValue, 'rgba'))) {
+				styleValue = DapString.trim(styleValue, true)
+			}
+			if (typeof ownValue == 'string' && ownValue && (DapCommon.matchingText(ownValue, 'rgb') || DapCommon.matchingText(ownValue, 'rgba'))) {
+				ownValue = DapString.trim(ownValue, true)
+			}
+			//是十六进制值，转为rgb值
+			if (typeof styleValue == 'string' && styleValue && DapCommon.matchingText(styleValue, 'hex')) {
+				const arr = DapColor.hex2rgb(styleValue)
+				styleValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+			}
+			if (typeof ownValue == 'string' && ownValue && DapCommon.matchingText(ownValue, 'hex')) {
+				const arr = DapColor.hex2rgb(ownValue)
+				ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+			}
+			return ownValue == styleValue
 		}
 		return node.styles!.hasOwnProperty(styleName)
 	}

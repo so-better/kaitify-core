@@ -1,5 +1,4 @@
-import { KNode } from '../../model'
-import { splitNodeToNodes } from '../../tools'
+import { KNode, splitNodeToNodes } from '../../model'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -54,9 +53,6 @@ export const CodeExtension = Extension.create({
 		 * 设置行内代码
 		 */
 		const setCode = async () => {
-			if (!this.selection.focused()) {
-				return
-			}
 			if (allCode()) {
 				return
 			}
@@ -110,9 +106,6 @@ export const CodeExtension = Extension.create({
 		 * 取消行内代码
 		 */
 		const unsetCode = async () => {
-			if (!this.selection.focused()) {
-				return
-			}
 			if (!allCode()) {
 				return
 			}
