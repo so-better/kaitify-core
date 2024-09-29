@@ -19,7 +19,7 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-  editor.value!.commands.allCode!() ? editor.value!.commands.unsetCode!() : editor.value!.commands.setCode!()
+  editor.value!.commands.isBackColor!('#9876f3') ? editor.value!.commands.unsetBackColor!('#9876f3') : editor.value!.commands.setBackColor!('#9876f3')
 }
 
 onMounted(async () => {

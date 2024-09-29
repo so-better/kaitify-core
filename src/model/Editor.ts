@@ -8,7 +8,7 @@ import { formatInlineParseText, formatBlockInChildren, formatSiblingNodesMerge, 
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { removeDomObserve, setDomObserve } from './config/dom-observe'
-import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension } from '../extensions'
+import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, ColorExtension, BackColorExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
@@ -220,7 +220,7 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [ImageExtension, VideoExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, FontFamilyExtension]
+	extensions: Extension[] = [ImageExtension, VideoExtension, TextExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, FontFamilyExtension, ColorExtension, BackColorExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */
@@ -333,7 +333,7 @@ export class Editor {
 	 */
 	internalCauseSelectionChange: boolean = false
 	/**
-	 * 是否用户操作的删除行为
+	 * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑
 	 */
 	isUserDelection: boolean = false
 	/**
