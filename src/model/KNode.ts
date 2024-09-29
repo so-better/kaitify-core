@@ -460,19 +460,20 @@ export class KNode {
 	/**
 	 * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
 	 */
-	firstTextClosedInNode = (node: KNode) => {
-		//如果不是闭合节点和文本节点则返回false
+	firstTextClosedInNode = (node: KNode): boolean => {
+		//不是闭合节点和文本节点
 		if (!this.isText() && !this.isClosed()) {
 			return false
 		}
-		//如果是同一个节点返回false
+		//是同一个节点
 		if (this.isEqual(node)) {
-			return false
+			return true
 		}
-		//如果目标节点包含当前节点
-		if (node.isContains(this)) {
-			const nodes = KNode.flat(node.children!).filter(item => item.isText() || item.isClosed())
-			return this.isEqual(nodes[0])
+		//目标节点包含当前节点
+		if (node.isContains(this) && node.hasChildren()) {
+			//获取第一个子节点
+			const firstChild = node.children![0]
+			return this.firstTextClosedInNode(firstChild)
 		}
 		return false
 	}
@@ -480,19 +481,20 @@ export class KNode {
 	/**
 	 * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个
 	 */
-	lastTextClosedInNode(node: KNode) {
-		//如果不是闭合节点和文本节点则返回false
+	lastTextClosedInNode(node: KNode): boolean {
+		//不是闭合节点和文本节点
 		if (!this.isText() && !this.isClosed()) {
 			return false
 		}
-		//如果是同一个节点返回false
+		//是同一个节点
 		if (this.isEqual(node)) {
-			return false
+			return true
 		}
-		//如果目标节点包含当前节点
-		if (node.isContains(this)) {
-			const nodes = KNode.flat(node.children!).filter(item => item.isText() || item.isClosed())
-			return this.isEqual(nodes[nodes.length - 1])
+		//目标节点包含当前节点
+		if (node.isContains(this) && node.hasChildren()) {
+			//获取最后一个子节点
+			const lastChild = node.children![node.children!.length - 1]
+			return this.lastTextClosedInNode(lastChild)
 		}
 		return false
 	}

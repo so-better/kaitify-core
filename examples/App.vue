@@ -28,10 +28,11 @@ onMounted(async () => {
     editable: true,
     allowPasteHtml: true,
     onSelectionUpdate(sel) {
-      console.log(sel);
+
 
     }
   })
+
 })
 </script>
 <style lang="less">
