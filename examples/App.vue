@@ -19,7 +19,7 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-  editor.value!.commands.isBold!() ? editor.value!.commands.unsetBold!() : editor.value!.commands.setBold!()
+  editor.value!.commands.clearFormat!() 
 }
 
 onMounted(async () => {

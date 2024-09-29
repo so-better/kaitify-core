@@ -4,12 +4,13 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		setTextStyle?: (styles: KNodeStylesType) => Promise<void>
-		setTextMark?: (marks: KNodeMarksType) => Promise<void>
-		removeTextStyle?: (styleNames?: string[]) => Promise<void>
-		removeTextMark?: (markNames?: string[]) => Promise<void>
 		isTextStyle?: (styleName: string, styleValue?: string | number) => boolean
 		isTextMark?: (markName: string, markValue?: string | number) => boolean
+		setTextStyle?: (styles: KNodeStylesType, updateView?: boolean) => Promise<void>
+		setTextMark?: (marks: KNodeMarksType, updateView?: boolean) => Promise<void>
+		removeTextStyle?: (styleNames?: string[], updateView?: boolean) => Promise<void>
+		removeTextMark?: (markNames?: string[], updateView?: boolean) => Promise<void>
+		clearFormat?: () => Promise<void>
 	}
 }
 
@@ -149,7 +150,7 @@ export const TextExtension = Extension.create({
 		/**
 		 * 设置光标所在文本样式
 		 */
-		const setTextStyle = async (styles: KNodeStylesType) => {
+		const setTextStyle = async (styles: KNodeStylesType, updateView: boolean | undefined = true) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -201,13 +202,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			await this.updateView()
+			if (updateView) await this.updateView()
 		}
 
 		/**
 		 * 设置光标所在文本标记
 		 */
-		const setTextMark = async (marks: KNodeMarksType) => {
+		const setTextMark = async (marks: KNodeMarksType, updateView: boolean | undefined = true) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -259,13 +260,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			await this.updateView()
+			if (updateView) await this.updateView()
 		}
 
 		/**
 		 * 移除光标所在文本样式
 		 */
-		const removeTextStyle = async (styleNames?: string[]) => {
+		const removeTextStyle = async (styleNames?: string[], updateView: boolean | undefined = true) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -295,13 +296,13 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			await this.updateView()
+			if (updateView) await this.updateView()
 		}
 
 		/**
 		 * 移除光标所在文本标记
 		 */
-		const removeTextMark = async (markNames?: string[]) => {
+		const removeTextMark = async (markNames?: string[], updateView: boolean | undefined = true) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -331,7 +332,15 @@ export const TextExtension = Extension.create({
 				})
 			}
 			//更新视图
-			await this.updateView()
+			if (updateView) await this.updateView()
+		}
+
+		/**
+		 * 清除格式
+		 */
+		const clearFormat = async () => {
+			await removeTextMark(undefined, false)
+			await removeTextStyle()
 		}
 
 		return {
@@ -340,7 +349,8 @@ export const TextExtension = Extension.create({
 			setTextStyle,
 			setTextMark,
 			removeTextStyle,
-			removeTextMark
+			removeTextMark,
+			clearFormat
 		}
 	}
 })
