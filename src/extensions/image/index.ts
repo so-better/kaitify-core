@@ -111,7 +111,7 @@ export const ImageExtension = Extension.create({
 	name: 'image',
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
-		if (node.tag == 'img' && node.hasMarks()) {
+		if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
 			if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
 			if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
 		}
@@ -119,7 +119,7 @@ export const ImageExtension = Extension.create({
 	},
 	pasteKeepStyles(node) {
 		const styles: KNodeStylesType = {}
-		if (node.tag == 'img' && node.hasStyles()) {
+		if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
 			styles['width'] = node.styles!['width'] || 'auto'
 		}
 		return styles

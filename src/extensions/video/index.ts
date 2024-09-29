@@ -24,6 +24,18 @@ declare module '../../model' {
 }
 
 /**
+ * 获取最大宽度
+ */
+const getMaxWidth = (element: HTMLElement): number => {
+	const parentElement = element.parentElement!
+	let maxWidth = DapElement.width(parentElement)
+	if (!maxWidth) {
+		maxWidth = getMaxWidth(parentElement)
+	}
+	return maxWidth
+}
+
+/**
  * 设置视频选中
  */
 const videoFocus = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
@@ -39,7 +51,7 @@ const videoFocus = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
  */
 const videoResizable = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
 	//获取父元素宽度
-	const parentWidth = DapElement.width(el.parentElement!)
+	const parentWidth = getMaxWidth(el)
 	//设置拖拽改变大小的功能
 	interact(el).unset()
 	interact(el).resizable({
@@ -102,7 +114,7 @@ export const VideoExtension = Extension.create({
 	name: 'video',
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
-		if (node.tag == 'video' && node.hasMarks()) {
+		if (node.isMatch({ tag: 'video' }) && node.hasMarks()) {
 			if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
 			if (node.marks!.hasOwnProperty('autoplay')) marks['autoplay'] = node.marks!['autoplay']
 			if (node.marks!.hasOwnProperty('loop')) marks['loop'] = node.marks!['loop']
@@ -113,13 +125,13 @@ export const VideoExtension = Extension.create({
 	},
 	pasteKeepStyles(node) {
 		const styles: KNodeStylesType = {}
-		if (node.tag == 'video' && node.hasStyles()) {
+		if (node.isMatch({ tag: 'video' }) && node.hasStyles()) {
 			styles['width'] = node.styles!['width'] || 'auto'
 		}
 		return styles
 	},
 	formatRule({ editor, node }) {
-		if (node.tag == 'video') {
+		if (node.isMatch({ tag: 'video' })) {
 			const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
 			const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
 			//前一个节点不存在或者不是零宽度空白文本节点

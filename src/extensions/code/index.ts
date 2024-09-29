@@ -1,4 +1,5 @@
-import { KNode, splitNodeToNodes } from '../../model'
+import { KNode } from '../../model'
+import { splitNodeToNodes } from '../../tools'
 import { Extension } from '../Extension'
 
 declare module '../../model' {

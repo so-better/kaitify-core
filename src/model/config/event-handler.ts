@@ -28,14 +28,6 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 				if (node.marks!.hasOwnProperty('disabled')) {
 					marks['disabled'] = node.marks!['disabled']
 				}
-				//链接的href属性保留
-				if (node.tag == 'a' && node.marks!.hasOwnProperty('href')) {
-					marks['href'] = node.marks!['href']
-				}
-				//链接的target属性保留
-				if (node.tag == 'a' && node.marks!.hasOwnProperty('target')) {
-					marks['target'] = node.marks!['target']
-				}
 				//表格列宽属性保留
 				if (node.tag == 'col' && node.marks!.hasOwnProperty('width')) {
 					marks['width'] = node.marks!['width']
@@ -50,20 +42,7 @@ const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]
 				}
 			}
 			//处理需要保留的样式
-			if (node.hasStyles()) {
-				//块元素保留textIndent样式
-				if (node.isBlock() && node.styles!.hasOwnProperty('textIndent')) {
-					styles.textIndent = node.styles!.textIndent
-				}
-				//块元素保留textAlign样式
-				if (node.isBlock() && node.styles!.hasOwnProperty('textAlign')) {
-					styles.textAlign = node.styles!.textAlign
-				}
-				//块元素保留lineHeight样式
-				if (node.isBlock() && node.styles!.hasOwnProperty('lineHeight')) {
-					styles.lineHeight = node.styles!.lineHeight
-				}
-			}
+			// if (node.hasStyles()) {}
 			//自定义标记保留
 			if (typeof this.pasteKeepMarks == 'function') {
 				const extendMarks = this.pasteKeepMarks.apply(this, [node])

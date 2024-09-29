@@ -1,115 +1,12 @@
 import { string as DapString } from 'dap-util'
 import { isZeroWidthText } from '../../tools'
 import { Editor } from '../Editor'
-import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
+import { KNode } from '../KNode'
 
 /**
  * 格式化函数类型
  */
 export type RuleFunctionType = (opts: { editor: Editor; node: KNode }) => void
-
-/**
- * 打散指定的节点，将其分裂成多个节点，如果子孙节点还有子节点则继续打散
- */
-export const splitNodeToNodes = (editor: Editor, node: KNode) => {
-	if (node.hasChildren()) {
-		node.children!.forEach(item => {
-			if (!item.isClosed()) {
-				item.marks = { ...(item.marks || {}), ...(node.marks || {}) }
-				item.styles = { ...(item.styles || {}), ...(node.styles || {}) }
-			}
-			editor.addNodeBefore(item, node)
-			splitNodeToNodes(editor, item)
-		})
-		node.children = []
-	}
-}
-
-/**
- * 处理子节点中的块节点，如果父节点是行内节点则将块节点转为行内节点，如果块节点和其他节点并存亦将块节点转为行内节点
- */
-export const formatBlockInChildren: RuleFunctionType = ({ node }) => {
-	//当前节点存在子节点
-	if (node.hasChildren() && !node.isEmpty()) {
-		//过滤子节点中的空节点和占位符（因为占位符会在存在其他节点时清除，所以不考虑）
-		const nodes = node.children!.filter(item => {
-			return !item.isEmpty() && !item.isPlaceholder()
-		})
-		//获取子节点中的块节点
-		const blockNodes = nodes.filter(item => {
-			return item.isBlock()
-		})
-		//存在块节点时如果当前节点是行内节点 或者 子节点中存在其他节点
-		if (blockNodes.length && (node.isInline() || blockNodes.length != nodes.length)) {
-			//将块节点转为行内节点
-			blockNodes.forEach(item => {
-				item.type = 'inline'
-			})
-		}
-	}
-}
-
-/**
- * 处理一些需要转为文本节点的特殊节点
- */
-export const formatInlineParseText: RuleFunctionType = ({ editor, node }) => {
-	if (!node.isEmpty() && node.tag && ['b', 'strong', 'sup', 'sub', 'i', 'u', 'del', 'font'].includes(node.tag)) {
-		//针对这些特殊的节点设置对应的样式
-		const styles: KNodeStylesType = node.styles || {}
-		const marks: KNodeMarksType = node.marks || {}
-		switch (node.tag) {
-			case 'b':
-			case 'strong':
-				node.styles = {
-					...styles,
-					fontWeight: 'bold'
-				}
-				break
-			case 'sup':
-				node.styles = {
-					...styles,
-					verticalAlign: 'super'
-				}
-				break
-			case 'sub':
-				node.styles = {
-					...styles,
-					verticalAlign: 'sub'
-				}
-				break
-			case 'i':
-				node.styles = {
-					...styles,
-					fontStyle: 'italic'
-				}
-				break
-			case 'u':
-				node.styles = {
-					...styles,
-					textDecorationLine: 'underline'
-				}
-				break
-			case 'del':
-				node.styles = {
-					...styles,
-					textDecorationLine: 'line-through'
-				}
-				break
-			case 'font':
-				node.styles = {
-					...styles,
-					fontFamily: (marks.face as string) || ''
-				}
-				delete marks.face
-				node.marks = marks
-				break
-		}
-		//将节点标签转为默认的文本标签
-		node.tag = editor.textRenderTag
-		//有子节点的节点进行拆分
-		splitNodeToNodes(editor, node)
-	}
-}
 
 /**
  * 处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符 & 重置不可编辑节点内的光标位置

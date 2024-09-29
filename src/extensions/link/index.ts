@@ -1,4 +1,5 @@
-import { KNode, KNodeMarksType, splitNodeToNodes } from '../../model'
+import { KNode, KNodeMarksType } from '../../model'
+import { splitNodeToNodes } from '../../tools'
 import { Extension } from '../Extension'
 
 /**
@@ -30,6 +31,14 @@ declare module '../../model' {
 
 export const LinkExtension = Extension.create({
 	name: 'link',
+	pasteKeepMarks(node) {
+		const marks: KNodeMarksType = {}
+		if (node.isMatch({ tag: 'a' }) && node.hasMarks()) {
+			if (node.marks!.hasOwnProperty('href')) marks['href'] = node.marks!['href']
+			if (node.marks!.hasOwnProperty('target')) marks['target'] = node.marks!['target']
+		}
+		return marks
+	},
 	formatRule({ editor, node }) {
 		//链接里只能有文本节点和闭合节点
 		if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {

@@ -1,3 +1,5 @@
+import { KNodeStylesType } from '../../model'
+import { splitNodeToNodes } from '../../tools'
 import { Extension } from '../Extension'
 
 declare module '../../model' {
@@ -10,6 +12,17 @@ declare module '../../model' {
 
 export const SubscriptExtension = Extension.create({
 	name: 'subscript',
+	formatRule({ editor, node }) {
+		if (!node.isEmpty() && node.isMatch({ tag: 'sub' })) {
+			const styles: KNodeStylesType = node.styles || {}
+			node.styles = {
+				...styles,
+				verticalAlign: 'sub'
+			}
+			node.tag = editor.textRenderTag
+			splitNodeToNodes(editor, node)
+		}
+	},
 	addCommands() {
 		/**
 		 * 光标所在文本是否下标
