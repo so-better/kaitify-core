@@ -19,7 +19,13 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-  editor.value!.commands.isBackColor!('#9876f3') ? editor.value!.commands.unsetBackColor!('#9876f3') : editor.value!.commands.setBackColor!('#9876f3')
+  !!editor.value!.commands.getLink!() ? editor.value!.commands.updateLink!({
+    newOpen: true
+  }) : editor.value!.commands.setLink!({
+    text: '我是一个链接',
+    href: 'https://www.baidu.com',
+    newOpen: false
+  })
 }
 
 onMounted(async () => {

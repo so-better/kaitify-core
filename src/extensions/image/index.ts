@@ -21,6 +21,18 @@ declare module '../../model' {
 }
 
 /**
+ * 获取最大宽度
+ */
+const getMaxWidth = (element: HTMLElement): number => {
+	const parentElement = element.parentElement!
+	let maxWidth = DapElement.width(parentElement)
+	if (!maxWidth) {
+		maxWidth = getMaxWidth(parentElement)
+	}
+	return maxWidth
+}
+
+/**
  * 设置图片选中
  */
 const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
@@ -36,7 +48,7 @@ const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
  */
 const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 	//获取父元素宽度
-	const parentWidth = DapElement.width(el.parentElement!)
+	const parentWidth = getMaxWidth(el)
 	//设置拖拽改变大小的功能
 	interact(el).unset()
 	interact(el).resizable({
