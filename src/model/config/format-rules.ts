@@ -137,14 +137,14 @@ export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
 				//起点和终点在一起
 				if (editor.selection.collapsed()) {
-					//如果光标在不可编辑节点的最后面，则移动到后一个可设置光标的节点的前面
-					const lastNode = editor.getLastSelectionNodeInChildren(uneditableNode)!
-					if (lastNode.isEqual(editor.selection.start!.node)) {
-						editor.setSelectionBefore(nexteSelectionNode, 'all')
-					}
-					//否则一律设置到前一个可设置光标的节点的后面
-					else {
+					//如果光标在不可编辑节点的最前面，则移动到前一个可设置光标的节点的后面
+					const firstNode = editor.getFirstSelectionNodeInChildren(uneditableNode)!
+					if (firstNode.isEqual(editor.selection.start!.node) && editor.selection.start!.offset == 0) {
 						editor.setSelectionAfter(previousSelectionNode, 'all')
+					}
+					//否则一律设置到后一个可设置光标的节点的前面
+					else {
+						editor.setSelectionBefore(nexteSelectionNode, 'all')
 					}
 				}
 				//起点和终点不在一起，则选中该不可编辑的节点
@@ -155,13 +155,13 @@ export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 			}
 			//起点在不可编辑的节点里，则更新起点位置
 			else if (editor.isSelectionInNode(uneditableNode, 'start')) {
-				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
-				editor.setSelectionAfter(previousSelectionNode, 'start')
+				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
+				editor.setSelectionBefore(nexteSelectionNode, 'start')
 			}
 			//终点在不可编辑的节点里，则更新终点位置
 			else if (editor.isSelectionInNode(uneditableNode, 'end')) {
-				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
-				editor.setSelectionBefore(nexteSelectionNode, 'end')
+				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
+				editor.setSelectionAfter(previousSelectionNode, 'end')
 			}
 		}
 	}
