@@ -14,7 +14,8 @@ import { Editor } from '../src'
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.setFontSize!('50px')
+  editor.value!.delete()
+  editor.value!.updateView()
 }
 
 const onClick2 = () => {

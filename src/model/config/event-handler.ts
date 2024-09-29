@@ -234,8 +234,10 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
 	}
 	//删除内容
 	else if (event.inputType == 'deleteContentBackward' || event.inputType == 'deleteByCut' || event.inputType == 'deleteByDrag') {
+		this.isUserDelection = true
 		this.delete()
-		this.updateView()
+		await this.updateView()
+		this.isUserDelection = false
 	}
 	//插入段落
 	else if (event.inputType == 'insertParagraph' || event.inputType == 'insertLineBreak') {

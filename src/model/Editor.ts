@@ -333,12 +333,16 @@ export class Editor {
 	 */
 	internalCauseSelectionChange: boolean = false
 	/**
+	 * 是否用户操作的删除行为
+	 */
+	isUserDelection: boolean = false
+	/**
 	 * dom监听【不可修改】
 	 */
 	domObserver: MutationObserver | null = null
 
 	/**
-	 * 将后一个块节点与前一个块节点合并，如果前一个块节点是不可编辑的，直接清除前一个节点
+	 * 该方法目前只为delete方法内部使用：将后一个块节点与前一个块节点合并，如果前一个块节点是不可编辑的，直接清除前一个节点
 	 */
 	mergeBlock(node: KNode, target: KNode) {
 		//不是块节点则不处理
@@ -349,11 +353,13 @@ export class Editor {
 		if (node.isEmpty() || target.isEmpty()) {
 			return
 		}
-		//前一个块节点是不可编辑的则直接删除前一个块节点
 		const uneditableNode = node.getUneditable()
-		if (uneditableNode) {
+		//是用户操作的删除行为并且前一个块节点是不可编辑的，则直接删除前一个块节点
+		if (this.isUserDelection && uneditableNode) {
 			uneditableNode.toEmpty()
-		} else {
+		}
+		//否则走正常删除逻辑
+		else {
 			const nodes = target.children!.map(item => {
 				item.parent = node
 				return item
@@ -2138,11 +2144,11 @@ export class Editor {
 		if (this.selection.collapsed()) {
 			const node = this.selection.start!.node
 			const uneditableNode = node.getUneditable()
-			//在不可编辑的节点里直接删除该不可编辑的节点
-			if (uneditableNode) {
+			//是用户操作的删除行为并且在不可编辑的节点里，则直接删除该不可编辑的节点
+			if (this.isUserDelection && uneditableNode) {
 				uneditableNode.toEmpty()
 			}
-			//在正常节点内
+			//否则走正常删除逻辑
 			else {
 				const offset = this.selection.start!.offset
 				//前一个可设置光标的节点
