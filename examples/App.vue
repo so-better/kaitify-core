@@ -15,20 +15,7 @@ import { Editor, KNode } from '../src'
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.insertNode(KNode.create({
-    type: 'inline',
-    tag: 'font',
-    marks: {
-      face: '楷体-简'
-    },
-    children: [
-      {
-        type: 'text',
-        textContent: 'hello'
-      }
-    ]
-  }))
-  editor.value!.updateView()
+  editor.value!.commands.getAlign!('right') ? editor.value!.commands.unsetAlign!('right') : editor.value!.commands.setAlign!('right')
 }
 
 const onClick2 = () => {

@@ -8,7 +8,7 @@ import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMer
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { removeDomObserve, setDomObserve } from './config/dom-observe'
-import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, ColorExtension, BackColorExtension, LinkExtension, BlockExtension } from '../extensions'
+import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, ColorExtension, BackColorExtension, LinkExtension, BlockExtension, AlignExtension } from '../extensions'
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
@@ -220,7 +220,7 @@ export class Editor {
 	/**
 	 * 插件数组【初始化后不可修改】
 	 */
-	extensions: Extension[] = [TextExtension, BlockExtension, ImageExtension, VideoExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension]
+	extensions: Extension[] = [TextExtension, BlockExtension, ImageExtension, VideoExtension, HistoryExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension]
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】
 	 */

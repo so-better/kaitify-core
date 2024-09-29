@@ -8,7 +8,6 @@ export const BlockExtension = Extension.create({
 		const styles: KNodeStylesType = {}
 		if (node.isBlock() && node.hasStyles()) {
 			if (node.styles!.hasOwnProperty('textIndent')) styles.textIndent = node.styles!.textIndent
-			if (node.styles!.hasOwnProperty('textAlign')) styles.textAlign = node.styles!.textAlign
 			if (node.styles!.hasOwnProperty('lineHeight')) styles.lineHeight = node.styles!.lineHeight
 		}
 		return styles
