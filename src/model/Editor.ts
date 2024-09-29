@@ -338,7 +338,7 @@ export class Editor {
 	domObserver: MutationObserver | null = null
 
 	/**
-	 * 将后一个块节点与前一个块节点合并
+	 * 将后一个块节点与前一个块节点合并，如果前一个块节点是不可编辑的，直接清除前一个节点
 	 */
 	mergeBlock(node: KNode, target: KNode) {
 		//不是块节点则不处理
@@ -2128,7 +2128,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】对选区进行删除
+	 * 【API】对选区进行删除，如果选区在不可编辑节点内，则是清除该节点
 	 */
 	delete() {
 		if (!this.selection.focused()) {

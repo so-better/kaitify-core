@@ -14,7 +14,7 @@ import { Editor } from '../src'
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value?.commands.setVideo!({ src: 'https://js.588ku.com/comp/video/images/video_banner_240920.mp4', width: '30%' })
+  editor.value!.commands.setFontSize!('50px')
 }
 
 const onClick2 = () => {
