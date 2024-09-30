@@ -12,17 +12,19 @@ declare module '../../model' {
 
 export const BoldExtension = Extension.create({
 	name: 'bold',
-	formatRule({ editor, node }) {
-		if (!node.isEmpty() && (node.isMatch({ tag: 'b' }) || node.isMatch({ tag: 'strong' }))) {
-			const styles: KNodeStylesType = node.styles || {}
-			node.styles = {
-				...styles,
-				fontWeight: 'bold'
+	formatRules: [
+		({ editor, node }) => {
+			if (!node.isEmpty() && (node.isMatch({ tag: 'b' }) || node.isMatch({ tag: 'strong' }))) {
+				const styles: KNodeStylesType = node.styles || {}
+				node.styles = {
+					...styles,
+					fontWeight: 'bold'
+				}
+				node.tag = editor.textRenderTag
+				splitNodeToNodes.apply(editor, [node])
 			}
-			node.tag = editor.textRenderTag
-			splitNodeToNodes.apply(editor, [node])
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 光标所在文本是否加粗

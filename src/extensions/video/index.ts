@@ -130,22 +130,24 @@ export const VideoExtension = Extension.create({
 		}
 		return styles
 	},
-	formatRule({ editor, node }) {
-		if (node.isMatch({ tag: 'video' })) {
-			const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-			const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-			//前一个节点不存在或者不是零宽度空白文本节点
-			if (!previousNode || !previousNode.isZeroWidthText()) {
-				const zeroWidthText = KNode.createZeroWidthText()
-				editor.addNodeBefore(zeroWidthText, node)
-			}
-			//后一个节点不存在或者不是零宽度空白文本节点
-			if (!nextNode || !nextNode.isZeroWidthText()) {
-				const zeroWidthText = KNode.createZeroWidthText()
-				editor.addNodeAfter(zeroWidthText, node)
+	formatRules: [
+		({ editor, node }) => {
+			if (node.isMatch({ tag: 'video' })) {
+				const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+				const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+				//前一个节点不存在或者不是零宽度空白文本节点
+				if (!previousNode || !previousNode.isZeroWidthText()) {
+					const zeroWidthText = KNode.createZeroWidthText()
+					editor.addNodeBefore(zeroWidthText, node)
+				}
+				//后一个节点不存在或者不是零宽度空白文本节点
+				if (!nextNode || !nextNode.isZeroWidthText()) {
+					const zeroWidthText = KNode.createZeroWidthText()
+					editor.addNodeAfter(zeroWidthText, node)
+				}
 			}
 		}
-	},
+	],
 	afterUpdateView() {
 		//编辑器不可编辑状态下不设置
 		if (!this.isEditable()) {

@@ -55,9 +55,8 @@ const toHeading = (editor: Editor, node: KNode, level: HeadingLevelType) => {
 	}
 	//非固定块节点
 	else {
+		editor.toParagraph(node)
 		node.tag = headingLevelMap[level]
-		node.marks = {}
-		node.styles = {}
 	}
 }
 
@@ -106,8 +105,8 @@ export const HeadingExtension = Extension.create({
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
-				blockNodes.forEach(blockNode => {
-					toHeading(this, blockNode, level)
+				blockNodes.forEach(item => {
+					toHeading(this, item, level)
 				})
 			}
 			await this.updateView()

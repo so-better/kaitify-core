@@ -39,14 +39,16 @@ export const LinkExtension = Extension.create({
 		}
 		return marks
 	},
-	formatRule({ editor, node }) {
-		//链接里只能有文本节点和闭合节点
-		if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
-			node.children!.forEach(item => {
-				splitNodeToNodes.apply(editor, [item])
-			})
+	formatRules: [
+		({ editor, node }) => {
+			//链接里只能有文本节点和闭合节点
+			if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
+				node.children!.forEach(item => {
+					splitNodeToNodes.apply(editor, [item])
+				})
+			}
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 获取光标所在的链接，如果光标不在一个链接内，返回null

@@ -15,7 +15,7 @@ export type ExtensionCreateOptionType = {
 	/**
 	 * 自定义格式化规则
 	 */
-	formatRule?: RuleFunctionType
+	formatRules?: RuleFunctionType[]
 	/**
 	 * 自定义dom转为非文本节点的后续处理
 	 */
@@ -61,7 +61,7 @@ export class Extension {
 	/**
 	 * 自定义格式化规则
 	 */
-	formatRule?: RuleFunctionType
+	formatRules?: RuleFunctionType[]
 	/**
 	 * 自定义dom转为非文本节点的后续处理
 	 */
@@ -97,7 +97,7 @@ export class Extension {
 	static create(options: ExtensionCreateOptionType) {
 		const extension = new Extension(options.name)
 		if (options.extraKeepTags) extension.extraKeepTags = options.extraKeepTags
-		if (options.formatRule) extension.formatRule = options.formatRule
+		if (options.formatRules) extension.formatRules = options.formatRules
 		if (options.domParseNodeCallback) extension.domParseNodeCallback = options.domParseNodeCallback
 		if (options.pasteKeepMarks) extension.pasteKeepMarks = options.pasteKeepMarks
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles

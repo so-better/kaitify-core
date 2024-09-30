@@ -12,17 +12,19 @@ declare module '../../model' {
 
 export const StrikethroughExtension = Extension.create({
 	name: 'strikethrough',
-	formatRule({ editor, node }) {
-		if (!node.isEmpty() && node.isMatch({ tag: 'del' })) {
-			const styles: KNodeStylesType = node.styles || {}
-			node.styles = {
-				...styles,
-				textDecorationLine: 'line-through'
+	formatRules: [
+		({ editor, node }) => {
+			if (!node.isEmpty() && node.isMatch({ tag: 'del' })) {
+				const styles: KNodeStylesType = node.styles || {}
+				node.styles = {
+					...styles,
+					textDecorationLine: 'line-through'
+				}
+				node.tag = editor.textRenderTag
+				splitNodeToNodes.apply(editor, [node])
 			}
-			node.tag = editor.textRenderTag
-			splitNodeToNodes.apply(editor, [node])
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 光标所在文本是否删除线

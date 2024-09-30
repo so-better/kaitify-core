@@ -43,9 +43,8 @@ const toBlockquote = (editor: Editor, node: KNode) => {
 	}
 	//非固定块节点
 	else {
+		editor.toParagraph(node)
 		node.tag = 'blockquote'
-		node.marks = {}
-		node.styles = {}
 	}
 }
 
@@ -94,8 +93,8 @@ export const BlockquoteExtension = Extension.create({
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
-				blockNodes.forEach(blockNode => {
-					toBlockquote(this, blockNode)
+				blockNodes.forEach(item => {
+					toBlockquote(this, item)
 				})
 			}
 			await this.updateView()

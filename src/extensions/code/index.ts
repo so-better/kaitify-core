@@ -14,14 +14,16 @@ declare module '../../model' {
 
 export const CodeExtension = Extension.create({
 	name: 'code',
-	formatRule({ editor, node }) {
-		//行内代码里只能有文本节点和闭合节点
-		if (node.isMatch({ tag: 'code' }) && node.hasChildren()) {
-			node.children!.forEach(item => {
-				splitNodeToNodes.apply(editor, [item])
-			})
+	formatRules: [
+		({ editor, node }) => {
+			//行内代码里只能有文本节点和闭合节点
+			if (node.isMatch({ tag: 'code' }) && node.hasChildren()) {
+				node.children!.forEach(item => {
+					splitNodeToNodes.apply(editor, [item])
+				})
+			}
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 获取光标所在的行内代码，如果光标不在一个行内代码内，返回null

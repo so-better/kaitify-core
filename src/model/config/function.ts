@@ -473,8 +473,8 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 			return node
 		}
 	}
-	if (extension.formatRule) {
-		this.formatRules = [extension.formatRule, ...this.formatRules]
+	if (extension.formatRules) {
+		this.formatRules = [...extension.formatRules, ...this.formatRules]
 	}
 	if (extension.pasteKeepMarks) {
 		const fn = this.pasteKeepMarks

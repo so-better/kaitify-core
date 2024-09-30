@@ -1,0 +1,283 @@
+import { Editor, KNode } from '../../model'
+import { getSelectionBlockNodes } from '../../model/config/function'
+import { Extension } from '../Extension'
+
+declare module '../../model' {
+	interface EditorCommandsType {
+		getList?: ({ ordered }: { ordered?: boolean }) => KNode | null
+		hasList?: ({ ordered }: { ordered?: boolean }) => boolean
+		allList?: ({ ordered }: { ordered?: boolean }) => boolean
+		setList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
+		unsetList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
+	}
+}
+
+/**
+ * 块节点转为列表
+ */
+const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
+	if (!node.isBlock()) {
+		return
+	}
+	//是列表项节点
+	if (node.isMatch({ tag: 'li' })) {
+		//如果是和当前要转的列表类型一致则不处理
+		if (node.parent!.isMatch({ tag: ordered ? 'ol' : 'ul' })) {
+			return
+		}
+		//获取列表节点
+		const listNode = node.parent!
+		//获取当前块节点在列表项节点里的序列
+		const index = listNode.children!.findIndex(item => item.isEqual(node))
+		//复制当前块节点
+		const newNode = node.clone(false)
+		//将块节点的子节点都给复制的块节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, newNode, index)
+		})
+		node.children = []
+		//创建新的列表节点
+		const newListNode = KNode.create({
+			type: 'block',
+			tag: ordered ? 'ol' : 'ul',
+			children: []
+		})
+		//将复制的块节点给新的列表节点
+		editor.addNode(newNode, newListNode)
+		//该列表项节点是原列表节点的第一个子节点
+		if (index == 0) {
+			editor.addNodeBefore(newListNode, listNode)
+		}
+		//该列表项节点是原列表节点的最后一个子节点
+		else if (index == listNode.children!.length - 1) {
+			editor.addNodeAfter(newListNode, listNode)
+		}
+		//该列表项节点在原列表节点的中间
+		else {
+			//复制原列表节点
+			const sList = listNode.clone(false)
+			//截取原节点的前半部分数据给复制的列表节点
+			const sListItems = listNode.children!.splice(0, index)
+			sListItems.forEach((item, index) => {
+				editor.addNode(item, sList, index)
+			})
+			editor.addNodeBefore(newListNode, listNode)
+			editor.addNodeBefore(sList, newListNode)
+		}
+	}
+	//是固定的块节点或者内嵌套的块节点
+	else if (node.fixed || node.nested) {
+		//克隆块节点
+		const newNode = node.clone(false)
+		//创建列表节点
+		const listNode = KNode.create({
+			type: 'block',
+			tag: ordered ? 'ol' : 'ul',
+			children: [
+				{
+					type: 'block',
+					tag: 'li',
+					nested: true,
+					children: []
+				}
+			]
+		})
+		//将原来块节点的子节点给列表节点的列表项节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, listNode.children![0], index)
+		})
+		//清空原来的块节点
+		node.children = []
+		//将列表节点添加到新块节点下
+		editor.addNode(listNode, newNode)
+		//将新块节点代替原来的块节点
+		editor.addNodeBefore(newNode, node)
+	}
+	//非固定块节点
+	else {
+		//将块节点转为列表节点
+		editor.toParagraph(node)
+		node.tag = 'ol'
+		//创建列表项节点
+		const listItem = KNode.create({
+			type: 'block',
+			tag: 'li'
+		})
+		//将列表节点的子节点都给列表项节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, listItem, index)
+		})
+		//将列表项节点作为列表节点的子节点
+		node.children = [listItem]
+		listItem.parent = node
+	}
+}
+
+/**
+ * 取消当前列表项块节点的列表设置
+ */
+const ListItemToParagraph = (editor: Editor, node: KNode) => {
+	//获取列表节点
+	const listNode = node.parent!
+	//列表项在列表节点中的序列
+	const index = listNode.children!.findIndex(item => item.isEqual(node))
+	//在列表节点的第一个位置
+	if (index == 0) {
+		editor.addNodeBefore(node, listNode)
+		listNode.children!.splice(index, 1)
+	}
+	//在列表节点的最后一个位置
+	else if (index == listNode.children!.length - 1) {
+		editor.addNodeAfter(node, listNode)
+		listNode.children!.splice(index, 1)
+	}
+	//在列表节点的中间位置
+	else {
+		//复制原列表节点
+		const sList = listNode.clone(false)
+		//截取原节点的前半部分数据给复制的列表节点
+		const sListItems = listNode.children!.splice(0, index)
+		sListItems.forEach((item, index) => {
+			editor.addNode(item, sList, index)
+		})
+		editor.addNodeBefore(node, listNode)
+		listNode.children!.splice(0, 1)
+		editor.addNodeBefore(sList, node)
+	}
+	editor.toParagraph(node)
+}
+
+export const ListExtension = Extension.create({
+	name: 'list',
+	formatRules: [
+		//不在列表内的列表项处理
+		({ editor, node }) => {
+			if (node.isMatch({ tag: 'li' })) {
+				//如果li节点无父节点或者父节点不是有序列也不是无序列表，则默认加入到无序列表中
+				if (!node.parent || (!node.parent.isMatch({ tag: 'ol' }) && !node.parent.isMatch({ tag: 'ul' }))) {
+					//设为内嵌块节点
+					node.nested = true
+					//创建列表节点
+					const listNode = KNode.create({
+						type: 'block',
+						tag: 'ul'
+					})
+					//获取父节点
+					const parentNode = node.parent
+					//在父节点中的位置序列
+					const index = parentNode ? parentNode.children!.findIndex(item => item.isEqual(node)) : editor.stackNodes.findIndex(item => item.isEqual(node))
+					//从父节点中移除
+					parentNode ? parentNode.children!.splice(index, 1, listNode) : editor.stackNodes.splice(index, 1, listNode)
+					//加入到列表节点中
+					editor.addNode(node, listNode)
+				}
+			}
+		},
+		//列表合并处理
+		({ editor, node }) => {
+			//节点是有序列表
+			if (node.isMatch({ tag: 'ol' })) {
+				//前一个兄弟节点
+				const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
+				//前一个兄弟节点是有序列表则将当前节点的子节点都给前一个节点
+				if (previousNode && previousNode.isMatch({ tag: 'ol' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
+					const nodes = node.children!.map(item => {
+						item.parent = previousNode
+						return item
+					})
+					previousNode.children!.push(...nodes)
+					node.children = []
+				}
+			}
+			if (node.isMatch({ tag: 'ul' })) {
+				//前一个兄弟节点
+				const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
+				//前一个兄弟节点是无序列表则将当前节点的子节点都给前一个节点
+				if (previousNode && previousNode.isMatch({ tag: 'ul' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
+					const nodes = node.children!.map(item => {
+						item.parent = previousNode
+						return item
+					})
+					previousNode.children!.push(...nodes)
+					node.children = []
+				}
+			}
+		}
+	],
+	addCommands() {
+		/**
+		 * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
+		 */
+		const getList = ({ ordered }: { ordered?: boolean }) => {
+			return this.getMatchNodeBySelection({ tag: ordered ? 'ol' : 'ul' })
+		}
+
+		/**
+		 * 判断光标范围内是否有有序列表或者无序列表
+		 */
+		const hasList = ({ ordered }: { ordered?: boolean }) => {
+			return this.isSelectionNodesSomeMatch({ tag: ordered ? 'ol' : 'ul' })
+		}
+
+		/**
+		 * 判断光标范围内是否都是有序列表或者无序列表
+		 */
+		const allList = ({ ordered }: { ordered?: boolean }) => {
+			return this.isSelectionNodesAllMatch({ tag: ordered ? 'ol' : 'ul' })
+		}
+
+		/**
+		 * 设置有序列表或者无序列表
+		 */
+		const setList = async ({ ordered }: { ordered?: boolean }) => {
+			if (allList({ ordered })) {
+				return
+			}
+			//起点和终点在一起
+			if (this.selection.collapsed()) {
+				const blockNode = this.selection.start!.node.getBlock()
+				toList(this, blockNode, ordered)
+			}
+			//起点和终点不在一起
+			else {
+				const blockNodes = getSelectionBlockNodes.apply(this)
+				blockNodes.forEach(item => {
+					toList(this, item, ordered)
+				})
+			}
+			await this.updateView()
+		}
+
+		/**
+		 * 取消有序列表或者无序列表
+		 */
+		const unsetList = async ({ ordered }: { ordered?: boolean }) => {
+			if (!allList({ ordered })) {
+				return
+			}
+			//起点和终点在一起
+			if (this.selection.collapsed()) {
+				const blockNode = this.selection.start!.node.getBlock()
+				const matchNode = blockNode.getMatchNode({ tag: 'li' })
+				if (matchNode) ListItemToParagraph(this, matchNode)
+			}
+			//起点和终点不在一起
+			else {
+				const blockNodes = getSelectionBlockNodes.apply(this)
+				blockNodes.forEach(item => {
+					const matchNode = item.getMatchNode({ tag: 'li' })
+					if (matchNode) ListItemToParagraph(this, matchNode)
+				})
+			}
+			await this.updateView()
+		}
+
+		return {
+			getList,
+			hasList,
+			allList,
+			setList,
+			unsetList
+		}
+	}
+})

@@ -12,17 +12,19 @@ declare module '../../model' {
 
 export const SubscriptExtension = Extension.create({
 	name: 'subscript',
-	formatRule({ editor, node }) {
-		if (!node.isEmpty() && node.isMatch({ tag: 'sub' })) {
-			const styles: KNodeStylesType = node.styles || {}
-			node.styles = {
-				...styles,
-				verticalAlign: 'sub'
+	formatRules: [
+		({ editor, node }) => {
+			if (!node.isEmpty() && node.isMatch({ tag: 'sub' })) {
+				const styles: KNodeStylesType = node.styles || {}
+				node.styles = {
+					...styles,
+					verticalAlign: 'sub'
+				}
+				node.tag = editor.textRenderTag
+				splitNodeToNodes.apply(editor, [node])
 			}
-			node.tag = editor.textRenderTag
-			splitNodeToNodes.apply(editor, [node])
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 光标所在文本是否下标

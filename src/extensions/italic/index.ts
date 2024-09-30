@@ -12,17 +12,19 @@ declare module '../../model' {
 
 export const ItalicExtension = Extension.create({
 	name: 'italic',
-	formatRule({ editor, node }) {
-		if (!node.isEmpty() && node.isMatch({ tag: 'i' })) {
-			const styles: KNodeStylesType = node.styles || {}
-			node.styles = {
-				...styles,
-				fontStyle: 'italic'
+	formatRules: [
+		({ editor, node }) => {
+			if (!node.isEmpty() && node.isMatch({ tag: 'i' })) {
+				const styles: KNodeStylesType = node.styles || {}
+				node.styles = {
+					...styles,
+					fontStyle: 'italic'
+				}
+				node.tag = editor.textRenderTag
+				splitNodeToNodes.apply(editor, [node])
 			}
-			node.tag = editor.textRenderTag
-			splitNodeToNodes.apply(editor, [node])
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 光标所在文本是否斜体

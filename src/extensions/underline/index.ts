@@ -12,17 +12,19 @@ declare module '../../model' {
 
 export const UnderlineExtension = Extension.create({
 	name: 'underline',
-	formatRule({ editor, node }) {
-		if (!node.isEmpty() && node.isMatch({ tag: 'u' })) {
-			const styles: KNodeStylesType = node.styles || {}
-			node.styles = {
-				...styles,
-				textDecorationLine: 'underline'
+	formatRules: [
+		({ editor, node }) => {
+			if (!node.isEmpty() && node.isMatch({ tag: 'u' })) {
+				const styles: KNodeStylesType = node.styles || {}
+				node.styles = {
+					...styles,
+					textDecorationLine: 'underline'
+				}
+				node.tag = editor.textRenderTag
+				splitNodeToNodes.apply(editor, [node])
 			}
-			node.tag = editor.textRenderTag
-			splitNodeToNodes.apply(editor, [node])
 		}
-	},
+	],
 	addCommands() {
 		/**
 		 * 光标所在文本是否下划线

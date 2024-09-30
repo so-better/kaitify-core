@@ -7,10 +7,6 @@ export type BlockParseType = {
 	 */
 	tag: string
 	/**
-	 * 如果为true则表示会将该dom转为编辑器配置的默认块节点
-	 */
-	parse?: boolean
-	/**
 	 * 如果为true则表示会将该dom转为块节点后设置为固定状态
 	 */
 	fixed?: boolean
@@ -27,10 +23,6 @@ export type InlineParseType = {
 	 * dom标签
 	 */
 	tag: string
-	/**
-	 * 如果是true表示会将该dom转为编辑器配置的默认行内节点
-	 */
-	parse?: boolean
 }
 /**
  * 闭合节点的转换类型
@@ -85,24 +77,19 @@ export const blockParse: BlockParseType[] = [
 		tag: 'pre'
 	},
 	{
-		tag: 'address',
-		parse: true
+		tag: 'address'
 	},
 	{
-		tag: 'article',
-		parse: true
+		tag: 'article'
 	},
 	{
-		tag: 'aside',
-		parse: true
+		tag: 'aside'
 	},
 	{
-		tag: 'nav',
-		parse: true
+		tag: 'nav'
 	},
 	{
-		tag: 'section',
-		parse: true
+		tag: 'section'
 	},
 	{
 		tag: 'li',
