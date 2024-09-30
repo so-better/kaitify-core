@@ -15,7 +15,7 @@ import { Editor, KNode } from '../src'
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.allBlockquote!() ? editor.value!.commands.unsetBlockquote!() : editor.value!.commands.setBlockquote!()
+  editor.value!.commands.allHeading!({ level: 0 }) ? editor.value!.commands.unsetHeading!({ level: 0 }) : editor.value!.commands.setHeading!({ level: 0 })
 }
 
 const onClick2 = () => {
