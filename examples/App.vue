@@ -19,7 +19,7 @@ const onClick1 = () => {
 }
 
 const onClick2 = () => {
-  editor.value!.commands.setHorizontal!()
+  editor.value!.commands.allList!({ ordered: false }) ? editor.value!.commands.unsetList!({ ordered: false }) : editor.value!.commands.setList!({ ordered: false })
 }
 
 onMounted(async () => {

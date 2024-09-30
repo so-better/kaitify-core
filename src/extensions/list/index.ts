@@ -97,7 +97,7 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
 	else {
 		//将块节点转为列表节点
 		editor.toParagraph(node)
-		node.tag = 'ol'
+		node.tag = ordered ? 'ol' : 'ul'
 		//创建列表项节点
 		const listItem = KNode.create({
 			type: 'block',
