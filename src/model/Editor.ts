@@ -598,6 +598,16 @@ export class Editor {
 	}
 
 	/**
+	 * 【API】指定的块节点是否是一个段落
+	 */
+	isPararagph(node: KNode) {
+		if (!node.isBlock()) {
+			return false
+		}
+		return node.isMatch({ tag: this.blockRenderTag }) && !node.hasMarks() && !node.hasStyles()
+	}
+
+	/**
 	 * 【API】将指定节点添加到某个节点的子节点数组里
 	 */
 	addNode(node: KNode, parentNode: KNode, index: number | undefined = 0) {
@@ -1269,8 +1279,8 @@ export class Editor {
 			else if (!blockNode.fixed) {
 				//光标在块节点的起始处
 				if (firstSelectionNode.isEqual(node) && offset == 0) {
-					//块节点只有占位符
-					if (blockNode.allIsPlaceholder()) {
+					//块节点只有占位符，存在父节点或者不是段落
+					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
 						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行
@@ -1286,8 +1296,8 @@ export class Editor {
 				}
 				//光标在块节点的末尾处
 				else if (lastSelectionNode.isEqual(node) && offset == (node.isText() ? node.textContent!.length : 1)) {
-					//块节点只有占位符
-					if (blockNode.allIsPlaceholder()) {
+					//块节点只有占位符，存在父节点或者不是段落
+					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
 						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行
@@ -1304,8 +1314,8 @@ export class Editor {
 				}
 				//光标在块节点的中间
 				else {
-					//块节点只有占位符
-					if (blockNode.allIsPlaceholder()) {
+					//块节点只有占位符，存在父节点或者不是段落
+					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
 						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行

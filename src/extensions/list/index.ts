@@ -117,6 +117,12 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
  * 取消当前列表项块节点的列表设置
  */
 const ListItemToParagraph = (editor: Editor, node: KNode) => {
+	if (!node.isBlock()) {
+		return
+	}
+	if (!node.isMatch({ tag: 'li' })) {
+		return
+	}
 	//获取列表节点
 	const listNode = node.parent!
 	//列表项在列表节点中的序列
@@ -152,25 +158,23 @@ export const ListExtension = Extension.create({
 	formatRules: [
 		//不在列表内的列表项处理
 		({ editor, node }) => {
-			if (node.isMatch({ tag: 'li' })) {
-				//如果li节点无父节点或者父节点不是有序列也不是无序列表，则默认加入到无序列表中
-				if (!node.parent || (!node.parent.isMatch({ tag: 'ol' }) && !node.parent.isMatch({ tag: 'ul' }))) {
-					//设为内嵌块节点
-					node.nested = true
-					//创建列表节点
-					const listNode = KNode.create({
-						type: 'block',
-						tag: 'ul'
-					})
-					//获取父节点
-					const parentNode = node.parent
-					//在父节点中的位置序列
-					const index = parentNode ? parentNode.children!.findIndex(item => item.isEqual(node)) : editor.stackNodes.findIndex(item => item.isEqual(node))
-					//从父节点中移除
-					parentNode ? parentNode.children!.splice(index, 1, listNode) : editor.stackNodes.splice(index, 1, listNode)
-					//加入到列表节点中
-					editor.addNode(node, listNode)
-				}
+			//如果li节点无父节点或者父节点不是有序列也不是无序列表，则默认加入到无序列表中
+			if (node.isMatch({ tag: 'li' }) && (!node.parent || !(node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' })))) {
+				//设为内嵌块节点
+				node.nested = true
+				//创建列表节点
+				const listNode = KNode.create({
+					type: 'block',
+					tag: 'ul'
+				})
+				//获取父节点
+				const parentNode = node.parent
+				//在父节点中的位置序列
+				const index = parentNode ? parentNode.children!.findIndex(item => item.isEqual(node)) : editor.stackNodes.findIndex(item => item.isEqual(node))
+				//从父节点中移除
+				parentNode ? parentNode.children!.splice(index, 1, listNode) : editor.stackNodes.splice(index, 1, listNode)
+				//加入到列表节点中
+				editor.addNode(node, listNode)
 			}
 		},
 		//列表合并处理
