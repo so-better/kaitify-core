@@ -1,4 +1,4 @@
-import { KNode } from '../../model'
+import { Editor, KNode } from '../../model'
 import { getSelectionBlockNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
 
@@ -15,10 +15,38 @@ declare module '../../model' {
 /**
  * 块节点转为引用
  */
-const toBlockquote = (node: KNode) => {
-	node.tag = 'blockquote'
-	node.marks = {}
-	node.styles = {}
+const toBlockquote = (editor: Editor, node: KNode) => {
+	if (!node.isBlock()) {
+		return
+	}
+	//是固定的块节点或者内嵌套的块节点
+	if (node.fixed || node.nested) {
+		//克隆块节点
+		const newNode = node.clone(false)
+		//创建引用节点
+		const blockquoteNode = KNode.create({
+			type: 'block',
+			tag: 'blockquote',
+			children: []
+		})
+		//将原来块节点的子节点给引用节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, blockquoteNode, index)
+		})
+		//清空原来的块节点
+		node.children = []
+		//将引用节点添加到新块节点下
+		blockquoteNode.parent = newNode
+		newNode.children = [blockquoteNode]
+		//将新块节点代替原来的块节点
+		editor.addNodeBefore(newNode, node)
+	}
+	//非固定块节点
+	else {
+		node.tag = 'blockquote'
+		node.marks = {}
+		node.styles = {}
+	}
 }
 
 export const BlockquoteExtension = Extension.create({
@@ -60,18 +88,14 @@ export const BlockquoteExtension = Extension.create({
 			}
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
-				const node = KNode.create({
-					type: 'block',
-					tag: 'blockquote',
-					children: [{ type: 'closed', tag: 'br' }]
-				})
-				this.insertNode(node)
+				const blockNode = this.selection.start!.node.getBlock()
+				toBlockquote(this, blockNode)
 			}
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
-				blockNodes.forEach(item => {
-					toBlockquote(item)
+				blockNodes.forEach(blockNode => {
+					toBlockquote(this, blockNode)
 				})
 			}
 			await this.updateView()
@@ -86,14 +110,15 @@ export const BlockquoteExtension = Extension.create({
 			}
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
-				const node = this.selection.start!.node.getMatchNode({ tag: 'blockquote' })
-				if (node) this.toParagraph(node)
+				const matchNode = this.selection.start!.node.getMatchNode({ tag: 'blockquote' })
+				if (matchNode) this.toParagraph(matchNode)
 			}
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
-					this.toParagraph(item)
+					const matchNode = item.getMatchNode({ tag: 'blockquote' })
+					if (matchNode) this.toParagraph(matchNode)
 				})
 			}
 			await this.updateView()

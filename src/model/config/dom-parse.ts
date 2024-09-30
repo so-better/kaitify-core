@@ -14,6 +14,10 @@ export type BlockParseType = {
 	 * 如果为true则表示会将该dom转为块节点后设置为固定状态
 	 */
 	fixed?: boolean
+	/**
+	 * 如果为true则表示会将该dom转为块节点后设置为内嵌套状态
+	 */
+	nested?: boolean
 }
 /**
  * 行内节点的转换类型
@@ -101,35 +105,43 @@ export const blockParse: BlockParseType[] = [
 		parse: true
 	},
 	{
-		tag: 'li'
+		tag: 'li',
+		nested: true
 	},
 	{
 		tag: 'tfoot',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'tbody',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'thead',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'tr',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'th',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'td',
-		fixed: true
+		fixed: true,
+		nested: true
 	},
 	{
 		tag: 'colgroup',
-		fixed: true
+		fixed: true,
+		nested: true
 	}
 ]
 /**

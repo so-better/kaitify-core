@@ -177,8 +177,8 @@ export const patchNode = (newNode: KNode, oldNode: KNode) => {
 			newNode
 		})
 	}
-	//type和locked、fixed变更
-	else if (newNode.type != oldNode.type || newNode.locked != oldNode.locked || newNode.fixed != oldNode.fixed) {
+	//type和locked、fixed、nested变更
+	else if (newNode.type != oldNode.type || newNode.locked != oldNode.locked || newNode.fixed != oldNode.fixed || newNode.nested != oldNode.nested) {
 		result.push({
 			type: 'replace',
 			newNode,

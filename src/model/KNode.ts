@@ -23,21 +23,12 @@ export type KNodeStylesType = CSS.Properties<string | number> & {
  * 节点匹配入参类型
  */
 export type KNodeMatchOptionType = {
-	/**
-	 * 节点对应的dom标签
-	 */
 	tag?: string
-	/**
-	 * 节点标记集合
-	 */
 	marks?:
 		| KNodeMarksType
 		| {
 				[mark: string]: boolean
 		  }
-	/**
-	 * 节点样式集合
-	 */
 	styles?:
 		| KNodeStylesType
 		| {
@@ -49,44 +40,15 @@ export type KNodeMatchOptionType = {
  * 创建节点的入参类型
  */
 export type KNodeCreateOptionType = {
-	/**
-	 * 节点类型
-	 */
 	type: KNodeType
-	/**
-	 * 节点对应的dom标签
-	 */
 	tag?: string
-	/**
-	 * 节点标记集合
-	 */
 	marks?: KNodeMarksType
-	/**
-	 * 节点样式集合
-	 */
 	styles?: KNodeStylesType
-	/**
-	 * 节点命名空间
-	 */
 	namespace?: string
-	/**
-	 * 节点文本内容
-	 */
 	textContent?: string
-	/**
-	 * 是否锁定节点：
-	 * 针对块节点，在符合合并条件的情况下不允许编辑器将其与父节点或者子节点进行合并；
-	 * 针对行内节点，在符合合并条件的情况下是否允许编辑器将其与相邻节点或者父节点或者子节点进行合并；
-	 * 针对文本节点，在符合合并的条件下是否允许编辑器将其与相邻节点或者父节点进行合并。
-	 */
 	locked?: boolean
-	/**
-	 * 是否为固定块节点，值为true时：当光标在节点起始处或者光标在节点内只有占位符时，执行删除操作不会删除此节点，会再次创建一个占位符进行处理；当光标在节点内且节点不是代码块样式，不会进行换行
-	 */
 	fixed?: boolean
-	/**
-	 * 子节点数组
-	 */
+	nested?: boolean
 	children?: KNodeCreateOptionType[]
 }
 
@@ -94,24 +56,9 @@ export type KNodeCreateOptionType = {
  * 创建零宽度无断空白文本节点的入参类型
  */
 export type ZeroWidthTextKNodeCreateOptionType = {
-	/**
-	 * 节点标记集合
-	 */
 	marks?: KNodeMarksType
-	/**
-	 * 节点样式集合
-	 */
 	styles?: KNodeStylesType
-	/**
-	 * 节点命名空间
-	 */
 	namespace?: string
-	/**
-	 * 是否锁定节点：
-	 * 针对块节点，在符合合并条件的情况下不允许编辑器将其与父节点或者子节点进行合并；
-	 * 针对行内节点，在符合合并条件的情况下是否允许编辑器将其与相邻节点或者父节点或者子节点进行合并；
-	 * 针对文本节点，在符合合并的条件下是否允许编辑器将其与相邻节点或者父节点进行合并。
-	 */
 	locked?: boolean
 }
 
@@ -155,6 +102,10 @@ export class KNode {
 	 */
 	fixed: boolean = false
 	/**
+	 * 是否为固定格式的内嵌块节点，如li、tr、td等【可以修改】
+	 */
+	nested: boolean = false
+	/**
 	 * 命名空间【可以修改】
 	 */
 	namespace?: string
@@ -193,6 +144,16 @@ export class KNode {
 	 */
 	isText() {
 		return this.type == 'text'
+	}
+
+	/**
+	 * 【API】获取所在的根级块节点
+	 */
+	getRootBlock(): KNode {
+		if (this.isBlock() && !this.parent) {
+			return this
+		}
+		return this.parent!.getRootBlock()
 	}
 
 	/**
@@ -412,7 +373,8 @@ export class KNode {
 			namespace: this.namespace,
 			textContent: this.textContent,
 			locked: this.locked,
-			fixed: this.fixed
+			fixed: this.fixed,
+			nested: this.nested
 		})
 		if (deep && this.hasChildren()) {
 			this.children!.forEach(child => {
@@ -440,7 +402,8 @@ export class KNode {
 			namespace: this.namespace,
 			textContent: this.textContent,
 			locked: this.locked,
-			fixed: this.fixed
+			fixed: this.fixed,
+			nested: this.nested
 		})
 		newNode.key = this.key
 		if (this.hasChildren()) {
@@ -622,6 +585,7 @@ export class KNode {
 		knode.textContent = options.textContent
 		knode.fixed = options.fixed || false
 		knode.locked = options.locked || false
+		knode.nested = options.nested || false
 		knode.marks = DapCommon.clone(options.marks)
 		knode.styles = DapCommon.clone(options.styles)
 		knode.namespace = options.namespace

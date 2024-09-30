@@ -47,7 +47,7 @@ export const IndentExtension = Extension.create({
 			//起点和终点不在一起
 			const blockNodes = getSelectionBlockNodes.apply(this)
 			return blockNodes.every(item => {
-				return item.getMatchNode({ styles: { textIndent: val } })
+				return !!item.getMatchNode({ styles: { textIndent: val } })
 			})
 		}
 

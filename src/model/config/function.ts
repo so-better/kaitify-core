@@ -796,15 +796,15 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 }
 
 /**
- * 光标在只有占位符的块节点内执行换行操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
+ * 光标在只有占位符的非固定块节点内执行换行操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
  */
 export const handlerForParagraphInsertOnlyWithPlaceholder = function (this: Editor, node: KNode) {
-	//非块节点，或者不是只有占位符
-	if (!node.isBlock() || !node.allIsPlaceholder()) {
+	//非块节点，或者不是只有占位符，或者是固定块节点
+	if (!node.isBlock() || !node.allIsPlaceholder() || node.fixed) {
 		return
 	}
-	//存在父节点
-	if (node.parent) {
+	//存在父节点并且父节点不是固定块节点
+	if (node.parent && !node.parent.fixed) {
 		//块节点的父节点
 		const parentNode = node.parent
 		//获取该块节点在父节点中的位置
@@ -842,20 +842,22 @@ export const handlerForParagraphInsertOnlyWithPlaceholder = function (this: Edit
 }
 
 /**
- * 光标在编辑器开始处执行删除操作，所在块节点转为段落，并且成为根级的块节点
+ * 1. 光标在非固定块节点开始处（存在父节点且父节点不包括前一个可设置光标的节点所在的块节点）执行删除操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
+ * 2. 光标在编辑器的开始处，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
  */
 export const handlerForDeleteInStart = function (this: Editor, node: KNode) {
-	if (!node.isBlock()) {
+	if (!node.isBlock() || node.fixed) {
 		return
 	}
-	//存在父节点
-	if (node.parent) {
+	//存在父节点且不是固定块节点
+	if (node.parent && !node.parent.fixed) {
+		const parentNode = node.parent
+		//获取该块节点在父节点中的位置
+		const index = parentNode.children!.findIndex(item => item.isEqual(node))
 		//将块节点移到父节点之前
-		node.parent.children!.splice(0, 1)
-		this.addNodeBefore(node, node.parent)
-		handlerForDeleteInStart.apply(this, [node])
-	} else {
-		//转为段落
-		this.toParagraph(node)
+		parentNode.children!.splice(index, 1)
+		this.addNodeBefore(node, parentNode)
 	}
+	//转为段落
+	this.toParagraph(node)
 }

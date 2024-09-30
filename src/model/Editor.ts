@@ -526,6 +526,7 @@ export class Editor {
 			config.children = []
 			if (block.parse) config.tag = this.blockRenderTag
 			if (block.fixed) config.fixed = block.fixed
+			if (block.nested) config.nested = block.nested
 		}
 		//默认的行内节点
 		else if (inline) {
@@ -1457,7 +1458,14 @@ export class Editor {
 						}
 						//光标在块节点的开始处并且块节点不是固定的
 						else if (!blockNode.fixed) {
-							mergeBlock.apply(this, [previousBlock, blockNode])
+							//块节点存在父节点，并且父节点不包括前一个可设置光标的节点所在的块节点
+							if (blockNode.parent && !blockNode.parent.isContains(previousBlock)) {
+								handlerForDeleteInStart.apply(this, [blockNode])
+							}
+							//正常合并
+							else {
+								mergeBlock.apply(this, [previousBlock, blockNode])
+							}
 						}
 					}
 					//前一个可设置光标的节点不存在，说明在编辑器开始处
