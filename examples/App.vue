@@ -15,20 +15,22 @@ import { Editor, KNode } from '../src'
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.isColor!('#f30') ? editor.value!.commands.unsetColor!('#f30') : editor.value!.commands.setColor!('#f30')
+  editor.value!.commands.allBlockquote!() ? editor.value!.commands.unsetBlockquote!() : editor.value!.commands.setBlockquote!()
 }
 
 const onClick2 = () => {
-  editor.value!.commands.clearFormat!() 
+  editor.value!.commands.setHorizontal!()
 }
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<h3 style="text-align:right;">我是一个段落</h3><h4><span style="color:rgb(255, 51, 0);">我是一个段落</span></h4><h5 contenteditable="false">我是一个<span style="color:red;">333</span>不可编辑的段落</h5><h6>我是一个段落</h6><p>我是一个段落<code>Kaitify Editor</code></p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video autoplay loop muted src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" controls alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><br/></p>`,
+    value: `<blockquote><p>我是一段引用</p></blockquote><h3 style="text-align:right;">我是一个段落</h3><h4><span style="color:rgb(255, 51, 0);">我是一个段落</span></h4><h5 contenteditable="false">我是一个<span style="color:red;">333</span>不可编辑的段落</h5><h6>我是一个段落</h6><p>我是一个段落<code>Kaitify Editor</code></p><p><img src="https://preview.qiantucdn.com/meijing/25/83/17/60y58PICcfEViGqWCsKJ2_PIC2018.jpg!qt_h320_webp" alt="图片" /></p><p><video autoplay loop muted src="https://js.588ku.com/comp/video/images/video_banner_240920.mp4" controls alt="视频地址" /></p><table><tr><td>333<br>444</td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><hr/></td></tr><tr><td><br></td><td><br></td><td><br></td></tr></table><p><br></p><ol><li>列表1</li><li>列表2</li></ol><p><hr/></p>`,
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    onSelectionUpdate(sel) { }
+    onSelectionUpdate(sel) {
+
+    }
   })
   console.log(editor.value!.stackNodes);
 
