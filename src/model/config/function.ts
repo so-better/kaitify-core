@@ -794,3 +794,68 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 		}
 	}
 }
+
+/**
+ * 光标在只有占位符的块节点内执行换行操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
+ */
+export const handlerForParagraphInsertOnlyWithPlaceholder = function (this: Editor, node: KNode) {
+	//非块节点，或者不是只有占位符
+	if (!node.isBlock() || !node.allIsPlaceholder()) {
+		return
+	}
+	//存在父节点
+	if (node.parent) {
+		//块节点的父节点
+		const parentNode = node.parent
+		//获取该块节点在父节点中的位置
+		const index = parentNode.children!.findIndex(item => item.isEqual(node))
+		//该块节点在父节点第一个
+		if (index == 0) {
+			//将块节点移到父节点之前
+			parentNode.children!.splice(index, 1)
+			this.addNodeBefore(node, parentNode)
+		}
+		//该块节点在父节点的最后一个
+		else if (index == parentNode.children!.length - 1) {
+			//将块节点移到父节点之后
+			parentNode.children!.splice(index, 1)
+			this.addNodeAfter(node, parentNode)
+		}
+		//该块节点在父节点中间
+		else {
+			//克隆父节点
+			const newParentNode = parentNode.clone(false)
+			//获取父节点的子节点数组
+			const children = parentNode.children!
+			//重新设置父节点的子节点
+			parentNode.children! = children.slice(0, index)
+			//设置克隆的父节点的子节点
+			newParentNode.children = children.slice(index + 1)
+			//将块节点移动到父节点后
+			this.addNodeAfter(node, parentNode)
+			//将克隆的父节点添加到块节点后
+			this.addNodeAfter(newParentNode, node)
+		}
+	}
+	//转为段落
+	this.toParagraph(node)
+}
+
+/**
+ * 光标在编辑器开始处执行删除操作，所在块节点转为段落，并且成为根级的块节点
+ */
+export const handlerForDeleteInStart = function (this: Editor, node: KNode) {
+	if (!node.isBlock()) {
+		return
+	}
+	//存在父节点
+	if (node.parent) {
+		//将块节点移到父节点之前
+		node.parent.children!.splice(0, 1)
+		this.addNodeBefore(node, node.parent)
+		handlerForDeleteInStart.apply(this, [node])
+	} else {
+		//转为段落
+		this.toParagraph(node)
+	}
+}

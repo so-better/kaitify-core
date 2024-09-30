@@ -12,7 +12,7 @@ import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtensi
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
-import { checkNodes, emptyFixedBlock, formatNodes, mergeBlock, redressSelection, registerExtension } from './config/function'
+import { checkNodes, emptyFixedBlock, formatNodes, handlerForDeleteInStart, handlerForParagraphInsertOnlyWithPlaceholder, mergeBlock, redressSelection, registerExtension } from './config/function'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -1266,44 +1266,9 @@ export class Editor {
 			else if (!blockNode.fixed) {
 				//光标在块节点的起始处
 				if (firstSelectionNode.isEqual(node) && offset == 0) {
-					//如果块节点只有占位符并且块节点不是段落
-					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
-						//列表项元素特殊处理
-						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
-							//列表节点
-							const listNode = blockNode.parent
-							//获取该块节点在列表节点中的位置
-							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
-							//该块节点在列表节点第一个
-							if (index == 0) {
-								//将块节点移到列表节点之前
-								listNode.children!.splice(index, 1)
-								this.addNodeBefore(blockNode, listNode)
-							}
-							//该块节点在列表节点的最后一个
-							else if (index == listNode.children!.length - 1) {
-								//将块节点移到列表节点之后
-								listNode.children!.splice(index, 1)
-								this.addNodeAfter(blockNode, listNode)
-							}
-							//该块节点在列表节点中间
-							else {
-								//克隆父节点
-								const newParent = blockNode.parent.clone(false)
-								//获取父节点的子节点数组
-								const listItems = listNode.children!
-								//重新设置父节点的子节点
-								listNode.children! = listItems.slice(0, index)
-								//设置克隆的父节点的子节点
-								newParent.children = listItems.slice(index + 1)
-								//将块节点移动到父节点后
-								this.addNodeAfter(blockNode, listNode)
-								//将克隆的父节点添加到块节点后
-								this.addNodeAfter(newParent, blockNode)
-							}
-						}
-						//转为段落
-						this.toParagraph(blockNode)
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行
 					else {
@@ -1318,43 +1283,9 @@ export class Editor {
 				}
 				//光标在块节点的末尾处
 				else if (lastSelectionNode.isEqual(node) && offset == (node.isText() ? node.textContent!.length : 1)) {
-					//如果块节点只有占位符并且块节点不是段落
-					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
-						//列表项元素特殊处理
-						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
-							//列表节点
-							const listNode = blockNode.parent
-							//获取该块节点在列表节点中的位置
-							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
-							//该块节点在列表节点第一个
-							if (index == 0) {
-								//将块节点移到列表节点之前
-								listNode.children!.splice(index, 1)
-								this.addNodeBefore(blockNode, listNode)
-							}
-							//该块节点在列表节点的最后一个
-							else if (index == listNode.children!.length - 1) {
-								//将块节点移到列表节点之后
-								listNode.children!.splice(index, 1)
-								this.addNodeAfter(blockNode, listNode)
-							}
-							//该块节点在列表节点中间
-							else {
-								//克隆父节点
-								const newParent = blockNode.parent.clone(false)
-								//获取父节点的子节点数组
-								const listItems = listNode.children!
-								//重新设置父节点的子节点
-								listNode.children! = listItems.slice(0, index)
-								//设置克隆的父节点的子节点
-								newParent.children = listItems.slice(index + 1)
-								//将块节点移动到父节点后
-								this.addNodeAfter(blockNode, listNode)
-								//将克隆的父节点添加到块节点后
-								this.addNodeAfter(newParent, blockNode)
-							}
-						}
-						this.toParagraph(blockNode)
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行
 					else {
@@ -1370,43 +1301,9 @@ export class Editor {
 				}
 				//光标在块节点的中间
 				else {
-					//如果块节点只有占位符并且块节点不是段落
-					if (blockNode.allIsPlaceholder() && blockNode.tag != this.blockRenderTag) {
-						//列表项元素特殊处理
-						if (blockNode.tag == 'li' && blockNode.parent && ['ol', 'ul'].includes(blockNode.parent.tag!)) {
-							//列表节点
-							const listNode = blockNode.parent
-							//获取该块节点在列表节点中的位置
-							const index = listNode.children!.findIndex(item => item.isEqual(blockNode))
-							//该块节点在列表节点第一个
-							if (index == 0) {
-								//将块节点移到列表节点之前
-								listNode.children!.splice(index, 1)
-								this.addNodeBefore(blockNode, listNode)
-							}
-							//该块节点在列表节点的最后一个
-							else if (index == listNode.children!.length - 1) {
-								//将块节点移到列表节点之后
-								listNode.children!.splice(index, 1)
-								this.addNodeAfter(blockNode, listNode)
-							}
-							//该块节点在列表节点中间
-							else {
-								//克隆父节点
-								const newParent = blockNode.parent.clone(false)
-								//获取父节点的子节点数组
-								const listItems = listNode.children!
-								//重新设置父节点的子节点
-								listNode.children! = listItems.slice(0, index)
-								//设置克隆的父节点的子节点
-								newParent.children = listItems.slice(index + 1)
-								//将块节点移动到父节点后
-								this.addNodeAfter(blockNode, listNode)
-								//将克隆的父节点添加到块节点后
-								this.addNodeAfter(newParent, blockNode)
-							}
-						}
-						this.toParagraph(blockNode)
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
 					}
 					//其他情况下正常换行
 					else {
@@ -1565,8 +1462,7 @@ export class Editor {
 					}
 					//前一个可设置光标的节点不存在，说明在编辑器开始处
 					else {
-						//转为段落
-						this.toParagraph(blockNode)
+						handlerForDeleteInStart.apply(this, [blockNode])
 					}
 				}
 				//光标在所在节点的内部
@@ -1696,7 +1592,7 @@ export class Editor {
 					this.addNode(placeholder, startBlockNode)
 					this.setSelectionBefore(placeholder, 'start')
 				}
-				//起点所在块节点为空，创建占位符
+				//终点所在块节点为空，创建占位符
 				if (endBlockNode.isEmpty()) {
 					const placeholder = KNode.createPlaceholder()
 					this.addNode(placeholder, endBlockNode)
