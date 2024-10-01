@@ -208,6 +208,29 @@ export const ListExtension = Extension.create({
 			}
 		}
 	],
+	onInsertParagraph(node, type) {
+		if (type == 1 && node.isMatch({ tag: 'li' })) {
+			//父节点存在且是列表节点则不处理
+			if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
+				return
+			}
+			//转为段落
+			this.toParagraph(node)
+		}
+	},
+	onDeleteComplete() {
+		const node = this.selection.start!.node
+		const blockNode = node.getBlock()
+		//如果是列表项节点
+		if (blockNode.isMatch({ tag: 'li' })) {
+			//父节点存在且是列表节点则不处理
+			if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
+				return
+			}
+			//转为段落
+			this.toParagraph(node)
+		}
+	},
 	addCommands() {
 		/**
 		 * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null

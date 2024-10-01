@@ -506,6 +506,20 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 			if (fn) fn.apply(this, [selection])
 		}
 	}
+	if (extension.onDeleteComplete) {
+		const fn = this.onDeleteComplete
+		this.onDeleteComplete = () => {
+			extension.onDeleteComplete!.apply(this)
+			if (fn) fn.apply(this)
+		}
+	}
+	if (extension.onInsertParagraph) {
+		const fn = this.onInsertParagraph
+		this.onInsertParagraph = (node: KNode, type: 0 | 1 | 2 | 3) => {
+			extension.onInsertParagraph!.apply(this, [node, type])
+			if (fn) fn.apply(this, [node, type])
+		}
+	}
 	if (extension.addCommands) {
 		const commands = extension.addCommands.apply(this)
 		this.commands = { ...this.commands, ...commands }
@@ -796,62 +810,38 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 }
 
 /**
- * 光标在只有占位符的非固定块节点（不是段落节点）内执行换行操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
+ * 将指定的非固定块节点从父节点（非固定块节点）中抽离，插入到和父节点同级的位置
  */
-export const handlerForParagraphInsertOnlyWithPlaceholder = function (this: Editor, node: KNode) {
-	//存在父节点并且父节点不是固定块节点
-	if (node.parent && !node.parent.fixed) {
-		debugger
-		//块节点的父节点
-		const parentNode = node.parent
-		//获取该块节点在父节点中的位置
-		const index = parentNode.children!.findIndex(item => item.isEqual(node))
-		//该块节点在父节点第一个
-		if (index == 0) {
-			//将块节点移到父节点之前
-			parentNode.children!.splice(index, 1)
-			this.addNodeBefore(node, parentNode)
-		}
-		//该块节点在父节点的最后一个
-		else if (index == parentNode.children!.length - 1) {
-			//将块节点移到父节点之后
-			parentNode.children!.splice(index, 1)
-			this.addNodeAfter(node, parentNode)
-		}
-		//该块节点在父节点中间
-		else {
-			//克隆父节点
-			const newParentNode = parentNode.clone(false)
-			//获取父节点的子节点数组
-			const children = parentNode.children!
-			//重新设置父节点的子节点
-			parentNode.children! = children.slice(0, index)
-			//设置克隆的父节点的子节点
-			newParentNode.children = children.slice(index + 1)
-			//将块节点移动到父节点后
-			this.addNodeAfter(node, parentNode)
-			//将克隆的父节点添加到块节点后
-			this.addNodeAfter(newParentNode, node)
-		}
-	}
-	//转为段落
-	if (!this.isPararagph(node)) this.toParagraph(node)
-}
-
-/**
- * 1. 光标在非固定块节点开始处（存在父节点且父节点不包括前一个可设置光标的节点所在的块节点）执行删除操作，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
- * 2. 光标在编辑器的开始处，块节点转为段落，块节点存在父节点的话会从父节点中脱离出去
- */
-export const handlerForDeleteInStart = function (this: Editor, node: KNode) {
-	//存在父节点且不是固定块节点
-	if (node.parent && !node.parent.fixed) {
-		const parentNode = node.parent
-		//获取该块节点在父节点中的位置
-		const index = parentNode.children!.findIndex(item => item.isEqual(node))
+export const removeBlockFromParentToSameLevel = function (this: Editor, node: KNode) {
+	//块节点的父节点
+	const parentNode = node.parent!
+	//获取该块节点在父节点中的位置
+	const index = parentNode.children!.findIndex(item => item.isEqual(node))
+	//该块节点在父节点第一个
+	if (index == 0) {
 		//将块节点移到父节点之前
 		parentNode.children!.splice(index, 1)
 		this.addNodeBefore(node, parentNode)
 	}
-	//转为段落
-	if (!this.isPararagph(node)) this.toParagraph(node)
+	//该块节点在父节点的最后一个
+	else if (index == parentNode.children!.length - 1) {
+		//将块节点移到父节点之后
+		parentNode.children!.splice(index, 1)
+		this.addNodeAfter(node, parentNode)
+	}
+	//该块节点在父节点中间
+	else {
+		//克隆父节点
+		const newParentNode = parentNode.clone(false)
+		//获取父节点的子节点数组
+		const children = parentNode.children!
+		//重新设置父节点的子节点
+		parentNode.children! = children.slice(0, index)
+		//设置克隆的父节点的子节点
+		newParentNode.children = children.slice(index + 1)
+		//将块节点移动到父节点后
+		this.addNodeAfter(node, parentNode)
+		//将克隆的父节点添加到块节点后
+		this.addNodeAfter(newParentNode, node)
+	}
 }

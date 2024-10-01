@@ -37,6 +37,14 @@ export type ExtensionCreateOptionType = {
 	 */
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
+	 * 插入段落时回调
+	 */
+	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
+	/**
+	 * 完成删除回调
+	 */
+	onDeleteComplete?: (this: Editor) => void
+	/**
 	 * 自定义命令
 	 */
 	addCommands?: (this: Editor) => EditorCommandsType
@@ -83,6 +91,14 @@ export class Extension {
 	 */
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
+	 * 插入段落时回调
+	 */
+	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
+	/**
+	 * 完成删除回调
+	 */
+	onDeleteComplete?: (this: Editor) => void
+	/**
 	 * 自定义命令
 	 */
 	addCommands?: (this: Editor) => EditorCommandsType
@@ -103,6 +119,8 @@ export class Extension {
 		if (options.pasteKeepStyles) extension.pasteKeepStyles = options.pasteKeepStyles
 		if (options.afterUpdateView) extension.afterUpdateView = options.afterUpdateView
 		if (options.onSelectionUpdate) extension.onSelectionUpdate = options.onSelectionUpdate
+		if (options.onDeleteComplete) extension.onDeleteComplete = options.onDeleteComplete
+		if (options.onInsertParagraph) extension.onInsertParagraph = options.onInsertParagraph
 		if (options.addCommands) extension.addCommands = options.addCommands
 		return extension
 	}

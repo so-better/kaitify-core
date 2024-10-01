@@ -12,7 +12,7 @@ import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtensi
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
-import { checkNodes, emptyFixedBlock, formatNodes, handlerForDeleteInStart, handlerForParagraphInsertOnlyWithPlaceholder, mergeBlock, redressSelection, registerExtension } from './config/function'
+import { checkNodes, emptyFixedBlock, formatNodes, mergeBlock, redressSelection, registerExtension, removeBlockFromParentToSameLevel } from './config/function'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -119,8 +119,10 @@ export type EditorConfigureOptionType = {
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
 	 * 插入段落时触发
+	 * 1. 第一个参数为换行操作后光标所在的块节点
+	 * 2. 第二个参数：0表示在代码块内换行；1表示当前块节点内只有占位符且存在父节点时从父节点抽离到父节点同级；2表示当前块节点只有占位符且不存在父节点且不是段落时转为段落；3表示正常换行
 	 */
-	onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void
+	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
 	/**
 	 * 完成删除时触发
 	 */
@@ -264,8 +266,10 @@ export class Editor {
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
 	 * 插入段落时触发【初始化后不可修改】
+	 * 1. 第一个参数为换行操作后光标所在的块节点
+	 * 2. 第二个参数：0表示在代码块内换行；1表示当前块节点内只有占位符且存在父节点时从父节点抽离到父节点同级；2表示当前块节点只有占位符且不存在父节点且不是段落时转为段落；3表示正常换行
 	 */
-	onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void
+	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
 	/**
 	 * 完成删除时触发【初始化后不可修改】
 	 */
@@ -600,7 +604,7 @@ export class Editor {
 	/**
 	 * 【API】指定的块节点是否是一个段落
 	 */
-	isPararagph(node: KNode) {
+	isParagraph(node: KNode) {
 		if (!node.isBlock()) {
 			return false
 		}
@@ -1272,16 +1276,53 @@ export class Editor {
 				this.insertNode(zeroWidthText)
 				this.setSelectionAfter(zeroWidthText, 'all')
 				if (typeof this.onInsertParagraph == 'function') {
-					this.onInsertParagraph.apply(this, [blockNode, blockNode])
+					this.onInsertParagraph.apply(this, [blockNode, 0])
 				}
 			}
 			//在非代码块样式内，且不是固定的块节点
 			else if (!blockNode.fixed) {
 				//光标在块节点的起始处
 				if (firstSelectionNode.isEqual(node) && offset == 0) {
-					//块节点只有占位符，存在父节点或者不是段落
-					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
-						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						//存在父节点
+						if (blockNode.parent) {
+							//父节点是固定节点，则正常换行
+							if (blockNode.parent.fixed) {
+								const newBlockNode = blockNode.clone(false)
+								const placeholderNode = KNode.createPlaceholder()
+								this.addNode(placeholderNode, newBlockNode)
+								this.addNodeBefore(newBlockNode, blockNode)
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 3])
+								}
+							}
+							//父节点不是固定块节点，从父节点中抽离到父节点同级
+							else {
+								removeBlockFromParentToSameLevel.apply(this, [blockNode])
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 1])
+								}
+							}
+						}
+						//在编辑器根部但不是段落
+						else if (!this.isParagraph(blockNode)) {
+							//转为段落
+							this.toParagraph(blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 2])
+							}
+						}
+						//在编辑器根部，但是是段落，正常换行
+						else {
+							const newBlockNode = blockNode.clone(false)
+							const placeholderNode = KNode.createPlaceholder()
+							this.addNode(placeholderNode, newBlockNode)
+							this.addNodeBefore(newBlockNode, blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 3])
+							}
+						}
 					}
 					//其他情况下正常换行
 					else {
@@ -1290,15 +1331,52 @@ export class Editor {
 						this.addNode(placeholderNode, newBlockNode)
 						this.addNodeBefore(newBlockNode, blockNode)
 						if (typeof this.onInsertParagraph == 'function') {
-							this.onInsertParagraph.apply(this, [blockNode, newBlockNode])
+							this.onInsertParagraph.apply(this, [blockNode, 3])
 						}
 					}
 				}
 				//光标在块节点的末尾处
 				else if (lastSelectionNode.isEqual(node) && offset == (node.isText() ? node.textContent!.length : 1)) {
-					//块节点只有占位符，存在父节点或者不是段落
-					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
-						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						//存在父节点
+						if (blockNode.parent) {
+							//父节点是固定节点
+							if (blockNode.parent.fixed) {
+								const newBlockNode = blockNode.clone(false)
+								const placeholderNode = KNode.createPlaceholder()
+								this.addNode(placeholderNode, newBlockNode)
+								this.addNodeBefore(newBlockNode, blockNode)
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 3])
+								}
+							}
+							//父节点不是固定块节点，从父节点中抽离到父节点同级
+							else {
+								removeBlockFromParentToSameLevel.apply(this, [blockNode])
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 1])
+								}
+							}
+						}
+						//在编辑器根部但不是段落
+						else if (!this.isParagraph(blockNode)) {
+							//转为段落
+							this.toParagraph(blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 2])
+							}
+						}
+						//在编辑器根部，但是是段落，正常换行
+						else {
+							const newBlockNode = blockNode.clone(false)
+							const placeholderNode = KNode.createPlaceholder()
+							this.addNode(placeholderNode, newBlockNode)
+							this.addNodeBefore(newBlockNode, blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 3])
+							}
+						}
 					}
 					//其他情况下正常换行
 					else {
@@ -1308,15 +1386,52 @@ export class Editor {
 						this.addNodeAfter(newBlockNode, blockNode)
 						this.setSelectionBefore(placeholderNode)
 						if (typeof this.onInsertParagraph == 'function') {
-							this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+							this.onInsertParagraph.apply(this, [newBlockNode, 3])
 						}
 					}
 				}
 				//光标在块节点的中间
 				else {
-					//块节点只有占位符，存在父节点或者不是段落
-					if (blockNode.allIsPlaceholder() && (blockNode.parent || !this.isPararagph(blockNode))) {
-						handlerForParagraphInsertOnlyWithPlaceholder.apply(this, [blockNode])
+					//块节点只有占位符
+					if (blockNode.allIsPlaceholder()) {
+						//存在父节点
+						if (blockNode.parent) {
+							//父节点是固定节点
+							if (blockNode.parent.fixed) {
+								const newBlockNode = blockNode.clone(false)
+								const placeholderNode = KNode.createPlaceholder()
+								this.addNode(placeholderNode, newBlockNode)
+								this.addNodeBefore(newBlockNode, blockNode)
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 3])
+								}
+							}
+							//父节点不是固定块节点，从父节点中抽离到父节点同级
+							else {
+								removeBlockFromParentToSameLevel.apply(this, [blockNode])
+								if (typeof this.onInsertParagraph == 'function') {
+									this.onInsertParagraph.apply(this, [blockNode, 1])
+								}
+							}
+						}
+						//在编辑器根部但不是段落
+						else if (!this.isParagraph(blockNode)) {
+							//转为段落
+							this.toParagraph(blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 2])
+							}
+						}
+						//在编辑器根部，但是是段落，正常换行
+						else {
+							const newBlockNode = blockNode.clone(false)
+							const placeholderNode = KNode.createPlaceholder()
+							this.addNode(placeholderNode, newBlockNode)
+							this.addNodeBefore(newBlockNode, blockNode)
+							if (typeof this.onInsertParagraph == 'function') {
+								this.onInsertParagraph.apply(this, [blockNode, 3])
+							}
+						}
 					}
 					//其他情况下正常换行
 					else {
@@ -1341,8 +1456,9 @@ export class Editor {
 						this.selection.end!.offset = offset
 						//删除新块节点光标所在位置前面的部分
 						this.delete()
+						//触发事件
 						if (typeof this.onInsertParagraph == 'function') {
-							this.onInsertParagraph.apply(this, [newBlockNode, blockNode])
+							this.onInsertParagraph.apply(this, [newBlockNode, 3])
 						}
 					}
 				}
@@ -1470,9 +1586,14 @@ export class Editor {
 						}
 						//光标在块节点的开始处并且块节点不是固定的
 						else if (!blockNode.fixed) {
-							//块节点存在父节点，并且父节点不包括前一个可设置光标的节点所在的块节点
+							//块节点存在父节点，并且父节点不包括前一个可设置光标的节点所在的块节点，说明该块节点在父节点的第一个位置
 							if (blockNode.parent && !blockNode.parent.isContains(previousBlock)) {
-								handlerForDeleteInStart.apply(this, [blockNode])
+								//父节点不是固定的
+								if (!blockNode.parent.fixed) {
+									//将块节点从父节点中抽离到父节点同级
+									removeBlockFromParentToSameLevel.apply(this, [blockNode])
+								}
+								//是固定的块节点就不用处理
 							}
 							//正常合并
 							else {
@@ -1482,7 +1603,11 @@ export class Editor {
 					}
 					//前一个可设置光标的节点不存在，说明在编辑器开始处
 					else {
-						handlerForDeleteInStart.apply(this, [blockNode])
+						//存在父节点，且不是固定的
+						if (blockNode.parent && !blockNode.parent.fixed) {
+							//将块节点从父节点中抽离到父节点同级
+							removeBlockFromParentToSameLevel.apply(this, [blockNode])
+						}
 					}
 				}
 				//光标在所在节点的内部
