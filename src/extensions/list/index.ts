@@ -208,28 +208,20 @@ export const ListExtension = Extension.create({
 			}
 		}
 	],
-	onInsertParagraph(node, type) {
-		if (type == 1 && node.isMatch({ tag: 'li' })) {
-			//父节点存在且是列表节点则不处理
-			if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
-				return
-			}
-			//转为段落
-			this.toParagraph(node)
+	onDetachMentBlockFromParentCallback(node) {
+		//父节点存在并且是列表节点
+		if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
+			//将该节点转为列表项节点
+			node.tag = 'li'
+			node.marks = {}
+			node.styles = {}
+			node.fixed = false
+			node.nested = true
+			node.locked = false
+			node.namespace = ''
+			return false
 		}
-	},
-	onDeleteComplete() {
-		const node = this.selection.start!.node
-		const blockNode = node.getBlock()
-		//如果是列表项节点
-		if (blockNode.isMatch({ tag: 'li' })) {
-			//父节点存在且是列表节点则不处理
-			if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
-				return
-			}
-			//转为段落
-			this.toParagraph(node)
-		}
+		return true
 	},
 	addCommands() {
 		/**

@@ -515,9 +515,17 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 	}
 	if (extension.onInsertParagraph) {
 		const fn = this.onInsertParagraph
-		this.onInsertParagraph = (node: KNode, type: 0 | 1 | 2 | 3) => {
-			extension.onInsertParagraph!.apply(this, [node, type])
-			if (fn) fn.apply(this, [node, type])
+		this.onInsertParagraph = (node: KNode) => {
+			extension.onInsertParagraph!.apply(this, [node])
+			if (fn) fn.apply(this, [node])
+		}
+	}
+	if (extension.onDetachMentBlockFromParentCallback) {
+		const fn = this.onDetachMentBlockFromParentCallback
+		this.onDetachMentBlockFromParentCallback = (node: KNode) => {
+			const useDefault = extension.onDetachMentBlockFromParentCallback!.apply(this, [node])
+			if (fn) return fn.apply(this, [node]) && useDefault
+			return useDefault
 		}
 	}
 	if (extension.addCommands) {
@@ -843,5 +851,72 @@ export const removeBlockFromParentToSameLevel = function (this: Editor, node: KN
 		this.addNodeAfter(node, parentNode)
 		//将克隆的父节点添加到块节点后
 		this.addNodeAfter(newParentNode, node)
+	}
+}
+
+/**
+ * 光标所在的块节点不是只有占位，且非固定块节点，非代码块样式的块节点，在该块节点内正常换行方法
+ */
+export const handlerForNormalInsertParagraph = function (this: Editor) {
+	//光标所在节点
+	const node = this.selection.start!.node
+	//光标在节点里的偏移值
+	const offset = this.selection.start!.offset
+	//光标所在块节点
+	const blockNode = node.getBlock()
+	//获取块节点内第一个可以设置光标的节点
+	const firstSelectionNode = this.getFirstSelectionNodeInChildren(blockNode)!
+	//获取块节点内最后一个可以设置光标的节点
+	const lastSelectionNode = this.getLastSelectionNodeInChildren(blockNode)!
+	//光标在块节点的起始处
+	if (firstSelectionNode.isEqual(node) && offset == 0) {
+		const newBlockNode = blockNode.clone(false)
+		const placeholderNode = KNode.createPlaceholder()
+		this.addNode(placeholderNode, newBlockNode)
+		this.addNodeBefore(newBlockNode, blockNode)
+		//触发换行事件
+		if (typeof this.onInsertParagraph == 'function') {
+			this.onInsertParagraph.apply(this, [blockNode])
+		}
+	}
+	//光标在块节点的末尾处
+	else if (lastSelectionNode.isEqual(node) && offset == (node.isText() ? node.textContent!.length : 1)) {
+		const newBlockNode = blockNode.clone(false)
+		const placeholderNode = KNode.createPlaceholder()
+		this.addNode(placeholderNode, newBlockNode)
+		this.addNodeAfter(newBlockNode, blockNode)
+		this.setSelectionBefore(placeholderNode)
+		//触发换行事件
+		if (typeof this.onInsertParagraph == 'function') {
+			this.onInsertParagraph.apply(this, [newBlockNode])
+		}
+	}
+	//光标在块节点的中间
+	else {
+		//创建新的块节点
+		const newBlockNode = blockNode.clone(true)
+		//插入到光标所在块节点之后
+		this.addNodeAfter(newBlockNode, blockNode)
+		//记录光标所在节点在块节点中的序列
+		const index = KNode.flat(blockNode.children!).findIndex(item => {
+			return this.selection.start!.node.isEqual(item)
+		})
+		//记录光标的偏移值
+		const offset = this.selection.start!.offset
+		//将光标终点移动到块节点最后
+		this.setSelectionAfter(lastSelectionNode, 'end')
+		//删除原块节点光标所在位置后面的部分
+		this.delete()
+		//将光标起点移动到新块节点的起始处
+		this.setSelectionBefore(newBlockNode, 'start')
+		//将光标终点移动到新块节点中与老块节点对应的位置
+		this.selection.end!.node = KNode.flat(newBlockNode.children!)[index]
+		this.selection.end!.offset = offset
+		//删除新块节点光标所在位置前面的部分
+		this.delete()
+		//触发事件
+		if (typeof this.onInsertParagraph == 'function') {
+			this.onInsertParagraph.apply(this, [newBlockNode])
+		}
 	}
 }

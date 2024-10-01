@@ -39,11 +39,15 @@ export type ExtensionCreateOptionType = {
 	/**
 	 * 插入段落时回调
 	 */
-	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
+	onInsertParagraph?: (this: Editor, node: KNode) => void
 	/**
 	 * 完成删除回调
 	 */
 	onDeleteComplete?: (this: Editor) => void
+	/**
+	 * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发
+	 */
+	onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean
 	/**
 	 * 自定义命令
 	 */
@@ -93,11 +97,15 @@ export class Extension {
 	/**
 	 * 插入段落时回调
 	 */
-	onInsertParagraph?: (this: Editor, node: KNode, type: 0 | 1 | 2 | 3) => void
+	onInsertParagraph?: (this: Editor, node: KNode) => void
 	/**
 	 * 完成删除回调
 	 */
 	onDeleteComplete?: (this: Editor) => void
+	/**
+	 * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发
+	 */
+	onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean
 	/**
 	 * 自定义命令
 	 */
@@ -121,6 +129,7 @@ export class Extension {
 		if (options.onSelectionUpdate) extension.onSelectionUpdate = options.onSelectionUpdate
 		if (options.onDeleteComplete) extension.onDeleteComplete = options.onDeleteComplete
 		if (options.onInsertParagraph) extension.onInsertParagraph = options.onInsertParagraph
+		if (options.onDetachMentBlockFromParentCallback) extension.onDetachMentBlockFromParentCallback = options.onDetachMentBlockFromParentCallback
 		if (options.addCommands) extension.addCommands = options.addCommands
 		return extension
 	}
