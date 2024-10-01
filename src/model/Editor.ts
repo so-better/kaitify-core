@@ -12,7 +12,7 @@ import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtensi
 import { NODE_MARK } from '../view'
 import { defaultUpdateView } from '../view/js-render'
 import { FontFamilyExtension } from '../extensions/fontFamily'
-import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, redressSelection, registerExtension, removeBlockFromParentToSameLevel } from './config/function'
+import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, redressSelection, registerExtension, removeBlockFromParentToSameLevel, setPlaceholder } from './config/function'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -176,6 +176,10 @@ export type EditorConfigureOptionType = {
 	 * 是否使用默认css样式
 	 */
 	useDefaultCSS?: boolean
+	/**
+	 * 编辑器内容只有一个段落时的默认文本
+	 */
+	placeholder?: string
 }
 
 /**
@@ -1655,6 +1659,8 @@ export class Editor {
 		})
 		//判断节点数组是否为空进行初始化
 		checkNodes.apply(this)
+		//设置placeholder
+		setPlaceholder.apply(this)
 		//旧的html值
 		const oldHtml = this.$el.innerHTML
 		//视图更新之前取消dom监听，以免干扰更新dom
@@ -1757,7 +1763,9 @@ export class Editor {
 		//初始化编辑器dom
 		editor.$el = initEditorDom(options.el)
 		//初始化设置编辑器样式
-		if (options.useDefaultCSS !== false) editor.$el.className = 'Kaitify'
+		if (options.useDefaultCSS !== false) editor.$el.classList.add('Kaitify')
+		//初始化设置编辑器默认提示文本
+		if (options.placeholder) editor.$el.setAttribute('kaitify-placeholder', options.placeholder)
 		//初始化内部属性
 		if (typeof options.allowCopy == 'boolean') editor.allowCopy = options.allowCopy
 		if (typeof options.allowCut == 'boolean') editor.allowCut = options.allowCut
@@ -1801,6 +1809,8 @@ export class Editor {
 		})
 		//初始化检查节点数组
 		checkNodes.apply(editor)
+		//设置placeholder
+		setPlaceholder.apply(editor)
 		//进行视图的渲染
 		const useDefault = typeof editor.onUpdateView == 'function' ? await editor.onUpdateView.apply(editor, [true]) : true
 		//使用默认逻辑

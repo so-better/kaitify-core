@@ -1,6 +1,8 @@
 @import url(./var.less);
 
 .Kaitify {
+	display: block;
+	position: relative;
 	font-size: @font-size;
 	font-family: @font-family;
 	color: @color;
@@ -137,6 +139,16 @@
 	&[contenteditable='true'] {
 		&:focus {
 			border-color: @theme;
+		}
+
+		&[kaitify-placeholder].showPlaceholder::before {
+			content: attr(kaitify-placeholder);
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: @padding;
+			line-height: @line-height;
+			opacity: 0.5;
 		}
 	}
 }

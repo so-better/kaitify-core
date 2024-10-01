@@ -2,7 +2,6 @@
 import { common as DapCommon, file as DapFile } from 'dap-util'
 import { Editor } from '../Editor'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
-import { Selection } from '../Selection'
 import { RuleFunctionType } from './format-rules'
 import { Extension } from '../../extensions'
 import { isContains } from '../../tools'
@@ -465,20 +464,69 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 	if (extension.extraKeepTags) {
 		this.extraKeepTags = [...extension.extraKeepTags, ...this.extraKeepTags]
 	}
+	if (extension.formatRules) {
+		this.formatRules = [...extension.formatRules, ...this.formatRules]
+	}
 	if (extension.domParseNodeCallback) {
 		const fn = this.domParseNodeCallback
-		this.domParseNodeCallback = (node: KNode) => {
+		this.domParseNodeCallback = node => {
 			node = extension.domParseNodeCallback!.apply(this, [node])
 			if (fn) node = fn.apply(this, [node])
 			return node
 		}
 	}
-	if (extension.formatRules) {
-		this.formatRules = [...extension.formatRules, ...this.formatRules]
+	if (extension.onSelectionUpdate) {
+		const fn = this.onSelectionUpdate
+		this.onSelectionUpdate = selection => {
+			extension.onSelectionUpdate!.apply(this, [selection])
+			if (fn) fn.apply(this, [selection])
+		}
+	}
+	if (extension.onInsertParagraph) {
+		const fn = this.onInsertParagraph
+		this.onInsertParagraph = node => {
+			extension.onInsertParagraph!.apply(this, [node])
+			if (fn) fn.apply(this, [node])
+		}
+	}
+	if (extension.onDeleteComplete) {
+		const fn = this.onDeleteComplete
+		this.onDeleteComplete = () => {
+			extension.onDeleteComplete!.apply(this)
+			if (fn) fn.apply(this)
+		}
+	}
+	if (extension.onKeydown) {
+		const fn = this.onKeydown
+		this.onKeydown = event => {
+			extension.onKeydown!.apply(this, [event])
+			if (fn) fn.apply(this, [event])
+		}
+	}
+	if (extension.onKeyup) {
+		const fn = this.onKeyup
+		this.onKeyup = event => {
+			extension.onKeyup!.apply(this, [event])
+			if (fn) fn.apply(this, [event])
+		}
+	}
+	if (extension.onFocus) {
+		const fn = this.onFocus
+		this.onFocus = event => {
+			extension.onFocus!.apply(this, [event])
+			if (fn) fn.apply(this, [event])
+		}
+	}
+	if (extension.onBlur) {
+		const fn = this.onBlur
+		this.onBlur = event => {
+			extension.onBlur!.apply(this, [event])
+			if (fn) fn.apply(this, [event])
+		}
 	}
 	if (extension.pasteKeepMarks) {
 		const fn = this.pasteKeepMarks
-		this.pasteKeepMarks = (node: KNode) => {
+		this.pasteKeepMarks = node => {
 			const marks = extension.pasteKeepMarks!.apply(this, [node])
 			if (fn) Object.assign(marks, fn.apply(this, [node]))
 			return marks
@@ -486,7 +534,7 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 	}
 	if (extension.pasteKeepStyles) {
 		const fn = this.pasteKeepStyles
-		this.pasteKeepStyles = (node: KNode) => {
+		this.pasteKeepStyles = node => {
 			const styles = extension.pasteKeepStyles!.apply(this, [node])
 			if (fn) Object.assign(styles, fn.apply(this, [node]))
 			return styles
@@ -499,30 +547,9 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 			if (fn) fn.apply(this)
 		}
 	}
-	if (extension.onSelectionUpdate) {
-		const fn = this.onSelectionUpdate
-		this.onSelectionUpdate = (selection: Selection) => {
-			extension.onSelectionUpdate!.apply(this, [selection])
-			if (fn) fn.apply(this, [selection])
-		}
-	}
-	if (extension.onDeleteComplete) {
-		const fn = this.onDeleteComplete
-		this.onDeleteComplete = () => {
-			extension.onDeleteComplete!.apply(this)
-			if (fn) fn.apply(this)
-		}
-	}
-	if (extension.onInsertParagraph) {
-		const fn = this.onInsertParagraph
-		this.onInsertParagraph = (node: KNode) => {
-			extension.onInsertParagraph!.apply(this, [node])
-			if (fn) fn.apply(this, [node])
-		}
-	}
 	if (extension.onDetachMentBlockFromParentCallback) {
 		const fn = this.onDetachMentBlockFromParentCallback
-		this.onDetachMentBlockFromParentCallback = (node: KNode) => {
+		this.onDetachMentBlockFromParentCallback = node => {
 			const useDefault = extension.onDetachMentBlockFromParentCallback!.apply(this, [node])
 			if (fn) return fn.apply(this, [node]) && useDefault
 			return useDefault
@@ -918,5 +945,17 @@ export const handlerForNormalInsertParagraph = function (this: Editor) {
 		if (typeof this.onInsertParagraph == 'function') {
 			this.onInsertParagraph.apply(this, [newBlockNode])
 		}
+	}
+}
+
+/**
+ * 设置placeholder，在每次视图更新时调用此方法
+ */
+export const setPlaceholder = function (this: Editor) {
+	//编辑器内只有一个块节点且是只有占位符的段落
+	if (this.stackNodes.length == 1 && this.isParagraph(this.stackNodes[0]) && this.stackNodes[0].allIsPlaceholder()) {
+		this.$el!.classList.add('showPlaceholder')
+	} else {
+		this.$el!.classList.remove('showPlaceholder')
 	}
 }
