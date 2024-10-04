@@ -1,4 +1,5 @@
 import { Extension } from '../Extension'
+import { isUndo, isRedo } from '../../model/config/keyboard'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -11,6 +12,18 @@ declare module '../../model' {
 
 export const HistoryExtension = Extension.create({
 	name: 'history',
+	onKeydown(event) {
+		//撤销
+		if (isUndo(event)) {
+			event.preventDefault()
+			this.commands.undo?.()
+		}
+		//重做
+		else if (isRedo(event)) {
+			event.preventDefault()
+			this.commands.redo?.()
+		}
+	},
 	addCommands() {
 		/**
 		 * 是否可以撤销，如果可以撤销返回对应的历史记录

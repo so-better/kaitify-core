@@ -1,5 +1,4 @@
 import { Editor } from '../Editor'
-import { isUndo, isRedo } from './keyboard'
 import { delay } from '../../tools'
 import { handlerForPasteDrop, redressSelection, updateSelection } from './function'
 
@@ -171,16 +170,6 @@ export const onKeyboard = function (this: Editor, e: Event) {
 		//不可编辑
 		if (!this.isEditable()) {
 			return
-		}
-		//撤销
-		if (isUndo(event)) {
-			event.preventDefault()
-			this.commands.undo?.()
-		}
-		//重做
-		else if (isRedo(event)) {
-			event.preventDefault()
-			this.commands.redo?.()
 		}
 		//触发keydown
 		if (typeof this.onKeydown == 'function') {

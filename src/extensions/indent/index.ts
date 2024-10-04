@@ -1,24 +1,12 @@
-import { KNode, KNodeStylesType } from '../../model'
-import { deleteProperty } from '../../tools'
+import { KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 import { getSelectionBlockNodes } from '../../model/config/function'
+import { isDecreaseIndent, isIncreaseIndent } from '../../model/config/keyboard'
 
 declare module '../../model' {
 	interface EditorCommandsType {
-		isIndent?: (val: string) => boolean
-		setIndent?: (val: string) => Promise<void>
-		unsetIndent?: (val: string) => Promise<void>
-	}
-}
-
-/**
- * 删除指定块节点及以上块节点的行高样式
- */
-const clearIndent = (blockNode: KNode, val: string) => {
-	const matchNode = blockNode.getMatchNode({ styles: { textIndent: val } })
-	if (matchNode) {
-		matchNode.styles = deleteProperty(matchNode.styles!, 'textIndent')
-		clearIndent(matchNode, val)
+		setIncreaseIndent?: () => Promise<void>
+		setDecreaseIndent?: () => Promise<void>
 	}
 }
 
@@ -31,40 +19,34 @@ export const IndentExtension = Extension.create({
 		}
 		return styles
 	},
+	onKeydown(event) {
+		//增加缩进
+		if (isIncreaseIndent(event)) {
+			event.preventDefault()
+			this.commands.setIncreaseIndent?.()
+		}
+		//减少缩进
+		else if (isDecreaseIndent(event)) {
+			event.preventDefault()
+			this.commands.setDecreaseIndent?.()
+		}
+	},
 	addCommands() {
 		/**
-		 * 光标所在的块节点是否都是符合的缩进值
+		 * 增加缩进
 		 */
-		const isIndent = (val: string) => {
-			if (!this.selection.focused()) {
-				return false
-			}
-			//起点和终点在一起
-			if (this.selection.collapsed()) {
-				const block = this.selection.start!.node.getBlock()
-				return !!block.getMatchNode({ styles: { textIndent: val } })
-			}
-			//起点和终点不在一起
-			const blockNodes = getSelectionBlockNodes.apply(this)
-			return blockNodes.every(item => {
-				return !!item.getMatchNode({ styles: { textIndent: val } })
-			})
-		}
-
-		/**
-		 * 设置缩进
-		 */
-		const setIndent = async (val: string) => {
-			if (isIndent(val)) {
-				return
-			}
+		const setIncreaseIndent = async () => {
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
 				const blockNode = this.selection.start!.node.getBlock()
 				const styles: KNodeStylesType = blockNode.hasStyles() ? blockNode.styles! : {}
+				let oldVal = 0
+				if (styles.textIndent && typeof styles.textIndent == 'string' && styles.textIndent.endsWith('em')) {
+					oldVal = parseFloat(styles.textIndent)
+				}
 				blockNode.styles = {
 					...styles,
-					textIndent: val
+					textIndent: `${oldVal + 2}em`
 				}
 			}
 			//起点和终点不在一起
@@ -72,9 +54,13 @@ export const IndentExtension = Extension.create({
 				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
 					const styles: KNodeStylesType = item.hasStyles() ? item.styles! : {}
+					let oldVal = 0
+					if (styles.textIndent && typeof styles.textIndent == 'string' && styles.textIndent.endsWith('em')) {
+						oldVal = parseFloat(styles.textIndent)
+					}
 					item.styles = {
 						...styles,
-						textIndent: val
+						textIndent: `${oldVal + 2}em`
 					}
 				})
 			}
@@ -82,31 +68,43 @@ export const IndentExtension = Extension.create({
 		}
 
 		/**
-		 * 取消缩进
+		 * 减少缩进
 		 */
-		const unsetIndent = async (val: string) => {
-			if (!isIndent(val)) {
-				return
-			}
+		const setDecreaseIndent = async () => {
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
 				const blockNode = this.selection.start!.node.getBlock()
-				clearIndent(blockNode, val)
+				const styles: KNodeStylesType = blockNode.hasStyles() ? blockNode.styles! : {}
+				let oldVal = 0
+				if (styles.textIndent && typeof styles.textIndent == 'string' && styles.textIndent.endsWith('em')) {
+					oldVal = parseFloat(styles.textIndent)
+				}
+				blockNode.styles = {
+					...styles,
+					textIndent: `${oldVal - 2 > 0 ? oldVal - 2 : 0}em`
+				}
 			}
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
-					clearIndent(item, val)
+					const styles: KNodeStylesType = item.hasStyles() ? item.styles! : {}
+					let oldVal = 0
+					if (styles.textIndent && typeof styles.textIndent == 'string' && styles.textIndent.endsWith('em')) {
+						oldVal = parseFloat(styles.textIndent)
+					}
+					item.styles = {
+						...styles,
+						textIndent: `${oldVal - 2 > 0 ? oldVal - 2 : 0}em`
+					}
 				})
 			}
 			await this.updateView()
 		}
 
 		return {
-			isIndent,
-			setIndent,
-			unsetIndent
+			setDecreaseIndent,
+			setIncreaseIndent
 		}
 	}
 })
