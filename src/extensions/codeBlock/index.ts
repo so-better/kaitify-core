@@ -113,6 +113,7 @@ export const CodeBlockExtension = Extension.create({
 		return marks
 	},
 	formatRules: [
+		//代码块高亮处理
 		({ editor, node }) => {
 			if (node.isMatch({ tag: 'pre' }) && node.hasChildren()) {
 				let language = (node.marks?.['kaitify-hljs'] || '') as string
