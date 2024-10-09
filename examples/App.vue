@@ -15,11 +15,11 @@ import { content } from "./content"
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.setMath!('\\frac{a}{b} + \\sqrt{c}')
+  editor.value!.commands.updateCodeBlockLanguage!({ language: 'java' })
 }
 
 const onClick2 = () => {
-  editor.value!.commands.allTask!() ? editor.value!.commands.unsetTask!() : editor.value!.commands.setTask!()
+  editor.value!.commands.allCodeBlock!() ? editor.value!.commands.unsetCodeBlock!() : editor.value!.commands.setCodeBlock!()
 }
 
 onMounted(async () => {

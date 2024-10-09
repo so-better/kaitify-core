@@ -11,6 +11,7 @@
 	line-height: @line-height;
 	border: 1px solid @border-color;
 	border-radius: @border-radius;
+	background: @background;
 	padding: @padding;
 	transition: border-color 500ms;
 	overflow-x: hidden;
@@ -86,7 +87,7 @@
 
 	code {
 		display: inline-block;
-		padding: 2px 4px;
+		padding: @code-padding @code-padding * 2;
 		margin: 0 @sides-between;
 		border-radius: @border-radius;
 		font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
@@ -167,7 +168,7 @@
 				border: solid @theme;
 				border-width: 0 2px 2px 0;
 				transform: rotate(45deg) translateY(-50%);
-				border-color: #fff;
+				border-color: @background;
 				user-select: none;
 				touch-action: none;
 			}
@@ -197,6 +198,21 @@
 		&:hover {
 			cursor: pointer !important;
 			background: fade(@theme, 10) !important;
+		}
+	}
+
+	//代码块
+	pre {
+		background: @codeblock-background;
+		color: @codeblock-color;
+		border-radius: @border-radius;
+		padding: @padding;
+		line-height: @line-height;
+		font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
+		margin: 0 0 @margin 0 !important;
+
+		&:last-child {
+			margin-bottom: 0 !important;
 		}
 	}
 
