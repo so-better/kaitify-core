@@ -15,11 +15,11 @@ import { content } from "./content"
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.updateListType!({ listType: 'lower-roman', ordered: true })
+  editor.value!.commands.setMath!('\\frac{a}{b} + \\sqrt{c}')
 }
 
 const onClick2 = () => {
-  editor.value!.commands.allList!({ ordered: false }) ? editor.value!.commands.unsetList!({ ordered: false }) : editor.value!.commands.setList!({ ordered: false })
+  editor.value!.commands.allTask!() ? editor.value!.commands.unsetTask!() : editor.value!.commands.setTask!()
 }
 
 onMounted(async () => {

@@ -1,3 +1,4 @@
+import { event as DapEvent, element as DapElement } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '../../model'
 import { getSelectionBlockNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
@@ -54,12 +55,64 @@ const toTask = (editor: Editor, node: KNode) => {
 	}
 }
 
+/**
+ * 编辑器点击切换待办状态
+ */
+const handlerForTaskCheck = function (this: Editor, e: Event) {
+	const event = e as MouseEvent
+	const elm = event.target as HTMLElement
+	if (elm === this.$el) {
+		return
+	}
+	const node = this.findNode(elm)
+	//点击的元素是待办
+	if (
+		node.getMatchNode({
+			tag: 'div',
+			marks: {
+				'kaitify-task': true
+			}
+		})
+	) {
+		const rect = DapElement.getElementBounding(elm)
+		//在复选框范围内
+		if (event.pageX >= Math.abs(rect.left) && event.pageX <= Math.abs(rect.left + 16) && event.pageY >= Math.abs(rect.top + elm.offsetHeight / 2 - 8) && event.pageY <= Math.abs(rect.top + elm.offsetHeight / 2 + 8)) {
+			if (node.marks!['kaitify-task'] == 'undo') {
+				node.marks!['kaitify-task'] = 'done'
+			} else {
+				node.marks!['kaitify-task'] = 'undo'
+			}
+			this.setSelectionAfter(node, 'all')
+			this.updateView()
+		}
+	}
+}
+
 export const TaskExtension = Extension.create({
 	name: 'task',
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.marks!.hasOwnProperty('kaitify-task')) marks['kaitify-task'] = node.marks!['kaitify-task']
 		return marks
+	},
+	afterUpdateView() {
+		if (!this.isEditable()) {
+			return
+		}
+		DapEvent.off(this.$el!, `click.task`)
+		DapEvent.on(this.$el!, `click.task`, handlerForTaskCheck.bind(this))
+	},
+	onInsertParagraph(node) {
+		if (
+			node.isMatch({
+				tag: 'div',
+				marks: {
+					'kaitify-task': true
+				}
+			})
+		) {
+			node.marks!['kaitify-task'] = 'undo'
+		}
 	},
 	addCommands() {
 		/**
