@@ -1,5 +1,5 @@
+import { platform } from 'dap-util'
 import { Extension } from '../Extension'
-import { isUndo, isRedo } from '../../model/config/keyboard'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -8,6 +8,28 @@ declare module '../../model' {
 		undo?: () => Promise<void>
 		redo?: () => Promise<void>
 	}
+}
+
+/**
+ * 键盘是否执行撤销操作
+ */
+const isUndo = function (e: KeyboardEvent) {
+	const { Mac } = platform.os()
+	if (Mac) {
+		return e.key.toLocaleLowerCase() == 'z' && e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey
+	}
+	return e.key.toLocaleLowerCase() == 'z' && e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
+}
+
+/**
+ * 键盘是否执行重做操作
+ */
+const isRedo = function (e: KeyboardEvent) {
+	const { Mac } = platform.os()
+	if (Mac) {
+		return e.key.toLocaleLowerCase() == 'z' && e.metaKey && e.shiftKey && !e.altKey && !e.ctrlKey
+	}
+	return e.key.toLocaleLowerCase() == 'y' && e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
 }
 
 export const HistoryExtension = Extension.create({

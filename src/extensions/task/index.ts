@@ -1,0 +1,164 @@
+import { Editor, KNode, KNodeMarksType } from '../../model'
+import { getSelectionBlockNodes } from '../../model/config/function'
+import { Extension } from '../Extension'
+
+declare module '../../model' {
+	interface EditorCommandsType {
+		getTask?: () => KNode | null
+		hasTask?: () => boolean
+		allTask?: () => boolean
+		setTask?: () => Promise<void>
+		unsetTask?: () => Promise<void>
+	}
+}
+
+/**
+ * 块节点转为待办
+ */
+const toTask = (editor: Editor, node: KNode) => {
+	if (!node.isBlock()) {
+		return
+	}
+	//是固定的块节点或者内嵌套的块节点
+	if (node.fixed || node.nested) {
+		//克隆块节点
+		const newNode = node.clone(false)
+		//创建待办节点
+		const taskNode = KNode.create({
+			type: 'block',
+			tag: 'div',
+			marks: {
+				'kaitify-task': 'undo'
+			},
+			children: []
+		})
+		//将原来块节点的子节点给待办节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, taskNode, index)
+		})
+		//清空原来的块节点
+		node.children = []
+		//将待办节点添加到新块节点下
+		taskNode.parent = newNode
+		newNode.children = [taskNode]
+		//将新块节点代替原来的块节点
+		editor.addNodeBefore(newNode, node)
+	}
+	//非固定块节点
+	else {
+		editor.toParagraph(node)
+		node.tag = 'div'
+		node.marks = {
+			'kaitify-task': 'undo'
+		}
+	}
+}
+
+export const TaskExtension = Extension.create({
+	name: 'task',
+	pasteKeepMarks(node) {
+		const marks: KNodeMarksType = {}
+		if (node.marks!.hasOwnProperty('kaitify-task')) marks['kaitify-task'] = node.marks!['kaitify-task']
+		return marks
+	},
+	addCommands() {
+		/**
+		 * 获取光标所在的待办节点，如果光标不在一个待办节点内，返回null
+		 */
+		const getTask = () => {
+			return this.getMatchNodeBySelection({
+				tag: 'div',
+				marks: {
+					'kaitify-task': true
+				}
+			})
+		}
+
+		/**
+		 * 判断光标范围内是否有待办节点
+		 */
+		const hasTask = () => {
+			return this.isSelectionNodesSomeMatch({
+				tag: 'div',
+				marks: {
+					'kaitify-task': true
+				}
+			})
+		}
+
+		/**
+		 * 光标范围内是否都是待办节点
+		 */
+		const allTask = () => {
+			return this.isSelectionNodesAllMatch({
+				tag: 'div',
+				marks: {
+					'kaitify-task': true
+				}
+			})
+		}
+
+		/**
+		 * 设置待办
+		 */
+		const setTask = async () => {
+			if (allTask()) {
+				return
+			}
+			//起点和终点在一起
+			if (this.selection.collapsed()) {
+				const blockNode = this.selection.start!.node.getBlock()
+				toTask(this, blockNode)
+			}
+			//起点和终点不在一起
+			else {
+				const blockNodes = getSelectionBlockNodes.apply(this)
+				blockNodes.forEach(item => {
+					toTask(this, item)
+				})
+			}
+			await this.updateView()
+		}
+
+		/**
+		 * 取消待办
+		 */
+		const unsetTask = async () => {
+			if (!allTask()) {
+				return
+			}
+			//起点和终点在一起
+			if (this.selection.collapsed()) {
+				const matchNode = this.selection.start!.node.getMatchNode({
+					tag: 'div',
+					marks: {
+						'kaitify-task': true
+					}
+				})
+				if (matchNode) this.toParagraph(matchNode)
+			}
+			//起点和终点不在一起
+			else {
+				const blockNodes = getSelectionBlockNodes.apply(this)
+				blockNodes.forEach(item => {
+					const matchNode = item.getMatchNode({
+						tag: 'div',
+						marks: {
+							'kaitify-task': true
+						}
+					})
+					if (matchNode) this.toParagraph(matchNode)
+				})
+			}
+			await this.updateView()
+		}
+
+		return {
+			getTask,
+			hasTask,
+			allTask,
+			setTask,
+			unsetTask
+		}
+	}
+})

@@ -1,6 +1,8 @@
-import { Editor, KNode } from '../../model'
+import { Editor, KNode, KNodeStylesType } from '../../model'
 import { getSelectionBlockNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
+
+type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -9,6 +11,7 @@ declare module '../../model' {
 		allList?: ({ ordered }: { ordered?: boolean }) => boolean
 		setList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
 		unsetList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
+		updateListType?: ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => Promise<void>
 	}
 }
 
@@ -177,6 +180,19 @@ export const ListExtension = Extension.create({
 				editor.addNode(node, listNode)
 			}
 		},
+		//列表固定设置序标在内侧
+		({ node }) => {
+			//节点是有序列表
+			if (node.isMatch({ tag: 'ol' }) || node.isMatch({ tag: 'ul' })) {
+				if (node.hasStyles()) {
+					node.styles!.listStylePosition = 'inside'
+				} else {
+					node.styles = {
+						listStylePosition: 'inside'
+					}
+				}
+			}
+		},
 		//列表合并处理
 		({ editor, node }) => {
 			//节点是有序列表
@@ -208,6 +224,14 @@ export const ListExtension = Extension.create({
 			}
 		}
 	],
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		//保留序标类型样式
+		if ((node.isMatch({ tag: 'ol' }) || node.isMatch({ tag: 'ul' })) && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('listStyleType')) styles.listStyleType = node.styles!['listStyleType']
+		}
+		return styles
+	},
 	onDetachMentBlockFromParentCallback(node) {
 		//父节点存在并且是列表节点
 		if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
@@ -291,12 +315,54 @@ export const ListExtension = Extension.create({
 			await this.updateView()
 		}
 
+		/**
+		 * 更新列表的序标类型
+		 */
+		const updateListType = async ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => {
+			//不存在列表
+			if (!hasList({ ordered })) {
+				return
+			}
+			//起点和终点在一起
+			if (this.selection.collapsed()) {
+				const blockNode = this.selection.start!.node.getBlock()
+				const matchNode = blockNode.getMatchNode({ tag: ordered ? 'ol' : 'ul' })
+				if (matchNode) {
+					if (matchNode.hasStyles()) {
+						matchNode.styles!.listStyleType = listType
+					} else {
+						matchNode.styles = {
+							listStyleType: listType
+						}
+					}
+				}
+			}
+			//起点和终点不在一起
+			else {
+				const blockNodes = getSelectionBlockNodes.apply(this)
+				blockNodes.forEach(item => {
+					const matchNode = item.getMatchNode({ tag: ordered ? 'ol' : 'ul' })
+					if (matchNode) {
+						if (matchNode.hasStyles()) {
+							matchNode.styles!.listStyleType = listType
+						} else {
+							matchNode.styles = {
+								listStyleType: listType
+							}
+						}
+					}
+				})
+			}
+			await this.updateView()
+		}
+
 		return {
 			getList,
 			hasList,
 			allList,
 			setList,
-			unsetList
+			unsetList,
+			updateListType
 		}
 	}
 })

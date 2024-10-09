@@ -1,13 +1,26 @@
 import { KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
 import { getSelectionBlockNodes } from '../../model/config/function'
-import { isDecreaseIndent, isIncreaseIndent } from '../../model/config/keyboard'
 
 declare module '../../model' {
 	interface EditorCommandsType {
 		setIncreaseIndent?: () => Promise<void>
 		setDecreaseIndent?: () => Promise<void>
 	}
+}
+
+/**
+ * 键盘是否执行增加缩进操作
+ */
+const isIncreaseIndent = function (e: KeyboardEvent) {
+	return e.key.toLocaleLowerCase() == 'tab' && !e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey
+}
+
+/**
+ * 键盘是否执行减少缩进操作
+ */
+const isDecreaseIndent = function (e: KeyboardEvent) {
+	return e.key.toLocaleLowerCase() == 'tab' && !e.metaKey && e.shiftKey && !e.altKey && !e.ctrlKey
 }
 
 export const IndentExtension = Extension.create({

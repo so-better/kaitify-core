@@ -873,7 +873,10 @@ export const removeBlockFromParentToSameLevel = function (this: Editor, node: KN
 		//重新设置父节点的子节点
 		parentNode.children! = children.slice(0, index)
 		//设置克隆的父节点的子节点
-		newParentNode.children = children.slice(index + 1)
+		newParentNode.children = children.slice(index + 1).map(item => {
+			item.parent = newParentNode
+			return item
+		})
 		//将块节点移动到父节点后
 		this.addNodeAfter(node, parentNode)
 		//将克隆的父节点添加到块节点后
