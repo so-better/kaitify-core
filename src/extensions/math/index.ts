@@ -45,6 +45,42 @@ export const MathExtension = Extension.create({
 		}
 		return styles
 	},
+	formatRules: [
+		({ editor, node }) => {
+			//两侧设置空白元素
+			if (
+				!node.isEmpty() &&
+				node.isMatch({
+					tag: 'span',
+					marks: {
+						'kaitify-math': true
+					}
+				})
+			) {
+				const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+				const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+				//前一个节点不存在或者不是零宽度空白文本节点
+				if (!previousNode || !previousNode.isZeroWidthText()) {
+					const zeroWidthText = KNode.createZeroWidthText()
+					editor.addNodeBefore(zeroWidthText, node)
+				}
+				//后一个节点不存在或者不是零宽度空白文本节点
+				if (!nextNode || !nextNode.isZeroWidthText()) {
+					const zeroWidthText = KNode.createZeroWidthText()
+					editor.addNodeAfter(zeroWidthText, node)
+				}
+				//重置光标
+				if (editor.isSelectionInNode(node, 'start')) {
+					const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+					if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
+				}
+				if (editor.isSelectionInNode(node, 'end')) {
+					const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+					if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
+				}
+			}
+		}
+	],
 	domParseNodeCallback(node) {
 		if (
 			node.isMatch({
@@ -54,6 +90,9 @@ export const MathExtension = Extension.create({
 				}
 			})
 		) {
+			//锁定节点防止合并
+			node.locked = true
+			//处理子孙节点
 			KNode.flat(node.children!).forEach(item => {
 				//锁定节点防止合并
 				item.locked = true

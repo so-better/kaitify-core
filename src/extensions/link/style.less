@@ -1,0 +1,17 @@
+.Kaitify {
+	a {
+		color: #0d1ad6;
+	}
+
+	//非编辑状态下
+	&:not([contenteditable='true']) {
+		a {
+			text-decoration: none;
+
+			&:hover {
+				cursor: pointer;
+				text-decoration: underline;
+			}
+		}
+	}
+}

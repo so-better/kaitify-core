@@ -48,6 +48,10 @@
 			border-color: @theme;
 		}
 
+		[contenteditable='false']:hover {
+			cursor: not-allowed;
+		}
+
 		&[kaitify-placeholder].showPlaceholder::before {
 			content: attr(kaitify-placeholder);
 			position: absolute;
