@@ -722,18 +722,6 @@ export const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: 
 				if (node.marks!.hasOwnProperty('disabled')) {
 					marks['disabled'] = node.marks!['disabled']
 				}
-				//表格列宽属性保留
-				if (node.tag == 'col' && node.marks!.hasOwnProperty('width')) {
-					marks['width'] = node.marks!['width']
-				}
-				//表格单元格colspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('colspan')) {
-					marks['colspan'] = node.marks!['colspan']
-				}
-				//表格单元格rowspan属性保留
-				if (['td', 'th'].includes(node.tag!) && node.marks!.hasOwnProperty('rowspan')) {
-					marks['rowspan'] = node.marks!['rowspan']
-				}
 			}
 			//处理需要保留的样式
 			// if (node.hasStyles()) {}

@@ -66,24 +66,24 @@ const handlerForTaskCheck = function (this: Editor, e: Event) {
 		return
 	}
 	const node = this.findNode(elm)
+	const matchNode = node.getMatchNode({
+		tag: 'div',
+		marks: {
+			'kaitify-task': true
+		}
+	})
 	//点击的元素是待办
-	if (
-		node.getMatchNode({
-			tag: 'div',
-			marks: {
-				'kaitify-task': true
-			}
-		})
-	) {
-		const rect = DapElement.getElementBounding(elm)
+	if (matchNode) {
+		const dom = this.findDom(matchNode)
+		const rect = DapElement.getElementBounding(dom)
 		//在复选框范围内
 		if (event.pageX >= Math.abs(rect.left) && event.pageX <= Math.abs(rect.left + 16) && event.pageY >= Math.abs(rect.top + elm.offsetHeight / 2 - 8) && event.pageY <= Math.abs(rect.top + elm.offsetHeight / 2 + 8)) {
-			if (node.marks!['kaitify-task'] == 'undo') {
-				node.marks!['kaitify-task'] = 'done'
+			if (matchNode.marks!['kaitify-task'] == 'undo') {
+				matchNode.marks!['kaitify-task'] = 'done'
 			} else {
-				node.marks!['kaitify-task'] = 'undo'
+				matchNode.marks!['kaitify-task'] = 'undo'
 			}
-			this.setSelectionAfter(node, 'all')
+			this.setSelectionAfter(matchNode, 'all')
 			this.updateView()
 		}
 	}
@@ -93,7 +93,16 @@ export const TaskExtension = Extension.create({
 	name: 'task',
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
-		if (node.marks!.hasOwnProperty('kaitify-task')) marks['kaitify-task'] = node.marks!['kaitify-task']
+		if (
+			node.isMatch({
+				tag: 'div',
+				marks: {
+					'kaitify-task': true
+				}
+			})
+		) {
+			marks['kaitify-task'] = node.marks!['kaitify-task']
+		}
 		return marks
 	},
 	afterUpdateView() {
