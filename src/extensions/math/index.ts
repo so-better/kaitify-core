@@ -2,6 +2,7 @@ import KaTex from 'katex'
 import { common as DapCommon } from 'dap-util'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
+import './style.less'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -64,42 +65,6 @@ export const MathExtension = Extension.create({
 		}
 		return node
 	},
-	formatRules: [
-		({ editor, node }) => {
-			//两侧设置空白元素
-			if (
-				!node.isEmpty() &&
-				node.isMatch({
-					tag: 'span',
-					marks: {
-						'kaitify-math': true
-					}
-				})
-			) {
-				const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-				const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-				//前一个节点不存在或者不是零宽度空白文本节点
-				if (!previousNode || !previousNode.isZeroWidthText()) {
-					const zeroWidthText = KNode.createZeroWidthText()
-					editor.addNodeBefore(zeroWidthText, node)
-				}
-				//后一个节点不存在或者不是零宽度空白文本节点
-				if (!nextNode || !nextNode.isZeroWidthText()) {
-					const zeroWidthText = KNode.createZeroWidthText()
-					editor.addNodeAfter(zeroWidthText, node)
-				}
-				//重置光标
-				if (editor.isSelectionInNode(node, 'start')) {
-					const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-					if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
-				}
-				if (editor.isSelectionInNode(node, 'end')) {
-					const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-					if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
-				}
-			}
-		}
-	],
 	addCommands() {
 		/**
 		 * 获取光标所在的数学公式节点，如果光标不在一个数学公式节点内，返回null

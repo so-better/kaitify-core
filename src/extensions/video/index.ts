@@ -2,6 +2,7 @@ import interact from 'interactjs'
 import { event as DapEvent, element as DapElement } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
 import { Extension } from '../Extension'
+import './style.less'
 
 /**
  * 插入视频方法入参类型

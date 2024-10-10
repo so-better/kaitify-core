@@ -1,6 +1,7 @@
 import { Editor, KNode } from '../../model'
 import { getSelectionBlockNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
+import './style.less'
 
 type HeadingLevelType = 0 | 1 | 2 | 3 | 4 | 5 | 6
 

@@ -1,0 +1,61 @@
+@import url(./var.less);
+
+.Kaitify {
+	display: block;
+	position: relative;
+	font-size: @font-size;
+	font-family: @font-family;
+	color: @color;
+	-webkit-font-smoothing: antialiased;
+	text-size-adjust: none;
+	line-height: @line-height;
+	border: 1px solid @border-color;
+	border-radius: @border-radius;
+	background: @background;
+	padding: @padding;
+	transition: border-color 500ms;
+	overflow-x: hidden;
+	overflow-y: auto;
+
+	::selection {
+		background-color: fade(@theme, 40);
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+		outline: none;
+	}
+
+	table {
+		width: 100%;
+		border: 1px solid @border-color;
+		border-collapse: collapse;
+		margin: 0 0 @margin 0;
+
+		th,
+		td {
+			border: 1px solid @border-color;
+			padding: @padding;
+		}
+	}
+
+	//编辑状态下才有的样式
+	&[contenteditable='true'] {
+		&:focus {
+			border-color: @theme;
+		}
+
+		&[kaitify-placeholder].showPlaceholder::before {
+			content: attr(kaitify-placeholder);
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: @padding;
+			line-height: @line-height;
+			opacity: 0.5;
+		}
+	}
+}

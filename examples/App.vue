@@ -15,7 +15,7 @@ import { content } from "./content"
 const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
-  editor.value!.commands.updateCodeBlockLanguage!({ language: 'java' })
+  editor.value!.commands.updateCodeBlockLanguage!({ language: 'typescript' })
 }
 
 const onClick2 = () => {
@@ -28,7 +28,7 @@ onMounted(async () => {
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    placeholder: '请输入内容...'
+    placeholder: '请输入内容...',
   })
   console.log(editor.value!.stackNodes);
 

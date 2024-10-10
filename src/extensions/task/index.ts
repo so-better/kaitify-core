@@ -2,6 +2,7 @@ import { event as DapEvent, element as DapElement } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '../../model'
 import { getSelectionBlockNodes } from '../../model/config/function'
 import { Extension } from '../Extension'
+import './style.less'
 
 declare module '../../model' {
 	interface EditorCommandsType {
