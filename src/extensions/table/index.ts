@@ -11,6 +11,11 @@ declare module '@/model' {
 	}
 }
 
+/**
+ * 获取表格真实列数和行数
+ */
+const getTableSize = (rows: KNode[]) => {}
+
 export const TableExtension = Extension.create({
 	name: 'table',
 	voidRenderTags: ['colgroup', 'col'],
@@ -43,10 +48,26 @@ export const TableExtension = Extension.create({
 		return marks
 	},
 	formatRules: [
+		//thead、tbody、tfoot去除
+		({ editor, node }) => {
+			if (node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'tfoot' })) {
+				node.children!.forEach(item => {
+					editor.addNodeBefore(item, node)
+				})
+				node.children = []
+			}
+		},
+		//th转td
+		({ node }) => {
+			if (node.isMatch({ tag: 'th' })) {
+				node.tag = 'td'
+			}
+		},
 		//表格结构格式化
 		({ node }) => {
 			//表格
 			if (node.isMatch({ tag: 'table' })) {
+				const rows = KNode.flat(node.children!).filter(item => item.isMatch({ tag: 'tr' }))
 			}
 		}
 	],

@@ -7,16 +7,31 @@
 		border-collapse: collapse;
 		margin: 0 0 @margin 0;
 
-		th,
 		td {
 			border: 1px solid @border-color;
 			padding: @padding;
-			text-align: left;
 			vertical-align: middle;
 		}
 
-		th {
-			font-weight: bold;
+		& > tr:first-child {
+			background: #f1f1f1;
+
+			td {
+				font-weight: bold;
+			}
+		}
+	}
+
+	//非编辑状态下
+	&:not([contenteditable='true']) {
+		table {
+			& > tr:not(:first-child) {
+				transition: background 300ms;
+
+				&:hover {
+					background: #f5f5f5;
+				}
+			}
 		}
 	}
 }
