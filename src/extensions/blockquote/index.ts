@@ -1,9 +1,9 @@
-import { Editor, KNode } from '../../model'
-import { getSelectionBlockNodes } from '../../model/config/function'
+import { Editor, KNode } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getBlockquote?: () => KNode | null
 		hasBlockquote?: () => boolean
@@ -51,6 +51,13 @@ const toBlockquote = (editor: Editor, node: KNode) => {
 
 export const BlockquoteExtension = Extension.create({
 	name: 'blockquote',
+	extraKeepTags: ['blockquote'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'blockquote' })) {
+			node.type = 'block'
+		}
+		return node
+	},
 	addCommands() {
 		/**
 		 * 获取光标所在的引用节点，如果光标不在一个引用节点内，返回null

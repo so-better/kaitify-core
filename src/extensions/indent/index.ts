@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
+import { KNodeStylesType } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
-import { getSelectionBlockNodes } from '../../model/config/function'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		setIncreaseIndent?: () => Promise<void>
 		setDecreaseIndent?: () => Promise<void>

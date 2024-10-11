@@ -1,5 +1,5 @@
-import { Editor, KNode } from '../../model'
-import { camelToKebab, isContains } from '../../tools'
+import { Editor, KNode } from '@/model'
+import { camelToKebab, isContains } from '@/tools'
 import { getNodeRenderOptions, KNodeRenderOptionType } from '../index'
 import { getDifferentMarks, getDifferentStyles, patchNodes } from './dom-patch'
 

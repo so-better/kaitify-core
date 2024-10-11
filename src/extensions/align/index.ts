@@ -1,11 +1,11 @@
-import { KNode, KNodeStylesType } from '../../model'
-import { deleteProperty } from '../../tools'
+import { KNode, KNodeStylesType } from '@/model'
+import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
-import { getSelectionBlockNodes } from '../../model/config/function'
+import { getSelectionBlockNodes } from '@/model/config/function'
 
 type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isAlign?: (val: AlignValueType) => boolean
 		setAlign?: (val: AlignValueType) => Promise<void>

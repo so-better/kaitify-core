@@ -1,6 +1,7 @@
+import { KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isBackColor?: (val: string) => boolean
 		setBackColor?: (val: string) => Promise<void>
@@ -10,6 +11,13 @@ declare module '../../model' {
 
 export const BackColorExtension = Extension.create({
 	name: 'backColor',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('backgroundColor')) styles.backgroundColor = node.styles!.backgroundColor
+		}
+		return styles
+	},
 	addCommands() {
 		/**
 		 * 光标所在文本的背景颜色是否与入参一致

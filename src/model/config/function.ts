@@ -1,10 +1,10 @@
 //这里放的都是和编辑器相关的方法，但是不想对外暴露的
 import { common as DapCommon, file as DapFile } from 'dap-util'
+import { Extension } from '@/extensions'
+import { isContains } from '@/tools'
 import { Editor } from '../Editor'
 import { KNode, KNodeMarksType, KNodeStylesType } from '../KNode'
 import { RuleFunctionType } from './format-rules'
-import { Extension } from '../../extensions'
-import { isContains } from '../../tools'
 
 /**
  * 获取选区内的可聚焦节点所在的块节点数组
@@ -461,6 +461,12 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 	//设置已注册
 	extension.registered = true
 
+	if (extension.voidRenderTags) {
+		this.voidRenderTags = [...extension.voidRenderTags, ...this.voidRenderTags]
+	}
+	if (extension.emptyRenderTags) {
+		this.emptyRenderTags = [...extension.emptyRenderTags, ...this.emptyRenderTags]
+	}
 	if (extension.extraKeepTags) {
 		this.extraKeepTags = [...extension.extraKeepTags, ...this.extraKeepTags]
 	}
@@ -699,49 +705,43 @@ export const checkNodes = function (this: Editor) {
 }
 
 /**
- * 粘贴时对非文本节点的标记和样式的保留处理
+ * 粘贴时对节点的标记和样式的保留处理
  */
 export const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: KNode[]) {
-	//不是文本
 	nodes.forEach(node => {
-		//不是文本节点
-		if (!node.isText()) {
-			const marks: KNodeMarksType = {}
-			const styles: KNodeStylesType = {}
-			//处理需要保留的标记
-			if (node.hasMarks()) {
-				//contenteditable属性保留
-				if (node.marks!.hasOwnProperty('contenteditable')) {
-					marks['contenteditable'] = node.marks!['contenteditable']
-				}
-				//name属性保留
-				if (node.marks!.hasOwnProperty('name')) {
-					marks['name'] = node.marks!['name']
-				}
-				//disabled属性保留
-				if (node.marks!.hasOwnProperty('disabled')) {
-					marks['disabled'] = node.marks!['disabled']
-				}
+		const marks: KNodeMarksType = {}
+		const styles: KNodeStylesType = {}
+		//处理需要保留的标记
+		if (node.hasMarks()) {
+			//contenteditable属性保留
+			if (node.marks!.hasOwnProperty('contenteditable')) {
+				marks['contenteditable'] = node.marks!['contenteditable']
 			}
-			//处理需要保留的样式
-			// if (node.hasStyles()) {}
-			//自定义标记保留
-			if (typeof this.pasteKeepMarks == 'function') {
-				const extendMarks = this.pasteKeepMarks.apply(this, [node])
-				Object.assign(marks, extendMarks)
+			//name属性保留
+			if (node.marks!.hasOwnProperty('name')) {
+				marks['name'] = node.marks!['name']
 			}
-			//自定义样式保留
-			if (typeof this.pasteKeepStyles == 'function') {
-				const extendStyles = this.pasteKeepStyles.apply(this, [node])
-				Object.assign(styles, extendStyles)
+			//disabled属性保留
+			if (node.marks!.hasOwnProperty('disabled')) {
+				marks['disabled'] = node.marks!['disabled']
 			}
-			//将处理后的样式和标记给节点
-			node.marks = marks
-			node.styles = styles
-			//处理子节点
-			if (node.hasChildren()) {
-				handlerForPasteKeepMarksAndStyles.apply(this, [node.children!])
-			}
+		}
+		//自定义标记保留
+		if (typeof this.pasteKeepMarks == 'function') {
+			const extendMarks = this.pasteKeepMarks.apply(this, [node])
+			Object.assign(marks, extendMarks)
+		}
+		//自定义样式保留
+		if (typeof this.pasteKeepStyles == 'function') {
+			const extendStyles = this.pasteKeepStyles.apply(this, [node])
+			Object.assign(styles, extendStyles)
+		}
+		//将处理后的样式和标记给节点
+		node.marks = marks
+		node.styles = styles
+		//处理子节点
+		if (node.hasChildren()) {
+			handlerForPasteKeepMarksAndStyles.apply(this, [node.children!])
 		}
 	})
 }

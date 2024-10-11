@@ -1,5 +1,5 @@
+import { delay } from '@/tools'
 import { Editor } from '../Editor'
-import { delay } from '../../tools'
 import { handlerForPasteDrop, redressSelection, updateSelection } from './function'
 
 /**

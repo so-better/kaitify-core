@@ -1,10 +1,10 @@
 import KaTex from 'katex'
 import { common as DapCommon } from 'dap-util'
-import { KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getMath?: () => KNode | null
 		hasMath?: () => boolean
@@ -15,6 +15,38 @@ declare module '../../model' {
 export const MathExtension = Extension.create({
 	name: 'math',
 	extraKeepTags: ['math', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mroot', 'munder', 'mover', 'munderover', 'mtable', 'mtr', 'mtd', 'mtext', 'mspace', 'mmultiscripts', 'menclose', 'mglyph', 'maction', 'maligngroup', 'malignmark', 'mprescripts', 'none', 'mpadded', 'ms', 'mphantom', 'mstyle', 'merror', 'mscarries', 'mscarry', 'msline', 'msgroup', 'msrow', 'mscolumn', 'mstack', 'mlongdiv', 'mlabeledtr', 'mlabeledmultiscripts', 'semantics', 'msubsup'],
+	domParseNodeCallback(node) {
+		if (
+			node.isMatch({
+				tag: 'span',
+				marks: {
+					'kaitify-math': true
+				}
+			})
+		) {
+			//锁定节点防止合并
+			node.locked = true
+			//设为行内
+			node.type = 'inline'
+			//处理子孙节点
+			KNode.flat(node.children!).forEach(item => {
+				//锁定节点防止合并
+				item.locked = true
+				//非文本节点
+				if (!item.isText()) {
+					//有子节点转为行内
+					if (item.hasChildren()) {
+						item.type = 'inline'
+					}
+					//无子节点转为闭合
+					else {
+						item.type = 'closed'
+					}
+				}
+			})
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		//数学公式内的标记全部保留
@@ -81,38 +113,6 @@ export const MathExtension = Extension.create({
 			}
 		}
 	],
-	domParseNodeCallback(node) {
-		if (
-			node.isMatch({
-				tag: 'span',
-				marks: {
-					'kaitify-math': true
-				}
-			})
-		) {
-			//锁定节点防止合并
-			node.locked = true
-			//设为行内
-			node.type = 'inline'
-			//处理子孙节点
-			KNode.flat(node.children!).forEach(item => {
-				//锁定节点防止合并
-				item.locked = true
-				//非文本节点
-				if (!item.isText()) {
-					//有子节点转为行内
-					if (item.hasChildren()) {
-						item.type = 'inline'
-					}
-					//无子节点转为闭合
-					else {
-						item.type = 'closed'
-					}
-				}
-			})
-		}
-		return node
-	},
 	addCommands() {
 		/**
 		 * 获取光标所在的数学公式节点，如果光标不在一个数学公式节点内，返回null

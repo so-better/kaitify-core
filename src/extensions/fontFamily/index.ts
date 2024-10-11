@@ -1,9 +1,9 @@
-import { KNodeMarksType, KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
-import { deleteProperty } from '../../tools'
+import { KNodeMarksType, KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
+import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isFontFamily?: (val: string) => boolean
 		setFontFamily?: (val: string) => Promise<void>
@@ -13,6 +13,20 @@ declare module '../../model' {
 
 export const FontFamilyExtension = Extension.create({
 	name: 'fontFamily',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('fontFamily')) styles.fontFamily = node.styles!.fontFamily
+		}
+		return styles
+	},
+	extraKeepTags: ['font'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'font' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && node.isMatch({ tag: 'font' })) {

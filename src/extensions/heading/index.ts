@@ -1,12 +1,11 @@
-import { Editor, KNode } from '../../model'
-import { getSelectionBlockNodes } from '../../model/config/function'
+import { Editor, KNode } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-type HeadingLevelType = 0 | 1 | 2 | 3 | 4 | 5 | 6
+type HeadingLevelType = 1 | 2 | 3 | 4 | 5 | 6
 
 const headingLevelMap = {
-	0: 'p',
 	1: 'h1',
 	2: 'h2',
 	3: 'h3',
@@ -15,7 +14,7 @@ const headingLevelMap = {
 	6: 'h6'
 }
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getHeading?: ({ level }: { level: HeadingLevelType }) => KNode | null
 		hasHeading?: ({ level }: { level: HeadingLevelType }) => boolean
@@ -63,6 +62,13 @@ const toHeading = (editor: Editor, node: KNode, level: HeadingLevelType) => {
 
 export const HeadingExtension = Extension.create({
 	name: 'heading',
+	extraKeepTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'h1' }) || node.isMatch({ tag: 'h2' }) || node.isMatch({ tag: 'h3' }) || node.isMatch({ tag: 'h4' }) || node.isMatch({ tag: 'h5' }) || node.isMatch({ tag: 'h6' })) {
+			node.type = 'block'
+		}
+		return node
+	},
 	addCommands() {
 		/**
 		 * 获取光标所在的标题，如果光标不在一个标题内，返回null

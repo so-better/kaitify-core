@@ -1,9 +1,9 @@
-import { KNode, KNodeStylesType } from '../../model'
-import { deleteProperty } from '../../tools'
+import { KNode, KNodeStylesType } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
+import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
-import { getSelectionBlockNodes } from '../../model/config/function'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isLineHeight?: (val: string | number) => boolean
 		setLineHeight?: (val: string | number) => Promise<void>

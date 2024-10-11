@@ -1,11 +1,11 @@
-import { Editor, KNode, KNodeStylesType } from '../../model'
-import { getSelectionBlockNodes } from '../../model/config/function'
+import { Editor, KNode, KNodeStylesType } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
 type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getList?: ({ ordered }: { ordered?: boolean }) => KNode | null
 		hasList?: ({ ordered }: { ordered?: boolean }) => boolean
@@ -105,7 +105,8 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
 		//创建列表项节点
 		const listItem = KNode.create({
 			type: 'block',
-			tag: 'li'
+			tag: 'li',
+			nested: true
 		})
 		//将列表节点的子节点都给列表项节点
 		node.children!.forEach((item, index) => {
@@ -159,6 +160,17 @@ const ListItemToParagraph = (editor: Editor, node: KNode) => {
 
 export const ListExtension = Extension.create({
 	name: 'list',
+	extraKeepTags: ['ul', 'ol', 'li'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'ul' }) || node.isMatch({ tag: 'ol' })) {
+			node.type = 'block'
+		}
+		if (node.isMatch({ tag: 'li' })) {
+			node.type = 'block'
+			node.nested = true
+		}
+		return node
+	},
 	formatRules: [
 		//不在列表内的列表项处理
 		({ editor, node }) => {

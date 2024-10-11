@@ -1,8 +1,8 @@
-import { KNode, KNodeMarksType } from '../../model'
+import { KNode, KNodeMarksType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getTable?: () => KNode | null
 		hasTable?: () => boolean
@@ -13,6 +13,22 @@ declare module '../../model' {
 
 export const TableExtension = Extension.create({
 	name: 'table',
+	voidRenderTags: ['colgroup', 'col'],
+	extraKeepTags: ['table', 'tfoot', 'tbody', 'thead', 'tr', 'th', 'td', 'col'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'table' })) {
+			node.type = 'block'
+		}
+		if (node.isMatch({ tag: 'tfoot' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tr' }) || node.isMatch({ tag: 'th' }) || node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'colgroup' })) {
+			node.type = 'block'
+			node.fixed = true
+			node.nested = true
+		}
+		if (node.isMatch({ tag: 'col' })) {
+			node.type = 'closed'
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		//表格列宽属性保留
@@ -28,7 +44,7 @@ export const TableExtension = Extension.create({
 	},
 	formatRules: [
 		//表格结构格式化
-		({ editor, node }) => {
+		({ node }) => {
 			//表格
 			if (node.isMatch({ tag: 'table' })) {
 			}

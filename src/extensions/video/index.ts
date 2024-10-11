@@ -1,6 +1,6 @@
 import interact from 'interactjs'
 import { event as DapEvent, element as DapElement } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -16,7 +16,7 @@ type SetVideoOptionType = {
 	loop?: boolean
 }
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getVideo?: () => KNode | null
 		hasVideo?: () => boolean
@@ -113,6 +113,13 @@ const videoResizable = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
 
 export const VideoExtension = Extension.create({
 	name: 'video',
+	extraKeepTags: ['video'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'video' })) {
+			node.type = 'closed'
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.isMatch({ tag: 'video' }) && node.hasMarks()) {

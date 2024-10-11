@@ -1,11 +1,11 @@
-import { Editor, KNode, KNodeMarksType } from '../../model'
-import { getSelectionBlockNodes } from '../../model/config/function'
+import { Editor, KNode, KNodeMarksType } from '@/model'
+import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
 
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getCodeBlock?: () => KNode | null
 		hasCodeBlock?: () => boolean
@@ -107,6 +107,13 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
 
 export const CodeBlockExtension = Extension.create({
 	name: 'codeBlock',
+	extraKeepTags: ['pre'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'pre' })) {
+			node.type = 'block'
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.isMatch({ tag: 'pre' }) && node.hasMarks()) {

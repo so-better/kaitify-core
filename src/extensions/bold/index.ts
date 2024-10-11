@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
+import { KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
-import { splitNodeToNodes } from '../../model/config/function'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isBold?: () => boolean
 		setBold?: () => Promise<void>
@@ -12,6 +12,20 @@ declare module '../../model' {
 
 export const BoldExtension = Extension.create({
 	name: 'bold',
+	extraKeepTags: ['b', 'strong'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'b' }) || node.isMatch({ tag: 'strong' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('fontWeight')) styles.fontWeight = node.styles!.fontWeight
+		}
+		return styles
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && (node.isMatch({ tag: 'b' }) || node.isMatch({ tag: 'strong' }))) {

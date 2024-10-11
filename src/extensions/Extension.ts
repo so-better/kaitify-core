@@ -1,4 +1,4 @@
-import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType, Selection } from '../model'
+import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType, Selection } from '@/model'
 
 /**
  * 创建插件的入参类型
@@ -8,6 +8,14 @@ export type ExtensionCreateOptionType = {
 	 * 插件名称
 	 */
 	name: string
+	/**
+	 * 不显示的标签
+	 */
+	voidRenderTags?: string[]
+	/**
+	 * 置空的标签
+	 */
+	emptyRenderTags?: string[]
 	/**
 	 * 额外保留的标签
 	 */
@@ -84,13 +92,21 @@ export class Extension {
 	 */
 	registered: boolean = false
 	/**
+	 * 不显示的标签
+	 */
+	voidRenderTags: string[] = []
+	/**
+	 * 置空的标签
+	 */
+	emptyRenderTags: string[] = []
+	/**
 	 * 额外保留的标签
 	 */
 	extraKeepTags: string[] = []
 	/**
 	 * 自定义格式化规则
 	 */
-	formatRules?: RuleFunctionType[]
+	formatRules: RuleFunctionType[] = []
 	/**
 	 * 自定义dom转为非文本节点的后续处理
 	 */
@@ -153,6 +169,8 @@ export class Extension {
 	 */
 	static create(options: ExtensionCreateOptionType) {
 		const extension = new Extension(options.name)
+		if (options.voidRenderTags) extension.voidRenderTags = options.voidRenderTags
+		if (options.emptyRenderTags) extension.emptyRenderTags = options.emptyRenderTags
 		if (options.extraKeepTags) extension.extraKeepTags = options.extraKeepTags
 		if (options.formatRules) extension.formatRules = options.formatRules
 		if (options.domParseNodeCallback) extension.domParseNodeCallback = options.domParseNodeCallback

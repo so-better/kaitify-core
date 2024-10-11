@@ -1,5 +1,5 @@
 import { common as DapCommon } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 
 /**
  * 渲染参数类型

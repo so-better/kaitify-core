@@ -1,5 +1,5 @@
-import { KNode, KNodeMarksType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNode, KNodeMarksType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -20,7 +20,7 @@ type UpdateLinkOptionType = {
 	newOpen?: boolean
 }
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getLink?: () => KNode | null
 		hasLink?: () => boolean
@@ -32,6 +32,13 @@ declare module '../../model' {
 
 export const LinkExtension = Extension.create({
 	name: 'link',
+	extraKeepTags: ['a'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'a' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.isMatch({ tag: 'a' }) && node.hasMarks()) {

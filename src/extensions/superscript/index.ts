@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isSuperscript?: () => boolean
 		setSuperscript?: () => Promise<void>
@@ -12,6 +12,20 @@ declare module '../../model' {
 
 export const SuperscriptExtension = Extension.create({
 	name: 'superscript',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('verticalAlign')) styles.verticalAlign = node.styles!.verticalAlign
+		}
+		return styles
+	},
+	extraKeepTags: ['sup'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'sup' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && node.isMatch({ tag: 'sup' })) {

@@ -1,6 +1,6 @@
 import interact from 'interactjs'
 import { event as DapEvent, element as DapElement } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -13,7 +13,7 @@ type SetImageOptionType = {
 	width?: string
 }
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getImage?: () => KNode | null
 		hasImage?: () => boolean
@@ -110,6 +110,13 @@ const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
 
 export const ImageExtension = Extension.create({
 	name: 'image',
+	extraKeepTags: ['img'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'img' })) {
+			node.type = 'closed'
+		}
+		return node
+	},
 	pasteKeepMarks(node) {
 		const marks: KNodeMarksType = {}
 		if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {

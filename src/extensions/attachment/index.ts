@@ -1,5 +1,5 @@
 import { event as DapEvent } from 'dap-util'
-import { KNode, KNodeMarksType, KNodeStylesType } from '../../model'
+import { KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import defaultIcon from './icon.svg'
 import './style.less'
@@ -10,7 +10,7 @@ type SetAttachmentConfigType = {
 	icon?: string
 }
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getAttachment?: () => KNode | null
 		hasAttachment?: () => boolean

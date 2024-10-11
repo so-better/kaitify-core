@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isSubscript?: () => boolean
 		setSubscript?: () => Promise<void>
@@ -12,6 +12,20 @@ declare module '../../model' {
 
 export const SubscriptExtension = Extension.create({
 	name: 'subscript',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('verticalAlign')) styles.verticalAlign = node.styles!.verticalAlign
+		}
+		return styles
+	},
+	extraKeepTags: ['sub'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'sub' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && node.isMatch({ tag: 'sub' })) {

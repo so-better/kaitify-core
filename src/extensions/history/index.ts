@@ -1,7 +1,7 @@
 import { platform } from 'dap-util'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		canUndo?: () => boolean
 		canRedo?: () => boolean

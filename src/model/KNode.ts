@@ -1,5 +1,5 @@
 import { common as DapCommon } from 'dap-util'
-import { createUniqueKey, getZeroWidthText, isZeroWidthText } from '../tools'
+import { createUniqueKey, getZeroWidthText, isZeroWidthText } from '@/tools'
 import * as CSS from 'csstype'
 /**
  * 节点类型

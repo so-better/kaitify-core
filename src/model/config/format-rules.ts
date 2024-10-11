@@ -1,5 +1,5 @@
 import { string as DapString } from 'dap-util'
-import { isZeroWidthText } from '../../tools'
+import { isZeroWidthText } from '@/tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
 import { applyMergeNode, getAllowMergeNode } from './function'

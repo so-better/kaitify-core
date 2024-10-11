@@ -1,8 +1,8 @@
-import { KNode } from '../../model'
+import { KNode } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		setHorizontal?: () => Promise<void>
 	}
@@ -10,6 +10,13 @@ declare module '../../model' {
 
 export const HorizontalExtension = Extension.create({
 	name: 'horizontal',
+	extraKeepTags: ['hr'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'hr' })) {
+			node.type = 'closed'
+		}
+		return node
+	},
 	addCommands() {
 		/**
 		 * 设置分隔线

@@ -1,17 +1,15 @@
 import { event as DapEvent, element as DapElement } from 'dap-util'
 import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNodeStylesType } from './KNode'
 import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
-import { blockParse, inlineParse, closedParse } from './config/dom-parse'
 import { Selection } from './Selection'
 import { History } from './History'
 import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { removeDomObserve, setDomObserve } from './config/dom-observe'
-import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '../extensions'
-import { NODE_MARK } from '../view'
-import { defaultUpdateView } from '../view/js-render'
-import { FontFamilyExtension } from '../extensions/fontFamily'
+import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
+import { NODE_MARK } from '@/view'
+import { defaultUpdateView } from '@/view/js-render'
 import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, redressSelection, registerExtension, removeBlockFromParentToSameLevel, setPlaceholder } from './config/function'
 
 /**
@@ -26,7 +24,7 @@ export type EditorSelectedType = {
  * 编辑器命令集合类型
  */
 export interface EditorCommandsType {
-	[name: string]: ((...args: any[]) => void) | undefined
+	[name: string]: ((...args: any[]) => any | void) | undefined
 }
 
 /**
@@ -217,11 +215,11 @@ export class Editor {
 	/**
 	 * 编辑器内定义不显示的标签【初始化后不建议修改】
 	 */
-	voidRenderTags: string[] = ['colgroup', 'col']
+	voidRenderTags: string[] = []
 	/**
 	 * 编辑器内定义需要置空的标签【初始化后不建议修改】
 	 */
-	emptyRenderTags: string[] = ['meta', 'link', 'style', 'script', 'title', 'base', 'noscript', 'template', 'annotation']
+	emptyRenderTags: string[] = ['meta', 'link', 'style', 'script', 'title', 'base', 'noscript', 'template', 'annotation', 'input', 'form', 'button']
 	/**
 	 * 编辑器内额外保留的标签【初始化后不建议修改】
 	 */
@@ -307,7 +305,7 @@ export class Editor {
 	 */
 	afterUpdateView?: (this: Editor) => void
 	/**
-	 * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
+	 * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
 	 */
 	onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean
 
@@ -326,7 +324,7 @@ export class Editor {
 	 */
 	history: History = new History()
 	/**
-	 * 命令集合
+	 * 命令集合【不可修改】
 	 */
 	commands: EditorCommandsType = {}
 	/**
@@ -355,7 +353,7 @@ export class Editor {
 	domObserver: MutationObserver | null = null
 
 	/**
-	 * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
+	 * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
 	 */
 	scrollViewToSelection() {
 		if (this.selection.focused()) {
@@ -439,7 +437,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】根据dom查找到编辑内的对应节点
+	 * 根据dom查找到编辑内的对应节点
 	 */
 	findNode(dom: HTMLElement) {
 		if (!isContains(this.$el!, dom)) {
@@ -457,7 +455,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】根据编辑器内的node查找真实dom
+	 * 根据编辑器内的node查找真实dom
 	 */
 	findDom(node: KNode) {
 		const dom = this.$el!.querySelector(`[${NODE_MARK}="${node.key}"]`)
@@ -468,7 +466,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】设置编辑器是否可编辑
+	 * 设置编辑器是否可编辑
 	 */
 	setEditable(editable: boolean) {
 		if (editable) {
@@ -480,14 +478,14 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断编辑器是否可编辑
+	 * 判断编辑器是否可编辑
 	 */
 	isEditable() {
 		return this.$el?.getAttribute('contenteditable') == 'true'
 	}
 
 	/**
-	 * 【API】dom转KNode
+	 * dom转KNode
 	 */
 	domParseNode(dom: Node) {
 		if (dom.nodeType != 1 && dom.nodeType != 3) {
@@ -520,10 +518,6 @@ export class Editor {
 				textContent: dom.textContent || ''
 			})
 		}
-		//默认配置
-		const block = blockParse.find(item => item.tag == tag)
-		const inline = inlineParse.find(item => item.tag == tag)
-		const closed = closedParse.find(item => item.tag == tag)
 		//构造参数
 		const config: KNodeCreateOptionType = {
 			type: 'inline',
@@ -533,19 +527,17 @@ export class Editor {
 			namespace: namespace || ''
 		}
 		//默认的块节点
-		if (block) {
+		if (['p', 'div', 'address', 'article', 'aside', 'nav', 'section'].includes(tag)) {
 			config.type = 'block'
 			config.children = []
-			if (block.fixed) config.fixed = block.fixed
-			if (block.nested) config.nested = block.nested
 		}
 		//默认的行内节点
-		else if (inline) {
+		else if (['span', 'label'].includes(tag)) {
 			config.type = 'inline'
 			config.children = []
 		}
 		//默认的自闭合节点
-		else if (closed) {
+		else if (['br'].includes(tag)) {
 			config.type = 'closed'
 		}
 		//其余元素如果不在extraKeepTags范围内则默认转为行内的默认文本节点标签
@@ -578,7 +570,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】html转KNode
+	 * html转KNode
 	 */
 	htmlParseNode(html: string) {
 		const template = document.createElement('template')
@@ -594,7 +586,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】将指定节点所在的块节点转为段落
+	 * 将指定节点所在的块节点转为段落
 	 */
 	toParagraph(node: KNode) {
 		if (!node.isBlock()) {
@@ -610,7 +602,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】指定的块节点是否是一个段落
+	 * 指定的块节点是否是一个段落
 	 */
 	isParagraph(node: KNode) {
 		if (!node.isBlock()) {
@@ -620,7 +612,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】将指定节点添加到某个节点的子节点数组里
+	 * 将指定节点添加到某个节点的子节点数组里
 	 */
 	addNode(node: KNode, parentNode: KNode, index: number | undefined = 0) {
 		//排除空节点
@@ -644,7 +636,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】将指定节点添加到某个节点前面
+	 * 将指定节点添加到某个节点前面
 	 */
 	addNodeBefore(node: KNode, target: KNode) {
 		if (target.parent) {
@@ -662,7 +654,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】将指定节点添加到某个节点后面
+	 * 将指定节点添加到某个节点后面
 	 */
 	addNodeAfter(node: KNode, target: KNode) {
 		if (target.parent) {
@@ -680,7 +672,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取某个节点内的最后一个可以设置光标点的节点，包括自身
+	 * 获取某个节点内的最后一个可以设置光标点的节点，包括自身
 	 */
 	getLastSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -710,7 +702,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取某个节点内的第一个可以设置光标点的节点，包括自身
+	 * 获取某个节点内的第一个可以设置光标点的节点，包括自身
 	 */
 	getFirstSelectionNodeInChildren(node: KNode): KNode | null {
 		//空节点
@@ -740,7 +732,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】查找指定节点之前可以设置为光标点的非空节点，不包括自身
+	 * 查找指定节点之前可以设置为光标点的非空节点，不包括自身
 	 */
 	getPreviousSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -768,7 +760,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】查找指定节点之后可以设置为光标点的非空节点，不包括自身
+	 * 查找指定节点之后可以设置为光标点的非空节点，不包括自身
 	 */
 	getNextSelectionNode(node: KNode): KNode | null {
 		const nodes = node.parent ? node.parent.children! : this.stackNodes
@@ -796,7 +788,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+	 * 设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionBefore(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -844,7 +836,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+	 * 设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
 	 */
 	setSelectionAfter(node?: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//指定到某个节点
@@ -892,7 +884,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
+	 * 更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
 	 */
 	updateSelectionRecently(type: 'all' | 'start' | 'end' | undefined = 'all') {
 		if (!this.selection.focused()) {
@@ -937,7 +929,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
+	 * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
 	 */
 	isSelectionInNode(node: KNode, type: 'all' | 'start' | 'end' | undefined = 'all') {
 		//没有初始化设置光标
@@ -956,7 +948,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取光标选区内的节点数据
+	 * 获取光标选区内的节点数据
 	 */
 	getSelectedNodes(): EditorSelectedType[] {
 		//没有聚焦或者没有选区
@@ -1067,7 +1059,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标范围内的可聚焦节点是否全都在同一个符合条件节点内，如果是返回那个符合条件的节点，否则返回null
+	 * 判断光标范围内的可聚焦节点是否全都在同一个符合条件节点内，如果是返回那个符合条件的节点，否则返回null
 	 */
 	getMatchNodeBySelection(options: KNodeMatchOptionType) {
 		//没有聚焦
@@ -1093,7 +1085,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
+	 * 判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
 	 */
 	isSelectionNodesAllMatch(options: KNodeMatchOptionType) {
 		//没有聚焦
@@ -1113,7 +1105,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】判断光标范围内是否有可聚焦节点在符合条件的节点内
+	 * 判断光标范围内是否有可聚焦节点在符合条件的节点内
 	 */
 	isSelectionNodesSomeMatch(options: KNodeMatchOptionType) {
 		//没有聚焦
@@ -1133,7 +1125,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
+	 * 获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
 	 */
 	getFocusNodesBySelection(type: 'all' | 'closed' | 'text' | undefined = 'all') {
 		if (!this.selection.focused() || this.selection.collapsed()) {
@@ -1147,7 +1139,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
+	 * 获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
 	 */
 	getFocusSplitNodesBySelection(type: 'all' | 'closed' | 'text' | undefined = 'all') {
 		if (!this.selection.focused() || this.selection.collapsed()) {
@@ -1213,7 +1205,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】向选区插入文本
+	 * 向选区插入文本
 	 */
 	insertText(text: string) {
 		if (!text) {
@@ -1259,7 +1251,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
+	 * 向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
 	 */
 	insertParagraph() {
 		if (!this.selection.focused()) {
@@ -1321,7 +1313,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
+	 * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
 	 */
 	insertNode(node: KNode, cover: boolean | undefined = false) {
 		//未聚焦不处理
@@ -1400,7 +1392,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】对选区进行删除
+	 * 对选区进行删除
 	 */
 	delete() {
 		if (!this.selection.focused()) {
@@ -1626,7 +1618,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】更新编辑器视图
+	 * 更新编辑器视图
 	 */
 	async updateView(updateRealSelection: boolean | undefined = true, unPushHistory: boolean | undefined = false) {
 		if (!this.$el) {
@@ -1692,7 +1684,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】根据selection更新编辑器真实光标
+	 * 根据selection更新编辑器真实光标
 	 */
 	async updateRealSelection() {
 		const realSelection = window.getSelection()
@@ -1744,7 +1736,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】销毁编辑器的方法
+	 * 销毁编辑器的方法
 	 */
 	destroy() {
 		//去除可编辑效果
@@ -1755,7 +1747,7 @@ export class Editor {
 	}
 
 	/**
-	 * 【API】配置编辑器，返回创建的编辑器
+	 * 配置编辑器，返回创建的编辑器
 	 */
 	static async configure(options: EditorConfigureOptionType) {
 		//创建编辑器
@@ -1773,9 +1765,9 @@ export class Editor {
 		if (typeof options.allowPasteHtml == 'boolean') editor.allowPasteHtml = options.allowPasteHtml
 		if (options.textRenderTag) editor.textRenderTag = options.textRenderTag
 		if (options.blockRenderTag) editor.blockRenderTag = options.blockRenderTag
-		if (options.voidRenderTags) editor.voidRenderTags = options.voidRenderTags
-		if (options.emptyRenderTags) editor.emptyRenderTags = options.emptyRenderTags
-		if (options.extraKeepTags) editor.extraKeepTags = options.extraKeepTags
+		if (options.voidRenderTags) editor.voidRenderTags = [...editor.voidRenderTags, ...options.voidRenderTags]
+		if (options.emptyRenderTags) editor.emptyRenderTags = [...editor.emptyRenderTags, ...options.emptyRenderTags]
+		if (options.extraKeepTags) editor.extraKeepTags = [...editor.extraKeepTags, ...options.extraKeepTags]
 		if (options.extensions) editor.extensions = [...editor.extensions, ...options.extensions]
 		if (options.formatRules) editor.formatRules = [...options.formatRules, ...editor.formatRules]
 		if (options.domParseNodeCallback) editor.domParseNodeCallback = options.domParseNodeCallback

@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isStrikethrough?: () => boolean
 		setStrikethrough?: () => Promise<void>
@@ -12,6 +12,21 @@ declare module '../../model' {
 
 export const StrikethroughExtension = Extension.create({
 	name: 'strikethrough',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('textDecoration')) styles.textDecoration = node.styles!.textDecoration
+			if (node.styles!.hasOwnProperty('textDecorationLine')) styles.textDecorationLine = node.styles!.textDecorationLine
+		}
+		return styles
+	},
+	extraKeepTags: ['del'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'del' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && node.isMatch({ tag: 'del' })) {

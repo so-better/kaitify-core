@@ -1,8 +1,8 @@
-import { KNodeStylesType } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNodeStylesType } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		isItalic?: () => boolean
 		setItalic?: () => Promise<void>
@@ -12,6 +12,20 @@ declare module '../../model' {
 
 export const ItalicExtension = Extension.create({
 	name: 'italic',
+	pasteKeepStyles(node) {
+		const styles: KNodeStylesType = {}
+		if (node.isText() && node.hasStyles()) {
+			if (node.styles!.hasOwnProperty('fontStyle')) styles.fontStyle = node.styles!.fontStyle
+		}
+		return styles
+	},
+	extraKeepTags: ['i'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'i' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			if (!node.isEmpty() && node.isMatch({ tag: 'i' })) {

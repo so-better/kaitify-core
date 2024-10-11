@@ -1,9 +1,9 @@
-import { KNode } from '../../model'
-import { splitNodeToNodes } from '../../model/config/function'
+import { KNode } from '@/model'
+import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '../../model' {
+declare module '@/model' {
 	interface EditorCommandsType {
 		getCode?: () => KNode | null
 		hasCode?: () => boolean
@@ -15,6 +15,13 @@ declare module '../../model' {
 
 export const CodeExtension = Extension.create({
 	name: 'code',
+	extraKeepTags: ['code'],
+	domParseNodeCallback(node) {
+		if (node.isMatch({ tag: 'code' })) {
+			node.type = 'inline'
+		}
+		return node
+	},
 	formatRules: [
 		({ editor, node }) => {
 			//行内代码里只能有文本节点和闭合节点
