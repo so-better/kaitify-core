@@ -62,9 +62,23 @@ export const AttachmentExtension = Extension.create({
 		if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
 			//锁定节点
 			node.locked = true
-			//锁定子孙节点
+			//设为行内
+			node.type = 'inline'
+			//处理子孙节点
 			KNode.flat(node.children!).forEach(item => {
+				//锁定节点
 				item.locked = true
+				//非文本节点
+				if (!item.isText()) {
+					//有子节点转为行内
+					if (item.hasChildren()) {
+						item.type = 'inline'
+					}
+					//无子节点转为闭合
+					else {
+						item.type = 'closed'
+					}
+				}
 			})
 		}
 		return node

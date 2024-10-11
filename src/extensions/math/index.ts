@@ -92,13 +92,22 @@ export const MathExtension = Extension.create({
 		) {
 			//锁定节点防止合并
 			node.locked = true
+			//设为行内
+			node.type = 'inline'
 			//处理子孙节点
 			KNode.flat(node.children!).forEach(item => {
 				//锁定节点防止合并
 				item.locked = true
-				//没有子节点的非文本节点设为闭合节点
-				if (!item.isText() && !item.hasChildren()) {
-					item.type = 'closed'
+				//非文本节点
+				if (!item.isText()) {
+					//有子节点转为行内
+					if (item.hasChildren()) {
+						item.type = 'inline'
+					}
+					//无子节点转为闭合
+					else {
+						item.type = 'closed'
+					}
 				}
 			})
 		}

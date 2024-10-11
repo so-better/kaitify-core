@@ -28,7 +28,11 @@ export const TableExtension = Extension.create({
 	},
 	formatRules: [
 		//表格结构格式化
-		({ editor, node }) => {}
+		({ editor, node }) => {
+			//表格
+			if (node.isMatch({ tag: 'table' })) {
+			}
+		}
 	],
 	addCommands() {
 		/**
