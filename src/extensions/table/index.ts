@@ -2,19 +2,20 @@ import { KNode, KNodeMarksType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
+type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom'
+
 declare module '@/model' {
 	interface EditorCommandsType {
 		getTable?: () => KNode | null
 		hasTable?: () => boolean
+		canMergeCells?: (direction: TableCellsMergeDirection) => boolean
 		setTable?: () => Promise<void>
 		unsetTable?: () => Promise<void>
 	}
 }
 
-type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom'
-
 /**
- * 获取td节点的rowspan和colspan数量
+ * 获取td节点的实际所占的行数和列数
  */
 const getCellSize = (cell: KNode) => {
 	let rowCount = 1
@@ -42,6 +43,11 @@ const getTableSize = (rows: KNode[]) => {
 	}
 	return { rowCount: rows.length, colCount: maxColCount }
 }
+
+/**
+ * 获取上一行同列的单元格
+ */
+const getPreviousRowSameCell = (cell: KNode) => {}
 
 export const TableExtension = Extension.create({
 	name: 'table',
@@ -129,27 +135,35 @@ export const TableExtension = Extension.create({
 			const cell = this.getMatchNodeBySelection({ tag: 'td' })
 			//光标在一个单元格内
 			if (cell) {
+				const row = cell.parent!
 				//向右合并
 				if (direction == 'right') {
 					//获取后一个单元格
-					const nextCell = cell.getNext(cell.parent!.children!)
+					const nextCell = cell.getNext(row.children!)
 					//存在后一个单元格
 					if (nextCell) {
-						return
+						return getCellSize(nextCell).rowCount == getCellSize(cell).rowCount
 					}
 					return false
 				}
 				//向左合并
 				if (direction == 'left') {
-
+					//获取前一个单元格
+					const previousCell = cell.getPrevious(cell.parent!.children!)
+					//存在前一个单元格
+					if (previousCell) {
+						return getCellSize(previousCell).rowCount == getCellSize(cell).rowCount
+					}
+					return false
 				}
 				//向上合并
 				if (direction == 'top') {
-
+					//获取上一行同列的单元格
+					const previousCell = getPreviousRowSameCell(cell)
+					console.log(previousCell)
 				}
 				//向下合并
 				if (direction == 'bottom') {
-
 				}
 			}
 			return false
@@ -158,16 +172,17 @@ export const TableExtension = Extension.create({
 		/**
 		 * 插入表格
 		 */
-		const setTable = async () => { }
+		const setTable = async () => {}
 
 		/**
 		 * 取消表格
 		 */
-		const unsetTable = async () => { }
+		const unsetTable = async () => {}
 
 		return {
 			getTable,
 			hasTable,
+			canMergeCells,
 			setTable,
 			unsetTable
 		}
