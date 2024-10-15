@@ -35,10 +35,6 @@
 			border-color: @theme;
 		}
 
-		[contenteditable='false']:hover {
-			cursor: not-allowed;
-		}
-
 		&[kaitify-placeholder].showPlaceholder::before {
 			content: attr(kaitify-placeholder);
 			position: absolute;
@@ -47,6 +43,10 @@
 			padding: @padding;
 			line-height: @line-height;
 			opacity: 0.5;
+		}
+
+		[contenteditable='false']:hover {
+			cursor: not-allowed;
 		}
 	}
 }
