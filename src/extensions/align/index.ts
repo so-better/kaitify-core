@@ -7,20 +7,20 @@ type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		isAlign?: (val: AlignValueType) => boolean
-		setAlign?: (val: AlignValueType) => Promise<void>
-		unsetAlign?: (val: AlignValueType) => Promise<void>
+		isAlign?: (value: AlignValueType) => boolean
+		setAlign?: (value: AlignValueType) => Promise<void>
+		unsetAlign?: (value: AlignValueType) => Promise<void>
 	}
 }
 
 /**
  * 删除指定块节点及以上块节点的对齐方式
  */
-const clearAlign = (blockNode: KNode, val: AlignValueType) => {
-	const matchNode = blockNode.getMatchNode({ styles: { textAlign: val } })
+const clearAlign = (blockNode: KNode, value: AlignValueType) => {
+	const matchNode = blockNode.getMatchNode({ styles: { textAlign: value } })
 	if (matchNode) {
 		matchNode.styles = deleteProperty(matchNode.styles!, 'textAlign')
-		clearAlign(matchNode, val)
+		clearAlign(matchNode, value)
 	}
 }
 
@@ -37,27 +37,27 @@ export const AlignExtension = Extension.create({
 		/**
 		 * 光标所在的块节点是否都是符合的对齐方式
 		 */
-		const isAlign = (val: AlignValueType) => {
+		const isAlign = (value: AlignValueType) => {
 			if (!this.selection.focused()) {
 				return false
 			}
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
 				const block = this.selection.start!.node.getBlock()
-				return !!block.getMatchNode({ styles: { textAlign: val } })
+				return !!block.getMatchNode({ styles: { textAlign: value } })
 			}
 			//起点和终点不在一起
 			const blockNodes = getSelectionBlockNodes.apply(this)
 			return blockNodes.every(item => {
-				return !!item.getMatchNode({ styles: { textAlign: val } })
+				return !!item.getMatchNode({ styles: { textAlign: value } })
 			})
 		}
 
 		/**
 		 * 设置对齐方式
 		 */
-		const setAlign = async (val: AlignValueType) => {
-			if (isAlign(val)) {
+		const setAlign = async (value: AlignValueType) => {
+			if (isAlign(value)) {
 				return
 			}
 			//起点和终点在一起
@@ -66,7 +66,7 @@ export const AlignExtension = Extension.create({
 				const styles: KNodeStylesType = blockNode.hasStyles() ? blockNode.styles! : {}
 				blockNode.styles = {
 					...styles,
-					textAlign: val
+					textAlign: value
 				}
 			}
 			//起点和终点不在一起
@@ -76,7 +76,7 @@ export const AlignExtension = Extension.create({
 					const styles: KNodeStylesType = item.hasStyles() ? item.styles! : {}
 					item.styles = {
 						...styles,
-						textAlign: val
+						textAlign: value
 					}
 				})
 			}
@@ -86,20 +86,20 @@ export const AlignExtension = Extension.create({
 		/**
 		 * 取消对齐方式
 		 */
-		const unsetAlign = async (val: AlignValueType) => {
-			if (!isAlign(val)) {
+		const unsetAlign = async (value: AlignValueType) => {
+			if (!isAlign(value)) {
 				return
 			}
 			//起点和终点在一起
 			if (this.selection.collapsed()) {
 				const blockNode = this.selection.start!.node.getBlock()
-				clearAlign(blockNode, val)
+				clearAlign(blockNode, value)
 			}
 			//起点和终点不在一起
 			else {
 				const blockNodes = getSelectionBlockNodes.apply(this)
 				blockNodes.forEach(item => {
-					clearAlign(item, val)
+					clearAlign(item, value)
 				})
 			}
 			await this.updateView()

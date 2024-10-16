@@ -7,11 +7,11 @@ type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'uppe
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		getList?: ({ ordered }: { ordered?: boolean }) => KNode | null
-		hasList?: ({ ordered }: { ordered?: boolean }) => boolean
-		allList?: ({ ordered }: { ordered?: boolean }) => boolean
-		setList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
-		unsetList?: ({ ordered }: { ordered?: boolean }) => Promise<void>
+		getList?: (ordered: boolean) => KNode | null
+		hasList?: (ordered: boolean) => boolean
+		allList?: (ordered: boolean) => boolean
+		setList?: (ordered: boolean) => Promise<void>
+		unsetList?: (ordered: boolean) => Promise<void>
 		updateListType?: ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => Promise<void>
 	}
 }
@@ -264,29 +264,29 @@ export const ListExtension = Extension.create({
 		/**
 		 * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
 		 */
-		const getList = ({ ordered }: { ordered?: boolean }) => {
+		const getList = (ordered?: boolean) => {
 			return this.getMatchNodeBySelection({ tag: ordered ? 'ol' : 'ul' })
 		}
 
 		/**
 		 * 判断光标范围内是否有有序列表或者无序列表
 		 */
-		const hasList = ({ ordered }: { ordered?: boolean }) => {
+		const hasList = (ordered?: boolean) => {
 			return this.isSelectionNodesSomeMatch({ tag: ordered ? 'ol' : 'ul' })
 		}
 
 		/**
 		 * 判断光标范围内是否都是有序列表或者无序列表
 		 */
-		const allList = ({ ordered }: { ordered?: boolean }) => {
+		const allList = (ordered?: boolean) => {
 			return this.isSelectionNodesAllMatch({ tag: ordered ? 'ol' : 'ul' })
 		}
 
 		/**
 		 * 设置有序列表或者无序列表
 		 */
-		const setList = async ({ ordered }: { ordered?: boolean }) => {
-			if (allList({ ordered })) {
+		const setList = async (ordered?: boolean) => {
+			if (allList(ordered)) {
 				return
 			}
 			//起点和终点在一起
@@ -307,8 +307,8 @@ export const ListExtension = Extension.create({
 		/**
 		 * 取消有序列表或者无序列表
 		 */
-		const unsetList = async ({ ordered }: { ordered?: boolean }) => {
-			if (!allList({ ordered })) {
+		const unsetList = async (ordered?: boolean) => {
+			if (!allList(ordered)) {
 				return
 			}
 			//起点和终点在一起
@@ -333,7 +333,7 @@ export const ListExtension = Extension.create({
 		 */
 		const updateListType = async ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => {
 			//不存在列表
-			if (!hasList({ ordered })) {
+			if (!hasList(ordered)) {
 				return
 			}
 			//起点和终点在一起

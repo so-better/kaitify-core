@@ -3,9 +3,9 @@ import { Extension } from '../Extension'
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		isBackColor?: (val: string) => boolean
-		setBackColor?: (val: string) => Promise<void>
-		unsetBackColor?: (val: string) => Promise<void>
+		isBackColor?: (value: string) => boolean
+		setBackColor?: (value: string) => Promise<void>
+		unsetBackColor?: (value: string) => Promise<void>
 	}
 }
 
@@ -22,25 +22,25 @@ export const BackColorExtension = Extension.create({
 		/**
 		 * 光标所在文本的背景颜色是否与入参一致
 		 */
-		const isBackColor = (val: string) => {
-			return this.commands.isTextStyle!('background-color', val) || this.commands.isTextStyle!('background', val)
+		const isBackColor = (value: string) => {
+			return this.commands.isTextStyle!('background-color', value) || this.commands.isTextStyle!('background', value)
 		}
 		/**
 		 * 设置背景颜色
 		 */
-		const setBackColor = async (val: string) => {
-			if (isBackColor(val)) {
+		const setBackColor = async (value: string) => {
+			if (isBackColor(value)) {
 				return
 			}
 			await this.commands.setTextStyle!({
-				backgroundColor: val
+				backgroundColor: value
 			})
 		}
 		/**
 		 * 取消背景颜色
 		 */
-		const unsetBackColor = async (val: string) => {
-			if (!isBackColor(val)) {
+		const unsetBackColor = async (value: string) => {
+			if (!isBackColor(value)) {
 				return
 			}
 			await this.commands.removeTextStyle!(['backgroundColor'])

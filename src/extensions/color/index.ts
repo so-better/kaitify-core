@@ -3,9 +3,9 @@ import { Extension } from '../Extension'
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		isColor?: (val: string) => boolean
-		setColor?: (val: string) => Promise<void>
-		unsetColor?: (val: string) => Promise<void>
+		isColor?: (value: string) => boolean
+		setColor?: (value: string) => Promise<void>
+		unsetColor?: (value: string) => Promise<void>
 	}
 }
 
@@ -22,25 +22,25 @@ export const ColorExtension = Extension.create({
 		/**
 		 * 光标所在文本的颜色是否与入参一致
 		 */
-		const isColor = (val: string) => {
-			return this.commands.isTextStyle!('color', val)
+		const isColor = (value: string) => {
+			return this.commands.isTextStyle!('color', value)
 		}
 		/**
 		 * 设置颜色
 		 */
-		const setColor = async (val: string) => {
-			if (isColor(val)) {
+		const setColor = async (value: string) => {
+			if (isColor(value)) {
 				return
 			}
 			await this.commands.setTextStyle!({
-				color: val
+				color: value
 			})
 		}
 		/**
 		 * 取消颜色
 		 */
-		const unsetColor = async (val: string) => {
-			if (!isColor(val)) {
+		const unsetColor = async (value: string) => {
+			if (!isColor(value)) {
 				return
 			}
 			await this.commands.removeTextStyle!(['color'])

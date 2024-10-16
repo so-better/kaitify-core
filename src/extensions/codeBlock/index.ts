@@ -12,7 +12,7 @@ declare module '@/model' {
 		allCodeBlock?: () => boolean
 		setCodeBlock?: () => Promise<void>
 		unsetCodeBlock?: () => Promise<void>
-		updateCodeBlockLanguage?: ({ language }: { language?: HljsLanguageType }) => Promise<void>
+		updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>
 	}
 }
 
@@ -240,7 +240,7 @@ export const CodeBlockExtension = Extension.create({
 		/**
 		 * 更新语言类型
 		 */
-		const updateCodeBlockLanguage = async ({ language }: { language?: HljsLanguageType }) => {
+		const updateCodeBlockLanguage = async (language: HljsLanguageType) => {
 			//不存在代码块
 			if (!hasCodeBlock()) {
 				return

@@ -3,9 +3,9 @@ import { Extension } from '../Extension'
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		isFontSize?: (val: string) => boolean
-		setFontSize?: (val: string) => Promise<void>
-		unsetFontSize?: (val: string) => Promise<void>
+		isFontSize?: (value: string) => boolean
+		setFontSize?: (value: string) => Promise<void>
+		unsetFontSize?: (value: string) => Promise<void>
 	}
 }
 
@@ -22,25 +22,25 @@ export const FontSizeExtension = Extension.create({
 		/**
 		 * 光标所在文本的字号大小是否与入参一致
 		 */
-		const isFontSize = (val: string) => {
-			return this.commands.isTextStyle!('fontSize', val)
+		const isFontSize = (value: string) => {
+			return this.commands.isTextStyle!('fontSize', value)
 		}
 		/**
 		 * 设置字号
 		 */
-		const setFontSize = async (val: string) => {
-			if (isFontSize(val)) {
+		const setFontSize = async (value: string) => {
+			if (isFontSize(value)) {
 				return
 			}
 			await this.commands.setTextStyle!({
-				fontSize: val
+				fontSize: value
 			})
 		}
 		/**
 		 * 取消字号
 		 */
-		const unsetFontSize = async (val: string) => {
-			if (!isFontSize(val)) {
+		const unsetFontSize = async (value: string) => {
+			if (!isFontSize(value)) {
 				return
 			}
 			await this.commands.removeTextStyle!(['fontSize'])

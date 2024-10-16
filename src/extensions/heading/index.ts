@@ -16,11 +16,11 @@ const headingLevelMap = {
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		getHeading?: ({ level }: { level: HeadingLevelType }) => KNode | null
-		hasHeading?: ({ level }: { level: HeadingLevelType }) => boolean
-		allHeading?: ({ level }: { level: HeadingLevelType }) => boolean
-		setHeading?: ({ level }: { level: HeadingLevelType }) => Promise<void>
-		unsetHeading?: ({ level }: { level: HeadingLevelType }) => Promise<void>
+		getHeading?: (level: HeadingLevelType) => KNode | null
+		hasHeading?: (level: HeadingLevelType) => boolean
+		allHeading?: (level: HeadingLevelType) => boolean
+		setHeading?: (level: HeadingLevelType) => Promise<void>
+		unsetHeading?: (level: HeadingLevelType) => Promise<void>
 	}
 }
 
@@ -73,7 +73,7 @@ export const HeadingExtension = Extension.create({
 		/**
 		 * 获取光标所在的标题，如果光标不在一个标题内，返回null
 		 */
-		const getHeading = ({ level }: { level: HeadingLevelType }) => {
+		const getHeading = (level: HeadingLevelType) => {
 			return this.getMatchNodeBySelection({
 				tag: headingLevelMap[level]
 			})
@@ -82,7 +82,7 @@ export const HeadingExtension = Extension.create({
 		/**
 		 * 判断光标范围内是否有标题
 		 */
-		const hasHeading = ({ level }: { level: HeadingLevelType }) => {
+		const hasHeading = (level: HeadingLevelType) => {
 			return this.isSelectionNodesSomeMatch({
 				tag: headingLevelMap[level]
 			})
@@ -91,7 +91,7 @@ export const HeadingExtension = Extension.create({
 		/**
 		 * 光标范围内是否都是标题
 		 */
-		const allHeading = ({ level }: { level: HeadingLevelType }) => {
+		const allHeading = (level: HeadingLevelType) => {
 			return this.isSelectionNodesAllMatch({
 				tag: headingLevelMap[level]
 			})
@@ -100,8 +100,8 @@ export const HeadingExtension = Extension.create({
 		/**
 		 * 设置标题
 		 */
-		const setHeading = async ({ level }: { level: HeadingLevelType }) => {
-			if (allHeading({ level })) {
+		const setHeading = async (level: HeadingLevelType) => {
+			if (allHeading(level)) {
 				return
 			}
 			//起点和终点在一起
@@ -122,8 +122,8 @@ export const HeadingExtension = Extension.create({
 		/**
 		 * 取消标题
 		 */
-		const unsetHeading = async ({ level }: { level: HeadingLevelType }) => {
-			if (!allHeading({ level })) {
+		const unsetHeading = async (level: HeadingLevelType) => {
+			if (!allHeading(level)) {
 				return
 			}
 			//起点和终点在一起

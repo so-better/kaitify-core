@@ -5,9 +5,9 @@ import { Extension } from '../Extension'
 
 declare module '@/model' {
 	interface EditorCommandsType {
-		isFontFamily?: (val: string) => boolean
-		setFontFamily?: (val: string) => Promise<void>
-		unsetFontFamily?: (val: string) => Promise<void>
+		isFontFamily?: (value: string) => boolean
+		setFontFamily?: (value: string) => Promise<void>
+		unsetFontFamily?: (value: string) => Promise<void>
 	}
 }
 
@@ -46,25 +46,25 @@ export const FontFamilyExtension = Extension.create({
 		/**
 		 * 光标所在文本的字体是否与入参一致
 		 */
-		const isFontFamily = (val: string) => {
-			return this.commands.isTextStyle!('fontFamily', val)
+		const isFontFamily = (value: string) => {
+			return this.commands.isTextStyle!('fontFamily', value)
 		}
 		/**
 		 * 设置字体
 		 */
-		const setFontFamily = async (val: string) => {
-			if (isFontFamily(val)) {
+		const setFontFamily = async (value: string) => {
+			if (isFontFamily(value)) {
 				return
 			}
 			await this.commands.setTextStyle!({
-				fontFamily: val
+				fontFamily: value
 			})
 		}
 		/**
 		 * 取消字体
 		 */
-		const unsetFontFamily = async (val: string) => {
-			if (!isFontFamily(val)) {
+		const unsetFontFamily = async (value: string) => {
+			if (!isFontFamily(value)) {
 				return
 			}
 			await this.commands.removeTextStyle!(['fontFamily'])
