@@ -4,7 +4,7 @@ import './style.less'
 
 type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getTable?: () => KNode | null
 		hasTable?: () => boolean
@@ -12,6 +12,10 @@ declare module '@/model' {
 		setTable?: ({ rows, columns }: { rows: number, columns: number }) => Promise<void>
 		unsetTable?: () => Promise<void>
 		mergeCell?: (direction: TableCellsMergeDirection) => Promise<void>
+		addRow?: (direction: 'up' | 'down') => Promise<void>
+		deleteRow?: () => Promise<void>
+		addColumn?: (direction: 'left' | 'right') => Promise<void>
+		deleteColumn?: () => Promise<void>
 	}
 }
 
@@ -361,14 +365,54 @@ export const TableExtension = Extension.create({
 		/**
 		 * 插入表格
 		 */
-		const setTable = async () => {
-
+		const setTable = async ({ rows, columns }: { rows: number, columns: number }) => {
+			if (!!getTable()) {
+				return
+			}
+			const tableNode = KNode.create({
+				type: 'block',
+				tag: 'table',
+				children: []
+			})
+			for (let i = 0; i < rows; i++) {
+				const rowNode = KNode.create({
+					type: 'block',
+					tag: 'tr',
+					nested: true,
+					fixed: true,
+					children: []
+				})
+				for (let j = 0; j < columns; j++) {
+					const cellNode = KNode.create({
+						type: 'block',
+						tag: 'td',
+						nested: true,
+						fixed: true,
+						children: [{
+							type: 'closed',
+							tag: 'br'
+						}]
+					})
+					this.addNode(cellNode, rowNode, rowNode.children!.length)
+				}
+				this.addNode(rowNode, tableNode, tableNode.children!.length)
+			}
+			this.insertNode(tableNode)
+			this.setSelectionBefore(tableNode, 'all')
+			await this.updateView()
 		}
 
 		/**
 		 * 取消表格
 		 */
-		const unsetTable = async () => { }
+		const unsetTable = async () => {
+			const tableNode = getTable()
+			if (!tableNode) {
+				return
+			}
+			tableNode.toEmpty()
+			await this.updateView()
+		}
 
 		/**
 		 * 合并单元格
@@ -387,13 +431,66 @@ export const TableExtension = Extension.create({
 			await this.updateView()
 		}
 
+		/**
+		 * 添加行
+		 */
+		const addRow = async (direction: 'up' | 'down') => {
+			const cell = this.getMatchNodeBySelection({ tag: 'td' })
+			//光标在某个单元格内
+			if (cell) {
+				const row = cell.parent!
+				const newRow = KNode.create({
+					type: 'block',
+					tag: 'tr',
+					nested: true,
+					fixed: true,
+					children: []
+				})
+				// 这里建列数有问题？？？？？
+				for (let i = 0; i < row.children!.length; i++) {
+					const newCell = KNode.create({
+						type: 'block',
+						tag: 'td',
+						nested: true,
+						fixed: true,
+						children: [{
+							type: 'closed',
+							tag: 'br'
+						}]
+					})
+					this.addNode(newCell, newRow, newRow.children!.length)
+				}
+				//向上插入行
+				if (direction == 'up') {
+
+				}
+				//向下插入行
+				else {
+					const { rowCount } = getCellSize(cell)
+					let i = 1
+					let current: KNode = row
+					while (i < rowCount) {
+						const nextRow = current!.getNext(row.parent!.children!)
+						if (!nextRow) {
+							break
+						}
+						current = nextRow
+						i++
+					}
+					this.addNodeAfter(newRow, current)
+				}
+				await this.updateView()
+			}
+		}
+
 		return {
 			getTable,
 			hasTable,
 			canMergeCells,
 			setTable,
 			unsetTable,
-			mergeCell
+			mergeCell,
+			addRow
 		}
 	}
 })

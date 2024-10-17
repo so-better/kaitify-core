@@ -3,7 +3,7 @@ import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getCode?: () => KNode | null
 		hasCode?: () => boolean

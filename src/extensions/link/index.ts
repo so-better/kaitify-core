@@ -20,7 +20,7 @@ type UpdateLinkOptionType = {
 	newOpen?: boolean
 }
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getLink?: () => KNode | null
 		hasLink?: () => boolean

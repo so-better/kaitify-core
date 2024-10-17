@@ -3,7 +3,7 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isLineHeight?: (value: string | number) => boolean
 		setLineHeight?: (value: string | number) => Promise<void>

@@ -5,7 +5,7 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 
 type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isAlign?: (value: AlignValueType) => boolean
 		setAlign?: (value: AlignValueType) => Promise<void>

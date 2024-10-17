@@ -16,7 +16,7 @@ type SetVideoOptionType = {
 	loop?: boolean
 }
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getVideo?: () => KNode | null
 		hasVideo?: () => boolean

@@ -3,7 +3,7 @@ import { splitNodeToNodes } from '@/model/config/function'
 import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isFontFamily?: (value: string) => boolean
 		setFontFamily?: (value: string) => Promise<void>

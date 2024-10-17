@@ -10,7 +10,7 @@ type SetAttachmentConfigType = {
 	icon?: string
 }
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getAttachment?: () => KNode | null
 		hasAttachment?: () => boolean

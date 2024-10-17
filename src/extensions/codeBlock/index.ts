@@ -2,10 +2,9 @@ import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
-
 import './style.less'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getCodeBlock?: () => KNode | null
 		hasCodeBlock?: () => boolean

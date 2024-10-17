@@ -13,7 +13,7 @@ type SetImageOptionType = {
 	width?: string
 }
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getImage?: () => KNode | null
 		hasImage?: () => boolean

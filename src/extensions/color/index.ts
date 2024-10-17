@@ -1,7 +1,7 @@
 import { KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isColor?: (value: string) => boolean
 		setColor?: (value: string) => Promise<void>

@@ -16,11 +16,10 @@ const editor = ref<Editor | null>(null)
 
 const onClick1 = () => {
   //editor.value!.commands.setMath!('\\lim_{n \\to \\infty} \\sum_{k=1}^{n} \\frac{1}{k^2} + \\int_0^1 \\frac{1}{x^2 + 1} \\, dx = \\frac{\\pi^2}{6} + \\frac{\\pi}{2}')
-  editor.value!.commands.mergeCell!('bottom')
+  !!editor.value!.commands.addRow!('down')
 }
 
 const onClick2 = () => {
-  editor.value!.commands.mergeCell!('right')
 }
 
 onMounted(async () => {

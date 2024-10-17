@@ -2,7 +2,7 @@ import { KNodeStylesType } from '@/model'
 import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isSuperscript?: () => boolean
 		setSuperscript?: () => Promise<void>

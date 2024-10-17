@@ -2,7 +2,7 @@ import { common as DapCommon, string as DapString, color as DapColor } from 'dap
 import { KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isTextStyle?: (styleName: string, styleValue?: string | number) => boolean
 		isTextMark?: (markName: string, markValue?: string | number) => boolean

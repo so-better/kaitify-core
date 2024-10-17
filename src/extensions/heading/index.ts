@@ -14,7 +14,7 @@ const headingLevelMap = {
 	6: 'h6'
 }
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getHeading?: (level: HeadingLevelType) => KNode | null
 		hasHeading?: (level: HeadingLevelType) => boolean

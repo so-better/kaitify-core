@@ -4,7 +4,7 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getTask?: () => KNode | null
 		hasTask?: () => boolean

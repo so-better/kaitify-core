@@ -2,7 +2,7 @@ import { KNodeStylesType } from '@/model'
 import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isBold?: () => boolean
 		setBold?: () => Promise<void>

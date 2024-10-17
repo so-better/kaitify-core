@@ -2,7 +2,7 @@ import { KNode } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		setHorizontal?: () => Promise<void>
 	}

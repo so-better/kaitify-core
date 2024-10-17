@@ -1,7 +1,7 @@
 import { KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		isFontSize?: (value: string) => boolean
 		setFontSize?: (value: string) => Promise<void>

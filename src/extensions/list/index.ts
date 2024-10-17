@@ -5,7 +5,7 @@ import './style.less'
 
 type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
 
-declare module '@/model' {
+declare module '../../model' {
 	interface EditorCommandsType {
 		getList?: (ordered: boolean) => KNode | null
 		hasList?: (ordered: boolean) => boolean
