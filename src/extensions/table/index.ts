@@ -46,7 +46,7 @@ const createHideCellNode = () => {
 	})
 }
 /**
- * 获取单元格节点实际所占的行数和列数
+ * 获取单元格节点的rowspan和colspan
  */
 const getCellSize = (cell: KNode) => {
 	let rowCount = 1
@@ -58,7 +58,7 @@ const getCellSize = (cell: KNode) => {
 	return { rowCount, colCount }
 }
 /**
- * 获取单元格节点后面有几个隐藏单元格
+ * 获取单元格节点同一行的后面有几个隐藏单元格
  */
 const getHideCellCountAfter = (cell: KNode) => {
 	let count = 0
@@ -131,6 +131,15 @@ const setCellToHide = (cell: KNode) => {
 		cell.styles!.display = 'none'
 	} else {
 		cell.styles = { display: 'none' }
+	}
+	if (cell.hasMarks()) {
+		const marks: KNodeMarksType = {}
+		Object.keys(cell.marks!).forEach(markName => {
+			if (markName != 'rowspan' && markName != 'colspan') {
+				marks[markName] = cell.marks![markName]
+			}
+		})
+		cell.marks = { ...marks }
 	}
 }
 /**
@@ -436,51 +445,61 @@ export const TableExtension = Extension.create({
 		 */
 		const addRow = async (direction: 'up' | 'down') => {
 			const cell = this.getMatchNodeBySelection({ tag: 'td' })
-			//光标在某个单元格内
-			if (cell) {
+			//光标在某个非隐藏的单元格内
+			if (cell && !isHideCell(cell)) {
 				const row = cell.parent!
-				const newRow = KNode.create({
-					type: 'block',
-					tag: 'tr',
-					nested: true,
-					fixed: true,
-					children: []
-				})
-				// 这里建列数有问题？？？？？
-				for (let i = 0; i < row.children!.length; i++) {
-					const newCell = KNode.create({
-						type: 'block',
-						tag: 'td',
-						nested: true,
-						fixed: true,
-						children: [{
-							type: 'closed',
-							tag: 'br'
-						}]
-					})
-					this.addNode(newCell, newRow, newRow.children!.length)
-				}
-				//向上插入行
+				const cellSize = getCellSize(cell)
+				//上面插入一行
 				if (direction == 'up') {
 
 				}
-				//向下插入行
+				//下面插入一行
 				else {
-					const { rowCount } = getCellSize(cell)
-					let i = 1
-					let current: KNode = row
-					while (i < rowCount) {
-						const nextRow = current!.getNext(row.parent!.children!)
-						if (!nextRow) {
-							break
-						}
-						current = nextRow
-						i++
-					}
-					this.addNodeAfter(newRow, current)
+
 				}
-				await this.updateView()
 			}
+			// 	const newRow = KNode.create({
+			// 		type: 'block',
+			// 		tag: 'tr',
+			// 		nested: true,
+			// 		fixed: true,
+			// 		children: []
+			// 	})
+			// 	// 这里建列数有问题？？？？？
+			// 	for (let i = 0; i < row.children!.length; i++) {
+			// 		const newCell = KNode.create({
+			// 			type: 'block',
+			// 			tag: 'td',
+			// 			nested: true,
+			// 			fixed: true,
+			// 			children: [{
+			// 				type: 'closed',
+			// 				tag: 'br'
+			// 			}]
+			// 		})
+			// 		this.addNode(newCell, newRow, newRow.children!.length)
+			// 	}
+			// 	//向上插入行
+			// 	if (direction == 'up') {
+
+			// 	}
+			// 	//向下插入行
+			// 	else {
+			// 		const { rowCount } = getCellSize(cell)
+			// 		let i = 1
+			// 		let current: KNode = row
+			// 		while (i < rowCount) {
+			// 			const nextRow = current!.getNext(row.parent!.children!)
+			// 			if (!nextRow) {
+			// 				break
+			// 			}
+			// 			current = nextRow
+			// 			i++
+			// 		}
+			// 		this.addNodeAfter(newRow, current)
+			// 	}
+			// 	await this.updateView()
+			// }
 		}
 
 		return {
