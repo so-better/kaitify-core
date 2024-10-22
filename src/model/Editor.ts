@@ -60,10 +60,6 @@ export type EditorConfigureOptionType = {
 	 */
 	blockRenderTag?: string
 	/**
-	 * 自定义编辑器内定义不显示的标签
-	 */
-	voidRenderTags?: string[]
-	/**
 	 * 自定义编辑器内定义需要置空的标签
 	 */
 	emptyRenderTags?: string[]
@@ -212,10 +208,6 @@ export class Editor {
 	 * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】
 	 */
 	blockRenderTag: string = 'p'
-	/**
-	 * 编辑器内定义不显示的标签【初始化后不建议修改】
-	 */
-	voidRenderTags: string[] = []
 	/**
 	 * 编辑器内定义需要置空的标签【初始化后不建议修改】
 	 */
@@ -504,7 +496,7 @@ export class Editor {
 		const tag = dom.nodeName.toLocaleLowerCase() //标签名称
 		const namespace = (dom as HTMLElement).namespaceURI //命名空间
 		//如果是需要置为空的标签返回空文本节点
-		if (this.voidRenderTags.includes(tag)) {
+		if (this.emptyRenderTags.includes(tag)) {
 			return KNode.create({
 				type: 'text'
 			})
@@ -680,7 +672,7 @@ export class Editor {
 			return null
 		}
 		//子节点是不可见节点
-		if (node.tag && this.voidRenderTags.includes(node.tag)) {
+		if (node.void) {
 			return null
 		}
 		//文本节点和闭合节点返回自身
@@ -710,7 +702,7 @@ export class Editor {
 			return null
 		}
 		//子节点是不可见节点
-		if (node.tag && this.voidRenderTags.includes(node.tag)) {
+		if (node.void) {
 			return null
 		}
 		//文本节点和闭合节点返回自身
@@ -745,7 +737,7 @@ export class Editor {
 				return this.getPreviousSelectionNode(previousNode)
 			}
 			//是不可见节点，则跳过继续向前
-			if (previousNode.tag && this.voidRenderTags.includes(previousNode.tag)) {
+			if (previousNode.void) {
 				return this.getPreviousSelectionNode(previousNode)
 			}
 			//是文本节点或者闭合节点
@@ -773,7 +765,7 @@ export class Editor {
 				return this.getNextSelectionNode(nextNode)
 			}
 			//是不可见节点，则跳过继续向后
-			if (nextNode.tag && this.voidRenderTags.includes(nextNode.tag)) {
+			if (nextNode.void) {
 				return this.getNextSelectionNode(nextNode)
 			}
 			//是文本节点或者闭合节点
@@ -1551,7 +1543,7 @@ export class Editor {
 			//获取选区内的节点信息
 			const result = this.getSelectedNodes().filter(item => {
 				//批量删除时需要过滤掉那些不显示的节点
-				return !this.voidRenderTags.includes(item.node.tag!)
+				return !item.node.void
 			})
 			//起点所在块节点
 			const startBlockNode = this.selection.start!.node.getBlock()
@@ -1765,7 +1757,6 @@ export class Editor {
 		if (typeof options.allowPasteHtml == 'boolean') editor.allowPasteHtml = options.allowPasteHtml
 		if (options.textRenderTag) editor.textRenderTag = options.textRenderTag
 		if (options.blockRenderTag) editor.blockRenderTag = options.blockRenderTag
-		if (options.voidRenderTags) editor.voidRenderTags = [...editor.voidRenderTags, ...options.voidRenderTags]
 		if (options.emptyRenderTags) editor.emptyRenderTags = [...editor.emptyRenderTags, ...options.emptyRenderTags]
 		if (options.extraKeepTags) editor.extraKeepTags = [...editor.extraKeepTags, ...options.extraKeepTags]
 		if (options.extensions) editor.extensions = [...editor.extensions, ...options.extensions]

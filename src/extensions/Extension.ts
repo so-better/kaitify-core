@@ -9,10 +9,6 @@ export type ExtensionCreateOptionType = {
 	 */
 	name: string
 	/**
-	 * 不显示的标签
-	 */
-	voidRenderTags?: string[]
-	/**
 	 * 置空的标签
 	 */
 	emptyRenderTags?: string[]
@@ -92,10 +88,6 @@ export class Extension {
 	 */
 	registered: boolean = false
 	/**
-	 * 不显示的标签
-	 */
-	voidRenderTags: string[] = []
-	/**
 	 * 置空的标签
 	 */
 	emptyRenderTags: string[] = []
@@ -169,7 +161,6 @@ export class Extension {
 	 */
 	static create(options: ExtensionCreateOptionType) {
 		const extension = new Extension(options.name)
-		if (options.voidRenderTags) extension.voidRenderTags = options.voidRenderTags
 		if (options.emptyRenderTags) extension.emptyRenderTags = options.emptyRenderTags
 		if (options.extraKeepTags) extension.extraKeepTags = options.extraKeepTags
 		if (options.formatRules) extension.formatRules = options.formatRules

@@ -461,9 +461,6 @@ export const registerExtension = function (this: Editor, extension: Extension) {
 	//设置已注册
 	extension.registered = true
 
-	if (extension.voidRenderTags) {
-		this.voidRenderTags = [...extension.voidRenderTags, ...this.voidRenderTags]
-	}
 	if (extension.emptyRenderTags) {
 		this.emptyRenderTags = [...extension.emptyRenderTags, ...this.emptyRenderTags]
 	}
@@ -688,7 +685,7 @@ export const redressSelection = function (this: Editor) {
  */
 export const checkNodes = function (this: Editor) {
 	const nodes = this.stackNodes.filter(item => {
-		return !item.isEmpty() && !this.voidRenderTags.includes(item.tag!)
+		return !item.isEmpty() && !item.void
 	})
 	if (nodes.length == 0) {
 		const node = KNode.create({

@@ -25,15 +25,15 @@ export type KNodeStylesType = CSS.Properties<string | number> & {
 export type KNodeMatchOptionType = {
 	tag?: string
 	marks?:
-		| KNodeMarksType
-		| {
-				[mark: string]: boolean
-		  }
+	| KNodeMarksType
+	| {
+		[mark: string]: boolean
+	}
 	styles?:
-		| KNodeStylesType
-		| {
-				[style: string]: boolean
-		  }
+	| KNodeStylesType
+	| {
+		[style: string]: boolean
+	}
 }
 
 /**
@@ -49,6 +49,7 @@ export type KNodeCreateOptionType = {
 	locked?: boolean
 	fixed?: boolean
 	nested?: boolean
+	void?: boolean
 	children?: KNodeCreateOptionType[]
 }
 
@@ -105,6 +106,10 @@ export class KNode {
 	 * 是否为固定格式的内嵌块节点，如li、tr、td等【可以修改】
 	 */
 	nested: boolean = false
+	/**
+	 * 是否为不可见节点，意味着此类节点在编辑器内视图内无法看到
+	 */
+	void?: boolean = false
 	/**
 	 * 命名空间【可以修改】
 	 */
@@ -374,7 +379,8 @@ export class KNode {
 			textContent: this.textContent,
 			locked: this.locked,
 			fixed: this.fixed,
-			nested: this.nested
+			nested: this.nested,
+			void: this.void
 		})
 		if (deep && this.hasChildren()) {
 			this.children!.forEach(child => {
@@ -403,7 +409,8 @@ export class KNode {
 			textContent: this.textContent,
 			locked: this.locked,
 			fixed: this.fixed,
-			nested: this.nested
+			nested: this.nested,
+			void: this.void
 		})
 		newNode.key = this.key
 		if (this.hasChildren()) {
@@ -586,6 +593,7 @@ export class KNode {
 		knode.fixed = options.fixed || false
 		knode.locked = options.locked || false
 		knode.nested = options.nested || false
+		knode.void = options.void || false
 		knode.marks = DapCommon.clone(options.marks)
 		knode.styles = DapCommon.clone(options.styles)
 		knode.namespace = options.namespace
