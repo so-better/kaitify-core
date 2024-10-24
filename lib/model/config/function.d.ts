@@ -1,7 +1,7 @@
+import { Extension } from '../../extensions';
 import { Editor } from '../Editor';
 import { KNode } from '../KNode';
 import { RuleFunctionType } from './format-rules';
-import { Extension } from '../../extensions';
 /**
  * 获取选区内的可聚焦节点所在的块节点数组
  */
@@ -51,10 +51,22 @@ export declare const redressSelection: (this: Editor) => boolean;
  */
 export declare const checkNodes: (this: Editor) => void;
 /**
- * 粘贴时对非文本节点的标记和样式的保留处理
+ * 粘贴时对节点的标记和样式的保留处理
  */
 export declare const handlerForPasteKeepMarksAndStyles: (this: Editor, nodes: KNode[]) => void;
 /**
  * 粘贴处理
  */
 export declare const handlerForPasteDrop: (this: Editor, dataTransfer: DataTransfer) => Promise<void>;
+/**
+ * 将指定的非固定块节点从父节点（非固定块节点）中抽离，插入到和父节点同级的位置
+ */
+export declare const removeBlockFromParentToSameLevel: (this: Editor, node: KNode) => void;
+/**
+ * 光标所在的块节点不是只有占位，且非固定块节点，非代码块样式的块节点，在该块节点内正常换行方法
+ */
+export declare const handlerForNormalInsertParagraph: (this: Editor) => void;
+/**
+ * 设置placeholder，在每次视图更新时调用此方法
+ */
+export declare const setPlaceholder: (this: Editor) => void;

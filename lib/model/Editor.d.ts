@@ -3,7 +3,6 @@ import { Selection } from './Selection';
 import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
-import '../extensions/fontFamily';
 /**
  * 编辑器获取光标范围内节点数据的类型
  */
@@ -15,7 +14,7 @@ export type EditorSelectedType = {
  * 编辑器命令集合类型
  */
 export interface EditorCommandsType {
-    [name: string]: ((...args: any[]) => void) | undefined;
+    [name: string]: ((...args: any[]) => any | void) | undefined;
 }
 /**
  * 编辑器配置入参类型
@@ -49,10 +48,6 @@ export type EditorConfigureOptionType = {
      * 自定义编辑内渲染默认块级节点的真实标签，即段落标签
      */
     blockRenderTag?: string;
-    /**
-     * 自定义编辑器内定义不显示的标签
-     */
-    voidRenderTags?: string[];
     /**
      * 自定义编辑器内定义需要置空的标签
      */
@@ -106,9 +101,9 @@ export type EditorConfigureOptionType = {
      */
     onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
-     * 插入段落时触发
+     * 换行时触发，换行操作后光标所在的块节点
      */
-    onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void;
+    onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**
      * 完成删除时触发
      */
@@ -142,6 +137,10 @@ export type EditorConfigureOptionType = {
      */
     afterUpdateView?: (this: Editor) => void;
     /**
+     * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
+     */
+    onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean;
+    /**
      * 编辑器的初始默认值
      */
     value: string;
@@ -157,6 +156,10 @@ export type EditorConfigureOptionType = {
      * 是否使用默认css样式
      */
     useDefaultCSS?: boolean;
+    /**
+     * 编辑器内容只有一个段落时的默认文本
+     */
+    placeholder?: string;
 };
 /**
  * 编辑器核心类
@@ -190,10 +193,6 @@ export declare class Editor {
      * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】
      */
     blockRenderTag: string;
-    /**
-     * 编辑器内定义不显示的标签【初始化后不建议修改】
-     */
-    voidRenderTags: string[];
     /**
      * 编辑器内定义需要置空的标签【初始化后不建议修改】
      */
@@ -247,9 +246,9 @@ export declare class Editor {
      */
     onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
-     * 插入段落时触发【初始化后不可修改】
+     * 换行时触发，换行操作后光标所在的块节点
      */
-    onInsertParagraph?: (this: Editor, blockNode: KNode, previousBlockNode: KNode) => void;
+    onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**
      * 完成删除时触发【初始化后不可修改】
      */
@@ -283,6 +282,10 @@ export declare class Editor {
      */
     afterUpdateView?: (this: Editor) => void;
     /**
+     * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
+     */
+    onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean;
+    /**
      * 唯一id【不可修改】
      */
     guid: number;
@@ -295,7 +298,7 @@ export declare class Editor {
      */
     history: History;
     /**
-     * 命令集合
+     * 命令集合【不可修改】
      */
     commands: EditorCommandsType;
     /**
@@ -323,135 +326,139 @@ export declare class Editor {
      */
     domObserver: MutationObserver | null;
     /**
-     * 【API】如果编辑器内有滚动条，滚动编辑器到光标可视范围
+     * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
      */
     scrollViewToSelection(): void;
     /**
-     * 【API】根据dom查找到编辑内的对应节点
+     * 根据dom查找到编辑内的对应节点
      */
     findNode(dom: HTMLElement): KNode;
     /**
-     * 【API】根据编辑器内的node查找真实dom
+     * 根据编辑器内的node查找真实dom
      */
     findDom(node: KNode): HTMLElement;
     /**
-     * 【API】设置编辑器是否可编辑
+     * 设置编辑器是否可编辑
      */
     setEditable(editable: boolean): void;
     /**
-     * 【API】判断编辑器是否可编辑
+     * 判断编辑器是否可编辑
      */
     isEditable(): boolean;
     /**
-     * 【API】dom转KNode
+     * dom转KNode
      */
     domParseNode(dom: Node): KNode;
     /**
-     * 【API】html转KNode
+     * html转KNode
      */
     htmlParseNode(html: string): KNode[];
     /**
-     * 【API】将指定节点所在的块节点转为段落
+     * 将指定节点所在的块节点转为段落
      */
     toParagraph(node: KNode): void;
     /**
-     * 【API】将指定节点添加到某个节点的子节点数组里
+     * 指定的块节点是否是一个段落
+     */
+    isParagraph(node: KNode): boolean;
+    /**
+     * 将指定节点添加到某个节点的子节点数组里
      */
     addNode(node: KNode, parentNode: KNode, index?: number | undefined): void;
     /**
-     * 【API】将指定节点添加到某个节点前面
+     * 将指定节点添加到某个节点前面
      */
     addNodeBefore(node: KNode, target: KNode): void;
     /**
-     * 【API】将指定节点添加到某个节点后面
+     * 将指定节点添加到某个节点后面
      */
     addNodeAfter(node: KNode, target: KNode): void;
     /**
-     * 【API】获取某个节点内的最后一个可以设置光标点的节点，包括自身
+     * 获取某个节点内的最后一个可以设置光标点的节点，包括自身
      */
     getLastSelectionNodeInChildren(node: KNode): KNode | null;
     /**
-     * 【API】获取某个节点内的第一个可以设置光标点的节点，包括自身
+     * 获取某个节点内的第一个可以设置光标点的节点，包括自身
      */
     getFirstSelectionNodeInChildren(node: KNode): KNode | null;
     /**
-     * 【API】查找指定节点之前可以设置为光标点的非空节点，不包括自身
+     * 查找指定节点之前可以设置为光标点的非空节点，不包括自身
      */
     getPreviousSelectionNode(node: KNode): KNode | null;
     /**
-     * 【API】查找指定节点之后可以设置为光标点的非空节点，不包括自身
+     * 查找指定节点之后可以设置为光标点的非空节点，不包括自身
      */
     getNextSelectionNode(node: KNode): KNode | null;
     /**
-     * 【API】设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+     * 设置光标到指定节点内部的起始处，如果没有指定节点则设置光标到编辑器起始处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
      */
     setSelectionBefore(node?: KNode, type?: 'all' | 'start' | 'end' | undefined): void;
     /**
-     * 【API】设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
+     * 设置光标到指定节点内部的末尾处，如果没有指定节点则设置光标到编辑器末尾处，start表示只设置起点，end表示只设置终点，all表示起点和终点都设置
      */
     setSelectionAfter(node?: KNode, type?: 'all' | 'start' | 'end' | undefined): void;
     /**
-     * 【API】更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
+     * 更新指定光标到离当前光标点最近的节点上，start表示只更新起点，end表示只更新终点，all表示起点和终点都更新，不包括当前光标所在节点
      */
     updateSelectionRecently(type?: 'all' | 'start' | 'end' | undefined): void;
     /**
-     * 【API】判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
+     * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
      */
     isSelectionInNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean | undefined;
     /**
-     * 【API】获取光标选区内的节点数据
+     * 获取光标选区内的节点数据
      */
     getSelectedNodes(): EditorSelectedType[];
     /**
-     * 【API】判断光标范围内的可聚焦节点是否全都在同一个符合条件节点内，如果是返回那个符合条件的节点，否则返回null
+     * 判断光标范围内的可聚焦节点是否全都在同一个符合条件节点内，如果是返回那个符合条件的节点，否则返回null
      */
     getMatchNodeBySelection(options: KNodeMatchOptionType): KNode | null;
     /**
-     * 【API】判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
+     * 判断光标范围内的可聚焦节点是否全都在符合条件的（不一定是同一个）节点内
      */
     isSelectionNodesAllMatch(options: KNodeMatchOptionType): boolean;
     /**
-     * 【API】判断光标范围内是否有可聚焦节点在符合条件的节点内
+     * 判断光标范围内是否有可聚焦节点在符合条件的节点内
      */
     isSelectionNodesSomeMatch(options: KNodeMatchOptionType): boolean;
     /**
-     * 【API】获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
+     * 获取所有在光标范围内的可聚焦节点，该方法拿到的可聚焦节点（文本）可能部分区域不在光标范围内
      */
     getFocusNodesBySelection(type?: 'all' | 'closed' | 'text' | undefined): KNode[];
     /**
-     * 【API】获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
+     * 获取所有在光标范围内的可聚焦节点，该方法可能会切割部分文本节点，摒弃其不在光标范围内的部分，所以也可能会更新光标的位置
      */
     getFocusSplitNodesBySelection(type?: 'all' | 'closed' | 'text' | undefined): KNode[];
     /**
-     * 【API】向选区插入文本
+     * 向选区插入文本
      */
     insertText(text: string): void;
     /**
-     * 【API】向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
+     * 向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
      */
     insertParagraph(): void;
     /**
-     * 【API】向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
+     * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
      */
     insertNode(node: KNode, cover?: boolean | undefined): void;
     /**
-     * 【API】对选区进行删除
+     * 对选区进行删除
      */
     delete(): void;
     /**
-     * 【API】更新编辑器视图
+     * 更新编辑器视图
      */
     updateView(updateRealSelection?: boolean | undefined, unPushHistory?: boolean | undefined): Promise<void>;
     /**
-     * 【API】根据selection更新编辑器真实光标
+     * 根据selection更新编辑器真实光标
      */
     updateRealSelection(): Promise<void>;
     /**
-     * 【API】销毁编辑器的方法
+     * 销毁编辑器的方法
      */
     destroy(): void;
     /**
-     * 【API】配置编辑器，返回创建的编辑器
+     * 配置编辑器，返回创建的编辑器
      */
     static configure(options: EditorConfigureOptionType): Promise<Editor>;
 }

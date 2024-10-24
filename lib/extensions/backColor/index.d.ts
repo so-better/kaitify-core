@@ -1,9 +1,9 @@
 import { Extension } from '../Extension';
 declare module '../../model' {
     interface EditorCommandsType {
-        isBackColor?: (val: string) => boolean;
-        setBackColor?: (val: string) => Promise<void>;
-        unsetBackColor?: (val: string) => Promise<void>;
+        isBackColor?: (value: string) => boolean;
+        setBackColor?: (value: string) => Promise<void>;
+        unsetBackColor?: (value: string) => Promise<void>;
     }
 }
 export declare const BackColorExtension: Extension;

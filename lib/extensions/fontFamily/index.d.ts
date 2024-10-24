@@ -1,9 +1,9 @@
 import { Extension } from '../Extension';
 declare module '../../model' {
     interface EditorCommandsType {
-        isFontFamily?: (val: string) => boolean;
-        setFontFamily?: (val: string) => Promise<void>;
-        unsetFontFamily?: (val: string) => Promise<void>;
+        isFontFamily?: (value: string) => boolean;
+        setFontFamily?: (value: string) => Promise<void>;
+        unsetFontFamily?: (value: string) => Promise<void>;
     }
 }
 export declare const FontFamilyExtension: Extension;

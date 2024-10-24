@@ -1,5 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
+import './style.less';
 /**
  * 插入视频方法入参类型
  */
