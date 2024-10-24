@@ -12,7 +12,7 @@ declare module '../../model' {
     setTable?: ({ rows, columns }: { rows: number; columns: number }) => Promise<void>
     unsetTable?: () => Promise<void>
     mergeCell?: (direction: TableCellsMergeDirection) => Promise<void>
-    addRow?: (direction: 'up' | 'down') => Promise<void>
+    addRow?: (direction: 'top' | 'bottom') => Promise<void>
     deleteRow?: () => Promise<void>
     addColumn?: (direction: 'left' | 'right') => Promise<void>
     deleteColumn?: () => Promise<void>
@@ -659,7 +659,7 @@ export const TableExtension = Extension.create({
     /**
      * 添加行
      */
-    const addRow = async (direction: 'up' | 'down') => {
+    const addRow = async (direction: 'top' | 'bottom') => {
       const cell = this.getMatchNodeBySelection({ tag: 'td' })
       //光标在某个非隐藏的单元格内
       if (cell && !isHideCell(cell)) {
@@ -689,7 +689,7 @@ export const TableExtension = Extension.create({
           this.addNode(newCell, newRow, newRow.children!.length)
         }
         //上面插入一行
-        if (direction == 'up') {
+        if (direction == 'top') {
           this.addNodeBefore(newRow, row)
         }
         //下面插入一行

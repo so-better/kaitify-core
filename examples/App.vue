@@ -1,9 +1,18 @@
 <template>
   <div style="padding: 20px">
     <div id="toolbar">
-      <sup>333</sup>
-      <button @click="onClick1">插入图片</button>
-      <button @click="onClick2">删除图片</button>
+      <button @click="editor?.commands.setTable!({ rows: 5, columns: 5 })">插入 5 x 5 表格</button>
+      <button @click="editor?.commands.unsetTable!()">删除表格</button>
+      <button @click="editor?.commands.addColumn!('right')">向右插入列</button>
+      <button @click="editor?.commands.addColumn!('left')">向左插入列</button>
+      <button @click="editor?.commands.addRow!('top')">向上插入行</button>
+      <button @click="editor?.commands.addRow!('bottom')">向下插入行</button>
+      <button @click="editor?.commands.mergeCell!('left')">向左合并单元格</button>
+      <button @click="editor?.commands.mergeCell!('right')">向右合并单元格</button>
+      <button @click="editor?.commands.mergeCell!('top')">向上合并单元格</button>
+      <button @click="editor?.commands.mergeCell!('bottom')">向下合并单元格</button>
+      <button @click="editor?.commands.deleteRow!()">删除行</button>
+      <button @click="editor?.commands.deleteColumn!()">删除列</button>
     </div>
     <div id="editor" style="height: 400px;" </div>
     </div>
@@ -69,8 +78,8 @@ body {
   width: 100%;
   margin-bottom: 20px;
 
-  button+button {
-    margin-left: 10px;
+  button {
+    margin: 5px;
   }
 }
 
