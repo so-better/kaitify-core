@@ -1,4 +1,4 @@
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
+import { Editor, KNode, KNodeCreateOptionType, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -169,16 +169,6 @@ const resetTableHideCells = (editor: Editor, rows: KNode[]) => {
 	}
 }
 /**
- * 表格的colgroup更新
- */
-const resetTableColgroup = (editor: Editor, table: KNode) => {
-	const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))
-	//目前设定是table下只有tr，需要重新设计????
-	if (colgroup) {
-	} else {
-	}
-}
-/**
  * 获取单元格指定方向的最近的一个非隐藏单元格
  */
 const getTargetNotHideCell = (cell: KNode, direction: TableCellsMergeDirection) => {
@@ -281,7 +271,6 @@ const setCellToHide = (cell: KNode) => {
 		cell.marks = { ...marks }
 	}
 	cell.void = true
-
 	const placeholderNode = KNode.createPlaceholder()
 	cell.children = [placeholderNode]
 	placeholderNode.parent = cell
@@ -300,9 +289,7 @@ const setCellNotHide = (cell: KNode) => {
 		}
 	})
 	cell.styles = { ...styles }
-
 	cell.void = false
-
 	const placeholderNode = KNode.createPlaceholder()
 	cell.children = [placeholderNode]
 	placeholderNode.parent = cell
@@ -417,13 +404,88 @@ export const TableExtension = Extension.create({
 		return marks
 	},
 	formatRules: [
-		//thead、tbody、tfoot去除
+		//表格结构改造
 		({ editor, node }) => {
-			if (node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'tfoot' })) {
-				node.children!.forEach(item => {
-					editor.addNodeBefore(item, node)
+			if (node.isMatch({ tag: 'table' })) {
+				//获取表格下所有的节点
+				const nodes = KNode.flat(node.children!)
+				//获取tbody节点
+				let tbody = nodes.find(item => item.isMatch({ tag: 'tbody' }))
+				//如果tbody节点不存在，则创建该节点
+				if (!tbody) {
+					tbody = KNode.create({
+						type: 'block',
+						tag: 'tbody',
+						nested: true,
+						fixed: true,
+						children: []
+					})
+				}
+				//获取所有的表格行节点并设置为tbody的子节点
+				const rows = nodes.filter(item => item.isMatch({ tag: 'tr' })).map(item => {
+					item.parent = tbody
+					return item
 				})
-				node.children = []
+				tbody.children = [...rows]
+				//获取表格列数
+				const { colCount } = getTableSize(rows)
+				//获取colgroup节点
+				let colgroup = nodes.find(item => item.isMatch({ tag: 'colgroup' }))
+				//colgroup节点存在
+				if (colgroup) {
+					//遍历每个col节点
+					colgroup.children!.forEach(col => {
+						//没有标记
+						if (!col.hasMarks()) {
+							col.marks = {
+								width: 'auto'
+							}
+						}
+						//没有width标记
+						else if (!col.marks!['width']) {
+							col.marks!['width'] = 'auto'
+						}
+					})
+					//对缺少的col元素进行补全
+					const length = colgroup.children!.length
+					for (let i = 0; i < colCount - length; i++) {
+						const col = KNode.create({
+							type: 'closed',
+							tag: 'col',
+							marks: {
+								width: 'auto'
+							},
+							void: true
+						})
+						editor.addNode(col, colgroup, colgroup.children!.length)
+					}
+				}
+				//colgroup节点不存在，则创建该节点
+				else {
+					const children: KNodeCreateOptionType[] = []
+					for (let i = colCount - 1; i >= 0; i--) {
+						children.push({
+							type: 'closed',
+							tag: 'col',
+							marks: {
+								width: 'auto'
+							},
+							void: true
+						})
+					}
+					colgroup = KNode.create({
+						type: 'block',
+						tag: 'colgroup',
+						fixed: true,
+						nested: true,
+						void: true,
+						children: children
+					})
+				}
+				//将colgroup和tbody设为表格的子节点
+				node.children = [colgroup, tbody]
+				colgroup.parent = node
+				tbody.parent = node
 			}
 		},
 		//th转td
@@ -436,13 +498,11 @@ export const TableExtension = Extension.create({
 		({ editor, node }) => {
 			if (node.isMatch({ tag: 'table' })) {
 				//所有行
-				const rows = node.children!
+				const rows = node.children!.find(item => item.isMatch({ tag: 'tbody' }))!.children!
 				//过滤表格中的隐藏单元格
 				filterHideCells(rows)
 				//重新设置表格的隐藏单元格
 				resetTableHideCells(editor, rows)
-				//设置colgroup
-				resetTableColgroup(editor, node)
 			}
 		},
 	],
@@ -509,21 +569,11 @@ export const TableExtension = Extension.create({
 			if (!!getTable()) {
 				return
 			}
-			const tableNode = KNode.create({
-				type: 'block',
-				tag: 'table',
-				children: []
-			})
+			const rowNodes: KNodeCreateOptionType[] = []
 			for (let i = 0; i < rows; i++) {
-				const rowNode = KNode.create({
-					type: 'block',
-					tag: 'tr',
-					nested: true,
-					fixed: true,
-					children: []
-				})
+				const cellNodes: KNodeCreateOptionType[] = []
 				for (let j = 0; j < columns; j++) {
-					const cellNode = KNode.create({
+					cellNodes.push({
 						type: 'block',
 						tag: 'td',
 						nested: true,
@@ -533,11 +583,27 @@ export const TableExtension = Extension.create({
 							tag: 'br'
 						}]
 					})
-					this.addNode(cellNode, rowNode, rowNode.children!.length)
 				}
-				this.addNode(rowNode, tableNode, tableNode.children!.length)
+				rowNodes.push({
+					type: 'block',
+					tag: 'tr',
+					nested: true,
+					fixed: true,
+					children: cellNodes
+				})
 			}
-			this.insertNode(tableNode)
+			const tableNode = KNode.create({
+				type: 'block',
+				tag: 'table',
+				children: [{
+					type: 'block',
+					tag: 'tbody',
+					fixed: true,
+					nested: true,
+					children: rowNodes
+				}]
+			})
+			this.insertNode(tableNode, true)
 			this.setSelectionBefore(tableNode, 'all')
 			await this.updateView()
 		}
