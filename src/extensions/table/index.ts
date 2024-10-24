@@ -310,9 +310,6 @@ const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMerge
 				colspan: targetCellSize.colCount + cellSize.colCount
 			}
 		}
-		const placeholderNode = KNode.createPlaceholder()
-		cell.children = [placeholderNode]
-		placeholderNode.parent = cell
 		setCellToHide(cell)
 	} else if (direction == 'right') {
 		const children = targetCell.children!.map(item => {
@@ -327,9 +324,6 @@ const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMerge
 				colspan: cellSize.colCount + targetCellSize.colCount
 			}
 		}
-		const placeholderNode = KNode.createPlaceholder()
-		targetCell.children = [placeholderNode]
-		placeholderNode.parent = targetCell
 		setCellToHide(targetCell)
 	} else if (direction == 'top') {
 		const children = cell.children!.map(item => {
@@ -344,9 +338,6 @@ const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMerge
 				rowspan: targetCellSize.rowCount + cellSize.rowCount
 			}
 		}
-		const placeholderNode = KNode.createPlaceholder()
-		cell.children = [placeholderNode]
-		placeholderNode.parent = cell
 		setCellToHide(cell)
 	} else if (direction == 'bottom') {
 		const children = targetCell.children!.map(item => {
@@ -361,9 +352,6 @@ const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMerge
 				rowspan: cellSize.rowCount + targetCellSize.rowCount
 			}
 		}
-		const placeholderNode = KNode.createPlaceholder()
-		targetCell.children = [placeholderNode]
-		placeholderNode.parent = targetCell
 		setCellToHide(targetCell)
 	}
 }
