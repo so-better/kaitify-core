@@ -1,3 +1,5 @@
+import interact from 'interactjs'
+import { element as DapElement, event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeCreateOptionType, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
@@ -355,6 +357,103 @@ const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMerge
     setCellToHide(targetCell)
   }
 }
+/**
+ * 获取最大宽度
+ */
+const getMaxWidth = (element: HTMLElement): number => {
+  const parentElement = element.parentElement!
+  let maxWidth = DapElement.width(parentElement)
+  if (!maxWidth) {
+    maxWidth = getMaxWidth(parentElement)
+  }
+  return maxWidth
+}
+/**
+ * 设置表格拖拽改变列宽
+ */
+const tableResizable = (editor: Editor) => {
+  //设置拖拽改变大小的功能
+  interact('.Kaitify table td').unset()
+  interact('.Kaitify table td').resizable({
+    //是否启用
+    enabled: true,
+    //指定可以调整大小的边缘
+    edges: { left: false, right: true, bottom: false, top: false },
+    //启用惯性效果
+    inertia: false,
+    //调整大小时的自动滚动功能
+    autoScroll: true,
+    //保持宽高比
+    preserveAspectRatio: true,
+    //水平调整
+    axis: 'x',
+    //事件
+    listeners: {
+      start(event) {
+        //最后一列不能拖拽
+        if (!event.target.nextElementSibling) {
+          event.interaction.stop()
+          return
+        }
+        //禁用dragstart
+        DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
+        //获取单元格节点
+        const node = editor.findNode(event.target)
+        //获取单元格在父节点中的序列
+        const index = node.parent!.children!.findIndex(item => item.isEqual(node))
+        //获取单元格所在的表格
+        const table = node.getMatchNode({ tag: 'table' })!
+        //获取表格的colgroup节点
+        const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
+        //获取对应的col节点
+        const col = colgroup.children![index]
+        //获取对应的真实dom
+        const colDom = editor.findDom(col)
+        //暂存
+        DapData.set(event.target, 'col', col)
+        DapData.set(event.target, 'colDom', colDom)
+      },
+      //拖拽
+      move(event) {
+        //获取宽度
+        let { width } = event.rect
+        //设置最小宽度
+        if (width < 50) width = 50
+        //设置最大宽度
+        if (width >= event.target.parentElement.offsetWidth) width = event.target.parentElement.offsetWidth
+        //获取暂存的col元素
+        const colDom = DapData.get(event.target, 'colDom') as HTMLElement
+        //设置宽度
+        colDom.setAttribute('width', `${width}px`)
+      },
+      //结束拖拽
+      end(event) {
+        //恢复dragstart
+        DapEvent.off(event.target, 'dragstart')
+        //获取宽度
+        let { width } = event.rect
+        //设置最小宽度
+        if (width < 50) width = 50
+        //设置最大宽度
+        if (width >= event.target.parentElement.offsetWidth) width = event.target.parentElement.offsetWidth
+        //获取暂存的col节点
+        const col = DapData.get(event.target, 'col') as KNode
+        //设置百分比宽度
+        const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
+        //设置节点的styles
+        if (col.hasStyles()) {
+          col.marks!.width = `${percentWidth}%`
+        } else {
+          col.marks = {
+            width: `${percentWidth}%`
+          }
+        }
+        //更新视图
+        editor.updateView()
+      }
+    }
+  })
+}
 
 export const TableExtension = Extension.create({
   name: 'table',
@@ -514,6 +613,14 @@ export const TableExtension = Extension.create({
       }
     }
   ],
+  afterUpdateView() {
+    //编辑器不可编辑状态下不设置
+    if (!this.isEditable()) {
+      return
+    }
+    //表格拖拽改变列宽
+    tableResizable(this)
+  },
   addCommands() {
     /**
      * 获取光标所在的表格节点，如果光标不在一个表格节点内，返回null

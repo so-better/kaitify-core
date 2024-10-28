@@ -167,10 +167,6 @@ export type EditorConfigureOptionType = {
    */
   autofocus?: boolean
   /**
-   * 是否使用默认css样式
-   */
-  useDefaultCSS?: boolean
-  /**
    * 编辑器内容只有一个段落时的默认文本
    */
   placeholder?: string
@@ -1757,7 +1753,7 @@ export class Editor {
     //初始化编辑器dom
     editor.$el = initEditorDom(options.el)
     //初始化设置编辑器样式
-    if (options.useDefaultCSS !== false) editor.$el.classList.add('Kaitify')
+    editor.$el.classList.add('Kaitify')
     //初始化设置编辑器默认提示文本
     if (options.placeholder) editor.$el.setAttribute('kaitify-placeholder', options.placeholder)
     //初始化内部属性
