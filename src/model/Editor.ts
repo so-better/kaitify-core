@@ -332,7 +332,7 @@ export class Editor {
    */
   internalCauseSelectionChange: boolean = false
   /**
-   * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑
+   * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑【不可修改】
    */
   isUserDelection: boolean = false
   /**

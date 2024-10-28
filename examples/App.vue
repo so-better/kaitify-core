@@ -38,7 +38,7 @@ onMounted(async () => {
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    placeholder: '请输入内容...',
+    placeholder: '请输入内容...'
   })
   console.log(editor.value!.stackNodes)
 
