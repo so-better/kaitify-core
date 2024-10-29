@@ -1,52 +1,59 @@
-@import url(../../css/var.less);
+.Kaitify {
+  div[kaitify-task] {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    margin: 0 0 var(--kaitify-margin) 0;
+    padding: 0;
+    width: 100%;
 
-.Kaitify div[kaitify-task] {
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	position: relative;
-	margin: 0 0 @margin 0;
-	padding: 0;
-	width: 100%;
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
 
-	&:last-child {
-		margin-bottom: 0 !important;
-	}
+    &::before {
+      position: relative;
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--kaitify-theme);
+      border-radius: var(--kaitify-border-radius);
+      margin-right: 10px;
+      user-select: none;
+      touch-action: none;
+    }
 
-	&::before {
-		position: relative;
-		content: '';
-		width: 16px;
-		height: 16px;
-		border: 1px solid @theme;
-		border-radius: @border-radius;
-		margin-right: 10px;
-		cursor: pointer;
-		user-select: none;
-		touch-action: none;
-	}
+    &[kaitify-task='done'] {
+      text-decoration: line-through;
 
-	&[kaitify-task='done'] {
-		text-decoration: line-through;
+      &::before {
+        background: var(--kaitify-theme);
+      }
 
-		&::before {
-			background: @theme;
-		}
+      &::after {
+        content: '';
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        width: 5px;
+        height: 10px;
+        margin-top: -2.5px;
+        border: solid var(--kaitify-theme);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg) translateY(-50%);
+        border-color: var(--kaitify-background-color);
+        user-select: none;
+        touch-action: none;
+      }
+    }
+  }
 
-		&::after {
-			content: '';
-			position: absolute;
-			left: 2px;
-			top: 50%;
-			width: 5px;
-			height: 10px;
-			margin-top: -2.5px;
-			border: solid @theme;
-			border-width: 0 2px 2px 0;
-			transform: rotate(45deg) translateY(-50%);
-			border-color: @background;
-			user-select: none;
-			touch-action: none;
-		}
-	}
+  &[contenteditable='true'] {
+    div[kaitify-task] {
+      &::before {
+        cursor: pointer;
+      }
+    }
+  }
 }

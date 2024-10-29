@@ -1,4 +1,5 @@
 //引入基本样式
+import './css/var.less'
 import './css/style.less'
 //基本数据结构
 export * from './model'

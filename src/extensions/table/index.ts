@@ -379,6 +379,10 @@ const tableResizable = (editor: Editor) => {
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
+    //设置鼠标样式
+    cursorChecker(_action, _interactable, element, _interacting) {
+      return editor.isEditable() && element.nextElementSibling ? 'ew-resize' : 'default'
+    },
     //启用惯性效果
     inertia: false,
     //调整大小时的自动滚动功能
@@ -389,9 +393,10 @@ const tableResizable = (editor: Editor) => {
     axis: 'x',
     //事件
     listeners: {
+      //开始拖拽
       start(event) {
-        //最后一列不能拖拽
-        if (!event.target.nextElementSibling) {
+        //最后一列不能拖拽、不可编辑状态下不能拖拽
+        if (!event.target.nextElementSibling || !editor.isEditable()) {
           event.interaction.stop()
           return
         }
@@ -416,11 +421,7 @@ const tableResizable = (editor: Editor) => {
       //拖拽
       move(event) {
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= event.target.parentElement.offsetWidth) width = event.target.parentElement.offsetWidth
+        const { width } = event.rect
         //获取暂存的col元素
         const colDom = DapData.get(event.target, 'colDom') as HTMLElement
         //设置宽度
@@ -431,15 +432,11 @@ const tableResizable = (editor: Editor) => {
         //恢复dragstart
         DapEvent.off(event.target, 'dragstart')
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= event.target.parentElement.offsetWidth) width = event.target.parentElement.offsetWidth
-        //获取暂存的col节点
-        const col = DapData.get(event.target, 'col') as KNode
+        const { width } = event.rect
         //设置百分比宽度
         const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
+        //获取暂存的col节点
+        const col = DapData.get(event.target, 'col') as KNode
         //设置节点的styles
         if (col.hasStyles()) {
           col.marks!.width = `${percentWidth}%`
@@ -614,10 +611,6 @@ export const TableExtension = Extension.create({
     }
   ],
   afterUpdateView() {
-    //编辑器不可编辑状态下不设置
-    if (!this.isEditable()) {
-      return
-    }
     //表格拖拽改变列宽
     tableResizable(this)
   },

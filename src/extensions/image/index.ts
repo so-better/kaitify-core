@@ -1,5 +1,5 @@
 import interact from 'interactjs'
-import { event as DapEvent, element as DapElement } from 'dap-util'
+import { event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
@@ -22,41 +22,46 @@ declare module '../../model' {
 }
 
 /**
- * 获取最大宽度
- */
-const getMaxWidth = (element: HTMLElement): number => {
-  const parentElement = element.parentElement!
-  let maxWidth = DapElement.width(parentElement)
-  if (!maxWidth) {
-    maxWidth = getMaxWidth(parentElement)
-  }
-  return maxWidth
-}
-
-/**
  * 设置图片选中
  */
-const imageFocus = (editor: Editor, el: HTMLImageElement, node: KNode) => {
-  DapEvent.off(el, 'click')
-  DapEvent.on(el, 'click', () => {
-    editor.setSelectionBefore(node, 'start')
-    editor.setSelectionAfter(node, 'end')
-    editor.updateRealSelection()
+const imageFocus = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.image_focus')
+  DapEvent.on(editor.$el!, 'click.image_focus', e => {
+    //编辑器不可编辑状态下不设置
+    if (!editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: 'img'
+    })
+    if (matchNode) {
+      editor.setSelectionBefore(matchNode, 'start')
+      editor.setSelectionAfter(matchNode, 'end')
+      editor.updateRealSelection()
+    }
   })
 }
 /**
  * 设置图片拖拽
  */
-const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
-  //获取父元素宽度
-  const parentWidth = getMaxWidth(el)
+const imageResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact(el).unset()
-  interact(el).resizable({
+  interact('.Kaitify img').unset()
+  interact('.Kaitify img').resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
+    //设置鼠标样式
+    cursorChecker() {
+      return editor.isEditable() ? 'ew-resize' : 'default'
+    },
     //启用惯性效果
     inertia: false,
     //调整大小时的自动滚动功能
@@ -68,17 +73,22 @@ const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
     //事件
     listeners: {
       start(event) {
+        //不可编辑状态下不能拖拽
+        if (!editor.isEditable()) {
+          event.interaction.stop()
+          return
+        }
         //禁用dragstart
         DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
+        //获取图片节点
+        const node = editor.findNode(event.target)
+        //暂存
+        DapData.set(event.target, 'node', node)
       },
       //拖拽
       move(event) {
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= parentWidth) width = parentWidth
+        const { width } = event.rect
         //设置dom的宽度
         event.target.style.width = `${width}px`
       },
@@ -87,13 +97,11 @@ const imageResizable = (editor: Editor, el: HTMLImageElement, node: KNode) => {
         //恢复dragstart
         DapEvent.off(event.target, 'dragstart')
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= parentWidth) width = parentWidth
+        const { width } = event.rect
         //设置百分比宽度
-        const percentWidth = Number(((width / parentWidth) * 100).toFixed(2))
+        const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
+        //获取图片节点
+        const node = DapData.get(event.target, 'node')
         //设置节点的styles
         if (node.hasStyles()) {
           node.styles!.width = `${percentWidth}%`
@@ -134,19 +142,10 @@ export const ImageExtension = Extension.create({
     return styles
   },
   afterUpdateView() {
-    //编辑器不可编辑状态下不设置
-    if (!this.isEditable()) {
-      return
-    }
-    const images = this.$el!.querySelectorAll('img')
-    images.forEach(el => {
-      //查找对应的节点
-      const node = this.findNode(el)
-      //图片选中
-      imageFocus(this, el, node)
-      //图片拖拽改变大小
-      imageResizable(this, el, node)
-    })
+    //图片选中
+    imageFocus(this)
+    //图片拖拽改变大小
+    imageResizable(this)
   },
   addCommands() {
     /**

@@ -1,15 +1,13 @@
-@import url(../../css/var.less);
-
 .Kaitify pre {
-	background: #000;
-	color: #fff;
-	border-radius: @border-radius;
-	padding: @padding;
-	line-height: @line-height;
-	font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
-	margin: 0 0 @margin 0 !important;
+  background: #111;
+  color: #fff;
+  border-radius: var(--kaitify-border-radius);
+  padding: var(--kaitify-padding);
+  line-height: var(--kaitify-line-height);
+  font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
+  margin: 0 0 var(--kaitify-margin) 0 !important;
 
-	&:last-child {
-		margin-bottom: 0 !important;
-	}
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
 }

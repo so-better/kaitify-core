@@ -1,5 +1,5 @@
 import interact from 'interactjs'
-import { event as DapEvent, element as DapElement } from 'dap-util'
+import { event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
@@ -25,63 +25,74 @@ declare module '../../model' {
 }
 
 /**
- * 获取最大宽度
- */
-const getMaxWidth = (element: HTMLElement): number => {
-  const parentElement = element.parentElement!
-  let maxWidth = DapElement.width(parentElement)
-  if (!maxWidth) {
-    maxWidth = getMaxWidth(parentElement)
-  }
-  return maxWidth
-}
-
-/**
  * 设置视频选中
  */
-const videoFocus = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
-  DapEvent.off(el, 'click')
-  DapEvent.on(el, 'click', () => {
-    editor.setSelectionBefore(node, 'start')
-    editor.setSelectionAfter(node, 'end')
-    editor.updateRealSelection()
+const videoFocus = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.video_focus')
+  DapEvent.on(editor.$el!, 'click.video_focus', e => {
+    //编辑器不可编辑状态下不设置
+    if (!editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: 'video'
+    })
+    if (matchNode) {
+      editor.setSelectionBefore(matchNode, 'start')
+      editor.setSelectionAfter(matchNode, 'end')
+      editor.updateRealSelection()
+    }
   })
 }
 /**
  * 设置视频拖拽
  */
-const videoResizable = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
-  //获取父元素宽度
-  const parentWidth = getMaxWidth(el)
+const videoResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact(el).unset()
-  interact(el).resizable({
+  interact('.Kaitify video').unset()
+  interact('.Kaitify video').resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
+    //设置鼠标样式
+    cursorChecker() {
+      return editor.isEditable() ? 'ew-resize' : 'default'
+    },
     //启用惯性效果
     inertia: false,
     //调整大小时的自动滚动功能
     autoScroll: true,
-    //保持视频的宽高比
+    //保持图片的宽高比
     preserveAspectRatio: true,
     //水平调整
     axis: 'x',
     //事件
     listeners: {
+      //开始拖拽
       start(event) {
+        //不可编辑状态下不能拖拽
+        if (!editor.isEditable()) {
+          event.interaction.stop()
+          return
+        }
         //禁用dragstart
         DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
+        //获取视频节点
+        const node = editor.findNode(event.target)
+        //暂存
+        DapData.set(event.target, 'node', node)
       },
       //拖拽
       move(event) {
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= parentWidth) width = parentWidth
+        const { width } = event.rect
         //设置dom的宽度
         event.target.style.width = `${width}px`
       },
@@ -90,13 +101,11 @@ const videoResizable = (editor: Editor, el: HTMLVideoElement, node: KNode) => {
         //恢复dragstart
         DapEvent.off(event.target, 'dragstart')
         //获取宽度
-        let { width } = event.rect
-        //设置最小宽度
-        if (width < 50) width = 50
-        //设置最大宽度
-        if (width >= parentWidth) width = parentWidth
+        const { width } = event.rect
         //设置百分比宽度
-        const percentWidth = Number(((width / parentWidth) * 100).toFixed(2))
+        const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
+        //获取视频节点
+        const node = DapData.get(event.target, 'node')
         //设置节点的styles
         if (node.hasStyles()) {
           node.styles!.width = `${percentWidth}%`
@@ -158,19 +167,10 @@ export const VideoExtension = Extension.create({
     }
   ],
   afterUpdateView() {
-    //编辑器不可编辑状态下不设置
-    if (!this.isEditable()) {
-      return
-    }
-    const videos = this.$el!.querySelectorAll('video')
-    videos.forEach(el => {
-      //查找对应的节点
-      const node = this.findNode(el)
-      //视频选中
-      videoFocus(this, el, node)
-      //视频拖拽改变大小
-      videoResizable(this, el, node)
-    })
+    //视频选中
+    videoFocus(this)
+    //视频拖拽改变大小
+    videoResizable(this)
   },
   addCommands() {
     /**

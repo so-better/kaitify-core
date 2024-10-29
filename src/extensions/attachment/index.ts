@@ -1,5 +1,5 @@
 import { event as DapEvent } from 'dap-util'
-import { KNode, KNodeMarksType, KNodeStylesType } from '@/model'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import defaultIcon from './icon.svg'
 import './style.less'
@@ -21,24 +21,43 @@ declare module '../../model' {
 /**
  * 下载附件
  */
-const downloadAttachment = (element: HTMLElement) => {
-  DapEvent.off(element, 'click')
-  DapEvent.on(element, 'click', async event => {
-    const el = event.currentTarget as HTMLElement
-    //获取文件地址
-    const url = el.getAttribute('kaitify-attachment')!
-    //使用fetch读取文件地址
-    const res = await fetch(url, {
-      method: 'GET'
+const downloadAttachment = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.attachment')
+  DapEvent.on(editor.$el!, 'click.attachment', async e => {
+    //可编辑状态下无法下载
+    if (editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: 'span',
+      marks: {
+        'kaitify-attachment': true
+      }
     })
-    //获取blob数据
-    const blob = await res.blob()
-    //创建a标签进行下载
-    const a = document.createElement('a')
-    a.setAttribute('target', '_blank')
-    a.setAttribute('href', URL.createObjectURL(blob))
-    a.setAttribute('download', el.innerText)
-    a.click()
+    //点击的是附件
+    if (matchNode) {
+      const el = editor.findDom(matchNode)
+      //获取文件地址
+      const url = matchNode.marks!['kaitify-attachment'] as string
+      //使用fetch读取文件地址
+      const res = await fetch(url, {
+        method: 'GET'
+      })
+      //获取blob数据
+      const blob = await res.blob()
+      //创建a标签进行下载
+      const a = document.createElement('a')
+      a.setAttribute('target', '_blank')
+      a.setAttribute('href', URL.createObjectURL(blob))
+      a.setAttribute('download', el.innerText)
+      a.click()
+    }
   })
 }
 
@@ -85,7 +104,6 @@ export const AttachmentExtension = Extension.create({
   },
   formatRules: [
     ({ editor, node }) => {
-      //两侧设置空白元素
       if (
         !node.isEmpty() &&
         node.isMatch({
@@ -95,6 +113,11 @@ export const AttachmentExtension = Extension.create({
           }
         })
       ) {
+        //没有不可编辑标记的话需要设置
+        if (node.marks!['contenteditable'] != 'false') {
+          node.marks!['contenteditable'] = 'false'
+        }
+        //两侧设置空白元素
         const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
         const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
         //前一个节点不存在或者不是零宽度空白文本节点
@@ -120,15 +143,8 @@ export const AttachmentExtension = Extension.create({
     }
   ],
   afterUpdateView() {
-    //编辑器可编辑状态下不设置
-    if (this.isEditable()) {
-      return
-    }
-    const elements = this.$el!.querySelectorAll('span[kaitify-attachment]')
-    elements.forEach(el => {
-      //下载附件
-      downloadAttachment(el as HTMLElement)
-    })
+    //下载附件
+    downloadAttachment(this)
   },
   addCommands() {
     /**

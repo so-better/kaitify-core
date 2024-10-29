@@ -23,7 +23,7 @@ export const BackColorExtension = Extension.create({
      * 光标所在文本的背景颜色是否与入参一致
      */
     const isBackColor = (value: string) => {
-      return this.commands.isTextStyle!('background-color', value) || this.commands.isTextStyle!('background', value)
+      return this.commands.isTextStyle!('backgroundColor', value) || this.commands.isTextStyle!('background', value)
     }
     /**
      * 设置背景颜色
