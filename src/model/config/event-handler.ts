@@ -89,8 +89,10 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
   }
   //拖入
   else if (event.inputType == 'insertFromDrop') {
-    //延迟是因为光标这时候还没有更新，需要等待光标更新了
+    //延时，防止和deleteByDrag冲突
     await delay()
+    //拖放时不会触发selectionchange，所以虚拟光标位置没有更新，这里主动更新一下
+    updateSelection.apply(this)
     //存在粘贴数据且允许粘贴
     if (event.dataTransfer && this.allowPaste) {
       await handlerForPasteDrop.apply(this, [event.dataTransfer])
