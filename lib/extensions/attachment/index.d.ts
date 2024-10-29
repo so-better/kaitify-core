@@ -1,6 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-import './style.less';
+
 type SetAttachmentConfigType = {
     url: string;
     text: string;

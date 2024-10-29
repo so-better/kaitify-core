@@ -4,7 +4,11 @@
       <fieldset>
         <legend>编辑器设置</legend>
         <div class="toolbar">
-          <button @click="editor?.setEditable(!editor.isEditable())">设置启用/禁用</button>
+          <button @click="editor?.setEditable(!editor.isEditable())">启用/禁用编辑功能</button>
+          <button @click="editor && (editor.allowCopy = !editor.allowCopy)">启用/禁用复制功能</button>
+          <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
+          <button @click="editor && (editor.allowPaste = !editor.allowPaste)">启用/禁用粘贴功能</button>
+          <button @click="editor && (editor.allowPasteHtml = !editor.allowPasteHtml)">启用/禁用粘贴HTML功能</button>
           <button @click="editor?.commands.undo!()">撤销</button>
           <button @click="editor?.commands.redo!()">重做</button>
         </div>
@@ -231,7 +235,6 @@
 import { onMounted, ref } from 'vue'
 import { Editor, KNode } from '../src'
 import { content } from "./content"
-import { url } from 'inspector';
 const editor = ref<Editor | null>(null)
 
 onMounted(async () => {

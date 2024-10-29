@@ -1,5 +1,6 @@
 import { KNodeMarksType, KNodeStylesType } from '../../model';
 import { Extension } from '../Extension';
+
 declare module '../../model' {
     interface EditorCommandsType {
         isTextStyle?: (styleName: string, styleValue?: string | number) => boolean;

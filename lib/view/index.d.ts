@@ -1,4 +1,5 @@
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '../model';
+
 /**
  * 渲染参数类型
  */

@@ -5,7 +5,7 @@ import { Selection } from './Selection'
 import { History } from './History'
 import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
-import { onBeforeInput, onBlur, onComposition, onCopy, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
+import { onBeforeInput, onBlur, onComposition, onCopy, onCut, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { removeDomObserve, setDomObserve } from './config/dom-observe'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
 import { NODE_MARK } from '@/view'
@@ -1831,6 +1831,8 @@ export class Editor {
     DapEvent.on(editor.$el, 'blur.kaitify', onBlur.bind(editor))
     //监听编辑器复制
     DapEvent.on(editor.$el, 'copy.kaitify', onCopy.bind(editor))
+    //监听编辑器剪切
+    DapEvent.on(editor.$el, 'cut.kaitify', onCut.bind(editor))
     //返回编辑器实例
     return editor
   }

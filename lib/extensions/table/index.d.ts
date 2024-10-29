@@ -1,6 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-import './style.less';
+
 type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom';
 declare module '../../model' {
     interface EditorCommandsType {

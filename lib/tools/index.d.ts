@@ -1,4 +1,5 @@
 import { KNodeMarksType, KNodeStylesType } from '../model';
+
 /**
  * 用于KNode生成唯一的key
  */

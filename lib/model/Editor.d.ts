@@ -3,6 +3,7 @@ import { Selection } from './Selection';
 import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
+
 /**
  * 编辑器获取光标范围内节点数据的类型
  */
@@ -152,10 +153,6 @@ export type EditorConfigureOptionType = {
      * 是否自动聚焦
      */
     autofocus?: boolean;
-    /**
-     * 是否使用默认css样式
-     */
-    useDefaultCSS?: boolean;
     /**
      * 编辑器内容只有一个段落时的默认文本
      */
@@ -318,7 +315,7 @@ export declare class Editor {
      */
     internalCauseSelectionChange: boolean;
     /**
-     * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑
+     * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑【不可修改】
      */
     isUserDelection: boolean;
     /**

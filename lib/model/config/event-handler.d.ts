@@ -1,4 +1,5 @@
 import { Editor } from '../Editor';
+
 /**
  * 监听selection
  */
@@ -26,4 +27,8 @@ export declare const onBlur: (this: Editor, e: Event) => void;
 /**
  * 监听编辑器复制
  */
-export declare const onCopy: (this: Editor, e: Event) => Promise<void>;
+export declare const onCopy: (this: Editor, e: Event) => void;
+/**
+ * 监听编辑器剪切
+ */
+export declare const onCut: (this: Editor, e: Event) => void;

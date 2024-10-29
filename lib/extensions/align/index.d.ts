@@ -1,4 +1,5 @@
 import { Extension } from '../Extension';
+
 type AlignValueType = 'left' | 'right' | 'center' | 'justify';
 declare module '../../model' {
     interface EditorCommandsType {
