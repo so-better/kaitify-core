@@ -1,50 +1,50 @@
 .Kaitify {
-  display: block;
-  position: relative;
-  font-size: var(--kaitify-font-size);
-  font-family: var(--kaitify-font-family);
-  color: var(--kaitify-font-color);
-  -webkit-font-smoothing: antialiased;
-  text-size-adjust: none;
-  line-height: var(--kaitify-line-height);
-  border: 1px solid var(--kaitify-border-color);
-  border-radius: var(--kaitify-border-radius);
-  background: var(--kaitify-background-color);
-  padding: var(--kaitify-padding);
-  transition: border-color 500ms;
-  overflow-x: hidden;
-  overflow-y: auto;
+	display: block;
+	position: relative;
+	font-size: var(--kaitify-font-size);
+	font-family: var(--kaitify-font-family);
+	color: var(--kaitify-font-color);
+	-webkit-font-smoothing: antialiased;
+	text-size-adjust: none;
+	line-height: var(--kaitify-line-height);
+	border: 1px solid var(--kaitify-border-color);
+	border-radius: var(--kaitify-border-radius);
+	background: var(--kaitify-background-color);
+	padding: var(--kaitify-padding);
+	transition: border-color 500ms;
+	overflow-x: hidden;
+	overflow-y: auto;
 
-  ::selection {
-    background-color: var(--kaitify-light-theme);
-  }
+	::selection {
+		background-color: var(--kaitify-light-theme);
+	}
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+		outline: none;
+	}
 
-  //编辑状态下才有的样式
-  &[contenteditable='true'] {
-    &:focus {
-      border-color: var(--kaitify-theme);
-    }
+	//编辑状态下才有的样式
+	&[contenteditable='true'] {
+		&:focus {
+			border-color: var(--kaitify-theme);
+		}
 
-    &[kaitify-placeholder].showPlaceholder::before {
-      content: attr(kaitify-placeholder);
-      position: absolute;
-      left: 0;
-      top: 0;
-      padding: var(--kaitify-padding);
-      line-height: var(--kaitify-line-height);
-      opacity: 0.5;
-    }
+		&[kaitify-placeholder].showPlaceholder::before {
+			content: attr(kaitify-placeholder);
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: var(--kaitify-padding);
+			line-height: var(--kaitify-line-height);
+			opacity: 0.5;
+		}
 
-    [contenteditable='false']:hover {
-      cursor: not-allowed;
-    }
-  }
+		[contenteditable='false']:hover {
+			cursor: not-allowed;
+		}
+	}
 }

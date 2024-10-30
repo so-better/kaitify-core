@@ -4,6 +4,7 @@
       <fieldset>
         <legend>编辑器设置</legend>
         <div class="toolbar">
+          <button @click="deleteNode">启用/禁用编辑功能</button>
           <button @click="editor?.setEditable(!editor.isEditable())">启用/禁用编辑功能</button>
           <button @click="editor && (editor.allowCopy = !editor.allowCopy)">启用/禁用复制功能</button>
           <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
@@ -246,6 +247,12 @@ import { Editor } from '../src'
 import { content } from "./content"
 const editor = ref<Editor | null>(null)
 
+const deleteNode = () => {
+  const node = editor.value!.selection.start!.node
+  node.parent!.children?.splice(0, 1)
+  editor.value!.updateView()
+}
+
 onMounted(async () => {
   const res = await fetch('https://www.so-better.cn/api/doc/getById', {
     method: 'post',
@@ -257,7 +264,7 @@ onMounted(async () => {
     })
   }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: content,
+    value: res.data.docContent,
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
@@ -298,7 +305,7 @@ body {
   .left,
   .right {
     display: block;
-    width: 50%;
+    width: 60%;
     position: relative;
     height: 100%;
     padding: 10px;
@@ -306,6 +313,7 @@ body {
 
   .left {
     overflow: auto;
+    width: 40%;
 
     .toolbar {
       display: flex;
