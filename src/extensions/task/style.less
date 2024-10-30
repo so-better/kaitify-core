@@ -1,11 +1,9 @@
 .Kaitify {
   div[kaitify-task] {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    display: block;
     position: relative;
     margin: 0 0 var(--kaitify-margin) 0;
-    padding: 0;
+    padding: 0 0 0 26px;
     width: 100%;
 
     &:last-child {
@@ -13,13 +11,15 @@
     }
 
     &::before {
-      position: relative;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
       content: '';
       width: 16px;
       height: 16px;
       border: 1px solid var(--kaitify-theme);
       border-radius: var(--kaitify-border-radius);
-      margin-right: 10px;
       user-select: none;
       touch-action: none;
     }

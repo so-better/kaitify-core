@@ -184,6 +184,13 @@
         </div>
       </fieldset>
       <fieldset>
+        <legend>提示</legend>
+        <div class="toolbar">
+          <button @click="editor?.commands.setTip!()">插入提示</button>
+          <button @click="editor?.commands.unsetTip!()">取消提示</button>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>引用</legend>
         <div class="toolbar">
           <button @click="editor?.commands.setBlockquote!()">插入引用</button>
@@ -235,21 +242,28 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor } from '../src'
 import { content } from "./content"
 const editor = ref<Editor | null>(null)
 
 onMounted(async () => {
+  const res = await fetch('https://www.so-better.cn/api/doc/getById', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      docId: 245
+    })
+  }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: content,
+    value: content,//res?.data?.docContent || content,
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
     placeholder: '请输入内容...',
     dark: false
   })
-  console.log(editor.value!.stackNodes)
-
 })
 </script>
 <style lang="less">

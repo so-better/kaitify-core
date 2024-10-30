@@ -23,8 +23,6 @@ const toTask = (editor: Editor, node: KNode) => {
   }
   //是固定的块节点或者内嵌套的块节点
   if (node.fixed || node.nested) {
-    //克隆块节点
-    const newNode = node.clone(false)
     //创建待办节点
     const taskNode = KNode.create({
       type: 'block',
@@ -34,17 +32,15 @@ const toTask = (editor: Editor, node: KNode) => {
       },
       children: []
     })
-    //将原来块节点的子节点给待办节点
+    //将块节点的子节点给待办节点
     node.children!.forEach((item, index) => {
       editor.addNode(item, taskNode, index)
     })
     //清空原来的块节点
     node.children = []
-    //将待办节点添加到新块节点下
-    taskNode.parent = newNode
-    newNode.children = [taskNode]
-    //将新块节点代替原来的块节点
-    editor.addNodeBefore(newNode, node)
+    //将待办节点添加到块节点下
+    taskNode.parent = node
+    node.children = [taskNode]
   }
   //非固定块节点
   else {
