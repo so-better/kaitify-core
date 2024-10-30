@@ -257,7 +257,7 @@ onMounted(async () => {
     })
   }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: content,//res?.data?.docContent || content,
+    value: content,
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
