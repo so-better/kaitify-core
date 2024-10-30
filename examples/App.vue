@@ -11,6 +11,8 @@
           <button @click="editor && (editor.allowPasteHtml = !editor.allowPasteHtml)">启用/禁用粘贴HTML功能</button>
           <button @click="editor?.commands.undo!()">撤销</button>
           <button @click="editor?.commands.redo!()">重做</button>
+          <button @click="editor?.setDark(true)">深色模式</button>
+          <button @click="editor?.setDark(false)">浅色模式</button>
         </div>
       </fieldset>
       <fieldset>
@@ -243,7 +245,8 @@ onMounted(async () => {
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    placeholder: '请输入内容...'
+    placeholder: '请输入内容...',
+    dark: true
   })
   console.log(editor.value!.stackNodes)
 

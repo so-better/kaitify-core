@@ -2,10 +2,14 @@
   line-height: var(--kaitify-line-height);
   margin: 0 0 var(--kaitify-margin) 0 !important;
   padding: 0 0 0 var(--kaitify-large-padding);
-  border-left: 6px solid var(--kaitify-border-collor);
+  border-left: 6px solid var(--kaitify-border-color);
   color: #666;
 
   &:last-child {
     margin-bottom: 0 !important;
   }
+}
+
+:root[kaitify-dark] .Kaitify blockquote {
+  color: fade(#fff, 90);
 }
