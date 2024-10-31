@@ -263,7 +263,7 @@ onMounted(async () => {
     editable: true,
     allowPasteHtml: true,
     placeholder: '请输入内容...',
-    dark: true
+    dark: false
   })
 })
 </script>
