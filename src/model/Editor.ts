@@ -1378,6 +1378,12 @@ export class Editor {
 			const lastSelectionNode = this.getLastSelectionNodeInChildren(blockNode)!
 			//光标所在块节点是非固定块节点，插入的也是非固定块节点
 			if (!blockNode.fixed && node.isBlock() && !node.fixed) {
+				//光标在代码块样式内则将该节点转为行内节点后重新执行插入
+				if (selectionNode.isInCodeBlockStyle()) {
+					node.type = 'inline'
+					this.insertNode(node, cover)
+					return
+				}
 				//光标所在块节点只有换行符且cover为true，则替换当前块节点
 				if (blockNode.allIsPlaceholder() && cover) {
 					this.addNodeBefore(node, blockNode)
@@ -1393,12 +1399,6 @@ export class Editor {
 				}
 				//光标在块节点的中间部分则需要分割
 				else {
-					//光标在代码块样式内
-					if (this.selection.start!.node.isInCodeBlockStyle()) {
-						node.type = 'inline'
-						this.insertNode(node, cover)
-						return
-					}
 					//执行换行
 					this.insertParagraph()
 					//获取换行后光标位置所在的块节点
