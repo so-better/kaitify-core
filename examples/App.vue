@@ -4,7 +4,6 @@
       <fieldset>
         <legend>编辑器设置</legend>
         <div class="toolbar">
-          <button @click="deleteNode">启用/禁用编辑功能</button>
           <button @click="editor?.setEditable(!editor.isEditable())">启用/禁用编辑功能</button>
           <button @click="editor && (editor.allowCopy = !editor.allowCopy)">启用/禁用复制功能</button>
           <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
@@ -245,13 +244,8 @@
 import { onMounted, ref } from 'vue'
 import { Editor } from '../src'
 import { content } from "./content"
-const editor = ref<Editor | null>(null)
 
-const deleteNode = () => {
-  const node = editor.value!.selection.start!.node
-  node.parent!.children?.splice(0, 1)
-  editor.value!.updateView()
-}
+const editor = ref<Editor | null>(null)
 
 onMounted(async () => {
   const res = await fetch('https://www.so-better.cn/api/doc/getById', {
@@ -264,12 +258,12 @@ onMounted(async () => {
     })
   }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: res.data.docContent,
+    value: res.data.docContent.replaceAll('data-editify-hljs', 'kaitify-hljs'),
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
     placeholder: '请输入内容...',
-    dark: false
+    dark: true
   })
 })
 </script>

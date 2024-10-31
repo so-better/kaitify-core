@@ -98,6 +98,36 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
   }
 }
 
+/**
+ * 判断代码块是否需要更新
+ */
+const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent: string) => {
+  try {
+    const domPre = editor.findDom(node)
+    if (domPre) {
+      //语言不一致
+      const oldLanguage = domPre.getAttribute('kaitify-hljs') || ''
+      if (oldLanguage != language) {
+        return true
+      }
+      //文本内容不一致
+      const oldTextContent = domPre.innerText
+      if (oldTextContent != textContent) {
+        return true
+      }
+      //子节点数量不一致（防止在代码块里插入非文本节点，比如图片等）
+      const oldChildrenLength = domPre.childNodes.length
+      if (node.children!.length != oldChildrenLength) {
+        return true
+      }
+      return false
+    }
+    return true
+  } catch (error) {
+    return true
+  }
+}
+
 export const CodeBlockExtension = Extension.create({
   name: 'codeBlock',
   extraKeepTags: ['pre'],
@@ -129,29 +159,32 @@ export const CodeBlockExtension = Extension.create({
         const textContent = textNodes.reduce((val, item) => {
           return val + item.textContent
         }, '')
-        //将文本节点的内容转为经过hljs处理的内容
-        const html = getHljsHtml(textContent, language)
-        if (html) {
-          //将经过hljs处理的内容转为节点数组
-          const nodes = editor.htmlParseNode(html)
-          //将新的文本节点全部加入到代码块的子节点数组中
-          node.children = nodes.map(item => {
-            item.parent = node
-            return item
-          })
-          //更新光标位置
-          updateSelection(editor, node, textNodes, nodes)
-        } else {
-          const selectionStartInNode = editor.isSelectionInNode(node, 'start')
-          const selectionEndInNode = editor.isSelectionInNode(node, 'end')
-          const placeholderNode = KNode.createPlaceholder()
-          node.children = [placeholderNode]
-          placeholderNode.parent = node
-          if (selectionStartInNode) {
-            editor.setSelectionBefore(placeholderNode, 'start')
-          }
-          if (selectionEndInNode) {
-            editor.setSelectionBefore(placeholderNode, 'end')
+        //只有代码块语言改变和内容改变才需要重新进行高亮处理
+        if (isNeedUpdate(editor, node, language, textContent)) {
+          //将文本节点的内容转为经过hljs处理的内容
+          const html = getHljsHtml(textContent, language)
+          if (html) {
+            //将经过hljs处理的内容转为节点数组
+            const nodes = editor.htmlParseNode(html)
+            //将新的文本节点全部加入到代码块的子节点数组中
+            node.children = nodes.map(item => {
+              item.parent = node
+              return item
+            })
+            //更新光标位置
+            updateSelection(editor, node, textNodes, nodes)
+          } else {
+            const selectionStartInNode = editor.isSelectionInNode(node, 'start')
+            const selectionEndInNode = editor.isSelectionInNode(node, 'end')
+            const placeholderNode = KNode.createPlaceholder()
+            node.children = [placeholderNode]
+            placeholderNode.parent = node
+            if (selectionStartInNode) {
+              editor.setSelectionBefore(placeholderNode, 'start')
+            }
+            if (selectionEndInNode) {
+              editor.setSelectionBefore(placeholderNode, 'end')
+            }
           }
         }
       }

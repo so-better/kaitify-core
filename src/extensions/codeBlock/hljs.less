@@ -3,107 +3,113 @@
  */
 
 .Kaitify pre {
-  .kaitify-hljs-addition,
-  .kaitify-hljs-meta,
-  .kaitify-hljs-string,
-  .kaitify-hljs-symbol,
-  .kaitify-hljs-template-tag,
-  .kaitify-hljs-template-variable,
-  .kaitify-hljs-deletion,
-  .kaitify-hljs-variable {
-    color: #9283e7;
-  }
   .kaitify-hljs-comment,
   .kaitify-hljs-quote {
-    color: #979797;
+    color: #a0a1a7;
+    font-style: italic;
+  }
+  .kaitify-hljs-doctag,
+  .kaitify-hljs-formula,
+  .kaitify-hljs-keyword {
+    color: #a626a4;
+  }
+  .kaitify-hljs-deletion,
+  .kaitify-hljs-name,
+  .kaitify-hljs-section,
+  .kaitify-hljs-tag,
+  .kaitify-hljs-selector-tag,
+  .kaitify-hljs-subst {
+    color: #e45649;
+  }
+  .kaitify-hljs-literal {
+    color: #0184bb;
+  }
+  .kaitify-hljs-addition,
+  .kaitify-hljs-attribute,
+  .kaitify-hljs-meta-string,
+  .kaitify-hljs-regexp,
+  .kaitify-hljs-string,
+  .kaitify-hljs-template-tag {
+    color: #50a14f;
+  }
+  .kaitify-hljs-built_in,
+  .kaitify-hljs-class .kaitify-hljs-title {
+    color: #c18401;
+  }
+  .kaitify-hljs-attr,
+  .kaitify-hljs-number,
+  .kaitify-hljs-selector-attr,
+  .kaitify-hljs-selector-class,
+  .kaitify-hljs-selector-pseudo,
+  .kaitify-hljs-template-variable,
+  .kaitify-hljs-type,
+  .kaitify-hljs-variable {
+    color: #986801;
   }
   .kaitify-hljs-bullet,
   .kaitify-hljs-link,
-  .kaitify-hljs-number,
-  .kaitify-hljs-regexp,
-  .kaitify-hljs-attr,
-  .kaitify-hljs-attribute {
-    color: #40c886;
-  }
-
-  .kaitify-hljs-built_in,
-  .kaitify-hljs-doctag,
-  .kaitify-hljs-keyword,
-  .kaitify-hljs-name,
-  .kaitify-hljs-section,
-  .kaitify-hljs-strong,
-  .kaitify-hljs-tag,
-  .kaitify-hljs-literal,
-  .kaitify-hljs-type {
-    color: #65a1ef;
-  }
-
+  .kaitify-hljs-meta,
+  .kaitify-hljs-selector-id,
+  .kaitify-hljs-symbol,
   .kaitify-hljs-title {
-    color: #ec8e40;
+    color: #4078f2;
   }
-
-  .kaitify-hljs-selector-tag {
-    color: #e54f4f;
+  .kaitify-hljs-emphasis {
+    font-style: italic;
   }
-
-  .kaitify-hljs-selector-class {
-    color: #f2a463;
-  }
-
-  .kaitify-hljs-selector-id {
-    color: #3b9cc8;
+  .kaitify-hljs-strong {
+    font-weight: 700;
   }
 }
 
 :root[kaitify-dark] .Kaitify pre {
-  .kaitify-hljs-addition,
-  .kaitify-hljs-meta,
-  .kaitify-hljs-string,
-  .kaitify-hljs-symbol,
-  .kaitify-hljs-template-tag,
-  .kaitify-hljs-template-variable,
-  .kaitify-hljs-deletion,
-  .kaitify-hljs-variable {
-    color: #7866dc;
-  }
   .kaitify-hljs-comment,
   .kaitify-hljs-quote {
-    color: #c1c1c1;
+    color: rgba(255, 255, 255, 0.5);
   }
-  .kaitify-hljs-bullet,
-  .kaitify-hljs-link,
-  .kaitify-hljs-number,
-  .kaitify-hljs-regexp,
-  .kaitify-hljs-attr,
-  .kaitify-hljs-attribute {
-    color: #22c275;
+  .kaitify-hljs-meta {
+    color: #fff9;
   }
-
   .kaitify-hljs-built_in,
+  .kaitify-hljs-class .kaitify-hljs-title {
+    color: #e9950c;
+  }
   .kaitify-hljs-doctag,
+  .kaitify-hljs-formula,
   .kaitify-hljs-keyword,
+  .kaitify-hljs-literal,
   .kaitify-hljs-name,
   .kaitify-hljs-section,
   .kaitify-hljs-strong,
-  .kaitify-hljs-tag,
-  .kaitify-hljs-literal,
-  .kaitify-hljs-type {
-    color: #4280d2;
+  .kaitify-hljs-tag {
+    color: #2e95d3;
   }
-
-  .kaitify-hljs-title {
-    color: #d77e35;
+  .kaitify-hljs-addition,
+  .kaitify-hljs-attribute,
+  .kaitify-hljs-meta-string,
+  .kaitify-hljs-regexp,
+  .kaitify-hljs-string,
+  .kaitify-hljs-template-tag,
+  .kaitify-hljs-deletion {
+    color: #00a67d;
   }
-
+  .kaitify-hljs-attr,
+  .kaitify-hljs-number,
+  .kaitify-hljs-selector-attr,
+  .kaitify-hljs-selector-class,
+  .kaitify-hljs-selector-pseudo,
+  .kaitify-hljs-template-variable,
+  .kaitify-hljs-type,
+  .kaitify-hljs-variable {
+    color: #df3079;
+  }
+  .kaitify-hljs-bullet,
+  .kaitify-hljs-link,
+  .kaitify-hljs-selector-id,
+  .kaitify-hljs-symbol,
+  .kaitify-hljs-title,
+  .kaitify-hljs-attr,
   .kaitify-hljs-selector-tag {
-    color: #d73535;
-  }
-
-  .kaitify-hljs-selector-class {
-    color: #e68e45;
-  }
-
-  .kaitify-hljs-selector-id {
-    color: #329aca;
+    color: #f22c3d;
   }
 }

@@ -1660,7 +1660,8 @@ export class Editor {
     if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
     //克隆旧节点数组，防止在patch过程中旧节点数组中存在null，影响后续的视图更新
     const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
-    const t1 = Date.now()
+    //这里存放格式化过的节点，后续进行判断避免重复格式化造成资源浪费和性能问题
+    const hasUpdateNodes: KNode[] = []
     //对编辑器的新旧节点数组进行比对，遍历比对的结果进行动态格式化
     patchNodes(this.stackNodes, oldStackNodes).forEach(item => {
       //需要进行格式化的节点
@@ -1677,14 +1678,14 @@ export class Editor {
         //如果存在对父节点进行格式化
         node = parentNode ? parentNode : null
       }
-      //最终判断是否有需要格式化的节点进行格式化
-      if (node) {
+      //最终判断是否有需要格式化的节点，且该节点没有格式化过，进行格式化
+      if (node && !hasUpdateNodes.some(item => item.isEqual(node))) {
+        hasUpdateNodes.push(node)
         this.formatRules.forEach(rule => {
           formatNodes.apply(this, [rule, node.parent ? node.parent.children! : this.stackNodes])
         })
       }
     })
-    console.log(`节点比对&格式化 耗时：${(Date.now() - t1) / 1000}s`)
     //判断节点数组是否为空进行初始化
     checkNodes.apply(this)
     //设置placeholder
@@ -1693,13 +1694,10 @@ export class Editor {
     const oldHtml = this.$el.innerHTML
     //视图更新之前取消dom监听，以免干扰更新dom
     removeDomObserve(this)
-    const t2 = Date.now()
     //此处进行视图的更新
     const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [false]) : true
     //使用默认逻辑
     useDefault && defaultUpdateView.apply(this, [false])
-    console.log(`节点渲染 耗时：${(Date.now() - t2) / 1000}s`)
-    const t3 = Date.now()
     //视图更新完毕后重新设置dom监听
     setDomObserve(this)
     //新的html值
@@ -1720,7 +1718,6 @@ export class Editor {
     if (updateRealSelection) await this.updateRealSelection()
     //视图更新后回调
     if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
-    console.log(`视图更新后 耗时：${(Date.now() - t3) / 1000}s`)
   }
 
   /**
