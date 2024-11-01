@@ -52,6 +52,10 @@ export type EditorConfigureOptionType = {
 	 */
 	allowPasteHtml?: boolean
 	/**
+	 * 剪切板同时存在文件和html/text时，是否优先粘贴文件
+	 */
+	priorityPasteFiles?: boolean
+	/**
 	 * 自定义编辑器内渲染文本节点的真实标签
 	 */
 	textRenderTag?: string
@@ -208,6 +212,10 @@ export class Editor {
 	 * 是否允许粘贴html【初始化后可以修改】
 	 */
 	allowPasteHtml: boolean = false
+	/**
+	 * 剪切板同时存在文件和html/text时，是否优先粘贴文件【初始化后可以修改】
+	 */
+	priorityPasteFiles: boolean = false
 	/**
 	 * 编辑器内渲染文本节点的真实标签【初始化后不建议修改】
 	 */
@@ -1823,6 +1831,7 @@ export class Editor {
 		if (typeof options.allowCut == 'boolean') editor.allowCut = options.allowCut
 		if (typeof options.allowPaste == 'boolean') editor.allowPaste = options.allowPaste
 		if (typeof options.allowPasteHtml == 'boolean') editor.allowPasteHtml = options.allowPasteHtml
+		if (typeof options.priorityPasteFiles == 'boolean') editor.priorityPasteFiles = options.priorityPasteFiles
 		if (options.textRenderTag) editor.textRenderTag = options.textRenderTag
 		if (options.blockRenderTag) editor.blockRenderTag = options.blockRenderTag
 		if (options.emptyRenderTags) editor.emptyRenderTags = [...editor.emptyRenderTags, ...options.emptyRenderTags]

@@ -752,6 +752,55 @@ export const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: 
 }
 
 /**
+ * 粘贴时对文件的处理
+ */
+export const handlerForPasteFiles = async function (this: Editor, files: FileList) {
+	const length = files.length
+	for (let i = 0; i < length; i++) {
+		//图片粘贴
+		if (files[i].type.startsWith('image/')) {
+			//是否走默认逻辑
+			const useDefault = typeof this.onPasteImage == 'function' ? await this.onPasteImage.apply(this, [files[i]]) : true
+			//走默认逻辑
+			if (useDefault) {
+				const url = await DapFile.dataFileToBase64(files[i])
+				const image = KNode.create({
+					type: 'closed',
+					tag: 'img',
+					marks: {
+						src: url,
+						alt: files[i].name || ''
+					}
+				})
+				this.insertNode(image)
+			}
+		}
+		//视频粘贴
+		else if (files[i].type.startsWith('video/')) {
+			//是否走默认逻辑
+			const useDefault = typeof this.onPasteVideo == 'function' ? await this.onPasteVideo.apply(this, [files[i]]) : true
+			//走默认逻辑
+			if (useDefault) {
+				const url = await DapFile.dataFileToBase64(files[i])
+				const video = KNode.create({
+					type: 'closed',
+					tag: 'video',
+					marks: {
+						src: url,
+						alt: files[i].name || ''
+					}
+				})
+				this.insertNode(video)
+			}
+		}
+		//其他文件粘贴
+		else if (typeof this.onPasteFile == 'function') {
+			this.onPasteFile.apply(this, [files[i]])
+		}
+	}
+}
+
+/**
  * 粘贴处理
  */
 export const handlerForPasteDrop = async function (this: Editor, dataTransfer: DataTransfer) {
@@ -761,8 +810,12 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 	const text = dataTransfer.getData('text/plain')
 	//文件数组
 	const files = dataTransfer.files
-	//有html内容并且允许粘贴html
-	if (html && this.allowPasteHtml) {
+	//设置了优先粘贴文件，则处理文件粘贴
+	if (files.length && this.priorityPasteFiles) {
+		await handlerForPasteFiles.apply(this, [files])
+	}
+	//允许粘贴html，则处理html粘贴
+	else if (html && this.allowPasteHtml) {
 		//将html转为节点数组
 		const nodes = this.htmlParseNode(html).filter(item => {
 			return !item.isEmpty()
@@ -791,49 +844,7 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 	}
 	//有文件
 	else if (files.length) {
-		const length = files.length
-		for (let i = 0; i < length; i++) {
-			//图片粘贴
-			if (files[i].type.startsWith('image/')) {
-				//是否走默认逻辑
-				const useDefault = typeof this.onPasteImage == 'function' ? await this.onPasteImage.apply(this, [files[i]]) : true
-				//走默认逻辑
-				if (useDefault) {
-					const url = await DapFile.dataFileToBase64(files[i])
-					const image = KNode.create({
-						type: 'closed',
-						tag: 'img',
-						marks: {
-							src: url,
-							alt: files[i].name || ''
-						}
-					})
-					this.insertNode(image)
-				}
-			}
-			//视频粘贴
-			else if (files[i].type.startsWith('video/')) {
-				//是否走默认逻辑
-				const useDefault = typeof this.onPasteVideo == 'function' ? await this.onPasteVideo.apply(this, [files[i]]) : true
-				//走默认逻辑
-				if (useDefault) {
-					const url = await DapFile.dataFileToBase64(files[i])
-					const video = KNode.create({
-						type: 'closed',
-						tag: 'video',
-						marks: {
-							src: url,
-							alt: files[i].name || ''
-						}
-					})
-					this.insertNode(video)
-				}
-			}
-			//其他文件粘贴
-			else if (typeof this.onPasteFile == 'function') {
-				this.onPasteFile.apply(this, [files[i]])
-			}
-		}
+		await handlerForPasteFiles.apply(this, [files])
 	}
 }
 

@@ -9,6 +9,7 @@
           <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
           <button @click="editor && (editor.allowPaste = !editor.allowPaste)">启用/禁用粘贴功能</button>
           <button @click="editor && (editor.allowPasteHtml = !editor.allowPasteHtml)">启用/禁用粘贴HTML功能</button>
+          <button @click="editor && (editor.priorityPasteFiles = !editor.priorityPasteFiles)">启用/禁用文件粘贴优先</button>
           <button @click="editor?.commands.undo!()">撤销</button>
           <button @click="editor?.commands.redo!()">重做</button>
           <button @click="editor?.setDark(true)">深色模式</button>
@@ -262,8 +263,7 @@ onMounted(async () => {
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    placeholder: '请输入内容...',
-    dark: false
+    placeholder: '请输入内容...'
   })
 })
 </script>
