@@ -1702,9 +1702,28 @@ export class Editor {
 				if (typeof this.beforePatchNodeToFormat == 'function') {
 					node = this.beforePatchNodeToFormat.apply(this, [node])
 				}
-				//该节点没有格式化过则进行格式化
-				if (!hasUpdateNodes.some(item => item.isEqual(node!))) {
+				//判断该节点是否格式化过
+				const hasUpdate = hasUpdateNodes.some(item => {
+					//已经在hasUpdateNodes数组里了，说明格式化过了
+					if (item.isContains(node!)) {
+						return true
+					}
+					//需要格式化的节点没有父节点，并且hasUpdateNodes也存在没有父节点的节点
+					if (!node!.parent && !item.parent) {
+						return true
+					}
+					//需要格式化的节点有父节点，并且hasUpdateNodes也存在同父节点的节点
+					if (node!.parent && item.parent && node!.parent.isEqual(item.parent)) {
+						return true
+					}
+					//其他情况说明没有格式化过
+					return false
+				})
+				//没有格式化过则进行格式化
+				if (!hasUpdate) {
+					//加入到已经格式化的节点数组里
 					hasUpdateNodes.push(node)
+					//格式化
 					this.formatRules.forEach(rule => {
 						formatNodes.apply(this, [rule, node!.parent ? node!.parent.children! : this.stackNodes])
 					})
