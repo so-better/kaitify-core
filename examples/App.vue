@@ -2,9 +2,15 @@
   <div class="container">
     <div class="left">
       <fieldset>
+        <legend>自定义操作</legend>
+        <div class="toolbar">
+          <button>当前编辑器内容字数：{{ count }}</button>
+          <button @click="insertNode">插入节点</button>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>编辑器设置</legend>
         <div class="toolbar">
-          <button @click="insertNode">插入节点</button>
           <button @click="editor?.setEditable(!editor.isEditable())">启用/禁用编辑功能</button>
           <button @click="editor && (editor.allowCopy = !editor.allowCopy)">启用/禁用复制功能</button>
           <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
@@ -247,6 +253,7 @@ import { onMounted, ref } from 'vue'
 import { Editor, KNode } from '../src'
 import { content } from "./content"
 
+const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
 
 onMounted(async () => {
@@ -264,7 +271,10 @@ onMounted(async () => {
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
-    placeholder: '请输入内容...'
+    placeholder: '请输入内容...',
+    afterUpdateView() {
+      count.value = this.getText().trim().length
+    },
   })
 })
 

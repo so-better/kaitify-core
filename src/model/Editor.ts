@@ -1809,6 +1809,16 @@ export class Editor {
 	}
 
 	/**
+	 * 获取编辑器的纯文本内容
+	 */
+	getText() {
+		if (!this.$el) {
+			return ''
+		}
+		return this.$el.innerText
+	}
+
+	/**
 	 * 配置编辑器，返回创建的编辑器
 	 */
 	static async configure(options: EditorConfigureOptionType) {
