@@ -243,7 +243,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor } from '../src'
+import { Editor, KNode } from '../src'
 import { content } from "./content"
 
 const editor = ref<Editor | null>(null)
@@ -265,6 +265,65 @@ onMounted(async () => {
     allowPasteHtml: true,
     placeholder: '请输入内容...'
   })
+
+  const node = KNode.create({
+    type: 'block',
+    tag: 'div',
+    children: [
+      {
+        type: 'block',
+        tag: 'p',
+        children: [
+          {
+            type: 'text',
+            textContent: '我是p1'
+          }
+        ]
+      },
+      {
+        type: 'block',
+        tag: 'p',
+        children: [
+          {
+            type: 'text',
+            textContent: '我是p2'
+          },
+          {
+            type: 'inline',
+            tag: 'span',
+            children: [
+              {
+                type: 'block',
+                tag: 'div',
+                children: [
+                  {
+                    type: 'text',
+                    textContent: 'div'
+                  }
+                ]
+              },
+              {
+                type: 'text',
+                textContent: '我是'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: 'inline',
+        tag: 'span',
+        children: [
+          {
+            type: 'text',
+            textContent: '我是span'
+          }
+        ]
+      }
+    ]
+  })
+  editor.value.stackNodes = [node]
+  editor.value.updateView()
 })
 </script>
 <style lang="less">

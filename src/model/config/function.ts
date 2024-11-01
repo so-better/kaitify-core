@@ -801,6 +801,27 @@ export const handlerForPasteFiles = async function (this: Editor, files: FileLis
 }
 
 /**
+ * 处理某个节点数组，针对为空的块级节点补充占位符
+ */
+export const fillPlaceholderToEmptyBlock = function (this: Editor, nodes: KNode[]) {
+	const length = nodes.length
+	for (let i = 0; i < length; i++) {
+		if (nodes[i].isBlock()) {
+			//是空节点，补充占位符
+			if (nodes[i].isEmpty()) {
+				const placeholderNode = KNode.createPlaceholder()
+				nodes[i].children = [placeholderNode]
+				placeholderNode.parent = nodes[i]
+			}
+			//不是空节点，继续遍历子节点
+			else if (nodes[i].hasChildren()) {
+				fillPlaceholderToEmptyBlock.apply(this, [nodes[i].children!])
+			}
+		}
+	}
+}
+
+/**
  * 粘贴处理
  */
 export const handlerForPasteDrop = async function (this: Editor, dataTransfer: DataTransfer) {
@@ -820,6 +841,8 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
 		const nodes = this.htmlParseNode(html).filter(item => {
 			return !item.isEmpty()
 		})
+		//节点数组内的空块节点补充占位符
+		fillPlaceholderToEmptyBlock.apply(this, [nodes])
 		//粘贴时对非文本节点的标记和样式的保留处理
 		handlerForPasteKeepMarksAndStyles.apply(this, [nodes])
 		//是否走默认逻辑
