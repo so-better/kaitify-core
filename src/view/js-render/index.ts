@@ -157,6 +157,7 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 	}
 	//动态视图更新
 	else {
+		const t1 = Date.now()
 		//进行比对
 		patchNodes(this.stackNodes, this.oldStackNodes).forEach(item => {
 			//插入dom
@@ -206,5 +207,6 @@ export const defaultUpdateView = function (this: Editor, init: boolean) {
 				}
 			}
 		})
+		console.log(`渲染dom耗时：${Date.now() - t1}ms`)
 	}
 }

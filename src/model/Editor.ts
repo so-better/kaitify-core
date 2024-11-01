@@ -1680,6 +1680,7 @@ export class Editor {
 		const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
 		//这里存放格式化过的节点，后续进行判断避免重复格式化造成资源浪费和性能问题
 		const hasUpdateNodes: KNode[] = []
+		const t1 = Date.now()
 		//对编辑器的新旧节点数组进行比对，遍历比对的结果进行动态格式化
 		patchNodes(this.stackNodes, oldStackNodes).forEach(item => {
 			//需要进行格式化的节点
@@ -1723,6 +1724,7 @@ export class Editor {
 				if (!hasUpdate) {
 					//加入到已经格式化的节点数组里
 					hasUpdateNodes.push(node)
+					console.log('格式化的节点', node)
 					//格式化
 					this.formatRules.forEach(rule => {
 						formatNodes.apply(this, [rule, node!.parent ? node!.parent.children! : this.stackNodes])
@@ -1730,6 +1732,7 @@ export class Editor {
 				}
 			}
 		})
+		console.log(`动态格式化节点耗时：${Date.now() - t1}ms`)
 		//判断节点数组是否为空进行初始化
 		checkNodes.apply(this)
 		//设置placeholder
