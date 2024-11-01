@@ -2,7 +2,7 @@ import { string as DapString } from 'dap-util'
 import { isZeroWidthText } from '@/tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
-import { applyMergeNode, getAllowMergeNode } from './function'
+import { applyMergeNode, convertToBlock, getAllowMergeNode } from './function'
 
 /**
  * 格式化函数类型
@@ -19,34 +19,22 @@ export const fomratBlockTagParse: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
- * 针对节点的子节点数组：处理子节点中的块节点，如果父节点是行内节点则将块节点移出到父节所在的块节点前，如果块节点和其他节点并存亦将块节点移出到父节所在的块节点前
+ * 针对子节点中的块节点：行内节点的子节点中含有块节点则该节点转为块节点；子节点中的其他节点也转为块节点
  */
 export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
 	//当前节点存在子节点
 	if (node.hasChildren() && !node.isEmpty()) {
-		//过滤子节点中的空节点和占位符（因为占位符会在存在其他节点时清除，所以不考虑）
-		const nodes = node.children!.filter(item => {
-			return !item.isEmpty() && !item.isPlaceholder()
-		})
-		//存在块节点
-		const hasBlock = nodes.some(item => item.isBlock())
-		//全是块节点
-		const allBlock = nodes.every(item => item.isBlock())
-		//存在块节点且父节点是行内节点或者不全是块节点，此时需要将块节点移出到当前节点前
-		if (hasBlock && (node.isInline() || !allBlock)) {
-			let index = 0
-			while (index < node.children!.length) {
-				const current = node.children![index]
-				//不是块节点跳过，继续向下
-				if (!current.isBlock()) {
-					index++
-					continue
+		//子节点中存在非空的块节点
+		const hasBlock = node.children!.some(item => item.isBlock() && !item.isEmpty())
+		if (hasBlock) {
+			//将子节点中的非空非块节点转为块节点
+			node.children!.forEach(item => {
+				if (!item.isEmpty() && !item.isBlock()) {
+					convertToBlock.apply(editor, [item])
 				}
-				//是块节点则添加到当前节点前面
-				if (current.isBlock()) {
-					node.children!.splice(index, 1)
-					editor.addNodeBefore(current, node.getBlock())
-				}
+			})
+			if (!node.isBlock()) {
+				convertToBlock.apply(editor, [node])
 			}
 		}
 	}
@@ -57,55 +45,52 @@ export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
  */
 export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
 	const uneditableNode = node.getUneditable()
-	if (uneditableNode && !uneditableNode.isEmpty()) {
-		//非块节点处理
-		if (!uneditableNode.isBlock()) {
-			const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
-			const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
-			//前一个节点不存在或者不是零宽度空白文本节点
-			if (!previousNode || !previousNode.isZeroWidthText()) {
-				const zeroWidthText = KNode.createZeroWidthText()
-				editor.addNodeBefore(zeroWidthText, uneditableNode)
-			}
-			//后一个节点不存在或者不是零宽度空白文本节点
-			if (!nextNode || !nextNode.isZeroWidthText()) {
-				const zeroWidthText = KNode.createZeroWidthText()
-				editor.addNodeAfter(zeroWidthText, uneditableNode)
-			}
-			//是用户操作的删除行为，则需要更新光标位置
-			if (editor.isUserDelection) {
-				//起点和终点都在不可编辑的节点里
-				if (editor.isSelectionInNode(uneditableNode, 'all')) {
-					const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
-					const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
-					//起点和终点在一起
-					if (editor.selection.collapsed()) {
-						//如果光标在不可编辑节点的最前面，则移动到前一个可设置光标的节点的后面
-						const firstNode = editor.getFirstSelectionNodeInChildren(uneditableNode)!
-						if (firstNode.isEqual(editor.selection.start!.node) && editor.selection.start!.offset == 0) {
-							editor.setSelectionAfter(previousSelectionNode, 'all')
-						}
-						//否则一律设置到后一个可设置光标的节点的前面
-						else {
-							editor.setSelectionBefore(nexteSelectionNode, 'all')
-						}
+	if (uneditableNode && !uneditableNode.isEmpty() && !uneditableNode.isBlock()) {
+		const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
+		const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
+		//前一个节点不存在或者不是零宽度空白文本节点
+		if (!previousNode || !previousNode.isZeroWidthText()) {
+			const zeroWidthText = KNode.createZeroWidthText()
+			editor.addNodeBefore(zeroWidthText, uneditableNode)
+		}
+		//后一个节点不存在或者不是零宽度空白文本节点
+		if (!nextNode || !nextNode.isZeroWidthText()) {
+			const zeroWidthText = KNode.createZeroWidthText()
+			editor.addNodeAfter(zeroWidthText, uneditableNode)
+		}
+		//是用户操作的删除行为，则需要更新光标位置
+		if (editor.isUserDelection) {
+			//起点和终点都在不可编辑的节点里
+			if (editor.isSelectionInNode(uneditableNode, 'all')) {
+				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
+				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
+				//起点和终点在一起
+				if (editor.selection.collapsed()) {
+					//如果光标在不可编辑节点的最前面，则移动到前一个可设置光标的节点的后面
+					const firstNode = editor.getFirstSelectionNodeInChildren(uneditableNode)!
+					if (firstNode.isEqual(editor.selection.start!.node) && editor.selection.start!.offset == 0) {
+						editor.setSelectionAfter(previousSelectionNode, 'all')
 					}
-					//起点和终点不在一起，则选中该不可编辑的节点
+					//否则一律设置到后一个可设置光标的节点的前面
 					else {
-						editor.setSelectionAfter(previousSelectionNode, 'start')
-						editor.setSelectionBefore(nexteSelectionNode, 'end')
+						editor.setSelectionBefore(nexteSelectionNode, 'all')
 					}
 				}
-				//起点在不可编辑的节点里，则更新起点位置
-				else if (editor.isSelectionInNode(uneditableNode, 'start')) {
-					const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
-					editor.setSelectionBefore(nexteSelectionNode, 'start')
+				//起点和终点不在一起，则选中该不可编辑的节点
+				else {
+					editor.setSelectionAfter(previousSelectionNode, 'start')
+					editor.setSelectionBefore(nexteSelectionNode, 'end')
 				}
-				//终点在不可编辑的节点里，则更新终点位置
-				else if (editor.isSelectionInNode(uneditableNode, 'end')) {
-					const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
-					editor.setSelectionAfter(previousSelectionNode, 'end')
-				}
+			}
+			//起点在不可编辑的节点里，则更新起点位置
+			else if (editor.isSelectionInNode(uneditableNode, 'start')) {
+				const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
+				editor.setSelectionBefore(nexteSelectionNode, 'start')
+			}
+			//终点在不可编辑的节点里，则更新终点位置
+			else if (editor.isSelectionInNode(uneditableNode, 'end')) {
+				const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
+				editor.setSelectionAfter(previousSelectionNode, 'end')
 			}
 		}
 	}

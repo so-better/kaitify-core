@@ -24,8 +24,9 @@ export const CodeExtension = Extension.create({
 	},
 	formatRules: [
 		({ editor, node }) => {
-			//行内代码里只能有文本节点和闭合节点
+			//行内代码只能是行内节点并且只能有文本节点和闭合节点
 			if (node.isMatch({ tag: 'code' }) && node.hasChildren()) {
+				node.type = 'inline'
 				node.children!.forEach(item => {
 					splitNodeToNodes.apply(editor, [item])
 				})

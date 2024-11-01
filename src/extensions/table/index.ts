@@ -502,6 +502,35 @@ export const TableExtension = Extension.create({
 		return marks
 	},
 	formatRules: [
+		//表格相关节点类型设置
+		({ node }) => {
+			if (node.isMatch({ tag: 'table' })) {
+				node.type = 'block'
+			}
+			if (node.isMatch({ tag: 'tfoot' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tr' })) {
+				node.type = 'block'
+				node.fixed = true
+				node.nested = true
+			}
+			if (node.isMatch({ tag: 'th' }) || node.isMatch({ tag: 'td' })) {
+				node.type = 'block'
+				node.fixed = true
+				node.nested = true
+				if (isHideCell(node)) {
+					node.void = true
+				}
+			}
+			if (node.isMatch({ tag: 'colgroup' })) {
+				node.type = 'block'
+				node.fixed = true
+				node.nested = true
+				node.void = true
+			}
+			if (node.isMatch({ tag: 'col' })) {
+				node.type = 'closed'
+				node.void = true
+			}
+		},
 		//表格结构改造
 		({ editor, node }) => {
 			if (node.isMatch({ tag: 'table' })) {

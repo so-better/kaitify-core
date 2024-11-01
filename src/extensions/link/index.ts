@@ -49,8 +49,9 @@ export const LinkExtension = Extension.create({
 	},
 	formatRules: [
 		({ editor, node }) => {
-			//链接里只能有文本节点和闭合节点
+			//链接只能是行内节点且只能有文本节点和闭合节点
 			if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
+				node.type = 'inline'
 				node.children!.forEach(item => {
 					splitNodeToNodes.apply(editor, [item])
 				})

@@ -364,10 +364,6 @@ export class Editor {
 	 */
 	isUserDelection: boolean = false
 	/**
-	 * 是否有拖入行为【不可修改】
-	 */
-	isDropping: boolean = false
-	/**
 	 * dom监听【不可修改】
 	 */
 	domObserver: MutationObserver | null = null

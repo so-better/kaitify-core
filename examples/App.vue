@@ -4,6 +4,7 @@
       <fieldset>
         <legend>编辑器设置</legend>
         <div class="toolbar">
+          <button @click="insertNode">插入节点</button>
           <button @click="editor?.setEditable(!editor.isEditable())">启用/禁用编辑功能</button>
           <button @click="editor && (editor.allowCopy = !editor.allowCopy)">启用/禁用复制功能</button>
           <button @click="editor && (editor.allowCut = !editor.allowCut)">启用/禁用剪切功能</button>
@@ -265,66 +266,19 @@ onMounted(async () => {
     allowPasteHtml: true,
     placeholder: '请输入内容...'
   })
+})
 
+const insertNode = () => {
   const node = KNode.create({
-    type: 'block',
-    tag: 'div',
+    type: 'inline',
+    tag: 'h1',
     children: [
-      {
-        type: 'block',
-        tag: 'p',
-        children: [
-          {
-            type: 'text',
-            textContent: '我是p1'
-          }
-        ]
-      },
-      {
-        type: 'block',
-        tag: 'p',
-        children: [
-          {
-            type: 'text',
-            textContent: '我是p2'
-          },
-          {
-            type: 'inline',
-            tag: 'span',
-            children: [
-              {
-                type: 'block',
-                tag: 'div',
-                children: [
-                  {
-                    type: 'text',
-                    textContent: 'div'
-                  }
-                ]
-              },
-              {
-                type: 'text',
-                textContent: '我是'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'inline',
-        tag: 'span',
-        children: [
-          {
-            type: 'text',
-            textContent: '我是span'
-          }
-        ]
-      }
+      { type: 'text', textContent: 'const a = new B' },
     ]
   })
-  editor.value.stackNodes = [node]
-  editor.value.updateView()
-})
+  editor.value?.insertNode(node)
+  editor.value?.updateView()
+}
 </script>
 <style lang="less">
 html {

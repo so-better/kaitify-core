@@ -154,6 +154,9 @@ export const CodeBlockExtension = Extension.create({
 		//代码块高亮处理
 		({ editor, node }) => {
 			if (node.isMatch({ tag: 'pre' }) && node.hasChildren()) {
+				//代码块必须是块节点
+				if (!node.isBlock()) node.type = 'block'
+				//获取语言类型
 				let language = (node.marks?.['kaitify-hljs'] || '') as string
 				//语言存在但不是列表内的
 				if (language && !HljsLanguages.some(item => item == language)) {
