@@ -1709,10 +1709,6 @@ export class Editor {
 					if (item.isContains(node!)) {
 						return true
 					}
-					//需要格式化的节点没有父节点，并且hasUpdateNodes也存在没有父节点的节点
-					if (!node!.parent && !item.parent) {
-						return true
-					}
 					//需要格式化的节点有父节点，并且hasUpdateNodes也存在同父节点的节点
 					if (node!.parent && item.parent && node!.parent.isEqual(item.parent)) {
 						return true
@@ -1727,7 +1723,9 @@ export class Editor {
 					console.log('格式化的节点', node)
 					//格式化
 					this.formatRules.forEach(rule => {
-						formatNodes.apply(this, [rule, node!.parent ? node!.parent.children! : this.stackNodes])
+						const nodes = node!.parent ? node!.parent.children! : [node!]
+						const sourceNodes = node!.parent ? node!.parent.children! : this.stackNodes
+						formatNodes.apply(this, [rule, nodes, sourceNodes])
 					})
 				}
 			}
@@ -1897,7 +1895,7 @@ export class Editor {
 		editor.stackNodes = editor.htmlParseNode(options.value || '')
 		//将节点数组进行格式化
 		editor.formatRules.forEach(rule => {
-			formatNodes.apply(editor, [rule, editor.stackNodes])
+			formatNodes.apply(editor, [rule, editor.stackNodes, editor.stackNodes])
 		})
 		//初始化检查节点数组
 		checkNodes.apply(editor)

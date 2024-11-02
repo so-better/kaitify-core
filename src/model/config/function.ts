@@ -395,13 +395,13 @@ export const convertToBlock = function (this: Editor, node: KNode) {
 }
 
 /**
- * 对节点数组使用指定规则进行格式化
+ * 对节点数组使用指定规则进行格式化，nodes是需要格式化的节点数组，sourceNodes是格式化的节点所在的源数组
  */
-export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes: KNode[]) {
+export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes: KNode[], sourceNodes: KNode[]) {
 	let i = 0
 	while (i < nodes.length) {
 		const node = nodes[i]
-		//空节点直接删除并且跳过本次循环
+		//空节点直接删除
 		if (node.isEmpty()) {
 			if (this.isSelectionInNode(node, 'start')) {
 				this.updateSelectionRecently('start')
@@ -409,44 +409,46 @@ export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes
 			if (this.isSelectionInNode(node, 'end')) {
 				this.updateSelectionRecently('end')
 			}
-			nodes.splice(i, 1)
-			continue
+			const index = sourceNodes.findIndex(item => item.isEqual(node))
+			sourceNodes.splice(index, 1)
 		}
-		//对节点使用该规则进行格式化
-		rule({ editor: this, node })
-		//格式化后变成空节点，进行删除，并且跳过本次循环
-		if (node.isEmpty()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.updateSelectionRecently('start')
+		//非空节点
+		else {
+			//对节点使用该规则进行格式化
+			rule({ editor: this, node })
+			//格式化后变成空节点，进行删除
+			if (node.isEmpty()) {
+				if (this.isSelectionInNode(node, 'start')) {
+					this.updateSelectionRecently('start')
+				}
+				if (this.isSelectionInNode(node, 'end')) {
+					this.updateSelectionRecently('end')
+				}
+				const index = sourceNodes.findIndex(item => item.isEqual(node))
+				nodes.splice(index, 1)
 			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.updateSelectionRecently('end')
+			//格式化后不是空节点
+			else {
+				//如果当前节点不是块节点，但是却是在根部，则转为块节点
+				if (!node.isBlock() && this.stackNodes === nodes) {
+					convertToBlock.apply(this, [node])
+				}
+				//对子节点进行格式化
+				if (node.hasChildren()) {
+					formatNodes.apply(this, [rule, node.children!, node.children!])
+				}
+				//子节点格式化后变成空节点，需要删除该节点
+				if (node.isEmpty()) {
+					if (this.isSelectionInNode(node, 'start')) {
+						this.updateSelectionRecently('start')
+					}
+					if (this.isSelectionInNode(node, 'end')) {
+						this.updateSelectionRecently('end')
+					}
+					const index = nodes.findIndex(item => item.isEqual(node))
+					nodes.splice(index, 1)
+				}
 			}
-			//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
-			const index = nodes.findIndex(item => item.isEqual(node))
-			nodes.splice(index, 1)
-			continue
-		}
-		//如果当前节点不是块节点，但是却是在根部，则转为块节点
-		if (!node.isBlock() && this.stackNodes === nodes) {
-			convertToBlock.apply(this, [node])
-		}
-		//对子节点进行格式化
-		if (node.hasChildren()) {
-			formatNodes.apply(this, [rule, node.children!])
-		}
-		//子节点格式化后变成空节点，需要删除该节点，并且跳过本次循环
-		if (node.isEmpty()) {
-			if (this.isSelectionInNode(node, 'start')) {
-				this.updateSelectionRecently('start')
-			}
-			if (this.isSelectionInNode(node, 'end')) {
-				this.updateSelectionRecently('end')
-			}
-			//因为在格式化过程中可能会改变节点在数组中的序列位置，所以重新获取序列
-			const index = nodes.findIndex(item => item.isEqual(node))
-			nodes.splice(index, 1)
-			continue
 		}
 		i++
 	}
