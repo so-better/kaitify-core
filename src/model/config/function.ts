@@ -425,12 +425,12 @@ export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes
 					this.updateSelectionRecently('end')
 				}
 				const index = sourceNodes.findIndex(item => item.isEqual(node))
-				nodes.splice(index, 1)
+				sourceNodes.splice(index, 1)
 			}
 			//格式化后不是空节点
 			else {
 				//如果当前节点不是块节点，但是却是在根部，则转为块节点
-				if (!node.isBlock() && this.stackNodes === nodes) {
+				if (!node.isBlock() && this.stackNodes === sourceNodes) {
 					convertToBlock.apply(this, [node])
 				}
 				//对子节点进行格式化
@@ -445,8 +445,8 @@ export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes
 					if (this.isSelectionInNode(node, 'end')) {
 						this.updateSelectionRecently('end')
 					}
-					const index = nodes.findIndex(item => item.isEqual(node))
-					nodes.splice(index, 1)
+					const index = sourceNodes.findIndex(item => item.isEqual(node))
+					sourceNodes.splice(index, 1)
 				}
 			}
 		}
