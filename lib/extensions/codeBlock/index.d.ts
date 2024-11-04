@@ -1,7 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
 import { HljsLanguageType } from './hljs';
-
 declare module '../../model' {
     interface EditorCommandsType {
         getCodeBlock?: () => KNode | null;

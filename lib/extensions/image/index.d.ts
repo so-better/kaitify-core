@@ -1,6 +1,5 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-
 /**
  * 插入图片方法入参类型
  */
