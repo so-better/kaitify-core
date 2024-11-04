@@ -4,22 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="../node_modules/vue/dist/vue.global.prod.js"></script>
-    <script src="../lib/alex-editor.umd.js"></script>
+    <title>@kaitify/core</title>
+    <script src="../lib/kaitify-core.umd.js"></script>
 </head>
 
 <body>
-    <div id="editor" style="width: 400px;height: 400px;border: 1px solid #ddd;overflow: auto;"></div>
+    <div id="editor" style="height: 400px;"></div>
 </body>
 <script>
-    const { AlexElement, AlexEditor } = window['alex-editor']
-    const editor = new AlexEditor('#editor', {
-        value: '<p>hello,我是一个编辑器</p>'
+    const { Editor, KNode } = window['kaitify-core']
+    const editor = Editor.configure({
+        value:'hello',
+        el:'#editor'
     })
-    console.log(window['alex-editor']);
-    editor.formatElementStack()
-    editor.domRender()
+    console.log(window['kaitify-core']);
 </script>
 
 </html>

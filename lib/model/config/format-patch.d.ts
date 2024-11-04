@@ -1,13 +1,12 @@
 import { KNode } from '../KNode';
 
 /**
+ * 这里的比对结果仅进行格式化处理，只需要判断节点是否变化
+ */
+/**
  * 节点数组比对结果类型
  */
 export type NodePatchResultType = {
-    /**
-     * 差异类型：insert：插入节点；remove：移除节点；update：节点更新；replace：节点被替换；move：节点同级位置移动；empty：空节点
-     */
-    type: 'insert' | 'remove' | 'update' | 'replace' | 'move' | 'empty';
     /**
      * 新节点
      */
@@ -16,10 +15,6 @@ export type NodePatchResultType = {
      * 旧节点
      */
     oldNode: KNode | null;
-    /**
-     * 更新的字段
-     */
-    update?: 'textContent' | 'styles' | 'marks';
 };
 /**
  * 对新旧两个节点数组进行比对

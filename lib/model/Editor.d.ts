@@ -42,6 +42,10 @@ export type EditorConfigureOptionType = {
      */
     allowPasteHtml?: boolean;
     /**
+     * 剪切板同时存在文件和html/text时，是否优先粘贴文件
+     */
+    priorityPasteFiles?: boolean;
+    /**
      * 自定义编辑器内渲染文本节点的真实标签
      */
     textRenderTag?: string;
@@ -134,6 +138,10 @@ export type EditorConfigureOptionType = {
      */
     pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
     /**
+     * 视图更新前回调方法
+     */
+    beforeUpdateView?: (this: Editor) => void;
+    /**
      * 视图更新后回调方法
      */
     afterUpdateView?: (this: Editor) => void;
@@ -141,6 +149,10 @@ export type EditorConfigureOptionType = {
      * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
      */
     onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean;
+    /**
+     * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
+     */
+    beforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode;
     /**
      * 编辑器的初始默认值
      */
@@ -157,6 +169,10 @@ export type EditorConfigureOptionType = {
      * 编辑器内容只有一个段落时的默认文本
      */
     placeholder?: string;
+    /**
+     * 是否深色模式
+     */
+    dark?: boolean;
 };
 /**
  * 编辑器核心类
@@ -182,6 +198,10 @@ export declare class Editor {
      * 是否允许粘贴html【初始化后可以修改】
      */
     allowPasteHtml: boolean;
+    /**
+     * 剪切板同时存在文件和html/text时，是否优先粘贴文件【初始化后可以修改】
+     */
+    priorityPasteFiles: boolean;
     /**
      * 编辑器内渲染文本节点的真实标签【初始化后不建议修改】
      */
@@ -275,6 +295,10 @@ export declare class Editor {
      */
     pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
     /**
+     * 视图更新前回调方法【初始化后不可修改】
+     */
+    beforeUpdateView?: (this: Editor) => void;
+    /**
      * 视图更新后回调方法【初始化后不可修改】
      */
     afterUpdateView?: (this: Editor) => void;
@@ -282,6 +306,10 @@ export declare class Editor {
      * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
      */
     onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean;
+    /**
+     * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可【初始化后不可修改】
+     */
+    beforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode;
     /**
      * 唯一id【不可修改】
      */
@@ -342,6 +370,14 @@ export declare class Editor {
      * 判断编辑器是否可编辑
      */
     isEditable(): boolean;
+    /**
+     * 设置编辑器是否深色模式
+     */
+    setDark(dark: boolean): void;
+    /**
+     * 是否深色模式
+     */
+    isDark(): boolean;
     /**
      * dom转KNode
      */
@@ -454,6 +490,10 @@ export declare class Editor {
      * 销毁编辑器的方法
      */
     destroy(): void;
+    /**
+     * 获取编辑器的纯文本内容
+     */
+    getText(): string;
     /**
      * 配置编辑器，返回创建的编辑器
      */

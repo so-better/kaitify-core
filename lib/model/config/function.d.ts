@@ -32,9 +32,9 @@ export declare const applyMergeNode: (this: Editor, node: KNode, type: "parent" 
  */
 export declare const convertToBlock: (this: Editor, node: KNode) => void;
 /**
- * 对节点数组使用指定规则进行格式化
+ * 对节点数组使用指定规则进行格式化，nodes是需要格式化的节点数组，sourceNodes是格式化的节点所在的源数组
  */
-export declare const formatNodes: (this: Editor, rule: RuleFunctionType, nodes: KNode[]) => void;
+export declare const formatNodes: (this: Editor, rule: RuleFunctionType, nodes: KNode[], sourceNodes: KNode[]) => void;
 /**
  * 注册插件
  */
@@ -55,6 +55,14 @@ export declare const checkNodes: (this: Editor) => void;
  * 粘贴时对节点的标记和样式的保留处理
  */
 export declare const handlerForPasteKeepMarksAndStyles: (this: Editor, nodes: KNode[]) => void;
+/**
+ * 粘贴时对文件的处理
+ */
+export declare const handlerForPasteFiles: (this: Editor, files: FileList) => Promise<void>;
+/**
+ * 处理某个节点数组，针对为空的块级节点补充占位符
+ */
+export declare const fillPlaceholderToEmptyBlock: (this: Editor, nodes: KNode[]) => void;
 /**
  * 粘贴处理
  */
