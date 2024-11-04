@@ -1679,7 +1679,7 @@ export class Editor {
 		//克隆旧节点数组，防止在patch过程中旧节点数组中存在null，影响后续的视图更新
 		const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
 		//这里存放格式化过的节点数组，后续进行判断避免重复格式化造成资源浪费和性能问题
-		const hasUpdateNodes: KNode[][] = []
+		const hasUpdateNodes: KNode[] = []
 		const t1 = Date.now()
 		//对编辑器的新旧节点数组进行比对，遍历比对的结果进行动态格式化
 		patchNodes(this.stackNodes, oldStackNodes).forEach(item => {
@@ -1703,18 +1703,29 @@ export class Editor {
 				if (typeof this.beforePatchNodeToFormat == 'function') {
 					node = this.beforePatchNodeToFormat.apply(this, [node])
 				}
-				//需要格式化的节点数组
-				const nodes = node!.parent ? node!.parent.children! : this.stackNodes
 				//判断该节点数组是否格式化过
-				const hasUpdate = hasUpdateNodes.some(item => nodes === item)
+				const hasUpdate = hasUpdateNodes.some(item => {
+					//已经在hasUpdateNodes数组里了，说明格式化过了
+					if (item.isContains(node!)) {
+						return true
+					}
+					//需要格式化的节点有父节点，并且hasUpdateNodes也存在同父节点的节点
+					if (node!.parent && item.parent && item.parent.isContains(node!.parent)) {
+						return true
+					}
+					//其他情况说明没有格式化过
+					return false
+				})
 				//没有格式化过则进行格式化
 				if (!hasUpdate) {
 					//加入到已经格式化的节点数组里
-					hasUpdateNodes.push(nodes)
-					console.log('格式化的节点数组', nodes)
+					hasUpdateNodes.push(node)
+					console.log('格式化的节点', node)
 					//格式化
 					this.formatRules.forEach(rule => {
-						formatNodes.apply(this, [rule, nodes])
+						const nodes = node!.parent ? node!.parent.children! : [node!]
+						const sourceNodes = node!.parent ? node!.parent.children! : this.stackNodes
+						formatNodes.apply(this, [rule, nodes, sourceNodes])
 					})
 				}
 			}
@@ -1884,7 +1895,7 @@ export class Editor {
 		editor.stackNodes = editor.htmlParseNode(options.value || '')
 		//将节点数组进行格式化
 		editor.formatRules.forEach(rule => {
-			formatNodes.apply(editor, [rule, editor.stackNodes])
+			formatNodes.apply(editor, [rule, editor.stackNodes, editor.stackNodes])
 		})
 		//初始化检查节点数组
 		checkNodes.apply(editor)
