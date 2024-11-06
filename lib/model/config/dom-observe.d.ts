@@ -1,4 +1,5 @@
 import { Editor } from '../Editor';
+
 /**
  * 移除对编辑器的dom监听
  */

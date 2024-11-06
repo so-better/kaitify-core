@@ -1,4 +1,5 @@
 import { Extension } from '../Extension';
+
 declare module '../../model' {
     interface EditorCommandsType {
         isBackColor?: (value: string) => boolean;

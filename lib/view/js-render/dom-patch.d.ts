@@ -1,4 +1,5 @@
 import { KNode, KNodeMarksType, KNodeStylesType } from '../../model';
+
 /**
  * 节点数组比对结果类型
  */

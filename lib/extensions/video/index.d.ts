@@ -1,5 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
+
 /**
  * 插入视频方法入参类型
  */

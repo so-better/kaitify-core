@@ -3,6 +3,7 @@ import { Selection } from './Selection';
 import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
+
 /**
  * 编辑器获取光标范围内节点数据的类型
  */
@@ -105,7 +106,7 @@ export type EditorConfigureOptionType = {
      */
     onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
-     * 换行时触发，换行操作后光标所在的块节点
+     * 换行时触发，参数为换行操作后光标所在的块节点
      */
     onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**
@@ -262,7 +263,7 @@ export declare class Editor {
      */
     onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
-     * 换行时触发，换行操作后光标所在的块节点
+     * 换行时触发，参数为换行操作后光标所在的块节点
      */
     onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**

@@ -1,5 +1,6 @@
 import { Editor } from '../Editor';
 import { KNode } from '../KNode';
+
 /**
  * 格式化函数类型
  */

@@ -1,5 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
+
 type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman';
 declare module '../../model' {
     interface EditorCommandsType {

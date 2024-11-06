@@ -1,5 +1,6 @@
 import { KNode } from './KNode';
 import { Selection } from './Selection';
+
 /**
  * 历史记录的record类型
  */

@@ -1,4 +1,5 @@
 import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType, Selection } from '../model';
+
 /**
  * 创建插件的入参类型
  */

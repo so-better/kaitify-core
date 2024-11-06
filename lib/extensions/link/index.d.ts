@@ -1,5 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
+
 /**
  * 插入链接方法入参类型
  */

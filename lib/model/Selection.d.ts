@@ -1,4 +1,5 @@
 import { KNode } from './KNode';
+
 /**
  * 光标点位类型，node仅支持文本节点和闭合节点
  */
