@@ -116,7 +116,7 @@ export type EditorConfigureOptionType = {
 	 */
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
-	 * 换行时触发，换行操作后光标所在的块节点
+	 * 换行时触发，参数为换行操作后光标所在的块节点
 	 */
 	onInsertParagraph?: (this: Editor, node: KNode) => void
 	/**
@@ -277,7 +277,7 @@ export class Editor {
 	 */
 	onSelectionUpdate?: (this: Editor, selection: Selection) => void
 	/**
-	 * 换行时触发，换行操作后光标所在的块节点
+	 * 换行时触发，参数为换行操作后光标所在的块节点
 	 */
 	onInsertParagraph?: (this: Editor, node: KNode) => void
 	/**
@@ -1815,6 +1815,38 @@ export class Editor {
 	}
 
 	/**
+	 * 重新渲染编辑器视图
+	 */
+	async review(value: string) {
+		//视图更新前回调
+		if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
+		//根据value设置节点数组
+		this.stackNodes = this.htmlParseNode(value || '')
+		//将节点数组进行格式化
+		this.formatRules.forEach(rule => {
+			formatNodes.apply(this, [rule, this.stackNodes, this.stackNodes])
+		})
+		//初始化检查节点数组
+		checkNodes.apply(this)
+		//设置placeholder
+		setPlaceholder.apply(this)
+		//视图更新之前取消dom监听，以免干扰更新dom
+		removeDomObserve(this)
+		//进行视图的渲染
+		const useDefault = typeof this.onUpdateView == 'function' ? await this.onUpdateView.apply(this, [true]) : true
+		//使用默认逻辑
+		if (useDefault) defaultUpdateView.apply(this, [true])
+		//视图更新完毕后重新设置dom监听
+		setDomObserve(this)
+		//设置历史记录
+		this.history.setState(this.stackNodes, this.selection)
+		//更新旧节点数组
+		this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
+		//视图更新后回调
+		if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
+	}
+
+	/**
 	 * 销毁编辑器的方法
 	 */
 	destroy() {
@@ -1886,35 +1918,13 @@ export class Editor {
 		editor.extensions.forEach(item => registerExtension.apply(editor, [item]))
 		//设置编辑器是否可编辑
 		editor.setEditable(typeof options.editable == 'boolean' ? options.editable : true)
-		//视图更新前回调
-		if (typeof editor.beforeUpdateView == 'function') editor.beforeUpdateView.apply(editor)
-		//根据value设置节点数组
-		editor.stackNodes = editor.htmlParseNode(options.value || '')
-		//将节点数组进行格式化
-		editor.formatRules.forEach(rule => {
-			formatNodes.apply(editor, [rule, editor.stackNodes, editor.stackNodes])
-		})
-		//初始化检查节点数组
-		checkNodes.apply(editor)
-		//设置placeholder
-		setPlaceholder.apply(editor)
-		//进行视图的渲染
-		const useDefault = typeof editor.onUpdateView == 'function' ? await editor.onUpdateView.apply(editor, [true]) : true
-		//使用默认逻辑
-		if (useDefault) defaultUpdateView.apply(editor, [true])
-		//初始设置历史记录
-		editor.history.setState(editor.stackNodes, editor.selection)
-		//更新旧节点数组
-		editor.oldStackNodes = editor.stackNodes.map(item => item.fullClone())
+		//视图渲染
+		await editor.review(options.value || '')
 		//自动聚焦
 		if (options.autofocus) {
 			editor.setSelectionAfter()
 			await editor.updateRealSelection()
 		}
-		//视图更新后回调
-		if (typeof editor.afterUpdateView == 'function') editor.afterUpdateView.apply(editor)
-		//设置dom监听
-		setDomObserve(editor)
 		//监听js selection更新Selection
 		DapEvent.on(document, `selectionchange.kaitify_${editor.guid}`, onSelectionChange.bind(editor))
 		//监听内容输入

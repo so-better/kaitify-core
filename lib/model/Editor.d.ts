@@ -486,6 +486,10 @@ export declare class Editor {
      */
     updateRealSelection(): Promise<void>;
     /**
+     * 重新渲染编辑器视图
+     */
+    review(value: string): Promise<void>;
+    /**
      * 销毁编辑器的方法
      */
     destroy(): void;
