@@ -1815,7 +1815,7 @@ export class Editor {
 	}
 
 	/**
-	 * 重新渲染编辑器视图
+	 * 重新渲染编辑器视图，不会触发onChange
 	 */
 	async review(value: string) {
 		//视图更新前回调
