@@ -3,7 +3,6 @@ import { Selection } from './Selection';
 import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
-
 /**
  * 编辑器获取光标范围内节点数据的类型
  */
@@ -487,7 +486,7 @@ export declare class Editor {
      */
     updateRealSelection(): Promise<void>;
     /**
-     * 重新渲染编辑器视图
+     * 重新渲染编辑器视图，不会触发onChange
      */
     review(value: string): Promise<void>;
     /**

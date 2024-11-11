@@ -1,6 +1,5 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-
 type SetAttachmentConfigType = {
     url: string;
     text: string;

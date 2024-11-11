@@ -2,7 +2,6 @@ import { Extension } from '../../extensions';
 import { Editor } from '../Editor';
 import { KNode } from '../KNode';
 import { RuleFunctionType } from './format-rules';
-
 /**
  * 获取选区内的可聚焦节点所在的块节点数组
  */

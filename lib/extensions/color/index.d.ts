@@ -1,5 +1,4 @@
 import { Extension } from '../Extension';
-
 declare module '../../model' {
     interface EditorCommandsType {
         isColor?: (value: string) => boolean;
