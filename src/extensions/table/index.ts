@@ -4,16 +4,16 @@ import { Editor, KNode, KNodeCreateOptionType, KNodeMarksType, KNodeStylesType }
 import { Extension } from '../Extension'
 import './style.less'
 
-export type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom'
+export type TableCellsMergeDirectionType = 'left' | 'top' | 'right' | 'bottom'
 
 declare module '../../model' {
   interface EditorCommandsType {
     getTable?: () => KNode | null
     hasTable?: () => boolean
-    canMergeCells?: (direction: TableCellsMergeDirection) => boolean
+    canMergeCells?: (direction: TableCellsMergeDirectionType) => boolean
     setTable?: ({ rows, columns }: { rows: number; columns: number }) => Promise<void>
     unsetTable?: () => Promise<void>
-    mergeCell?: (direction: TableCellsMergeDirection) => Promise<void>
+    mergeCell?: (direction: TableCellsMergeDirectionType) => Promise<void>
     addRow?: (direction: 'top' | 'bottom') => Promise<void>
     deleteRow?: () => Promise<void>
     addColumn?: (direction: 'left' | 'right') => Promise<void>
@@ -173,7 +173,7 @@ const resetTableHideCells = (editor: Editor, rows: KNode[]) => {
 /**
  * 获取单元格指定方向的最近的一个非隐藏单元格
  */
-const getTargetNotHideCell = (cell: KNode, direction: TableCellsMergeDirection) => {
+const getTargetNotHideCell = (cell: KNode, direction: TableCellsMergeDirectionType) => {
   if (direction == 'right') {
     const nextCell = cell.getNext(cell.parent!.children!)
     if (nextCell) {
@@ -296,7 +296,7 @@ const setCellNotHide = (cell: KNode) => {
 /**
  * 合并两个单元格
  */
-const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMergeDirection) => {
+const mergeTwoCell = (cell: KNode, targetCell: KNode, direction: TableCellsMergeDirectionType) => {
   const cellSize = getCellSize(cell)
   const targetCellSize = getCellSize(targetCell)
   if (direction == 'left') {
@@ -667,7 +667,7 @@ export const TableExtension = Extension.create({
     /**
      * 是否可以合并单元格
      */
-    const canMergeCells = (direction: TableCellsMergeDirection) => {
+    const canMergeCells = (direction: TableCellsMergeDirectionType) => {
       if (!this.selection.focused()) {
         return false
       }
@@ -785,7 +785,7 @@ export const TableExtension = Extension.create({
     /**
      * 合并单元格
      */
-    const mergeCell = async (direction: TableCellsMergeDirection) => {
+    const mergeCell = async (direction: TableCellsMergeDirectionType) => {
       if (!canMergeCells(direction)) {
         return
       }
