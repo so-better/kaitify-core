@@ -170,7 +170,7 @@ export declare class KNode {
     /**
      * 【API】当前节点是否只包含占位符
      */
-    allIsPlaceholder(): boolean | 0;
+    allIsPlaceholder(): boolean;
     /**
      * 【API】设置为空节点
      */
