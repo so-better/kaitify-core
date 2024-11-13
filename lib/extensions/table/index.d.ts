@@ -1,6 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom';
+export type TableCellsMergeDirection = 'left' | 'top' | 'right' | 'bottom';
 declare module '../../model' {
     interface EditorCommandsType {
         getTable?: () => KNode | null;
@@ -19,4 +19,3 @@ declare module '../../model' {
     }
 }
 export declare const TableExtension: Extension;
-export {};

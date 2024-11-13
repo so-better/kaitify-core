@@ -3,7 +3,7 @@ import { deleteProperty } from '@/tools'
 import { Extension } from '../Extension'
 import { getSelectionBlockNodes } from '@/model/config/function'
 
-type AlignValueType = 'left' | 'right' | 'center' | 'justify'
+export type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
 declare module '../../model' {
   interface EditorCommandsType {

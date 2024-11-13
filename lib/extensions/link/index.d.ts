@@ -3,7 +3,7 @@ import { Extension } from '../Extension';
 /**
  * 插入链接方法入参类型
  */
-type SetLinkOptionType = {
+export type SetLinkOptionType = {
     href: string;
     text?: string;
     newOpen?: boolean;
@@ -11,7 +11,7 @@ type SetLinkOptionType = {
 /**
  * 更新链接方法入参类型
  */
-type UpdateLinkOptionType = {
+export type UpdateLinkOptionType = {
     href?: string;
     newOpen?: boolean;
 };
@@ -25,4 +25,3 @@ declare module '../../model' {
     }
 }
 export declare const LinkExtension: Extension;
-export {};

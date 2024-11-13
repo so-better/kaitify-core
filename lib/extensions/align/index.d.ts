@@ -1,5 +1,5 @@
 import { Extension } from '../Extension';
-type AlignValueType = 'left' | 'right' | 'center' | 'justify';
+export type AlignValueType = 'left' | 'right' | 'center' | 'justify';
 declare module '../../model' {
     interface EditorCommandsType {
         isAlign?: (value: AlignValueType) => boolean;
@@ -8,4 +8,3 @@ declare module '../../model' {
     }
 }
 export declare const AlignExtension: Extension;
-export {};

@@ -1,6 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-type SetAttachmentConfigType = {
+export type SetAttachmentConfigType = {
     url: string;
     text: string;
     icon?: string;
@@ -13,4 +13,3 @@ declare module '../../model' {
     }
 }
 export declare const AttachmentExtension: Extension;
-export {};

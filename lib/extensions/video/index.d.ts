@@ -3,7 +3,7 @@ import { Extension } from '../Extension';
 /**
  * 插入视频方法入参类型
  */
-type SetVideoOptionType = {
+export type SetVideoOptionType = {
     src: string;
     width?: string;
     controls?: boolean;
@@ -19,4 +19,3 @@ declare module '../../model' {
     }
 }
 export declare const VideoExtension: Extension;
-export {};

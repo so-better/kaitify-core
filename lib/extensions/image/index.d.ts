@@ -3,7 +3,7 @@ import { Extension } from '../Extension';
 /**
  * 插入图片方法入参类型
  */
-type SetImageOptionType = {
+export type SetImageOptionType = {
     src: string;
     alt?: string;
     width?: string;
@@ -16,4 +16,3 @@ declare module '../../model' {
     }
 }
 export declare const ImageExtension: Extension;
-export {};
