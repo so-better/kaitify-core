@@ -1308,7 +1308,7 @@ export class Editor {
       //光标所在块节点
       const blockNode = node.getBlock()
       //如果在代码块样式内
-      if (node.isInCodeBlockStyle()) {
+      if (!!node.isInCodeBlockStyle()) {
         this.insertText('\n')
         const zeroWidthText = KNode.createZeroWidthText()
         this.insertNode(zeroWidthText)
@@ -1383,7 +1383,7 @@ export class Editor {
       //光标所在块节点是非固定块节点，插入的也是非固定块节点
       if (!blockNode.fixed && node.isBlock() && !node.fixed) {
         //光标在代码块样式内则将该节点转为行内节点后重新执行插入
-        if (selectionNode.isInCodeBlockStyle()) {
+        if (!!selectionNode.isInCodeBlockStyle()) {
           node.type = 'inline'
           this.insertNode(node, cover)
           return

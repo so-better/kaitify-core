@@ -328,16 +328,16 @@ export class KNode {
   /**
    * 【API】判断当前节点是否在拥有代码块样式的块级节点内（包括自身）
    */
-  isInCodeBlockStyle(): boolean {
+  isInCodeBlockStyle(): KNode | null {
     const block = this.getBlock()
     if (block.tag == 'pre') {
-      return true
+      return block
     }
     const whiteSpace = block.hasStyles() ? block.styles!.whiteSpace || '' : ''
     if (['pre', 'pre-wrap'].includes(whiteSpace)) {
-      return true
+      return block
     }
-    return block.parent ? block.parent.isInCodeBlockStyle() : false
+    return block.parent ? block.parent.isInCodeBlockStyle() : null
   }
 
   /**

@@ -186,7 +186,7 @@ export declare class KNode {
     /**
      * 【API】判断当前节点是否在拥有代码块样式的块级节点内（包括自身）
      */
-    isInCodeBlockStyle(): boolean;
+    isInCodeBlockStyle(): KNode | null;
     /**
      * 【API】判断当前节点是否与另一个节点相同
      */

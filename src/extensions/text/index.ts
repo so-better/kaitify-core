@@ -59,10 +59,10 @@ const removeTextNodeStyles = (node: KNode, styleNames?: string[]) => {
  */
 const isTextNodeMark = (node: KNode, markName: string, markValue?: string | number) => {
   if (node.hasMarks()) {
-    if (markValue) {
-      return node.marks![markName] == markValue
+    if (markValue === undefined) {
+      return node.marks!.hasOwnProperty(markName)
     }
-    return node.marks!.hasOwnProperty(markName)
+    return node.marks![markName] == markValue
   }
   return false
 }
@@ -72,34 +72,34 @@ const isTextNodeMark = (node: KNode, markName: string, markValue?: string | numb
  */
 const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | number) => {
   if (node.hasStyles()) {
-    if (styleValue) {
-      let ownValue = node.styles![styleName]
-      //是字符串先将值转为小写
-      if (typeof styleValue == 'string') {
-        styleValue = styleValue.toLocaleLowerCase()
-      }
-      if (typeof ownValue == 'string') {
-        ownValue = ownValue.toLocaleLowerCase()
-      }
-      //是rgb或者rgba格式，则去除空格
-      if (typeof styleValue == 'string' && styleValue && (DapCommon.matchingText(styleValue, 'rgb') || DapCommon.matchingText(styleValue, 'rgba'))) {
-        styleValue = DapString.trim(styleValue, true)
-      }
-      if (typeof ownValue == 'string' && ownValue && (DapCommon.matchingText(ownValue, 'rgb') || DapCommon.matchingText(ownValue, 'rgba'))) {
-        ownValue = DapString.trim(ownValue, true)
-      }
-      //是十六进制值，转为rgb值
-      if (typeof styleValue == 'string' && styleValue && DapCommon.matchingText(styleValue, 'hex')) {
-        const arr = DapColor.hex2rgb(styleValue)
-        styleValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
-      }
-      if (typeof ownValue == 'string' && ownValue && DapCommon.matchingText(ownValue, 'hex')) {
-        const arr = DapColor.hex2rgb(ownValue)
-        ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
-      }
-      return ownValue == styleValue
+    if (styleValue === undefined) {
+      return node.styles!.hasOwnProperty(styleName)
     }
-    return node.styles!.hasOwnProperty(styleName)
+    let ownValue = node.styles![styleName]
+    //是字符串先将值转为小写
+    if (typeof styleValue == 'string') {
+      styleValue = styleValue.toLocaleLowerCase()
+    }
+    if (typeof ownValue == 'string') {
+      ownValue = ownValue.toLocaleLowerCase()
+    }
+    //是rgb或者rgba格式，则去除空格
+    if (typeof styleValue == 'string' && styleValue && (DapCommon.matchingText(styleValue, 'rgb') || DapCommon.matchingText(styleValue, 'rgba'))) {
+      styleValue = DapString.trim(styleValue, true)
+    }
+    if (typeof ownValue == 'string' && ownValue && (DapCommon.matchingText(ownValue, 'rgb') || DapCommon.matchingText(ownValue, 'rgba'))) {
+      ownValue = DapString.trim(ownValue, true)
+    }
+    //是十六进制值，转为rgb值
+    if (typeof styleValue == 'string' && styleValue && DapCommon.matchingText(styleValue, 'hex')) {
+      const arr = DapColor.hex2rgb(styleValue)
+      styleValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+    }
+    if (typeof ownValue == 'string' && ownValue && DapCommon.matchingText(ownValue, 'hex')) {
+      const arr = DapColor.hex2rgb(ownValue)
+      ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
+    }
+    return ownValue == styleValue
   }
   return false
 }
