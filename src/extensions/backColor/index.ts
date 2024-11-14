@@ -43,7 +43,7 @@ export const BackColorExtension = Extension.create({
       if (!isBackColor(value)) {
         return
       }
-      await this.commands.removeTextStyle!(['backgroundColor'])
+      await this.commands.removeTextStyle!(['backgroundColor', 'background'])
     }
 
     return {
