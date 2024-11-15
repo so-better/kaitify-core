@@ -8,22 +8,10 @@
     max-width: 100%;
     background: var(--kaitify-lightest-theme);
 
-    .katex {
-      display: inline-block;
-    }
-
     .katex,
     math {
       width: 100%;
       overflow: hidden;
-    }
-  }
-
-  //编辑状态下
-  &[contenteditable='true'] {
-    span[kaitify-math]:hover {
-      cursor: pointer !important;
-      background: var(--kaitify-lighter-theme) !important;
     }
   }
 }
