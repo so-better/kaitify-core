@@ -3,16 +3,7 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-export type HeadingLevelType = 1 | 2 | 3 | 4 | 5 | 6
-
-const headingLevelMap = {
-  1: 'h1',
-  2: 'h2',
-  3: 'h3',
-  4: 'h4',
-  5: 'h5',
-  6: 'h6'
-}
+export type HeadingLevelType = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 declare module '../../model' {
   interface EditorCommandsType {
@@ -30,6 +21,15 @@ declare module '../../model' {
 const toHeading = (editor: Editor, node: KNode, level: HeadingLevelType) => {
   if (!node.isBlock()) {
     return
+  }
+  const headingLevelMap = {
+    0: editor.blockRenderTag,
+    1: 'h1',
+    2: 'h2',
+    3: 'h3',
+    4: 'h4',
+    5: 'h5',
+    6: 'h6'
   }
   //是固定的块节点或者内嵌套的块节点
   if (node.fixed || node.nested) {
@@ -71,6 +71,15 @@ export const HeadingExtension = Extension.create({
     }
   ],
   addCommands() {
+    const headingLevelMap = {
+      0: this.blockRenderTag,
+      1: 'h1',
+      2: 'h2',
+      3: 'h3',
+      4: 'h4',
+      5: 'h5',
+      6: 'h6'
+    }
     /**
      * 获取光标所在的标题，如果光标不在一个标题内，返回null
      */
