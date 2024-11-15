@@ -1721,7 +1721,21 @@ export class Editor {
           hasUpdateNodes.push(node)
           //格式化
           this.formatRules.forEach(rule => {
-            const nodes = node!.parent ? node!.parent.children! : [node!]
+            let nodes: KNode[] = []
+            if (node!.parent) {
+              nodes = node!.parent.children!
+            } else {
+              //没有父节点的根级节点默认格式化当前节点的前后加起来三个节点
+              const previousNode = node!.getPrevious(this.stackNodes)
+              const nextNode = node!.getNext(this.stackNodes)
+              if (previousNode) {
+                nodes.push(previousNode)
+              }
+              nodes.push(node!)
+              if (nextNode) {
+                nodes.push(nextNode)
+              }
+            }
             const sourceNodes = node!.parent ? node!.parent.children! : this.stackNodes
             //需要格式化的节点存在于源数组内才需要进行格式化
             if (sourceNodes.some(n => n.isEqual(node!))) {
