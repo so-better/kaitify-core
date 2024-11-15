@@ -79,7 +79,7 @@ export const LinkExtension = Extension.create({
      * 设置连接
      */
     const setLink = async (options: SetLinkOptionType) => {
-      if (!this.selection.focused()) {
+      if (!this.selection.focused() || hasLink()) {
         return
       }
       if (!options.href) {
