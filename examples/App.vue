@@ -221,8 +221,8 @@
       <fieldset>
         <legend>Katex数学公式</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setMath!('\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}')">插入数学公式1</button>
-          <button @click="editor?.commands.setMath!('x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}')">插入数学公式2</button>
+          <button @click="editor?.commands.setMath!('\sum_{i=1}^{n} i = \frac{n(n+1)}{2}')">插入数学公式1</button>
+          <button @click="editor?.commands.setMath!('x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}')">插入数学公式2</button>
         </div>
       </fieldset>
       <fieldset>
