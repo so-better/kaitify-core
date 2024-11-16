@@ -164,7 +164,8 @@
         <legend>视频</legend>
         <div class="toolbar">
           <button
-            @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true, muted: true, loop: true })">插入视频</button>
+            @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true })">插入视频</button>
+          <button @click="editor?.commands.updateVideo!({ controls: true, loop: true })">更新视频</button>
         </div>
       </fieldset>
       <fieldset>
