@@ -5,17 +5,17 @@ declare module '../../model' {
     interface EditorCommandsType {
         getTable?: () => KNode | null;
         hasTable?: () => boolean;
-        canMergeCells?: (direction: TableCellsMergeDirectionType) => boolean;
+        canMergeTableCells?: (direction: TableCellsMergeDirectionType) => boolean;
         setTable?: ({ rows, columns }: {
             rows: number;
             columns: number;
         }) => Promise<void>;
         unsetTable?: () => Promise<void>;
-        mergeCell?: (direction: TableCellsMergeDirectionType) => Promise<void>;
-        addRow?: (direction: 'top' | 'bottom') => Promise<void>;
-        deleteRow?: () => Promise<void>;
-        addColumn?: (direction: 'left' | 'right') => Promise<void>;
-        deleteColumn?: () => Promise<void>;
+        mergeTableCell?: (direction: TableCellsMergeDirectionType) => Promise<void>;
+        addTableRow?: (direction: 'top' | 'bottom') => Promise<void>;
+        deleteTableRow?: () => Promise<void>;
+        addTableColumn?: (direction: 'left' | 'right') => Promise<void>;
+        deleteTableColumn?: () => Promise<void>;
     }
 }
 export declare const TableExtension: Extension;
