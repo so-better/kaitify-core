@@ -332,42 +332,22 @@ export const ListExtension = Extension.create({
 		}
 
 		/**
-		 * 更新列表的序标类型
+		 * 更新光标所在有无/无序列表的序标类型
 		 */
 		const updateListType = async ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => {
-			//不存在列表
-			if (!hasList(ordered)) {
+			if (!this.selection.focused()) {
 				return
 			}
-			//起点和终点在一起
-			if (this.selection.collapsed()) {
-				const blockNode = this.selection.start!.node.getBlock()
-				const matchNode = blockNode.getMatchNode({ tag: ordered ? 'ol' : 'ul' })
-				if (matchNode) {
-					if (matchNode.hasStyles()) {
-						matchNode.styles!.listStyleType = listType
-					} else {
-						matchNode.styles = {
-							listStyleType: listType
-						}
-					}
-				}
+			const listNode = getList(ordered)
+			if (!listNode) {
+				return
 			}
-			//起点和终点不在一起
-			else {
-				const blockNodes = getSelectionBlockNodes.apply(this)
-				blockNodes.forEach(item => {
-					const matchNode = item.getMatchNode({ tag: ordered ? 'ol' : 'ul' })
-					if (matchNode) {
-						if (matchNode.hasStyles()) {
-							matchNode.styles!.listStyleType = listType
-						} else {
-							matchNode.styles = {
-								listStyleType: listType
-							}
-						}
-					}
-				})
+			if (listNode.hasStyles()) {
+				listNode.styles!.listStyleType = listType
+			} else {
+				listNode.styles = {
+					listStyleType: listType
+				}
 			}
 			await this.updateView()
 		}
