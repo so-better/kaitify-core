@@ -705,7 +705,7 @@ export const TableExtension = Extension.create({
 		 * 插入表格
 		 */
 		const setTable = async ({ rows, columns }: { rows: number; columns: number }) => {
-			if (!!getTable()) {
+			if (!this.selection.focused() || hasTable()) {
 				return
 			}
 			const rowNodes: KNodeCreateOptionType[] = []
