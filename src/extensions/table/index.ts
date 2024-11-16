@@ -720,8 +720,14 @@ export const TableExtension = Extension.create({
 						fixed: true,
 						children: [
 							{
-								type: 'closed',
-								tag: 'br'
+								type: 'block',
+								tag: this.blockRenderTag,
+								children: [
+									{
+										type: 'closed',
+										tag: 'br'
+									}
+								]
 							}
 						]
 					})
