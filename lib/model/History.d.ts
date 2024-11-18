@@ -36,7 +36,7 @@ export declare class History {
      */
     setRedo(): HistoryRecordType | null;
     /**
-     * 更新当前记录的编辑的光标
+     * 更新当前记录的编辑器的光标
      */
     updateSelection(selection: Selection): void;
 }

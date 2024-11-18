@@ -105,10 +105,13 @@ export class History {
   }
 
   /**
-   * 更新当前记录的编辑的光标
+   * 更新当前记录的编辑器的光标
    */
   updateSelection(selection: Selection) {
     const record = this.records[this.records.length - 1]
+    if (this.records[this.records.length - 1].selection.isEqual(selection)) {
+      return
+    }
     const newSelection = this.cloneSelection(record.nodes, selection)
     this.records[this.records.length - 1].selection = newSelection
   }

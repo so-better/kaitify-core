@@ -217,6 +217,7 @@
         <div class="toolbar">
           <button
             @click="editor?.commands.setAttachment!({ 'url': 'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg', 'text': '附件图片' })">上传附件</button>
+          <button @click="editor?.commands.updateAttachment!({ 'url': '#', 'text': '附件2' })">更新附件</button>
         </div>
       </fieldset>
       <fieldset>

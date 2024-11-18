@@ -10,12 +10,15 @@
     background-repeat: no-repeat;
     background-size: 20px;
     padding-left: 25px;
+
+    &:hover {
+      cursor: pointer !important;
+    }
   }
 
   //非编辑状态下
   &:not([contenteditable='true']) {
     span[kaitify-attachment]:hover {
-      cursor: pointer;
       text-decoration: underline;
     }
   }

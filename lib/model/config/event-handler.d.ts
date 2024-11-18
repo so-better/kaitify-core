@@ -1,6 +1,6 @@
 import { Editor } from '../Editor';
 /**
- * 监听selection
+ * 监听外部改变selection
  */
 export declare const onSelectionChange: (this: Editor) => Promise<void>;
 /**
