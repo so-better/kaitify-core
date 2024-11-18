@@ -586,7 +586,6 @@ export const updateSelection = function (this: Editor) {
     const range = realSelection.getRangeAt(0)
     //光标在编辑器内
     if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
-      const oldSelecton = this.selection.clone()
       //如果光标起点是文本
       if (range.startContainer.nodeType == 3) {
         this.selection.start = {
@@ -661,7 +660,7 @@ export const updateSelection = function (this: Editor) {
           }
         }
       }
-      return !oldSelecton.isEqual(this.selection)
+      return true
     }
   }
   return false

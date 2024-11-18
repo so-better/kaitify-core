@@ -26,12 +26,4 @@ export declare class Selection {
      * 光标是否折叠
      */
     collapsed(): boolean;
-    /**
-     * 判断两个selection是否相同
-     */
-    isEqual(selection: Selection): boolean;
-    /**
-     * 完全克隆selection
-     */
-    clone(): Selection;
 }

@@ -109,9 +109,6 @@ export class History {
    */
   updateSelection(selection: Selection) {
     const record = this.records[this.records.length - 1]
-    if (this.records[this.records.length - 1].selection.isEqual(selection)) {
-      return
-    }
     const newSelection = this.cloneSelection(record.nodes, selection)
     this.records[this.records.length - 1].selection = newSelection
   }

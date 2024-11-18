@@ -36,34 +36,4 @@ export class Selection {
     }
     return this.start!.node.isEqual(this.end!.node) && this.start!.offset == this.end!.offset
   }
-
-  /**
-   * 判断两个selection是否相同
-   */
-  isEqual(selection: Selection) {
-    if (this.focused() && selection.focused()) {
-      const startEqual = this.start!.node.isEqual(selection.start!.node) && this.start!.offset == selection.start!.offset
-      const endEqual = this.end!.node.isEqual(selection.end!.node) && this.end!.offset == selection.end!.offset
-      return startEqual && endEqual
-    }
-    return false
-  }
-
-  /**
-   * 完全克隆selection
-   */
-  clone() {
-    const selection = new Selection()
-    if (this.focused()) {
-      selection.start = {
-        node: this.start!.node,
-        offset: this.start!.offset
-      }
-      selection.end = {
-        node: this.end!.node,
-        offset: this.end!.offset
-      }
-    }
-    return selection
-  }
 }

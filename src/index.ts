@@ -5,6 +5,6 @@ import './css/style.less'
 export * from './model'
 //插件
 export { Extension } from './extensions'
-export type { ExtensionCreateOptionType, AlignValueType, HeadingLevelType, SetLinkOptionType, SetImageOptionType, SetVideoOptionType, UpdateLinkOptionType, SetAttachmentConfigType, TableCellsMergeDirectionType } from './extensions'
+export type { ExtensionCreateOptionType, AlignValueType, HeadingLevelType, SetLinkOptionType, SetImageOptionType, SetVideoOptionType, UpdateLinkOptionType, SetAttachmentConfigType, UpdateAttachmentConfigType, TableCellsMergeDirectionType } from './extensions'
 //视图渲染
 export * from './view'
