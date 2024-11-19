@@ -1,10 +1,19 @@
 
 
 #### 更新日志<Badge type="tip" text="^1.9.0" />
-<script setup>
-import { ref } from 'vue'
+<div id="editor"></div>
 
-const count = ref(0)
+<script setup>
+import { ref, onMounted } from 'vue'
+import { KNode, Editor } from "../lib/kaitify-core.es"
+
+const editor = ref()
+
+onMounted(()=>{
+  editor.value = Editor.configure({
+    el:'#editor'
+  })
+})
 </script>
 <style module>
 .button {
