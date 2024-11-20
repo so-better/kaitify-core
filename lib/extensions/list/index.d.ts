@@ -1,6 +1,6 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
-type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman';
+type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman' | 'lower-greek' | 'cjk-ideographic';
 declare module '../../model' {
     interface EditorCommandsType {
         getList?: (ordered: boolean) => KNode | null;

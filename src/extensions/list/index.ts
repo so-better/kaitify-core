@@ -3,7 +3,7 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
+type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman' | 'lower-greek' | 'cjk-ideographic'
 
 declare module '../../model' {
 	interface EditorCommandsType {
