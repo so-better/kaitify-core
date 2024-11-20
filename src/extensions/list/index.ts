@@ -3,7 +3,9 @@ import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
 
-type ListType = 'disc' | 'circle' | 'square' | 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman' | 'lower-greek' | 'cjk-ideographic'
+export type OrderedListType = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman' | 'lower-greek' | 'cjk-ideographic'
+
+export type UnorderListType = 'disc' | 'circle' | 'square'
 
 declare module '../../model' {
 	interface EditorCommandsType {
@@ -12,7 +14,7 @@ declare module '../../model' {
 		allList?: (ordered: boolean) => boolean
 		setList?: (ordered: boolean) => Promise<void>
 		unsetList?: (ordered: boolean) => Promise<void>
-		updateListType?: ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => Promise<void>
+		updateListType?: ({ listType, ordered }: { listType: OrderedListType | UnorderListType; ordered?: boolean }) => Promise<void>
 	}
 }
 
@@ -334,7 +336,7 @@ export const ListExtension = Extension.create({
 		/**
 		 * 更新光标所在有无/无序列表的序标类型
 		 */
-		const updateListType = async ({ listType, ordered }: { listType: ListType; ordered?: boolean }) => {
+		const updateListType = async ({ listType, ordered }: { listType: OrderedListType | UnorderListType; ordered?: boolean }) => {
 			if (!this.selection.focused()) {
 				return
 			}

@@ -12,3 +12,4 @@ declare module '../../model' {
     }
 }
 export declare const CodeBlockExtension: Extension;
+export * from './hljs';

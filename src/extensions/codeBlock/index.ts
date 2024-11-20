@@ -275,7 +275,7 @@ export const CodeBlockExtension = Extension.create({
 		/**
 		 * 更新光标所在代码块的语言类型
 		 */
-		const updateCodeBlockLanguage = async (language: HljsLanguageType) => {
+		const updateCodeBlockLanguage = async (language?: HljsLanguageType) => {
 			if (!this.selection.focused()) {
 				return
 			}
@@ -303,3 +303,5 @@ export const CodeBlockExtension = Extension.create({
 		}
 	}
 })
+
+export * from './hljs'
