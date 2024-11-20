@@ -236,7 +236,12 @@ export const AttachmentExtension = Extension.create({
       //更新url
       attachmentNode.marks!['kaitify-attachment'] = url
       //更新text
-      attachmentNode.children![0].textContent = text
+      const textNode = KNode.create({
+        type: 'text',
+        textContent: text
+      })
+      textNode.parent = attachmentNode
+      attachmentNode.children = [textNode]
       //更新视图
       await this.updateView()
     }
@@ -253,7 +258,9 @@ export const AttachmentExtension = Extension.create({
         return null
       }
       const url = attachmentNode.marks!['kaitify-attachment'] as string
-      const text = attachmentNode.children![0].textContent as string
+      const text = attachmentNode.children!.reduce((val, item) => {
+        return val + item.textContent
+      }, '')
       return { url, text }
     }
 

@@ -5,6 +5,7 @@ declare module '../../model' {
         getMath?: () => KNode | null;
         hasMath?: () => boolean;
         setMath?: (value: string) => Promise<void>;
+        updateMath?: (value: string) => Promise<void>;
     }
 }
 export declare const MathExtension: Extension;
