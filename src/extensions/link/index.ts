@@ -2,6 +2,7 @@ import { KNode, KNodeMarksType } from '@/model'
 import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
+import { deleteProperty } from '@/tools'
 
 /**
  * 插入链接方法入参类型
@@ -16,7 +17,7 @@ export type SetLinkOptionType = {
  * 更新链接方法入参类型
  */
 export type UpdateLinkOptionType = {
-  href?: string
+  href: string
   newOpen?: boolean
 }
 
@@ -78,22 +79,22 @@ export const LinkExtension = Extension.create({
     /**
      * 设置连接
      */
-    const setLink = async (options: SetLinkOptionType) => {
+    const setLink = async ({ href, text, newOpen }: SetLinkOptionType) => {
       if (!this.selection.focused() || hasLink()) {
         return
       }
-      if (!options.href) {
+      if (!href) {
         return
       }
       //起点和终点在一起
       if (this.selection.collapsed()) {
-        if (!options.text) {
+        if (!text) {
           return
         }
         const marks: KNodeMarksType = {
-          href: options.href
+          href
         }
-        if (options.newOpen) {
+        if (newOpen) {
           marks.target = '_blank'
         }
         const linkNode = KNode.create({
@@ -103,7 +104,7 @@ export const LinkExtension = Extension.create({
           children: [
             {
               type: 'text',
-              textContent: options.text
+              textContent: text
             }
           ]
         })
@@ -112,9 +113,9 @@ export const LinkExtension = Extension.create({
       //起点和终点不在一起
       else {
         const marks: KNodeMarksType = {
-          href: options.href
+          href
         }
-        if (options.newOpen) {
+        if (newOpen) {
           marks.target = '_blank'
         }
         const linkNode = KNode.create({
@@ -135,22 +136,23 @@ export const LinkExtension = Extension.create({
     /**
      * 更新链接
      */
-    const updateLink = async (options: UpdateLinkOptionType) => {
+    const updateLink = async ({ href, newOpen }: UpdateLinkOptionType) => {
       if (!this.selection.focused()) {
+        return
+      }
+      if (!href) {
         return
       }
       const linkNode = getLink()
       if (!linkNode) {
         return
       }
-      const marks: KNodeMarksType = {}
-      if (options.href) {
-        marks.href = options.href
+      linkNode.marks!.href = href
+      if (newOpen) {
+        linkNode.marks!.target = '_blank'
+      } else {
+        linkNode.marks = deleteProperty(linkNode.marks!, 'target')
       }
-      if (options.newOpen) {
-        marks.target = '_blank'
-      }
-      linkNode.marks = { ...linkNode.marks!, ...marks }
       await this.updateView()
     }
 

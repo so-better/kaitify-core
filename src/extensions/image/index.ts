@@ -3,6 +3,7 @@ import { event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import './style.less'
+import { deleteProperty } from '@/tools'
 
 /**
  * 插入图片方法入参类型
@@ -13,11 +14,20 @@ export type SetImageOptionType = {
   width?: string
 }
 
+/**
+ * 更新图片方法入参类型
+ */
+export type UpdateImageOptionType = {
+  src: string
+  alt?: string
+}
+
 declare module '../../model' {
   interface EditorCommandsType {
     getImage?: () => KNode | null
     hasImage?: () => boolean
     setImage?: (options: SetImageOptionType) => Promise<void>
+    updateImage?: (options: UpdateImageOptionType) => Promise<void>
   }
 }
 
@@ -199,6 +209,31 @@ export const ImageExtension = Extension.create({
       await this.updateView()
     }
 
-    return { getImage, hasImage, setImage }
+    /**
+     * 更新图片
+     */
+    const updateImage = async ({ src, alt }: UpdateImageOptionType) => {
+      if (!this.selection.focused()) {
+        return
+      }
+      if (!src) {
+        return
+      }
+      const imageNode = getImage()
+      if (!imageNode) {
+        return
+      }
+      //更新url
+      imageNode.marks!.src = src
+      //更新alt
+      if (alt) {
+        imageNode.marks!.alt = alt
+      } else {
+        imageNode.marks = deleteProperty(imageNode.marks!, 'alt')
+      }
+      await this.updateView()
+    }
+
+    return { getImage, hasImage, setImage, updateImage }
   }
 })

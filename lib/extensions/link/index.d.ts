@@ -12,7 +12,7 @@ export type SetLinkOptionType = {
  * 更新链接方法入参类型
  */
 export type UpdateLinkOptionType = {
-    href?: string;
+    href: string;
     newOpen?: boolean;
 };
 declare module '../../model' {

@@ -4,23 +4,23 @@ import { Extension } from '../Extension'
 import defaultIcon from './icon.svg?raw'
 import './style.less'
 
-export type SetAttachmentConfigType = {
+export type SetAttachmentOptionType = {
   url: string
   text: string
   icon?: string
 }
 
-export type UpdateAttachmentConfigType = {
-  url?: string
-  text?: string
+export type UpdateAttachmentOptionType = {
+  url: string
+  text: string
 }
 
 declare module '../../model' {
   interface EditorCommandsType {
     getAttachment?: () => KNode | null
     hasAttachment?: () => boolean
-    setAttachment?: (options: SetAttachmentConfigType) => Promise<void>
-    updateAttachment?: (options: UpdateAttachmentConfigType) => Promise<void>
+    setAttachment?: (options: SetAttachmentOptionType) => Promise<void>
+    updateAttachment?: (options: UpdateAttachmentOptionType) => Promise<void>
     getAttachmentInfo?: () => { url: string; text: string } | null
   }
 }
@@ -201,7 +201,7 @@ export const AttachmentExtension = Extension.create({
     /**
      * 插入附件
      */
-    const setAttachment = async ({ url, text, icon }: SetAttachmentConfigType) => {
+    const setAttachment = async ({ url, text, icon }: SetAttachmentOptionType) => {
       if (!this.selection.focused() || hasAttachment()) {
         return
       }
@@ -222,11 +222,11 @@ export const AttachmentExtension = Extension.create({
     /**
      * 更新附件
      */
-    const updateAttachment = async ({ url, text }: UpdateAttachmentConfigType) => {
+    const updateAttachment = async ({ url, text }: UpdateAttachmentOptionType) => {
       if (!this.selection.focused()) {
         return
       }
-      if (!url && !text) {
+      if (!url || !text) {
         return
       }
       const attachmentNode = getAttachment()
@@ -234,13 +234,10 @@ export const AttachmentExtension = Extension.create({
         return
       }
       //更新url
-      if (url) {
-        attachmentNode.marks!['kaitify-attachment'] = url
-      }
-      //更新名称
-      if (text) {
-        attachmentNode.children![0].textContent = text
-      }
+      attachmentNode.marks!['kaitify-attachment'] = url
+      //更新text
+      attachmentNode.children![0].textContent = text
+      //更新视图
       await this.updateView()
     }
 
