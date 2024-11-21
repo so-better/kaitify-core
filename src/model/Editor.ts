@@ -474,7 +474,6 @@ export class Editor {
    * 根据编辑器内的node查找真实dom
    */
   findDom(node: KNode) {
-    let dom: HTMLElement | null = null
     //获取所有的符合选择器的元素
     const doms = this.$el!.querySelectorAll(`[${NODE_MARK}="${node.key}"]`)
     //如果没有则抛出异常
@@ -482,12 +481,11 @@ export class Editor {
       throw new Error(`Unexpected error occurred: the dom was not found in the editor`)
     }
     //查找父元素匹配的元素
-    const el = Array.from(doms).find(item => (node.parent ? item.parentElement && item.parentElement.getAttribute(`${NODE_MARK}`) == `${node.parent.key}` : item.parentElement === this.$el))
+    const dom = Array.from(doms).find(item => (node.parent ? item.parentElement?.getAttribute(`${NODE_MARK}`) == `${node.parent.key}` : item.parentElement === this.$el))
     //不存在则抛出异常
-    if (!el) {
+    if (!dom) {
       throw new Error(`Unexpected error occurred: the dom was not found in the editor`)
     }
-    dom = el as HTMLEmbedElement
     return dom as HTMLElement
   }
 
