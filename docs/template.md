@@ -1,6 +1,6 @@
 
 
-#### 更新日志<Badge type="tip" text="^1.9.0" />
+##### 更新日志<Badge type="tip" text="^1.9.0" />
 <div id="editor"></div>
 
 <script setup>

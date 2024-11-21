@@ -16,8 +16,17 @@ export default defineConfig({
     sidebar: {
       '/': [
         {
-          text: '开始使用',
-          link: '/start'
+          text: '开始',
+          items: [
+            {
+              text: '简介',
+              link: '/'
+            },
+            {
+              text: '快速上手',
+              link: '/quick-start'
+            }
+          ]
         }
       ]
     },
