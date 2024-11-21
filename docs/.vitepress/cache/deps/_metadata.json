@@ -1,235 +1,49 @@
 {
-  "hash": "85dc8bee",
-  "configHash": "3c82d211",
-  "lockfileHash": "89050ae3",
-  "browserHash": "c4b5a585",
+  "hash": "60deaa2a",
+  "configHash": "85b8c281",
+  "lockfileHash": "e462a670",
+  "browserHash": "c55b2823",
   "optimized": {
     "vue": {
       "src": "../../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "c857c7a5",
+      "fileHash": "2db9fa30",
       "needsInterop": false
     },
     "vitepress > @vue/devtools-api": {
       "src": "../../../../node_modules/@vue/devtools-api/dist/index.js",
       "file": "vitepress___@vue_devtools-api.js",
-      "fileHash": "cf62de9a",
+      "fileHash": "7920da8b",
       "needsInterop": false
     },
     "vitepress > @vueuse/core": {
       "src": "../../../../node_modules/@vueuse/core/index.mjs",
       "file": "vitepress___@vueuse_core.js",
-      "fileHash": "d5be4311",
+      "fileHash": "e2874592",
       "needsInterop": false
     },
     "vitepress > @vueuse/integrations/useFocusTrap": {
       "src": "../../../../node_modules/@vueuse/integrations/useFocusTrap.mjs",
       "file": "vitepress___@vueuse_integrations_useFocusTrap.js",
-      "fileHash": "1a22dfdf",
+      "fileHash": "c2414431",
       "needsInterop": false
     },
     "vitepress > mark.js/src/vanilla.js": {
       "src": "../../../../node_modules/mark.js/src/vanilla.js",
       "file": "vitepress___mark__js_src_vanilla__js.js",
-      "fileHash": "f5c2927d",
+      "fileHash": "aab2f347",
       "needsInterop": false
     },
     "vitepress > minisearch": {
       "src": "../../../../node_modules/minisearch/dist/es/index.js",
       "file": "vitepress___minisearch.js",
-      "fileHash": "43c5d3f3",
+      "fileHash": "8eed43cf",
       "needsInterop": false
     },
     "@theme/index": {
       "src": "../../../../node_modules/vitepress/dist/client/theme-default/index.js",
       "file": "@theme_index.js",
-      "fileHash": "13abc516",
-      "needsInterop": false
-    },
-    "dap-util": {
-      "src": "../../../../node_modules/dap-util/lib/dap-util.es.js",
-      "file": "dap-util.js",
-      "fileHash": "b6000f3d",
-      "needsInterop": false
-    },
-    "interactjs": {
-      "src": "../../../../node_modules/interactjs/dist/interact.min.js",
-      "file": "interactjs.js",
-      "fileHash": "62340c9b",
-      "needsInterop": true
-    },
-    "katex": {
-      "src": "../../../../node_modules/katex/dist/katex.mjs",
-      "file": "katex.js",
-      "fileHash": "3f8dd4a3",
-      "needsInterop": false
-    },
-    "highlight.js/lib/core": {
-      "src": "../../../../node_modules/highlight.js/es/core.js",
-      "file": "highlight__js_lib_core.js",
-      "fileHash": "898a09e6",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/plaintext": {
-      "src": "../../../../node_modules/highlight.js/es/languages/plaintext.js",
-      "file": "highlight__js_lib_languages_plaintext.js",
-      "fileHash": "882774d0",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/json": {
-      "src": "../../../../node_modules/highlight.js/es/languages/json.js",
-      "file": "highlight__js_lib_languages_json.js",
-      "fileHash": "7701e36a",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/javascript": {
-      "src": "../../../../node_modules/highlight.js/es/languages/javascript.js",
-      "file": "highlight__js_lib_languages_javascript.js",
-      "fileHash": "ce4c57fd",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/java": {
-      "src": "../../../../node_modules/highlight.js/es/languages/java.js",
-      "file": "highlight__js_lib_languages_java.js",
-      "fileHash": "98c39df6",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/typescript": {
-      "src": "../../../../node_modules/highlight.js/es/languages/typescript.js",
-      "file": "highlight__js_lib_languages_typescript.js",
-      "fileHash": "793d4f7f",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/python": {
-      "src": "../../../../node_modules/highlight.js/es/languages/python.js",
-      "file": "highlight__js_lib_languages_python.js",
-      "fileHash": "3ca4f1b1",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/php": {
-      "src": "../../../../node_modules/highlight.js/es/languages/php.js",
-      "file": "highlight__js_lib_languages_php.js",
-      "fileHash": "c31235b7",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/css": {
-      "src": "../../../../node_modules/highlight.js/es/languages/css.js",
-      "file": "highlight__js_lib_languages_css.js",
-      "fileHash": "7424a183",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/less": {
-      "src": "../../../../node_modules/highlight.js/es/languages/less.js",
-      "file": "highlight__js_lib_languages_less.js",
-      "fileHash": "61295af4",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/scss": {
-      "src": "../../../../node_modules/highlight.js/es/languages/scss.js",
-      "file": "highlight__js_lib_languages_scss.js",
-      "fileHash": "94ed1ca0",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/xml": {
-      "src": "../../../../node_modules/highlight.js/es/languages/xml.js",
-      "file": "highlight__js_lib_languages_xml.js",
-      "fileHash": "ff3aedbc",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/markdown": {
-      "src": "../../../../node_modules/highlight.js/es/languages/markdown.js",
-      "file": "highlight__js_lib_languages_markdown.js",
-      "fileHash": "d70eb97a",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/objectivec": {
-      "src": "../../../../node_modules/highlight.js/es/languages/objectivec.js",
-      "file": "highlight__js_lib_languages_objectivec.js",
-      "fileHash": "21e81e28",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/swift": {
-      "src": "../../../../node_modules/highlight.js/es/languages/swift.js",
-      "file": "highlight__js_lib_languages_swift.js",
-      "fileHash": "0ac4e627",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/dart": {
-      "src": "../../../../node_modules/highlight.js/es/languages/dart.js",
-      "file": "highlight__js_lib_languages_dart.js",
-      "fileHash": "282498e4",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/nginx": {
-      "src": "../../../../node_modules/highlight.js/es/languages/nginx.js",
-      "file": "highlight__js_lib_languages_nginx.js",
-      "fileHash": "e0d18f4b",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/go": {
-      "src": "../../../../node_modules/highlight.js/es/languages/go.js",
-      "file": "highlight__js_lib_languages_go.js",
-      "fileHash": "d40abb5f",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/http": {
-      "src": "../../../../node_modules/highlight.js/es/languages/http.js",
-      "file": "highlight__js_lib_languages_http.js",
-      "fileHash": "30a3fbc2",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/ruby": {
-      "src": "../../../../node_modules/highlight.js/es/languages/ruby.js",
-      "file": "highlight__js_lib_languages_ruby.js",
-      "fileHash": "f25308ed",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/c": {
-      "src": "../../../../node_modules/highlight.js/es/languages/c.js",
-      "file": "highlight__js_lib_languages_c.js",
-      "fileHash": "bf242795",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/cpp": {
-      "src": "../../../../node_modules/highlight.js/es/languages/cpp.js",
-      "file": "highlight__js_lib_languages_cpp.js",
-      "fileHash": "640ca912",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/csharp": {
-      "src": "../../../../node_modules/highlight.js/es/languages/csharp.js",
-      "file": "highlight__js_lib_languages_csharp.js",
-      "fileHash": "1863c106",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/sql": {
-      "src": "../../../../node_modules/highlight.js/es/languages/sql.js",
-      "file": "highlight__js_lib_languages_sql.js",
-      "fileHash": "7133a3e5",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/shell": {
-      "src": "../../../../node_modules/highlight.js/es/languages/shell.js",
-      "file": "highlight__js_lib_languages_shell.js",
-      "fileHash": "400ffd58",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/r": {
-      "src": "../../../../node_modules/highlight.js/es/languages/r.js",
-      "file": "highlight__js_lib_languages_r.js",
-      "fileHash": "78e30809",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/kotlin": {
-      "src": "../../../../node_modules/highlight.js/es/languages/kotlin.js",
-      "file": "highlight__js_lib_languages_kotlin.js",
-      "fileHash": "b34321ec",
-      "needsInterop": false
-    },
-    "highlight.js/lib/languages/rust": {
-      "src": "../../../../node_modules/highlight.js/es/languages/rust.js",
-      "file": "highlight__js_lib_languages_rust.js",
-      "fileHash": "363a495d",
+      "fileHash": "a050476b",
       "needsInterop": false
     }
   },
@@ -239,9 +53,6 @@
     },
     "chunk-L2JNJ22P": {
       "file": "chunk-L2JNJ22P.js"
-    },
-    "chunk-5WRI5ZAA": {
-      "file": "chunk-5WRI5ZAA.js"
     }
   }
 }
