@@ -43,53 +43,81 @@ const editor = await Editor.configure({
 
 构建编辑器的参数远不止上面所示的 `el`、`value`、`placeholder` 参数，完整参数如下：
 
-#### el <Badge type="danger" text="HTMLElement | string" />
+##### el <Badge type="danger" text="HTMLElement | string" />
 
 编辑器渲染的 `dom` 或者选择器
 
-#### allowCopy <Badge type="danger" text="boolean" />
+##### allowCopy <Badge type="danger" text="boolean" />
 
 是否允许复制，默认值为 `true`
 
-#### allowPaste <Badge type="danger" text="boolean" />
+##### allowPaste <Badge type="danger" text="boolean" />
 
 是否允许粘贴，默认值为 `true`
 
-#### allowCut <Badge type="danger" text="boolean" />
+##### allowCut <Badge type="danger" text="boolean" />
 
 是否允许剪切，默认值为 `true`
 
-#### allowPasteHtml <Badge type="danger" text="boolean" />
+##### allowPasteHtml <Badge type="danger" text="boolean" />
 
 粘贴的内容是否允许携带样式，默认值为 `false`，即粘贴内容时粘贴的是纯文本
 
-#### priorityPasteFiles <Badge type="danger" text="boolean" />
+##### priorityPasteFiles <Badge type="danger" text="boolean" />
 
 剪切板同时存在文件和 `html`/`text` 时，是否优先粘贴文件，默认值为 `false`
 
-#### textRenderTag <Badge type="danger" text="string" />
+##### textRenderTag <Badge type="danger" text="string" />
 
 自定义编辑器内渲染文本节点的真实标签，默认值为 `“span”`
 
-#### blockRenderTag <Badge type="danger" text="string" />
+##### blockRenderTag <Badge type="danger" text="string" />
 
 自定义编辑内渲染默认块级节点的真实标签，即段落标签，默认值为 `“p”`
 
-#### emptyRenderTags <Badge type="danger" text="string[]" />
+##### emptyRenderTags <Badge type="danger" text="string[]" />
 
 自定义编辑器内定义需要置空的标签数组，编辑器针对需要置空的标签，会转为空节点，不会渲染到视图中
 
-#### extraKeepTags <Badge type="danger" text="string[]" />
+##### extraKeepTags <Badge type="danger" text="string[]" />
 
 自定义编辑器内额外保留的标签，如果某个标签的元素被编辑器转为了默认的行内节点，不符合预期行为，可以通过此参数配置保留该标签
 
-#### extensions <Badge type="danger" text="Extension[]" />
+##### extensions <Badge type="danger" text="Extension[]" />
 
 自定义插件数组，该属性较为复杂，可参考 [拓展](/extensions) 一节的内容
 
-#### formatRules <Badge type="danger" text="RuleFunctionType[]" />
+##### formatRules <Badge type="danger" text="RuleFunctionType[]" />
 
 自定义节点数组格式化规则，可参考 [格式化规则](/guide/format-rules) 一节的内容
+
+##### domParseNodeCallback <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
+
+自定义 `dom` 转为非文本节点的后续处理，该属性方法主要作用于编辑器将字符串内容转为 KNode 节点数组时，生成每个节点的回调时期，在该方法里你可以对该节点进行自定义操作，修改内容，只需要将最终的节点返回即可
+
+##### onUpdateView <Badge type="danger" text="(this: Editor, init: boolean) => boolean | Promise<boolean>" />
+
+视图渲染时触发，如果返回 `true` 则表示继续使用默认逻辑，返回 `false` 则不走默认逻辑，需要自定义渲染视图。当我们与 `Vue` / `React` 等 UI 框架结合时，该方法会起到很大的作用
+
+##### onPasteText <Badge type="danger" text="(this: Editor, text: string) => boolean | Promise<boolean>" />
+
+编辑器粘贴纯文本时触发，如果返回 `true` 则表示继续使用默认逻辑，返回 `false` 则不走默认逻辑，需要进行自定义处理
+
+##### onPasteHtml <Badge type="danger" text="(this: Editor, nodes: KNode[], html: string) => boolean | Promise<boolean>" />
+
+编辑器粘贴 `html` 内容时触发，如果返回 `true` 则表示继续使用默认逻辑，返回 `false` 则不走默认逻辑，需要进行自定义处理
+
+##### onPasteImage <Badge type="danger" text="(this: Editor, file: File) => boolean | Promise<boolean>" />
+
+编辑器粘贴图片时触发，如果返回 `true` 则表示继续使用默认逻辑，返回 `false` 则不走默认逻辑，需要进行自定义处理
+
+##### onPasteVideo <Badge type="danger" text="(this: Editor, file: File) => boolean | Promise<boolean>" />
+
+编辑器粘贴视频时触发，如果返回 `true` 则表示继续使用默认逻辑，返回 `false` 则不走默认逻辑，需要进行自定义处理
+
+##### onPasteFile <Badge type="danger" text="(this: Editor, file: File) => void | Promise<void>" />
+
+编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理
 
 ## 修改默认样式
 
