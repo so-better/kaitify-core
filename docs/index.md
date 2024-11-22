@@ -1,3 +1,30 @@
-#### Kaitify是什么？
+---
+lastUpdated: false
+aside: false
+layout: home
 
-> Kaitify（发音：/ˈkaɪtəfaɪ/）是一款基于原生Javascript构建的富文本编辑器核心库
+hero:
+  name: kaitify
+  text: 基于原生JS的富文本编辑器核心库
+  tagline: 轻松构建一个L1级别的富文本编辑器...
+  # image:
+  #   src: ./.vitepress/theme/logo-vmake.png
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /guide/introduction
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/so-better/kaitify-core
+
+features:
+  - title: '@kaitify/vue'
+    details: 基于@kaitify/core开发的vue富文本编辑器核心库
+    link: https://github.com/so-better/kaitify-vue
+  - title: 'ruax'
+    details: 一个轻量的前端封装异步请求的 JS 库
+    link: https://github.com/so-better/ruax
+  - title: 'animator-clip'
+    details: 一个基于 JavaScript 的 requestAnimationFrame API 封装的轻量级 JS 动画插件
+    link: https://github.com/so-better/animator-clip
+---
