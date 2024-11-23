@@ -193,13 +193,6 @@
         </div>
       </fieldset>
       <fieldset>
-        <legend>提示</legend>
-        <div class="toolbar">
-          <button @click="editor?.commands.setTip!()">插入提示</button>
-          <button @click="editor?.commands.unsetTip!()">取消提示</button>
-        </div>
-      </fieldset>
-      <fieldset>
         <legend>引用</legend>
         <div class="toolbar">
           <button @click="editor?.commands.setBlockquote!()">插入引用</button>
@@ -269,7 +262,7 @@ onMounted(async () => {
     })
   }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: (res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent + res.data.docContent).replaceAll('data-editify-hljs', 'kaitify-hljs'),
+    value: (res.data.docContent).replaceAll('data-editify-hljs', 'kaitify-hljs'),
     el: '#editor',
     editable: true,
     allowPasteHtml: true,

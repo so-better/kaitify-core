@@ -8,7 +8,7 @@ title: Editor
 
 ## 创建一个编辑器
 
-通过如下代码，可以轻松构建一个富文本编辑器
+通过 `Editor` 的类方法 `configure`，我们可以轻松构建一个富文本编辑器，并获取创建后的编辑器实例
 
 ```html
 <div id="editor" style="width:100%;height:200px;"></div>
@@ -25,31 +25,6 @@ const editor = await Editor.configure({
 示例：
 
 <div id="ed" style="width:100%;height:200px;"></div>
-
-<script setup lang="ts">
-  import { useData } from 'vitepress'
-  import { onMounted, watch, ref } from "vue"
-  import { Editor } from "../../lib/kaitify-core.es.js"
-
-  const { isDark } = useData()
-
-  const editor = ref<Editor | undefined>()
-  
-  onMounted(async ()=>{
-    editor.value = await Editor.configure({
-      el: '#ed',
-      value: '',
-      dark: isDark.value,
-      placeholder:'请输入正文...'
-    })
-  })
-
-  watch(()=>isDark.value,newVal=>{
-    if(editor.value){
-        editor.value.setDark(isDark.value)
-    }
-  })
-</script>
 
 ## 编辑器构建参数
 
@@ -258,3 +233,28 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
 ```
 
 > 这些只是编辑器基本的样式变量，对于拓展中的样式，你还需要单独去修改，每一个拓展的样式都是单独维护的
+
+<script setup lang="ts">
+  import { useData } from 'vitepress'
+  import { onMounted, watch, ref } from "vue"
+  import { Editor } from "../../lib/kaitify-core.es.js"
+
+  const { isDark } = useData()
+
+  const editor = ref<Editor | undefined>()
+  
+  onMounted(async ()=>{
+    editor.value = await Editor.configure({
+      el: '#ed',
+      value: '',
+      dark: isDark.value,
+      placeholder:'请输入正文...'
+    })
+  })
+
+  watch(()=>isDark.value,newVal=>{
+    if(editor.value){
+        editor.value.setDark(isDark.value)
+    }
+  })
+</script>
