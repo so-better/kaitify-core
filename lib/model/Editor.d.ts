@@ -97,11 +97,11 @@ export type EditorConfigureOptionType = {
      */
     onPasteFile?: (this: Editor, file: File) => void | Promise<void>;
     /**
-     * 编辑器内容改变触发
+     * 编辑器内容改变时触发
      */
     onChange?: (this: Editor, newVal: string, oldVal: string) => void;
     /**
-     * 编辑器光标发生变化触发
+     * 编辑器光标发生变化时触发
      */
     onSelectionUpdate?: (this: Editor, selection: Selection) => void;
     /**
@@ -145,7 +145,7 @@ export type EditorConfigureOptionType = {
      */
     afterUpdateView?: (this: Editor) => void;
     /**
-     * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
+     * 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
      */
     onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean;
     /**
@@ -165,7 +165,7 @@ export type EditorConfigureOptionType = {
      */
     autofocus?: boolean;
     /**
-     * 编辑器内容只有一个段落时的默认文本
+     * 编辑器内容只有一个段落时的占位符内容
      */
     placeholder?: string;
     /**

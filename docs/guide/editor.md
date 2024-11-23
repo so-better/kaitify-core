@@ -16,9 +16,9 @@ title: Editor
 
 ```js
 const editor = await Editor.configure({
-  el: '#editor',
-  value: '',
-  placeholder: '请输入正文...'
+	el: '#editor',
+	value: '',
+	placeholder: '请输入正文...'
 })
 ```
 
@@ -26,16 +26,28 @@ const editor = await Editor.configure({
 
 <div id="ed" style="width:100%;height:200px;"></div>
 
-<script setup>
-  import { onMounted } from "vue"
+<script setup lang="ts">
+  import { useData } from 'vitepress'
+  import { onMounted, watch, ref } from "vue"
   import { Editor } from "../../lib/kaitify-core.es.js"
+
+  const { isDark } = useData()
+
+  const editor = ref<Editor | undefined>()
   
   onMounted(async ()=>{
-    const editor = await Editor.configure({
+    editor.value = await Editor.configure({
       el: '#ed',
       value: '',
+      dark: isDark.value,
       placeholder:'请输入正文...'
     })
+  })
+
+  watch(()=>isDark.value,newVal=>{
+    if(editor.value){
+        editor.value.setDark(isDark.value)
+    }
   })
 </script>
 
@@ -46,6 +58,26 @@ const editor = await Editor.configure({
 ##### el <Badge type="danger" text="HTMLElement | string" />
 
 编辑器渲染的 `dom` 或者选择器
+
+##### value <Badge type="danger" text="string" />
+
+编辑器的初始默认值
+
+##### editable <Badge type="danger" text="boolean" />
+
+编辑器构建时是否可编辑，默认值为 `true`
+
+##### autofocus <Badge type="danger" text="boolean" />
+
+是否自动聚焦，默认值为 `false`
+
+##### placeholder <Badge type="danger" text="string" />
+
+编辑器内容只有一个段落时的占位符内容
+
+##### dark <Badge type="danger" text="boolean" />
+
+是否深色模式，默认值为 `true`
 
 ##### allowCopy <Badge type="danger" text="boolean" />
 
@@ -119,53 +151,109 @@ const editor = await Editor.configure({
 
 编辑器粘贴除了图片和视频以外的文件时触发，需要自定义处理
 
+##### onChange <Badge type="danger" text="(this: Editor, newVal: string, oldVal: string) => void" />
+
+编辑器内容改变时触发
+
+##### onSelectionUpdate <Badge type="danger" text="(this: Editor, selection: Selection) => void" />
+
+编辑器光标发生变化时触发
+
+##### onInsertParagraph <Badge type="danger" text="(this: Editor, node: KNode) => void" />
+
+换行时触发，参数为换行操作后光标所在的块节点
+
+##### onDeleteComplete <Badge type="danger" text="(this: Editor) => void" />
+
+完成删除时触发
+
+##### onKeydown <Badge type="danger" text="(this: Editor, event: KeyboardEvent) => void" />
+
+光标在编辑器内时键盘按下触发
+
+##### onKeyup <Badge type="danger" text="(this: Editor, event: KeyboardEvent) => void" />
+
+光标在编辑器内时键盘松开触发
+
+##### onFocus <Badge type="danger" text="(this: Editor, event: FocusEvent) => void" />
+
+编辑器聚焦时触发
+
+##### onBlur <Badge type="danger" text="(this: Editor, event: FocusEvent) => void" />
+
+编辑器失焦时触发
+
+##### pasteKeepMarks <Badge type="danger" text="(this: Editor, node: KNode) => KNodeMarksType" />
+
+粘贴 `html` 时，对于节点标记保留的自定义方法
+
+##### pasteKeepStyles <Badge type="danger" text="(this: Editor, node: KNode) => KNodeStylesType" />
+
+粘贴 `html` 时，对于节点样式保留的自定义方法
+
+##### beforeUpdateView <Badge type="danger" text="(this: Editor) => void" />
+
+视图更新前回调方法
+
+##### afterUpdateView <Badge type="danger" text="(this: Editor) => void" />
+
+视图更新后回调方法
+
+##### onDetachMentBlockFromParentCallback <Badge type="danger" text="(this: Editor, node: KNode) => boolean" />
+
+在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回 `true` 则表示继续使用默认逻辑，会将该节点转为段落，返回 `false` 则不走默认逻辑，需要自定义处理
+
+##### beforePatchNodeToFormat <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
+
+编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
+
 ## 修改默认样式
 
 kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不需要，你可以通过 css 样式覆盖去修改。或者你可以通过修改 `:root` 下的 css 变量来修改：
 
 ```less
 :root {
-  //主题色
-  --kaitify-theme: #4bb4ba;
-  //最浅主题色，通常用于悬浮效果
-  --kaitify-lightest-theme: fade(@theme, 10);
-  //更浅主题色，通常用于激活效果
-  --kaitify-lighter-theme: fade(@theme, 20);
-  //浅主题色，用于选区颜色
-  --kaitify-light-theme: fade(@theme, 30);
-  //字体颜色
-  --kaitify-font-color: #505050;
-  //边框颜色
-  --kaitify-border-color: #dedede;
-  //背景色
-  --kaitify-background-color: #fff;
-  //行高
-  --kaitify-line-height: 1.5;
-  //字号
-  --kaitify-font-size: 14px;
-  //通用圆角大小
-  --kaitify-border-radius: 3px;
-  //外边距
-  --kaitify-margin: 10px;
-  --kaitify-small-margin: 5px;
-  --kaitify-large-margin: 15px;
-  //内边距
-  --kaitify-padding: 10px;
-  --kaitify-small-padding: 5px;
-  --kaitify-large-padding: 20px;
-  //节点两侧和其他节点的间距
-  --kaitify-sides-between: 2px;
-  //字体
-  --kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
+	//主题色
+	--kaitify-theme: #4bb4ba;
+	//最浅主题色，通常用于悬浮效果
+	--kaitify-lightest-theme: fade(@theme, 10);
+	//更浅主题色，通常用于激活效果
+	--kaitify-lighter-theme: fade(@theme, 20);
+	//浅主题色，用于选区颜色
+	--kaitify-light-theme: fade(@theme, 30);
+	//字体颜色
+	--kaitify-font-color: #505050;
+	//边框颜色
+	--kaitify-border-color: #dedede;
+	//背景色
+	--kaitify-background-color: #fff;
+	//行高
+	--kaitify-line-height: 1.5;
+	//字号
+	--kaitify-font-size: 14px;
+	//通用圆角大小
+	--kaitify-border-radius: 3px;
+	//外边距
+	--kaitify-margin: 10px;
+	--kaitify-small-margin: 5px;
+	--kaitify-large-margin: 15px;
+	//内边距
+	--kaitify-padding: 10px;
+	--kaitify-small-padding: 5px;
+	--kaitify-large-padding: 20px;
+	//节点两侧和其他节点的间距
+	--kaitify-sides-between: 2px;
+	//字体
+	--kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
 }
 
 :root[kaitify-dark] {
-  //字体颜色
-  --kaitify-font-color: #e7e7e7;
-  //边框颜色
-  --kaitify-border-color: #4a4a4a;
-  //背景色
-  --kaitify-background-color: #1a1a1a;
+	//字体颜色
+	--kaitify-font-color: #e7e7e7;
+	//边框颜色
+	--kaitify-border-color: #4a4a4a;
+	//背景色
+	--kaitify-background-color: #1a1a1a;
 }
 ```
 
