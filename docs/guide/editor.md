@@ -8,7 +8,8 @@ title: Editor
 
 ## 创建一个编辑器
 
-通过 `Editor` 的类方法 `configure`，我们可以轻松构建一个富文本编辑器，并获取创建后的编辑器实例
+- 通过 `Editor` 的类方法 `configure`，我们可以轻松构建一个富文本编辑器，并获取创建后的编辑器实例。
+- 具体如何操作编辑器，可以通过 [编辑器相关的 API](/apis/editor) 我们可以获取进一步的内容
 
 ```html
 <div id="editor" style="width:100%;height:200px;"></div>
@@ -25,6 +26,10 @@ const editor = await Editor.configure({
 示例：
 
 <div id="ed" style="width:100%;height:200px;"></div>
+
+## 节点数组 stackNodes
+
+`stackNodes` 作为编辑器实例的重要属性，用以存储 `KNode` 即节点数组，编辑器实例通过 `updateView` 方法每次更新编辑器视图，在更新视图之前会通过内部定义的格式化规则对节点数组进行规范化校验，以保证输出的内容都是合法的
 
 ## 编辑器构建参数
 
