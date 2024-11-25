@@ -6,20 +6,22 @@ title: KNode
 
 > KNode 是编辑器内容的唯一组成元素，可以说编辑器的任何操作都是与 KNode 有关的，也就是我们后面通常所说的节点
 
+富文本编辑器的内容原本都是 html 元素，但在 kaitify 的内部实现中，都被转换成了一个个节点，从而构成一个节点数组，挂载在编辑器实例属性 `stackNodes` 下
+
 ## 如何创建一个节点？
 
 通过 `KNode.create` 方法来创建一个节点
 
 ```ts
 const node = KNode.create({
-	type: 'block',
-	tag: 'p',
-	children: [
-		{
-			type: 'text',
-			textContent: '这是一个段落'
-		}
-	]
+  type: 'block',
+  tag: 'p',
+  children: [
+    {
+      type: 'text',
+      textContent: '这是一个段落'
+    }
+  ]
 })
 ```
 
@@ -117,11 +119,11 @@ const zeroTextNode = KNode.createZeroWidthText(options)
 const placeholderNode = KNode.createPlaceholder()
 ```
 
-当然你也可以使用 `create` 方法来创建，只是比较繁琐：
+当然你也可以使用 `create` 方法来创建，只是相对繁琐：
 
 ```ts
 const placeholderNode = KNode.create({
-	type: 'closed',
-	tag: 'br'
+  type: 'closed',
+  tag: 'br'
 })
 ```

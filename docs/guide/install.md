@@ -40,15 +40,31 @@ title: 安装
 </script>
 ```
 
-## 通过 npm 安装 kaitify
+## 通过 npm/yarn/pnpm 安装 kaitify
 
-> 假设你已了解关于  html、css  和  javascript  的中级知识，并且对于 npm，es6，webpack 已经有了足够的了解，我们更推荐这种安装方式
+> 假设你已了解关于  html、css  和  javascript  的中级知识，并且对于 npm，es6，webpack 已经有了足够的了解，我们更推荐这类安装方式
 
-```shell
+::: code-group
+
+```bash [npm]
 npm install @kaitify/core
-```
 
-```shell
 # 安装指定版本
 npm install @kaitify/core@0.0.1
 ```
+
+```bash [yarn]
+yarn install @kaitify/core
+
+# 安装指定版本
+yarn install @kaitify/core@0.0.1
+```
+
+```bash [pnpm]
+pnpm install @kaitify/core
+
+# 安装指定版本
+pnpm install @kaitify/core@0.0.1
+```
+
+:::
