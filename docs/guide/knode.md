@@ -25,11 +25,11 @@ const node = KNode.create({
 })
 ```
 
-## 节点构建参数
+## 节点构建参数 KNodeCreateOptionType
 
-##### type <Badge type="danger" text='"text" | "closed" | "inline" | "block"' />
+##### type <Badge type="danger" text='KNodeType' />
 
-节点类型
+节点类型，可取值 `block` `inline` `closed` `text`
 
 - `text`：文本节点，表示一段文本内容，没有 `tag` 属性，没有子节点，在视图渲染时会根据编辑器实例属性 `textRenderTag` 来渲染成对应的 dom
 - `closed`：闭合节点，即没有子节点的节点，如图片、视频等
@@ -76,9 +76,9 @@ const node = KNode.create({
 
 渲染 `dom` 所用到的命名空间。如果此值不存在，在默认的渲染方法中使用 `document.createElement` 方法来创建 `dom` 元素；如果此值存在，在默认的渲染方法中则会使用 `document.createElementNS` 方法来创建 `dom` 元素
 
-##### children <Badge type="danger" text='KNode[]' />
+##### children <Badge type="danger" text='KNodeCreateOptionType[]' />
 
-子节点数组，文本节点和闭合节点无需设置此属性
+子节点构建参数数组，文本节点和闭合节点无需设置此属性
 
 ## 零宽度无断空白文本节点
 

@@ -14,7 +14,7 @@ title: Editor 方法
 
 - 类型
   ```ts
-  Editor.configure(options: EditorConfigureOptionType): Promise<Editor>
+  configure(options: EditorConfigureOptionType): Promise<Editor>
   ```
 - 详细信息
 

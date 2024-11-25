@@ -632,7 +632,7 @@ export class KNode {
   /**
    * 【API】判断参数是否节点
    */
-  static isKNode(val: any) {
+  static isKNode(val: any): boolean {
     return val instanceof KNode
   }
 
