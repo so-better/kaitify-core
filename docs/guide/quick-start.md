@@ -15,9 +15,9 @@ title: 快速上手
 <div id="editor" style="width:500px;height:500px;"></div>
 ```
 
-```js
-// 编辑器创建并渲染的过程是异步的
-// 因此需要通过 `await` 来等待编辑器创建完成后获取编辑器实例
+```ts
+//编辑器创建并渲染的过程是异步的
+//因此需要通过 `await` 来等待编辑器创建完成后获取编辑器实例
 const editor = await Editor.configure({
   el: '#editor',
   value: '<p>hello</p>'
@@ -30,7 +30,7 @@ const editor = await Editor.configure({
 <div id="editor" style="width:500px;height:500px;"></div>
 ```
 
-```js
+```ts
 const editor = await Editor.configure({
   el: '#editor',
   value: '<p>hello</p>'

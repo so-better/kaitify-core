@@ -15,7 +15,7 @@ title: Editor
 <div id="editor" style="width:100%;height:200px;"></div>
 ```
 
-```js
+```ts
 const editor = await Editor.configure({
   el: '#editor',
   value: '',
@@ -31,7 +31,7 @@ const editor = await Editor.configure({
 
 `stackNodes` 作为编辑器实例的重要属性，用以存储 `KNode` 即节点数组，编辑器实例通过 `updateView` 方法每次更新编辑器视图，在更新视图之前会通过内部定义的格式化规则对节点数组进行规范化校验，以保证输出的内容都是合法的
 
-```js
+```ts
 const editor = await Editor.configure({
   el: '#editor',
   value: '<p>hello</p>'
