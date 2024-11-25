@@ -9,7 +9,7 @@ title: Editor
 ## 创建一个编辑器
 
 - 通过 `Editor` 的类方法 `configure`，我们可以轻松构建一个富文本编辑器，并获取创建后的编辑器实例。
-- 具体如何操作编辑器，可以通过 [编辑器相关的 API](/apis/editor) 我们可以获取进一步的内容
+- 具体如何操作编辑器，可以通过 [编辑器相关的 API](/apis/editor-attrs) 我们可以获取进一步的内容
 
 ```html
 <div id="editor" style="width:100%;height:200px;"></div>
@@ -17,9 +17,9 @@ title: Editor
 
 ```ts
 const editor = await Editor.configure({
-  el: '#editor',
-  value: '',
-  placeholder: '请输入正文...'
+	el: '#editor',
+	value: '',
+	placeholder: '请输入正文...'
 })
 ```
 
@@ -33,18 +33,18 @@ const editor = await Editor.configure({
 
 ```ts
 const editor = await Editor.configure({
-  el: '#editor',
-  value: '<p>hello</p>'
+	el: '#editor',
+	value: '<p>hello</p>'
 })
 const paragraph = KNode.create({
-  type: 'block',
-  tag: 'p',
-  children: [
-    {
-      type: 'text',
-      textContent: '我是一个段落'
-    }
-  ]
+	type: 'block',
+	tag: 'p',
+	children: [
+		{
+			type: 'text',
+			textContent: '我是一个段落'
+		}
+	]
 })
 //直接给stackNodes重新赋值，整个编辑器的内容都会被替换成这个段落
 editor.stackNodes = [paragraph]
@@ -214,47 +214,47 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
 
 ```less
 :root {
-  //主题色
-  --kaitify-theme: #4bb4ba;
-  //最浅主题色，通常用于悬浮效果
-  --kaitify-lightest-theme: fade(@theme, 10);
-  //更浅主题色，通常用于激活效果
-  --kaitify-lighter-theme: fade(@theme, 20);
-  //浅主题色，用于选区颜色
-  --kaitify-light-theme: fade(@theme, 30);
-  //字体颜色
-  --kaitify-font-color: #505050;
-  //边框颜色
-  --kaitify-border-color: #dedede;
-  //背景色
-  --kaitify-background-color: #fff;
-  //行高
-  --kaitify-line-height: 1.5;
-  //字号
-  --kaitify-font-size: 14px;
-  //通用圆角大小
-  --kaitify-border-radius: 3px;
-  //外边距
-  --kaitify-margin: 10px;
-  --kaitify-small-margin: 5px;
-  --kaitify-large-margin: 15px;
-  //内边距
-  --kaitify-padding: 10px;
-  --kaitify-small-padding: 5px;
-  --kaitify-large-padding: 20px;
-  //节点两侧和其他节点的间距
-  --kaitify-sides-between: 2px;
-  //字体
-  --kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
+	//主题色
+	--kaitify-theme: #4bb4ba;
+	//最浅主题色，通常用于悬浮效果
+	--kaitify-lightest-theme: fade(@theme, 10);
+	//更浅主题色，通常用于激活效果
+	--kaitify-lighter-theme: fade(@theme, 20);
+	//浅主题色，用于选区颜色
+	--kaitify-light-theme: fade(@theme, 30);
+	//字体颜色
+	--kaitify-font-color: #505050;
+	//边框颜色
+	--kaitify-border-color: #dedede;
+	//背景色
+	--kaitify-background-color: #fff;
+	//行高
+	--kaitify-line-height: 1.5;
+	//字号
+	--kaitify-font-size: 14px;
+	//通用圆角大小
+	--kaitify-border-radius: 3px;
+	//外边距
+	--kaitify-margin: 10px;
+	--kaitify-small-margin: 5px;
+	--kaitify-large-margin: 15px;
+	//内边距
+	--kaitify-padding: 10px;
+	--kaitify-small-padding: 5px;
+	--kaitify-large-padding: 20px;
+	//节点两侧和其他节点的间距
+	--kaitify-sides-between: 2px;
+	//字体
+	--kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
 }
 
 :root[kaitify-dark] {
-  //字体颜色
-  --kaitify-font-color: #e7e7e7;
-  //边框颜色
-  --kaitify-border-color: #4a4a4a;
-  //背景色
-  --kaitify-background-color: #1a1a1a;
+	//字体颜色
+	--kaitify-font-color: #e7e7e7;
+	//边框颜色
+	--kaitify-border-color: #4a4a4a;
+	//背景色
+	--kaitify-background-color: #1a1a1a;
 }
 ```
 
