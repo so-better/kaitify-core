@@ -18,7 +18,7 @@ const getExtensionsList = () => {
 export default defineConfig({
   base: '/@kaitify/core/',
   title: 'KAITIFY',
-  description: 'kaitify是一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置拓展，来帮助你快速构建一个富文本编辑器',
+  description: 'kaitify是一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置扩展，来帮助你快速构建一个富文本编辑器',
   lastUpdated: true,
   head: [['link', { rel: 'icon', type: 'image/png', href: './logo.png' }]],
   themeConfig: {
@@ -32,7 +32,7 @@ export default defineConfig({
     nav: [
       { text: '指南', link: '/guide/introduction', activeMatch: '/guide' },
       { text: 'API', link: '/apis/editor-attrs', activeMatch: '/apis' },
-      { text: '拓展', link: '/extensions/introduction', activeMatch: '/extensions' }
+      { text: '扩展', link: '/extensions/introduction', activeMatch: '/extensions' }
     ],
     sidebar: {
       '/guide': [
@@ -129,17 +129,17 @@ export default defineConfig({
           text: '开始使用',
           items: [
             {
-              text: '什么是拓展？',
+              text: '什么是扩展？',
               link: '/extensions/introduction'
             },
             {
-              text: '如何自己创建一个拓展？',
+              text: '如何自己创建一个扩展？',
               link: '/extensions/custom-extension'
             }
           ]
         },
         {
-          text: '内置拓展',
+          text: '内置扩展',
           items: getExtensionsList().map(name => {
             return {
               text: name,

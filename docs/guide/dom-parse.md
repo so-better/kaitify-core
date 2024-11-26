@@ -24,7 +24,7 @@ title: DOM转换规则
   - `br`元素会被转为闭合节点
   - 其余元素不在 `editor.extraKeepTags` 内的，都会被转为默认文本标签的行内节点
 
-> 每个内置拓展都可能设置了 extraKeepTags 属性，所以编辑器内保留的元素远不止以上这些
+> 每个内置扩展都可能设置了 extraKeepTags 属性，所以编辑器内保留的元素远不止以上这些
 
 最终，`domParseNode` 会返回给你一个 `KNode` 节点
 

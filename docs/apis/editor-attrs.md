@@ -50,7 +50,7 @@ title: Editor 属性
 
 ##### extraKeepTags <Badge type="danger" text="string[]" />
 
-此为只读属性，表示编辑器内额外保留的标签，默认保留的标签只有 `p` `div` `address` `article` `aside` `nav` `section` `span` `label` `br`，编辑器内置的许多拓展都设置了此属性，比如 `image`拓展等，可以通过输出该属性，查看编辑器额外保留了哪些标签，你可以在此基础上，在创建编辑器时添加额外需要保留的标签，需要注意的是，额外保留的标签默认都是行内节点，如果想做更多自定义的处理，需要在创建编辑器时结合属性 `domParseNodeCallback`
+此为只读属性，表示编辑器内额外保留的标签，默认保留的标签只有 `p` `div` `address` `article` `aside` `nav` `section` `span` `label` `br`，编辑器内置的许多扩展都设置了此属性，比如 `image`扩展等，可以通过输出该属性，查看编辑器额外保留了哪些标签，你可以在此基础上，在创建编辑器时添加额外需要保留的标签，需要注意的是，额外保留的标签默认都是行内节点，如果想做更多自定义的处理，需要在创建编辑器时结合属性 `domParseNodeCallback`
 
 ##### extensions <Badge type="danger" text="Extension[]" />
 
@@ -70,7 +70,7 @@ title: Editor 属性
 
 ##### commands <Badge type="danger" text="EditorCommandsType" />
 
-编辑器的命令集合，通过该属性可以直接调用编辑器内置拓展提供的命令方法
+编辑器的命令集合，通过该属性可以直接调用编辑器内置扩展提供的命令方法
 
 ##### stackNodes <Badge type="danger" text="KNode[]" />
 

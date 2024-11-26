@@ -17,9 +17,9 @@ title: Editor
 
 ```ts
 const editor = await Editor.configure({
-	el: '#editor',
-	value: '',
-	placeholder: '请输入正文...'
+  el: '#editor',
+  value: '',
+  placeholder: '请输入正文...'
 })
 ```
 
@@ -33,18 +33,18 @@ const editor = await Editor.configure({
 
 ```ts
 const editor = await Editor.configure({
-	el: '#editor',
-	value: '<p>hello</p>'
+  el: '#editor',
+  value: '<p>hello</p>'
 })
 const paragraph = KNode.create({
-	type: 'block',
-	tag: 'p',
-	children: [
-		{
-			type: 'text',
-			textContent: '我是一个段落'
-		}
-	]
+  type: 'block',
+  tag: 'p',
+  children: [
+    {
+      type: 'text',
+      textContent: '我是一个段落'
+    }
+  ]
 })
 //直接给stackNodes重新赋值，整个编辑器的内容都会被替换成这个段落
 editor.stackNodes = [paragraph]
@@ -118,7 +118,7 @@ editor.updateView()
 
 ##### extensions <Badge type="danger" text="Extension[]" />
 
-自定义插件数组，该属性较为复杂，可参考 [拓展](/extensions) 一节的内容
+自定义插件数组，该属性较为复杂，可参考 [扩展](/extensions) 一节的内容
 
 ##### formatRules <Badge type="danger" text="RuleFunctionType[]" />
 
@@ -214,51 +214,51 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
 
 ```less
 :root {
-	//主题色
-	--kaitify-theme: #4bb4ba;
-	//最浅主题色，通常用于悬浮效果
-	--kaitify-lightest-theme: fade(@theme, 10);
-	//更浅主题色，通常用于激活效果
-	--kaitify-lighter-theme: fade(@theme, 20);
-	//浅主题色，用于选区颜色
-	--kaitify-light-theme: fade(@theme, 30);
-	//字体颜色
-	--kaitify-font-color: #505050;
-	//边框颜色
-	--kaitify-border-color: #dedede;
-	//背景色
-	--kaitify-background-color: #fff;
-	//行高
-	--kaitify-line-height: 1.5;
-	//字号
-	--kaitify-font-size: 14px;
-	//通用圆角大小
-	--kaitify-border-radius: 3px;
-	//外边距
-	--kaitify-margin: 10px;
-	--kaitify-small-margin: 5px;
-	--kaitify-large-margin: 15px;
-	//内边距
-	--kaitify-padding: 10px;
-	--kaitify-small-padding: 5px;
-	--kaitify-large-padding: 20px;
-	//节点两侧和其他节点的间距
-	--kaitify-sides-between: 2px;
-	//字体
-	--kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
+  //主题色
+  --kaitify-theme: #4bb4ba;
+  //最浅主题色，通常用于悬浮效果
+  --kaitify-lightest-theme: fade(@theme, 10);
+  //更浅主题色，通常用于激活效果
+  --kaitify-lighter-theme: fade(@theme, 20);
+  //浅主题色，用于选区颜色
+  --kaitify-light-theme: fade(@theme, 30);
+  //字体颜色
+  --kaitify-font-color: #505050;
+  //边框颜色
+  --kaitify-border-color: #dedede;
+  //背景色
+  --kaitify-background-color: #fff;
+  //行高
+  --kaitify-line-height: 1.5;
+  //字号
+  --kaitify-font-size: 14px;
+  //通用圆角大小
+  --kaitify-border-radius: 3px;
+  //外边距
+  --kaitify-margin: 10px;
+  --kaitify-small-margin: 5px;
+  --kaitify-large-margin: 15px;
+  //内边距
+  --kaitify-padding: 10px;
+  --kaitify-small-padding: 5px;
+  --kaitify-large-padding: 20px;
+  //节点两侧和其他节点的间距
+  --kaitify-sides-between: 2px;
+  //字体
+  --kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
 }
 
 :root[kaitify-dark] {
-	//字体颜色
-	--kaitify-font-color: #e7e7e7;
-	//边框颜色
-	--kaitify-border-color: #4a4a4a;
-	//背景色
-	--kaitify-background-color: #1a1a1a;
+  //字体颜色
+  --kaitify-font-color: #e7e7e7;
+  //边框颜色
+  --kaitify-border-color: #4a4a4a;
+  //背景色
+  --kaitify-background-color: #1a1a1a;
 }
 ```
 
-> 这些只是编辑器基本的样式变量，对于拓展中的样式，你还需要单独去修改，每一个拓展的样式都是单独维护的
+> 这些只是编辑器基本的样式变量，对于扩展中的样式，你还需要单独去修改，每一个扩展的样式都是单独维护的
 
 <script setup lang="ts">
   import { useData } from 'vitepress'

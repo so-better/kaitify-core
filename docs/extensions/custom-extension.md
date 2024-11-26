@@ -1,12 +1,12 @@
 ---
-title: 如何自己创建一个拓展？
+title: 如何自己创建一个扩展？
 ---
 
-# 如何自己创建一个拓展？
+# 如何自己创建一个扩展？
 
-## 创建拓展
+## 创建扩展
 
-通过 `Extension.create` 方法可以创建一个拓展实例
+通过 `Extension.create` 方法可以创建一个扩展实例
 
 ```ts
 import { Editor, Extension } from '@kaitify/core'
@@ -32,11 +32,11 @@ const editor = await Editor.configure({
 })
 ```
 
-## 拓展构建参数
+## 扩展构建参数
 
 ##### name <Badge type="danger" text='string' />
 
-拓展的名称，不同的拓展的 `name` 必须唯一
+扩展的名称，不同的扩展的 `name` 必须唯一
 
 ##### emptyRenderTags <Badge type="danger" text='string[]' />
 
@@ -108,11 +108,11 @@ const editor = await Editor.configure({
 
 ##### addCommands <Badge type="danger" text="((this: Editor) => EditorCommandsType) | undefined" />
 
-自定义拓展命令，添加的命令可以通过 `editor.commands` 来调用
+自定义扩展命令，添加的命令可以通过 `editor.commands` 来调用
 
 ## 添加自定义命令
 
-创建拓展时通过配置 `addCommands` 来添加自定义命令
+创建扩展时通过配置 `addCommands` 来添加自定义命令
 
 ```ts
 import { Editor, Extension } from '@kaitify/core'
@@ -134,6 +134,6 @@ const editor = await Editor.configure({
 ```
 
 ```ts
-//通过命令去调用该拓展提供的insertText方法，会向编辑器插入文本并且更新视图
+//通过命令去调用该扩展提供的insertText方法，会向编辑器插入文本并且更新视图
 editor.commands.insertText('hello')
 ```
