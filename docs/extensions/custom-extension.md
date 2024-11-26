@@ -34,6 +34,8 @@ const editor = await Editor.configure({
 
 ## 扩展构建参数
 
+`Extension.create`方法接收一个 `ExtensionCreateOptionType` 类型的入参，该参数包含以下属性：
+
 ##### name <Badge type="danger" text='string' />
 
 扩展的名称，不同的扩展的 `name` 必须唯一
