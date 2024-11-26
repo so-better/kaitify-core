@@ -20,10 +20,10 @@ export default defineConfig({
   title: 'KAITIFY',
   description: 'kaitify是一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置拓展，来帮助你快速构建一个富文本编辑器',
   lastUpdated: true,
-  head: [['link', { rel: 'icon', type: 'image/png', href: './.vitepress/logo.png' }]],
+  head: [['link', { rel: 'icon', type: 'image/png', href: './logo.png' }]],
   themeConfig: {
     logo: {
-      src: './.vitepress/logo.png'
+      src: '/logo.png'
     },
     outline: {
       label: '本页目录',
@@ -90,20 +90,8 @@ export default defineConfig({
               link: '/guide/clipboard'
             },
             {
-              text: 'html粘贴处理',
-              link: '/guide/html-paste'
-            },
-            {
               text: '视图渲染',
               link: '/guide/render'
-            },
-            {
-              text: '性能优化',
-              link: '/guide/performance'
-            },
-            {
-              text: 'DOM命名空间',
-              link: '/guide/namespace'
             }
           ]
         }
