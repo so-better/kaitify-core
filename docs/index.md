@@ -8,7 +8,7 @@ hero:
   text: 基于原生JS的富文本编辑器核心库
   tagline: 轻松构建一个L1级别的富文本编辑器...
   image:
-    src: ./.vitepress/logo.png
+    src: ./logo.png
     width: 288
   actions:
     - theme: brand
