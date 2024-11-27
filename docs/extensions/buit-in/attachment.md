@@ -127,6 +127,27 @@ title: attachment 附件
 
   当光标不在同一个附件节点内时，返回 `null`，如果光标在同一个附件节点内，返回它的 `url` `text` `icon` 属性集合
 
+## 扩展配置
+
+`attachment` 扩展支持进行配置
+
+```ts
+import { AttachmentExtension } from '@kaitify/core'
+
+const editor = await Editor.configure({
+  el: '#editor',
+  value: '',
+  placeholder: '请输入正文...',
+  extensions: [AttachmentExtension({ icon: 'xxx.png' })]
+})
+```
+
+配置项：
+
+##### icon <Badge type="danger" text="string" />
+
+自定义默认的附件图标，当我们使用 setAttachment 方法插入附件时，如果没有设置附件图标，那么会使用该配置的图标，此值若未配置，再用默认的图标
+
 ## 代码示例
 
 <div style="margin:0 0 10px 0">

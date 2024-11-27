@@ -245,7 +245,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode, BoldExtension } from '../src'
+import { Editor, KNode, AttachmentExtension } from '../src'
 import { content } from "./content"
 
 const count = ref<number>(0)
@@ -263,7 +263,7 @@ onMounted(async () => {
   }).then(res => res.json())
   editor.value = await Editor.configure({
     value: (res.data.docContent).replaceAll('data-editify-hljs', 'kaitify-hljs'),
-    extensions: [BoldExtension()],
+    extensions: [AttachmentExtension({ icon: 'https://www.so-better.cn/static/attachments/h9PNcA0uJkWOZx971URJzLvn.jpg' })],
     el: '#editor',
     editable: true,
     allowPasteHtml: true,

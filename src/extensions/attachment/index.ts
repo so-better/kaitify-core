@@ -16,6 +16,10 @@ export type UpdateAttachmentOptionType = {
   icon?: string
 }
 
+export type AttachmentExtensionPropsType = {
+  icon: string
+}
+
 declare module '../../model' {
   interface EditorCommandsType {
     getAttachment?: () => KNode | null
@@ -73,7 +77,7 @@ const downloadAttachment = (editor: Editor) => {
   })
 }
 
-export const AttachmentExtension = () =>
+export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
   Extension.create({
     name: 'attachment',
     pasteKeepStyles(node) {
@@ -207,16 +211,16 @@ export const AttachmentExtension = () =>
       /**
        * 插入附件
        */
-      const setAttachment = async ({ url, text, icon }: SetAttachmentOptionType) => {
+      const setAttachment = async (options: SetAttachmentOptionType) => {
         if (!this.selection.focused() || hasAttachment()) {
           return
         }
-        if (!url || !text) {
+        if (!options.url || !options.text) {
           return
         }
         const defaultIconBase64 = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
         //设置html内容
-        const html = `<span kaitify-attachment="${url}" contenteditable="false" style="background-image:url(${icon || defaultIconBase64})"><span>${text}</span></span>`
+        const html = `<span kaitify-attachment="${options.url}" contenteditable="false" style="background-image:url(${options.icon || props?.icon || defaultIconBase64})"><span>${options.text}</span></span>`
         //html内容转为节点数组
         const nodes = this.htmlParseNode(html)
         //插入节点
@@ -228,11 +232,11 @@ export const AttachmentExtension = () =>
       /**
        * 更新附件
        */
-      const updateAttachment = async ({ url, text, icon }: UpdateAttachmentOptionType) => {
+      const updateAttachment = async (options: UpdateAttachmentOptionType) => {
         if (!this.selection.focused()) {
           return
         }
-        if (!url && !text && !icon) {
+        if (!options.url && !options.text && !options.icon) {
           return
         }
         const attachmentNode = getAttachment()
@@ -240,20 +244,20 @@ export const AttachmentExtension = () =>
           return
         }
         //更新url
-        if (url) {
-          attachmentNode.marks!['kaitify-attachment'] = url
+        if (options.url) {
+          attachmentNode.marks!['kaitify-attachment'] = options.url
         }
         //更新text
-        if (text) {
+        if (options.text) {
           const textNode = KNode.create({
             type: 'text',
-            textContent: text
+            textContent: options.text
           })
           textNode.parent = attachmentNode
           attachmentNode.children = [textNode]
         }
-        if (icon) {
-          attachmentNode.styles!['backgroundImage'] = `url(${icon})`
+        if (options.icon) {
+          attachmentNode.styles!['backgroundImage'] = `url(${options.icon})`
         }
         //更新视图
         await this.updateView()
