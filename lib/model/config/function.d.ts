@@ -35,7 +35,7 @@ export declare const convertToBlock: (this: Editor, node: KNode) => void;
  */
 export declare const formatNodes: (this: Editor, rule: RuleFunctionType, nodes: KNode[], sourceNodes: KNode[]) => void;
 /**
- * 注册插件
+ * 注册扩展
  */
 export declare const registerExtension: (this: Editor, extension: Extension) => void;
 /**
@@ -78,3 +78,7 @@ export declare const handlerForNormalInsertParagraph: (this: Editor) => void;
  * 设置placeholder，在每次视图更新时调用此方法
  */
 export declare const setPlaceholder: (this: Editor) => void;
+/**
+ * 合并扩展数组（只能用在扩展注册之前）
+ */
+export declare const mergeExtensions: (this: Editor, from: Extension[]) => Extension[];

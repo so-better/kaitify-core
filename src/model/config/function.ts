@@ -455,11 +455,12 @@ export const formatNodes = function (this: Editor, rule: RuleFunctionType, nodes
 }
 
 /**
- * 注册插件
+ * 注册扩展
  */
 export const registerExtension = function (this: Editor, extension: Extension) {
   //是否已注册
   if (extension.registered) return
+
   //设置已注册
   extension.registered = true
 
@@ -997,4 +998,21 @@ export const setPlaceholder = function (this: Editor) {
   } else {
     this.$el!.classList.remove('showPlaceholder')
   }
+}
+
+/**
+ * 合并扩展数组（只能用在扩展注册之前）
+ */
+export const mergeExtensions = function (this: Editor, from: Extension[]) {
+  //将编辑器自身内置的扩展转成Map，name作为key
+  const sourceExtensionMap: { [name: string]: Extension } = {}
+  this.extensions.forEach(extension => {
+    sourceExtensionMap[extension.name] = extension
+  })
+  //遍历配置的扩展，加入到Map，如果原有有同名扩展则覆盖
+  from.forEach(extension => {
+    sourceExtensionMap[extension.name] = extension
+  })
+  //返回整合后的扩展
+  return Object.values(sourceExtensionMap)
 }

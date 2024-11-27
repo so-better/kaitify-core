@@ -10,7 +10,7 @@ import { removeDomObserve, setDomObserve } from './config/dom-observe'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
 import { NODE_MARK } from '@/view'
 import { defaultUpdateView } from '@/view/js-render'
-import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, redressSelection, registerExtension, removeBlockFromParentToSameLevel, setPlaceholder } from './config/function'
+import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, mergeExtensions, redressSelection, registerExtension, removeBlockFromParentToSameLevel, setPlaceholder } from './config/function'
 
 /**
  * 编辑器获取光标范围内节点数据的类型
@@ -72,7 +72,7 @@ export type EditorConfigureOptionType = {
    */
   extraKeepTags?: string[]
   /**
-   * 自定义插件数组
+   * 自定义扩展数组
    */
   extensions?: Extension[]
   /**
@@ -233,7 +233,7 @@ export class Editor {
    */
   extraKeepTags: string[] = []
   /**
-   * 插件数组【初始化后不可修改】【open】
+   * 扩展数组【初始化后不可修改】【open】
    */
   extensions: Extension[] = [TextExtension(), ImageExtension(), VideoExtension(), HistoryExtension(), BoldExtension(), ItalicExtension(), StrikethroughExtension(), UnderlineExtension(), SuperscriptExtension(), SubscriptExtension(), CodeExtension(), FontSizeExtension(), FontFamilyExtension(), ColorExtension(), BackColorExtension(), LinkExtension(), AlignExtension(), LineHeightExtension(), IndentExtension(), HorizontalExtension(), BlockquoteExtension(), HeadingExtension(), ListExtension(), TaskExtension(), MathExtension(), CodeBlockExtension(), AttachmentExtension(), TableExtension()]
   /**
@@ -1907,7 +1907,7 @@ export class Editor {
     if (options.blockRenderTag) editor.blockRenderTag = options.blockRenderTag
     if (options.emptyRenderTags) editor.emptyRenderTags = [...editor.emptyRenderTags, ...options.emptyRenderTags]
     if (options.extraKeepTags) editor.extraKeepTags = [...editor.extraKeepTags, ...options.extraKeepTags]
-    if (options.extensions) editor.extensions = [...editor.extensions, ...options.extensions]
+    if (options.extensions) editor.extensions = mergeExtensions.apply(editor, [options.extensions])
     if (options.formatRules) editor.formatRules = [...options.formatRules, ...editor.formatRules]
     if (options.domParseNodeCallback) editor.domParseNodeCallback = options.domParseNodeCallback
     if (options.onUpdateView) editor.onUpdateView = options.onUpdateView
@@ -1930,7 +1930,7 @@ export class Editor {
     if (options.afterUpdateView) editor.afterUpdateView = options.afterUpdateView
     if (options.onDetachMentBlockFromParentCallback) editor.onDetachMentBlockFromParentCallback = options.onDetachMentBlockFromParentCallback
     if (options.beforePatchNodeToFormat) editor.beforePatchNodeToFormat = options.beforePatchNodeToFormat
-    //注册插件
+    //注册扩展
     editor.extensions.forEach(item => registerExtension.apply(editor, [item]))
     //设置编辑器是否可编辑
     editor.setEditable(typeof options.editable == 'boolean' ? options.editable : true)

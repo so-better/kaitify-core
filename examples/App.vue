@@ -245,7 +245,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor, KNode, BoldExtension } from '../src'
 import { content } from "./content"
 
 const count = ref<number>(0)
@@ -263,6 +263,7 @@ onMounted(async () => {
   }).then(res => res.json())
   editor.value = await Editor.configure({
     value: (res.data.docContent).replaceAll('data-editify-hljs', 'kaitify-hljs'),
+    extensions: [BoldExtension()],
     el: '#editor',
     editable: true,
     allowPasteHtml: true,

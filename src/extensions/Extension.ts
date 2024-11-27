@@ -1,11 +1,11 @@
 import { Editor, EditorCommandsType, KNode, KNodeMarksType, KNodeStylesType, RuleFunctionType, Selection } from '@/model'
 
 /**
- * 创建插件的入参类型
+ * 创建扩展的入参类型
  */
 export type ExtensionCreateOptionType = {
   /**
-   * 插件名称
+   * 扩展名称
    */
   name: string
   /**
@@ -84,11 +84,11 @@ export type ExtensionCreateOptionType = {
 }
 
 /**
- * 插件
+ * 扩展
  */
 export class Extension {
   /**
-   * 插件名称
+   * 扩展名称
    */
   name: string
   /**
@@ -173,7 +173,7 @@ export class Extension {
   }
 
   /**
-   * 创建插件
+   * 创建扩展
    */
   static create(options: ExtensionCreateOptionType) {
     const extension = new Extension(options.name)

@@ -61,7 +61,7 @@ export type EditorConfigureOptionType = {
      */
     extraKeepTags?: string[];
     /**
-     * 自定义插件数组
+     * 自定义扩展数组
      */
     extensions?: Extension[];
     /**
@@ -218,7 +218,7 @@ export declare class Editor {
      */
     extraKeepTags: string[];
     /**
-     * 插件数组【初始化后不可修改】【open】
+     * 扩展数组【初始化后不可修改】【open】
      */
     extensions: Extension[];
     /**
