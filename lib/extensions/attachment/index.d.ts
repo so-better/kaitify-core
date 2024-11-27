@@ -6,8 +6,9 @@ export type SetAttachmentOptionType = {
     icon?: string;
 };
 export type UpdateAttachmentOptionType = {
-    url: string;
-    text: string;
+    url?: string;
+    text?: string;
+    icon?: string;
 };
 declare module '../../model' {
     interface EditorCommandsType {
@@ -18,6 +19,7 @@ declare module '../../model' {
         getAttachmentInfo?: () => {
             url: string;
             text: string;
+            icon: string;
         } | null;
     }
 }

@@ -1,0 +1,128 @@
+---
+title: attachment 附件
+---
+
+# attachment 附件
+
+支持附件的渲染，提供插入附件的能力，在非可编辑状态下点击附件可以直接下载附件
+
+## Commands 命令
+
+##### getAttachment()
+
+获取光标所在的附件节点
+
+- 类型
+
+  ```ts
+  getAttachment(): KNode | null
+  ```
+
+- 详细信息
+
+  该方法可以获取光标所在的唯一附件节点，如果光标不在一个附件节点内，则返回 `null`
+
+- 示例
+
+  ```ts
+  const attachmentNode = editor.commands.getAttachment()
+  ```
+
+##### hasAttachment()
+
+判断光标范围内是否有附件节点
+
+- 类型
+
+  ```ts
+  hasAttachment(): boolean
+  ```
+
+- 详细信息
+
+  该方法用来判断光标范围内是否有附件节点，返回 `boolean` 值
+
+- 示例
+
+  ```ts
+  const has = editor.commands.hasAttachment()
+  ```
+
+##### setAttachment()
+
+插入附件
+
+- 类型
+
+  ```ts
+  setAttachment(options: SetAttachmentOptionType): Promise<void>
+  ```
+
+- 详细信息
+
+  提供一个入参，类型为 `SetAttachmentOptionType`，包含 3 个属性：
+
+  - url <Badge type="danger" text="string" />：附件的下载地址
+  - text <Badge type="danger" text="string" />：附件的显示名称
+  - icon <Badge type="danger" text="string" />：可选，自定义附件图标，这里填写图片地址
+
+  该方法会向编辑器内插入附件节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+
+  需要注意：当光标范围内包含其他的附件节点时，无法插入新的附件节点
+
+- 示例
+
+  ```ts
+  await editor.commands.setAttachment({
+    url: 'https://xxxxx.png',
+    text: '图片'
+  })
+  ```
+
+##### updateAttachment()
+
+更新附件信息
+
+- 类型
+
+  ```ts
+  updateAttachment(options: UpdateAttachmentOptionType): Promise<void>
+  ```
+
+- 详细信息
+
+  提供一个入参，类型为 `UpdateAttachmentOptionType`，包含以下 3 个属性：
+
+  - url <Badge type="danger" text="string" />：附件的下载地址，可选，不设置则不更新此属性
+  - text <Badge type="danger" text="string" />：附件的显示名称，可选，不设置则不更新此属性
+  - icon <Badge type="danger" text="string" />：自定义附件图标，这里填写图片地址，可选，不设置则不更新此属性
+
+  该方法可以自由地更新附件的地址、名称或者图标，并且在更新完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+
+  需要注意：当光标不在同一个附件节点内时，此方法无效，因为获取不到唯一的附件节点
+
+- 示例
+
+  ```ts
+  await editor.commands.updateAttachment({
+    url: 'www.baidu.com'
+  })
+  ```
+
+##### getAttachmentInfo()
+
+获取附件的信息
+
+- 类型
+
+  ```ts
+  getAttachmentInfo():
+    url: string;
+    text: string;
+    icon: string;
+  } | null
+  ```
+
+- 详细信息
+
+  当光标不在同一个附件节点内时，返回 `null`，如果光标在同一个附件节点内，返回它的 `url` `text` `icon` 属性集合

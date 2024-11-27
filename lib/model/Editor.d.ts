@@ -178,51 +178,51 @@ export type EditorConfigureOptionType = {
  */
 export declare class Editor {
     /**
-     * 编辑器的真实dom【初始化后不可修改】
+     * 编辑器的真实dom【初始化后不可修改】【open】
      */
     $el?: HTMLElement;
     /**
-     * 是否允许复制【初始化后可以修改】
+     * 是否允许复制【初始化后可以修改】【open】
      */
     allowCopy: boolean;
     /**
-     * 是否允许粘贴【初始化后可以修改】
+     * 是否允许粘贴【初始化后可以修改】【open】
      */
     allowPaste: boolean;
     /**
-     * 是否允许剪切【初始化后可以修改】
+     * 是否允许剪切【初始化后可以修改】【open】
      */
     allowCut: boolean;
     /**
-     * 是否允许粘贴html【初始化后可以修改】
+     * 是否允许粘贴html【初始化后可以修改】【open】
      */
     allowPasteHtml: boolean;
     /**
-     * 剪切板同时存在文件和html/text时，是否优先粘贴文件【初始化后可以修改】
+     * 剪切板同时存在文件和html/text时，是否优先粘贴文件【初始化后可以修改】【open】
      */
     priorityPasteFiles: boolean;
     /**
-     * 编辑器内渲染文本节点的真实标签【初始化后不建议修改】
+     * 编辑器内渲染文本节点的真实标签【初始化后不建议修改】【open】
      */
     textRenderTag: string;
     /**
-     * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】
+     * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】【open】
      */
     blockRenderTag: string;
     /**
-     * 编辑器内定义需要置空的标签【初始化后不建议修改】
+     * 编辑器内定义需要置空的标签【初始化后不建议修改】【open】
      */
     emptyRenderTags: string[];
     /**
-     * 编辑器内额外保留的标签【初始化后不建议修改】
+     * 编辑器内额外保留的标签【初始化后不建议修改】【open】
      */
     extraKeepTags: string[];
     /**
-     * 插件数组【初始化后不可修改】
+     * 插件数组【初始化后不可修改】【open】
      */
     extensions: Extension[];
     /**
-     * 编辑器的节点数组格式化规则【初始化后不可修改】
+     * 编辑器的节点数组格式化规则【初始化后不可修改】【open】
      */
     formatRules: RuleFunctionType[];
     /**
@@ -310,23 +310,23 @@ export declare class Editor {
      */
     beforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode;
     /**
-     * 唯一id【不可修改】
+     * 唯一id【不可修改】【open】
      */
     guid: number;
     /**
-     * 虚拟光标【不建议修改】
+     * 虚拟光标【不建议修改】【open】
      */
     selection: Selection;
     /**
-     * 历史记录【不建议修改】
+     * 历史记录【不建议修改】【open】
      */
     history: History;
     /**
-     * 命令集合【不可修改】
+     * 命令集合【不可修改】【open】
      */
     commands: EditorCommandsType;
     /**
-     * 节点数组【不建议修改】
+     * 节点数组【不建议修改】【open】
      */
     stackNodes: KNode[];
     /**
@@ -436,7 +436,7 @@ export declare class Editor {
     /**
      * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
      */
-    isSelectionInNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean | undefined;
+    isSelectionInNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean;
     /**
      * 获取光标选区内的节点数据
      */
@@ -470,7 +470,7 @@ export declare class Editor {
      */
     insertParagraph(): void;
     /**
-     * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点被插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
+     * 向选区插入节点，cover为true表示当向某个只有占位符的非固定块节点插入另一个非固定块节点时是否覆盖此节点，而不是直接插入进去
      */
     insertNode(node: KNode, cover?: boolean | undefined): void;
     /**

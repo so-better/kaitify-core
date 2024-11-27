@@ -35,3 +35,12 @@ title: 什么是扩展？
 ##### formatRules <Badge type="danger" text="RuleFunctionType[]" />
 
 节点数组格式化规则，同编辑器实例属性 `formatRules`
+
+## 使用拓展提供的命令
+
+通过 `editor.commands` 来调用拓展提供的命令
+
+```ts
+//调用align拓展提供的setAlign方法
+editor.commands.setAlign('center')
+```

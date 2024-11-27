@@ -246,7 +246,7 @@ export declare class KNode {
     /**
      * 【API】判断参数是否节点
      */
-    static isKNode(val: any): val is KNode;
+    static isKNode(val: any): boolean;
     /**
      * 【API】将某个节点数组扁平化处理后返回
      */

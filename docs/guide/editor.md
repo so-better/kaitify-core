@@ -262,7 +262,7 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
 
 <script setup lang="ts">
   import { useData } from 'vitepress'
-  import { onMounted, watch, ref } from "vue"
+  import { onMounted, onBeforeUnmount, watch, ref } from "vue"
   import { Editor } from "../../lib/kaitify-core.es.js"
 
   const { isDark } = useData()
@@ -276,6 +276,10 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
       dark: isDark.value,
       placeholder:'请输入正文...'
     })
+  })
+
+  onBeforeUnmount(()=>{
+    editor.value?.destroy()
   })
 
   watch(()=>isDark.value,newVal=>{

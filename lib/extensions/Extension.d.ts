@@ -60,6 +60,10 @@ export type ExtensionCreateOptionType = {
      */
     pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
     /**
+     * 视频更新前回调
+     */
+    beforeUpdateView?: (this: Editor) => void;
+    /**
      * 视图更新后回调
      */
     afterUpdateView?: (this: Editor) => void;
@@ -140,6 +144,10 @@ export declare class Extension {
      * 节点粘贴保留样式的自定义方法
      */
     pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
+    /**
+     * 视频更新前回调
+     */
+    beforeUpdateView?: (this: Editor) => void;
     /**
      * 视图更新后回调
      */

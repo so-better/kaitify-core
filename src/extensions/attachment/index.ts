@@ -11,8 +11,9 @@ export type SetAttachmentOptionType = {
 }
 
 export type UpdateAttachmentOptionType = {
-  url: string
-  text: string
+  url?: string
+  text?: string
+  icon?: string
 }
 
 declare module '../../model' {
@@ -21,7 +22,7 @@ declare module '../../model' {
     hasAttachment?: () => boolean
     setAttachment?: (options: SetAttachmentOptionType) => Promise<void>
     updateAttachment?: (options: UpdateAttachmentOptionType) => Promise<void>
-    getAttachmentInfo?: () => { url: string; text: string } | null
+    getAttachmentInfo?: () => { url: string; text: string; icon: string } | null
   }
 }
 
@@ -49,7 +50,6 @@ const downloadAttachment = (editor: Editor) => {
     })
     //点击的是附件
     if (matchNode) {
-      const el = editor.findDom(matchNode)
       //获取文件地址
       const url = matchNode.marks!['kaitify-attachment'] as string
       //使用fetch读取文件地址
@@ -62,7 +62,12 @@ const downloadAttachment = (editor: Editor) => {
       const a = document.createElement('a')
       a.setAttribute('target', '_blank')
       a.setAttribute('href', URL.createObjectURL(blob))
-      a.setAttribute('download', el.innerText)
+      a.setAttribute(
+        'download',
+        matchNode.children!.reduce((val, item) => {
+          return val + item.textContent
+        }, '')
+      )
       a.click()
     }
   })
@@ -222,11 +227,11 @@ export const AttachmentExtension = Extension.create({
     /**
      * 更新附件
      */
-    const updateAttachment = async ({ url, text }: UpdateAttachmentOptionType) => {
+    const updateAttachment = async ({ url, text, icon }: UpdateAttachmentOptionType) => {
       if (!this.selection.focused()) {
         return
       }
-      if (!url || !text) {
+      if (!url && !text && !icon) {
         return
       }
       const attachmentNode = getAttachment()
@@ -234,14 +239,21 @@ export const AttachmentExtension = Extension.create({
         return
       }
       //更新url
-      attachmentNode.marks!['kaitify-attachment'] = url
+      if (url) {
+        attachmentNode.marks!['kaitify-attachment'] = url
+      }
       //更新text
-      const textNode = KNode.create({
-        type: 'text',
-        textContent: text
-      })
-      textNode.parent = attachmentNode
-      attachmentNode.children = [textNode]
+      if (text) {
+        const textNode = KNode.create({
+          type: 'text',
+          textContent: text
+        })
+        textNode.parent = attachmentNode
+        attachmentNode.children = [textNode]
+      }
+      if (icon) {
+        attachmentNode.styles!['backgroundImage'] = `url(${icon})`
+      }
       //更新视图
       await this.updateView()
     }
@@ -261,7 +273,8 @@ export const AttachmentExtension = Extension.create({
       const text = attachmentNode.children!.reduce((val, item) => {
         return val + item.textContent
       }, '')
-      return { url, text }
+      const icon = attachmentNode.styles!['backgroundImage']!.match(/url\(["']?(.*?)["']?\)/)?.[1]!
+      return { url, text, icon }
     }
 
     return {
