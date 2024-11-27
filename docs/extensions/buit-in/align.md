@@ -4,13 +4,13 @@ title: align 对齐方式
 
 # align 对齐方式
 
-设置光标所在的块节点的对齐方式
+块节点的对齐方式
 
 ## Commands 命令
 
 ##### isAlign()
 
-光标所在的块节点是否都是符合的对齐方式
+判断光标所在的块节点是否都是符合的对齐方式
 
 - 类型
 
@@ -20,7 +20,7 @@ title: align 对齐方式
 
 - 详细信息
 
-  提供一个入参，类型为 AlignValueType，可取值为 `left` `right` `center` `justify`，用以判断光标所在的块节点是否都符合指定的对齐方式，返回 `boolean` 值
+  提供一个入参，类型为 `AlignValueType`，可取值为 `left` `right` `center` `justify`，用以判断光标所在的块节点是否都符合指定的对齐方式，返回 `boolean` 值
 
 - 示例
 
@@ -40,7 +40,9 @@ title: align 对齐方式
 
 - 详细信息
 
-  提供一个入参，类型为 AlignValueType，可取值为 `left` `right` `center` `justify`，该方法会设置光标所在的块节点的对齐方式，在设置完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+  提供一个入参，类型为 `AlignValueType`，可取值为 `left` `right` `center` `justify`，该方法会设置光标所在的块节点的对齐方式，在设置完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+
+  如果通过 `isAlign` 判断所在块节点都已经是该对齐方式了，则不会继续执行
 
 - 示例
 
@@ -60,7 +62,9 @@ title: align 对齐方式
 
 - 详细信息
 
-  提供一个入参，类型为 AlignValueType，可取值为 `left` `right` `center` `justify`，该方法会取消光标所在的块节点的指定对齐方式，在设置完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+  提供一个入参，类型为 `AlignValueType`，可取值为 `left` `right` `center` `justify`，该方法会取消光标所在的块节点的指定对齐方式，在设置完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+
+  如果通过 `isAlign` 判断所在块节点都已经不是该对齐方式了，则不会继续执行
 
 - 示例
 

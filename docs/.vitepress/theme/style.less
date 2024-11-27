@@ -28,6 +28,10 @@
   color: #308af3;
   transition: all 300ms;
 
+  &:not(:disabled):focus-visible {
+    outline: none;
+  }
+
   &:not(:disabled):hover {
     cursor: pointer;
     background: fade(#308af3, 20%);
