@@ -5,4 +5,4 @@ declare module '../../model' {
         setDecreaseIndent?: () => Promise<void>;
     }
 }
-export declare const IndentExtension: Extension;
+export declare const IndentExtension: () => Extension;

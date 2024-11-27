@@ -127,113 +127,114 @@ const imageResizable = (editor: Editor) => {
   })
 }
 
-export const ImageExtension = Extension.create({
-  name: 'image',
-  extraKeepTags: ['img'],
-  domParseNodeCallback(node) {
-    if (node.isMatch({ tag: 'img' })) {
-      node.type = 'closed'
-    }
-    return node
-  },
-  formatRules: [
-    ({ node }) => {
+export const ImageExtension = () =>
+  Extension.create({
+    name: 'image',
+    extraKeepTags: ['img'],
+    domParseNodeCallback(node) {
       if (node.isMatch({ tag: 'img' })) {
         node.type = 'closed'
       }
-    }
-  ],
-  pasteKeepMarks(node) {
-    const marks: KNodeMarksType = {}
-    if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
-      if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
-      if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
-    }
-    return marks
-  },
-  pasteKeepStyles(node) {
-    const styles: KNodeStylesType = {}
-    if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
-      styles['width'] = node.styles!['width'] || 'auto'
-    }
-    return styles
-  },
-  afterUpdateView() {
-    //图片选中
-    imageFocus(this)
-    //图片拖拽改变大小
-    imageResizable(this)
-  },
-  addCommands() {
-    /**
-     * 获取光标所在的图片，如果光标不在一张图片内，返回null
-     */
-    const getImage = () => {
-      return this.getMatchNodeBySelection({
-        tag: 'img'
-      })
-    }
-
-    /**
-     * 判断光标范围内是否有图片
-     */
-    const hasImage = () => {
-      return this.isSelectionNodesSomeMatch({
-        tag: 'img'
-      })
-    }
-
-    /**
-     * 插入图片
-     */
-    const setImage = async ({ src, alt, width }: SetImageOptionType) => {
-      if (!this.selection.focused()) {
-        return
-      }
-      if (!src) {
-        return
-      }
-      const imageNode = KNode.create({
-        type: 'closed',
-        tag: 'img',
-        marks: {
-          src,
-          alt: alt || ''
-        },
-        styles: {
-          width: width || 'auto'
+      return node
+    },
+    formatRules: [
+      ({ node }) => {
+        if (node.isMatch({ tag: 'img' })) {
+          node.type = 'closed'
         }
-      })
-      this.insertNode(imageNode)
-      this.setSelectionAfter(imageNode)
-      await this.updateView()
-    }
+      }
+    ],
+    pasteKeepMarks(node) {
+      const marks: KNodeMarksType = {}
+      if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
+        if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
+      }
+      return marks
+    },
+    pasteKeepStyles(node) {
+      const styles: KNodeStylesType = {}
+      if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
+        styles['width'] = node.styles!['width'] || 'auto'
+      }
+      return styles
+    },
+    afterUpdateView() {
+      //图片选中
+      imageFocus(this)
+      //图片拖拽改变大小
+      imageResizable(this)
+    },
+    addCommands() {
+      /**
+       * 获取光标所在的图片，如果光标不在一张图片内，返回null
+       */
+      const getImage = () => {
+        return this.getMatchNodeBySelection({
+          tag: 'img'
+        })
+      }
 
-    /**
-     * 更新图片
-     */
-    const updateImage = async ({ src, alt }: UpdateImageOptionType) => {
-      if (!this.selection.focused()) {
-        return
+      /**
+       * 判断光标范围内是否有图片
+       */
+      const hasImage = () => {
+        return this.isSelectionNodesSomeMatch({
+          tag: 'img'
+        })
       }
-      if (!src) {
-        return
-      }
-      const imageNode = getImage()
-      if (!imageNode) {
-        return
-      }
-      //更新url
-      imageNode.marks!.src = src
-      //更新alt
-      if (alt) {
-        imageNode.marks!.alt = alt
-      } else {
-        imageNode.marks = deleteProperty(imageNode.marks!, 'alt')
-      }
-      await this.updateView()
-    }
 
-    return { getImage, hasImage, setImage, updateImage }
-  }
-})
+      /**
+       * 插入图片
+       */
+      const setImage = async ({ src, alt, width }: SetImageOptionType) => {
+        if (!this.selection.focused()) {
+          return
+        }
+        if (!src) {
+          return
+        }
+        const imageNode = KNode.create({
+          type: 'closed',
+          tag: 'img',
+          marks: {
+            src,
+            alt: alt || ''
+          },
+          styles: {
+            width: width || 'auto'
+          }
+        })
+        this.insertNode(imageNode)
+        this.setSelectionAfter(imageNode)
+        await this.updateView()
+      }
+
+      /**
+       * 更新图片
+       */
+      const updateImage = async ({ src, alt }: UpdateImageOptionType) => {
+        if (!this.selection.focused()) {
+          return
+        }
+        if (!src) {
+          return
+        }
+        const imageNode = getImage()
+        if (!imageNode) {
+          return
+        }
+        //更新url
+        imageNode.marks!.src = src
+        //更新alt
+        if (alt) {
+          imageNode.marks!.alt = alt
+        } else {
+          imageNode.marks = deleteProperty(imageNode.marks!, 'alt')
+        }
+        await this.updateView()
+      }
+
+      return { getImage, hasImage, setImage, updateImage }
+    }
+  })

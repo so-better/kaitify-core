@@ -23,4 +23,4 @@ declare module '../../model' {
         } | null;
     }
 }
-export declare const AttachmentExtension: Extension;
+export declare const AttachmentExtension: () => Extension;

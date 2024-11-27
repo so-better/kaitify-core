@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetSubscript?: () => Promise<void>;
     }
 }
-export declare const SubscriptExtension: Extension;
+export declare const SubscriptExtension: () => Extension;

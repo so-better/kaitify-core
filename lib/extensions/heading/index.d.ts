@@ -10,4 +10,4 @@ declare module '../../model' {
         unsetHeading?: (level: HeadingLevelType) => Promise<void>;
     }
 }
-export declare const HeadingExtension: Extension;
+export declare const HeadingExtension: () => Extension;

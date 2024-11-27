@@ -54,110 +54,111 @@ const toHeading = (editor: Editor, node: KNode, level: HeadingLevelType) => {
   }
 }
 
-export const HeadingExtension = Extension.create({
-  name: 'heading',
-  extraKeepTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-  domParseNodeCallback(node) {
-    if (node.isMatch({ tag: 'h1' }) || node.isMatch({ tag: 'h2' }) || node.isMatch({ tag: 'h3' }) || node.isMatch({ tag: 'h4' }) || node.isMatch({ tag: 'h5' }) || node.isMatch({ tag: 'h6' })) {
-      node.type = 'block'
-    }
-    return node
-  },
-  formatRules: [
-    ({ node }) => {
+export const HeadingExtension = () =>
+  Extension.create({
+    name: 'heading',
+    extraKeepTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    domParseNodeCallback(node) {
       if (node.isMatch({ tag: 'h1' }) || node.isMatch({ tag: 'h2' }) || node.isMatch({ tag: 'h3' }) || node.isMatch({ tag: 'h4' }) || node.isMatch({ tag: 'h5' }) || node.isMatch({ tag: 'h6' })) {
         node.type = 'block'
       }
-    }
-  ],
-  addCommands() {
-    const headingLevelMap = {
-      0: this.blockRenderTag,
-      1: 'h1',
-      2: 'h2',
-      3: 'h3',
-      4: 'h4',
-      5: 'h5',
-      6: 'h6'
-    }
-    /**
-     * 获取光标所在的标题，如果光标不在一个标题内，返回null
-     */
-    const getHeading = (level: HeadingLevelType) => {
-      return this.getMatchNodeBySelection({
-        tag: headingLevelMap[level]
-      })
-    }
-
-    /**
-     * 判断光标范围内是否有标题
-     */
-    const hasHeading = (level: HeadingLevelType) => {
-      return this.isSelectionNodesSomeMatch({
-        tag: headingLevelMap[level]
-      })
-    }
-
-    /**
-     * 光标范围内是否都是标题
-     */
-    const allHeading = (level: HeadingLevelType) => {
-      return this.isSelectionNodesAllMatch({
-        tag: headingLevelMap[level]
-      })
-    }
-
-    /**
-     * 设置标题
-     */
-    const setHeading = async (level: HeadingLevelType) => {
-      if (allHeading(level)) {
-        return
+      return node
+    },
+    formatRules: [
+      ({ node }) => {
+        if (node.isMatch({ tag: 'h1' }) || node.isMatch({ tag: 'h2' }) || node.isMatch({ tag: 'h3' }) || node.isMatch({ tag: 'h4' }) || node.isMatch({ tag: 'h5' }) || node.isMatch({ tag: 'h6' })) {
+          node.type = 'block'
+        }
       }
-      //起点和终点在一起
-      if (this.selection.collapsed()) {
-        const blockNode = this.selection.start!.node.getBlock()
-        toHeading(this, blockNode, level)
+    ],
+    addCommands() {
+      const headingLevelMap = {
+        0: this.blockRenderTag,
+        1: 'h1',
+        2: 'h2',
+        3: 'h3',
+        4: 'h4',
+        5: 'h5',
+        6: 'h6'
       }
-      //起点和终点不在一起
-      else {
-        const blockNodes = getSelectionBlockNodes.apply(this)
-        blockNodes.forEach(item => {
-          toHeading(this, item, level)
+      /**
+       * 获取光标所在的标题，如果光标不在一个标题内，返回null
+       */
+      const getHeading = (level: HeadingLevelType) => {
+        return this.getMatchNodeBySelection({
+          tag: headingLevelMap[level]
         })
       }
-      await this.updateView()
-    }
 
-    /**
-     * 取消标题
-     */
-    const unsetHeading = async (level: HeadingLevelType) => {
-      if (!allHeading(level)) {
-        return
+      /**
+       * 判断光标范围内是否有标题
+       */
+      const hasHeading = (level: HeadingLevelType) => {
+        return this.isSelectionNodesSomeMatch({
+          tag: headingLevelMap[level]
+        })
       }
-      //起点和终点在一起
-      if (this.selection.collapsed()) {
-        const matchNode = this.selection.start!.node.getMatchNode({ tag: headingLevelMap[level] })
-        if (matchNode) this.toParagraph(matchNode)
+
+      /**
+       * 光标范围内是否都是标题
+       */
+      const allHeading = (level: HeadingLevelType) => {
+        return this.isSelectionNodesAllMatch({
+          tag: headingLevelMap[level]
+        })
       }
-      //起点和终点不在一起
-      else {
-        const blockNodes = getSelectionBlockNodes.apply(this)
-        blockNodes.forEach(item => {
-          const matchNode = item.getMatchNode({ tag: headingLevelMap[level] })
+
+      /**
+       * 设置标题
+       */
+      const setHeading = async (level: HeadingLevelType) => {
+        if (allHeading(level)) {
+          return
+        }
+        //起点和终点在一起
+        if (this.selection.collapsed()) {
+          const blockNode = this.selection.start!.node.getBlock()
+          toHeading(this, blockNode, level)
+        }
+        //起点和终点不在一起
+        else {
+          const blockNodes = getSelectionBlockNodes.apply(this)
+          blockNodes.forEach(item => {
+            toHeading(this, item, level)
+          })
+        }
+        await this.updateView()
+      }
+
+      /**
+       * 取消标题
+       */
+      const unsetHeading = async (level: HeadingLevelType) => {
+        if (!allHeading(level)) {
+          return
+        }
+        //起点和终点在一起
+        if (this.selection.collapsed()) {
+          const matchNode = this.selection.start!.node.getMatchNode({ tag: headingLevelMap[level] })
           if (matchNode) this.toParagraph(matchNode)
-        })
+        }
+        //起点和终点不在一起
+        else {
+          const blockNodes = getSelectionBlockNodes.apply(this)
+          blockNodes.forEach(item => {
+            const matchNode = item.getMatchNode({ tag: headingLevelMap[level] })
+            if (matchNode) this.toParagraph(matchNode)
+          })
+        }
+        await this.updateView()
       }
-      await this.updateView()
-    }
 
-    return {
-      getHeading,
-      hasHeading,
-      allHeading,
-      setHeading,
-      unsetHeading
+      return {
+        getHeading,
+        hasHeading,
+        allHeading,
+        setHeading,
+        unsetHeading
+      }
     }
-  }
-})
+  })

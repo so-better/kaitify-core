@@ -23,4 +23,4 @@ declare module '../../model' {
         updateImage?: (options: UpdateImageOptionType) => Promise<void>;
     }
 }
-export declare const ImageExtension: Extension;
+export declare const ImageExtension: () => Extension;

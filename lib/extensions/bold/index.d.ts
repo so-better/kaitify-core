@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetBold?: () => Promise<void>;
     }
 }
-export declare const BoldExtension: Extension;
+export declare const BoldExtension: () => Extension;

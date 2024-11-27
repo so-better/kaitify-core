@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetSuperscript?: () => Promise<void>;
     }
 }
-export declare const SuperscriptExtension: Extension;
+export declare const SuperscriptExtension: () => Extension;

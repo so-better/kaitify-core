@@ -4,4 +4,4 @@ declare module '../../model' {
         setHorizontal?: () => Promise<void>;
     }
 }
-export declare const HorizontalExtension: Extension;
+export declare const HorizontalExtension: () => Extension;

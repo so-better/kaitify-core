@@ -24,4 +24,4 @@ declare module '../../model' {
         updateVideo?: (options: UpdateVideoOptionType) => Promise<void>;
     }
 }
-export declare const VideoExtension: Extension;
+export declare const VideoExtension: () => Extension;

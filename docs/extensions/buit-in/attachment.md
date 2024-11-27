@@ -126,3 +126,65 @@ title: attachment 附件
 - 详细信息
 
   当光标不在同一个附件节点内时，返回 `null`，如果光标在同一个附件节点内，返回它的 `url` `text` `icon` 属性集合
+
+## 代码示例
+
+<div style="margin:0 0 10px 0">
+  <button class="demo-button" @click="editor?.commands.setAttachment({ url:'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg',text:'一张风景图'})" :disabled="!editable">插入附件</button>
+  <button class="demo-button" @click="updateAttachment" :disabled="!editable">更新附件信息</button>
+  <button class="demo-button" @click="getInfo" :disabled="!editable">获取附件信息</button>
+  <button class="demo-button" @click="editable=!editable">{{ editable ? '禁用编辑器':'启用编辑器' }}</button>
+</div>
+<div ref="editorRef" style="width:100%;height:100px;"></div>
+
+<script lang="ts" setup>
+  import { useData } from 'vitepress'
+  import { onMounted, watch, ref, onBeforeUnmount} from "vue"
+  import { Editor } from "../../../lib/kaitify-core.es.js"
+
+  const { isDark, page } = useData()
+  const editorRef = ref<HtmlElement | undefined>()
+  const editor = ref<Editor | undefined>()
+  const editable = ref<boolean>(true)
+  
+  onMounted(async ()=>{
+    editor.value = await Editor.configure({
+      el: editorRef.value,
+      value: '我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本',
+      dark: isDark.value,
+      editable:editable.value,
+      placeholder:'请输入正文...'
+    })
+  })
+
+  onBeforeUnmount(()=>{
+    editor.value?.destroy()
+  })
+
+  const updateAttachment = ()=>{
+    console.log(editor.value)
+    if(!editor.value?.commands.getAttachment()){
+      alert('请点击附件')
+      return
+    }
+    editor.value?.commands.updateAttachment({ text:'一张风景图.jpg' })
+  }
+
+  const getInfo = ()=>{
+    if(!editor.value?.commands.getAttachment()){
+      alert('请点击附件')
+      return
+    }
+    alert(JSON.stringify(editor.value?.commands.getAttachmentInfo()))
+  }
+
+  watch(()=>isDark.value,newVal=>{
+    if(editor.value){
+        editor.value.setDark(isDark.value)
+    }
+  })
+
+  watch(()=>editable.value,newVal=>{
+    editor.value.setEditable(newVal)
+  })
+</script>

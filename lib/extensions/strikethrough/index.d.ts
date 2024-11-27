@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetStrikethrough?: () => Promise<void>;
     }
 }
-export declare const StrikethroughExtension: Extension;
+export declare const StrikethroughExtension: () => Extension;

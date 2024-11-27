@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetColor?: (value: string) => Promise<void>;
     }
 }
-export declare const ColorExtension: Extension;
+export declare const ColorExtension: () => Extension;

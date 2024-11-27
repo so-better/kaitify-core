@@ -7,4 +7,4 @@ declare module '../../model' {
         unsetAlign?: (value: AlignValueType) => Promise<void>;
     }
 }
-export declare const AlignExtension: Extension;
+export declare const AlignExtension: () => Extension;

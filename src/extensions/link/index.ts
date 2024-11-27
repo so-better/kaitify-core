@@ -31,149 +31,150 @@ declare module '../../model' {
   }
 }
 
-export const LinkExtension = Extension.create({
-  name: 'link',
-  extraKeepTags: ['a'],
-  domParseNodeCallback(node) {
-    if (node.isMatch({ tag: 'a' })) {
-      node.type = 'inline'
-    }
-    return node
-  },
-  pasteKeepMarks(node) {
-    const marks: KNodeMarksType = {}
-    if (node.isMatch({ tag: 'a' }) && node.hasMarks()) {
-      if (node.marks!.hasOwnProperty('href')) marks['href'] = node.marks!['href']
-      if (node.marks!.hasOwnProperty('target')) marks['target'] = node.marks!['target']
-    }
-    return marks
-  },
-  formatRules: [
-    ({ editor, node }) => {
-      //链接只能是行内节点且只能有文本节点和闭合节点
-      if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
+export const LinkExtension = () =>
+  Extension.create({
+    name: 'link',
+    extraKeepTags: ['a'],
+    domParseNodeCallback(node) {
+      if (node.isMatch({ tag: 'a' })) {
         node.type = 'inline'
-        node.children!.forEach(item => {
-          splitNodeToNodes.apply(editor, [item])
+      }
+      return node
+    },
+    pasteKeepMarks(node) {
+      const marks: KNodeMarksType = {}
+      if (node.isMatch({ tag: 'a' }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('href')) marks['href'] = node.marks!['href']
+        if (node.marks!.hasOwnProperty('target')) marks['target'] = node.marks!['target']
+      }
+      return marks
+    },
+    formatRules: [
+      ({ editor, node }) => {
+        //链接只能是行内节点且只能有文本节点和闭合节点
+        if (node.isMatch({ tag: 'a' }) && node.hasChildren()) {
+          node.type = 'inline'
+          node.children!.forEach(item => {
+            splitNodeToNodes.apply(editor, [item])
+          })
+        }
+      }
+    ],
+    addCommands() {
+      /**
+       * 获取光标所在的链接，如果光标不在一个链接内，返回null
+       */
+      const getLink = () => {
+        return this.getMatchNodeBySelection({ tag: 'a' })
+      }
+
+      /**
+       * 判断光标范围内是否有链接
+       */
+      const hasLink = () => {
+        return this.isSelectionNodesSomeMatch({
+          tag: 'a'
         })
       }
-    }
-  ],
-  addCommands() {
-    /**
-     * 获取光标所在的链接，如果光标不在一个链接内，返回null
-     */
-    const getLink = () => {
-      return this.getMatchNodeBySelection({ tag: 'a' })
-    }
 
-    /**
-     * 判断光标范围内是否有链接
-     */
-    const hasLink = () => {
-      return this.isSelectionNodesSomeMatch({
-        tag: 'a'
-      })
-    }
-
-    /**
-     * 设置连接
-     */
-    const setLink = async ({ href, text, newOpen }: SetLinkOptionType) => {
-      if (!this.selection.focused() || hasLink()) {
-        return
-      }
-      if (!href) {
-        return
-      }
-      //起点和终点在一起
-      if (this.selection.collapsed()) {
-        if (!text) {
+      /**
+       * 设置连接
+       */
+      const setLink = async ({ href, text, newOpen }: SetLinkOptionType) => {
+        if (!this.selection.focused() || hasLink()) {
           return
         }
-        const marks: KNodeMarksType = {
-          href
+        if (!href) {
+          return
         }
+        //起点和终点在一起
+        if (this.selection.collapsed()) {
+          if (!text) {
+            return
+          }
+          const marks: KNodeMarksType = {
+            href
+          }
+          if (newOpen) {
+            marks.target = '_blank'
+          }
+          const linkNode = KNode.create({
+            type: 'inline',
+            tag: 'a',
+            marks,
+            children: [
+              {
+                type: 'text',
+                textContent: text
+              }
+            ]
+          })
+          this.insertNode(linkNode)
+        }
+        //起点和终点不在一起
+        else {
+          const marks: KNodeMarksType = {
+            href
+          }
+          if (newOpen) {
+            marks.target = '_blank'
+          }
+          const linkNode = KNode.create({
+            type: 'inline',
+            tag: 'a',
+            marks,
+            children: []
+          })
+          this.getFocusSplitNodesBySelection('all').forEach((item, index) => {
+            const newNode = item.clone(true)
+            this.addNode(newNode, linkNode, index)
+          })
+          this.insertNode(linkNode)
+        }
+        await this.updateView()
+      }
+
+      /**
+       * 更新链接
+       */
+      const updateLink = async ({ href, newOpen }: UpdateLinkOptionType) => {
+        if (!this.selection.focused()) {
+          return
+        }
+        if (!href) {
+          return
+        }
+        const linkNode = getLink()
+        if (!linkNode) {
+          return
+        }
+        linkNode.marks!.href = href
         if (newOpen) {
-          marks.target = '_blank'
+          linkNode.marks!.target = '_blank'
+        } else {
+          linkNode.marks = deleteProperty(linkNode.marks!, 'target')
         }
-        const linkNode = KNode.create({
-          type: 'inline',
-          tag: 'a',
-          marks,
-          children: [
-            {
-              type: 'text',
-              textContent: text
-            }
-          ]
-        })
-        this.insertNode(linkNode)
+        await this.updateView()
       }
-      //起点和终点不在一起
-      else {
-        const marks: KNodeMarksType = {
-          href
+
+      /**
+       * 取消链接
+       */
+      const unsetLink = async () => {
+        if (!this.selection.focused()) {
+          return
         }
-        if (newOpen) {
-          marks.target = '_blank'
+        const linkNode = getLink()
+        if (!linkNode) {
+          return
         }
-        const linkNode = KNode.create({
-          type: 'inline',
-          tag: 'a',
-          marks,
-          children: []
+        linkNode.children!.forEach(item => {
+          this.addNodeBefore(item, linkNode)
         })
-        this.getFocusSplitNodesBySelection('all').forEach((item, index) => {
-          const newNode = item.clone(true)
-          this.addNode(newNode, linkNode, index)
-        })
-        this.insertNode(linkNode)
+        linkNode.children = []
+        await this.updateView()
       }
-      await this.updateView()
-    }
 
-    /**
-     * 更新链接
-     */
-    const updateLink = async ({ href, newOpen }: UpdateLinkOptionType) => {
-      if (!this.selection.focused()) {
-        return
-      }
-      if (!href) {
-        return
-      }
-      const linkNode = getLink()
-      if (!linkNode) {
-        return
-      }
-      linkNode.marks!.href = href
-      if (newOpen) {
-        linkNode.marks!.target = '_blank'
-      } else {
-        linkNode.marks = deleteProperty(linkNode.marks!, 'target')
-      }
-      await this.updateView()
+      return { getLink, hasLink, setLink, updateLink, unsetLink }
     }
-
-    /**
-     * 取消链接
-     */
-    const unsetLink = async () => {
-      if (!this.selection.focused()) {
-        return
-      }
-      const linkNode = getLink()
-      if (!linkNode) {
-        return
-      }
-      linkNode.children!.forEach(item => {
-        this.addNodeBefore(item, linkNode)
-      })
-      linkNode.children = []
-      await this.updateView()
-    }
-
-    return { getLink, hasLink, setLink, updateLink, unsetLink }
-  }
-})
+  })

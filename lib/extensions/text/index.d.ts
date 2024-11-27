@@ -11,4 +11,4 @@ declare module '../../model' {
         clearFormat?: () => Promise<void>;
     }
 }
-export declare const TextExtension: Extension;
+export declare const TextExtension: () => Extension;

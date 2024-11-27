@@ -18,4 +18,4 @@ declare module '../../model' {
         deleteTableColumn?: () => Promise<void>;
     }
 }
-export declare const TableExtension: Extension;
+export declare const TableExtension: () => Extension;

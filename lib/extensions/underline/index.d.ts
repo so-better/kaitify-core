@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetUnderline?: () => Promise<void>;
     }
 }
-export declare const UnderlineExtension: Extension;
+export declare const UnderlineExtension: () => Extension;

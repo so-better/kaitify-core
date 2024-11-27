@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetFontSize?: (value: string) => Promise<void>;
     }
 }
-export declare const FontSizeExtension: Extension;
+export declare const FontSizeExtension: () => Extension;

@@ -11,5 +11,5 @@ declare module '../../model' {
         updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>;
     }
 }
-export declare const CodeBlockExtension: Extension;
+export declare const CodeBlockExtension: () => Extension;
 export * from './hljs';

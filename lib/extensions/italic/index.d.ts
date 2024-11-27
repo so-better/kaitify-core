@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetItalic?: () => Promise<void>;
     }
 }
-export declare const ItalicExtension: Extension;
+export declare const ItalicExtension: () => Extension;

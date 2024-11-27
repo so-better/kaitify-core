@@ -8,4 +8,4 @@ declare module '../../model' {
         updateMath?: (value: string) => Promise<void>;
     }
 }
-export declare const MathExtension: Extension;
+export declare const MathExtension: () => Extension;

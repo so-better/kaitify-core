@@ -9,4 +9,4 @@ declare module '../../model' {
         unsetCode?: () => Promise<void>;
     }
 }
-export declare const CodeExtension: Extension;
+export declare const CodeExtension: () => Extension;

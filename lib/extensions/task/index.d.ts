@@ -9,4 +9,4 @@ declare module '../../model' {
         unsetTask?: () => Promise<void>;
     }
 }
-export declare const TaskExtension: Extension;
+export declare const TaskExtension: () => Extension;

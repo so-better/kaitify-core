@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetLineHeight?: (value: string | number) => Promise<void>;
     }
 }
-export declare const LineHeightExtension: Extension;
+export declare const LineHeightExtension: () => Extension;

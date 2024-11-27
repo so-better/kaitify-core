@@ -15,4 +15,4 @@ declare module '../../model' {
         }) => Promise<void>;
     }
 }
-export declare const ListExtension: Extension;
+export declare const ListExtension: () => Extension;

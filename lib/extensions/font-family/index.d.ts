@@ -6,4 +6,4 @@ declare module '../../model' {
         unsetFontFamily?: (value: string) => Promise<void>;
     }
 }
-export declare const FontFamilyExtension: Extension;
+export declare const FontFamilyExtension: () => Extension;

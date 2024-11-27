@@ -9,4 +9,4 @@ declare module '../../model' {
         unsetBlockquote?: () => Promise<void>;
     }
 }
-export declare const BlockquoteExtension: Extension;
+export declare const BlockquoteExtension: () => Extension;

@@ -452,58 +452,11 @@ const tableResizable = (editor: Editor) => {
   })
 }
 
-export const TableExtension = Extension.create({
-  name: 'table',
-  extraKeepTags: ['table', 'tfoot', 'tbody', 'thead', 'tr', 'th', 'td', 'col', 'colgroup'],
-  domParseNodeCallback(node) {
-    if (node.isMatch({ tag: 'table' })) {
-      node.type = 'block'
-    }
-    if (node.isMatch({ tag: 'tfoot' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tr' })) {
-      node.type = 'block'
-      node.fixed = true
-      node.nested = true
-    }
-    if (node.isMatch({ tag: 'th' }) || node.isMatch({ tag: 'td' })) {
-      node.type = 'block'
-      node.fixed = true
-      node.nested = true
-      if (isHideCell(node)) {
-        node.void = true
-      }
-    }
-    if (node.isMatch({ tag: 'colgroup' })) {
-      node.type = 'block'
-      node.fixed = true
-      node.nested = true
-      node.void = true
-    }
-    if (node.isMatch({ tag: 'col' })) {
-      node.type = 'closed'
-      node.void = true
-    }
-    return node
-  },
-  pasteKeepStyles(node) {
-    const styles: KNodeStylesType = {}
-    //表格单元格保留display样式
-    if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
-      if (node.styles!.hasOwnProperty('display')) styles.display = node.styles!.display
-    }
-    return styles
-  },
-  pasteKeepMarks(node) {
-    const marks: KNodeMarksType = {}
-    //表格单元格rowspan和colspan属性保留
-    if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
-      if (node.marks!.hasOwnProperty('rowspan')) marks['rowspan'] = node.marks!['rowspan']
-      if (node.marks!.hasOwnProperty('colspan')) marks['colspan'] = node.marks!['colspan']
-    }
-    return marks
-  },
-  formatRules: [
-    //表格相关节点类型设置
-    ({ node }) => {
+export const TableExtension = () =>
+  Extension.create({
+    name: 'table',
+    extraKeepTags: ['table', 'tfoot', 'tbody', 'thead', 'tr', 'th', 'td', 'col', 'colgroup'],
+    domParseNodeCallback(node) {
       if (node.isMatch({ tag: 'table' })) {
         node.type = 'block'
       }
@@ -530,618 +483,666 @@ export const TableExtension = Extension.create({
         node.type = 'closed'
         node.void = true
       }
+      return node
     },
-    //表格结构改造
-    ({ editor, node }) => {
-      if (node.isMatch({ tag: 'table' })) {
-        //获取表格下所有的节点
-        const nodes = KNode.flat(node.children!)
-        //获取tbody节点
-        let tbody = nodes.find(item => item.isMatch({ tag: 'tbody' }))
-        //如果tbody节点不存在，则创建该节点
-        if (!tbody) {
-          tbody = KNode.create({
+    pasteKeepStyles(node) {
+      const styles: KNodeStylesType = {}
+      //表格单元格保留display样式
+      if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
+        if (node.styles!.hasOwnProperty('display')) styles.display = node.styles!.display
+      }
+      return styles
+    },
+    pasteKeepMarks(node) {
+      const marks: KNodeMarksType = {}
+      //表格单元格rowspan和colspan属性保留
+      if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
+        if (node.marks!.hasOwnProperty('rowspan')) marks['rowspan'] = node.marks!['rowspan']
+        if (node.marks!.hasOwnProperty('colspan')) marks['colspan'] = node.marks!['colspan']
+      }
+      return marks
+    },
+    formatRules: [
+      //表格相关节点类型设置
+      ({ node }) => {
+        if (node.isMatch({ tag: 'table' })) {
+          node.type = 'block'
+        }
+        if (node.isMatch({ tag: 'tfoot' }) || node.isMatch({ tag: 'tbody' }) || node.isMatch({ tag: 'thead' }) || node.isMatch({ tag: 'tr' })) {
+          node.type = 'block'
+          node.fixed = true
+          node.nested = true
+        }
+        if (node.isMatch({ tag: 'th' }) || node.isMatch({ tag: 'td' })) {
+          node.type = 'block'
+          node.fixed = true
+          node.nested = true
+          if (isHideCell(node)) {
+            node.void = true
+          }
+        }
+        if (node.isMatch({ tag: 'colgroup' })) {
+          node.type = 'block'
+          node.fixed = true
+          node.nested = true
+          node.void = true
+        }
+        if (node.isMatch({ tag: 'col' })) {
+          node.type = 'closed'
+          node.void = true
+        }
+      },
+      //表格结构改造
+      ({ editor, node }) => {
+        if (node.isMatch({ tag: 'table' })) {
+          //获取表格下所有的节点
+          const nodes = KNode.flat(node.children!)
+          //获取tbody节点
+          let tbody = nodes.find(item => item.isMatch({ tag: 'tbody' }))
+          //如果tbody节点不存在，则创建该节点
+          if (!tbody) {
+            tbody = KNode.create({
+              type: 'block',
+              tag: 'tbody',
+              nested: true,
+              fixed: true,
+              children: []
+            })
+          }
+          //获取所有的表格行节点并设置为tbody的子节点
+          const rows = nodes
+            .filter(item => item.isMatch({ tag: 'tr' }))
+            .map(item => {
+              item.parent = tbody
+              //过滤非法的子节点
+              if (item.hasChildren()) {
+                item.children = item.children!.filter(it => it.isMatch({ tag: 'td' }) || it.isMatch({ tag: 'th' }))
+              }
+              return item
+            })
+          tbody.children = [...rows]
+          //获取表格列数
+          const { colCount } = getTableSize(rows)
+          //获取colgroup节点
+          let colgroup = nodes.find(item => item.isMatch({ tag: 'colgroup' }))
+          //colgroup节点存在
+          if (colgroup) {
+            //过滤非法的子节点
+            colgroup.children = colgroup.children!.filter(item => item.isMatch({ tag: 'col' }))
+            //遍历每个col节点
+            colgroup.children!.forEach(col => {
+              //没有标记
+              if (!col.hasMarks()) {
+                col.marks = {
+                  width: 'auto'
+                }
+              }
+              //没有width标记
+              else if (!col.marks!['width']) {
+                col.marks!['width'] = 'auto'
+              }
+            })
+            //对缺少的col元素进行补全
+            const length = colgroup.children!.length
+            for (let i = 0; i < colCount - length; i++) {
+              const col = KNode.create({
+                type: 'closed',
+                tag: 'col',
+                marks: {
+                  width: 'auto'
+                },
+                void: true
+              })
+              editor.addNode(col, colgroup, colgroup.children!.length)
+            }
+          }
+          //colgroup节点不存在，则创建该节点
+          else {
+            const children: KNodeCreateOptionType[] = []
+            for (let i = colCount - 1; i >= 0; i--) {
+              children.push({
+                type: 'closed',
+                tag: 'col',
+                marks: {
+                  width: 'auto'
+                },
+                void: true
+              })
+            }
+            colgroup = KNode.create({
+              type: 'block',
+              tag: 'colgroup',
+              fixed: true,
+              nested: true,
+              void: true,
+              children: children
+            })
+          }
+          //将colgroup和tbody设为表格的子节点
+          node.children = [colgroup, tbody]
+          colgroup.parent = node
+          tbody.parent = node
+        }
+      },
+      //th转td
+      ({ node }) => {
+        if (node.isMatch({ tag: 'th' })) {
+          node.tag = 'td'
+        }
+      },
+      //针对跨行跨列的单元格，增加隐藏单元格
+      ({ editor, node }) => {
+        if (node.isMatch({ tag: 'table' })) {
+          //所有行
+          const rows = node.children!.find(item => item.isMatch({ tag: 'tbody' }))!.children!
+          //过滤表格中的隐藏单元格
+          filterHideCells(rows)
+          //重新设置表格的隐藏单元格
+          resetTableHideCells(editor, rows)
+        }
+      }
+    ],
+    afterUpdateView() {
+      //表格拖拽改变列宽
+      tableResizable(this)
+    },
+    addCommands() {
+      /**
+       * 获取光标所在的表格节点，如果光标不在一个表格节点内，返回null
+       */
+      const getTable = () => {
+        return this.getMatchNodeBySelection({
+          tag: 'table'
+        })
+      }
+
+      /**
+       * 判断光标范围内是否有表格节点
+       */
+      const hasTable = () => {
+        return this.isSelectionNodesSomeMatch({
+          tag: 'table'
+        })
+      }
+
+      /**
+       * 是否可以合并单元格
+       */
+      const canMergeTableCells = (direction: TableCellsMergeDirectionType) => {
+        if (!this.selection.focused()) {
+          return false
+        }
+        //光标所在的单元格
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })
+        //光标在一个单元格内
+        if (cell && !isHideCell(cell)) {
+          //获取指定的合并的单元格
+          const targetCell = getTargetNotHideCell(cell, direction)
+          //单元格存在
+          if (targetCell) {
+            if (direction == 'left' || direction == 'right') {
+              const rows = cell.parent!.parent!.children!.filter(row => row.children!.some(n => !isHideCell(n)))
+              //只有一行
+              if (rows.length == 1) {
+                return true
+              }
+              const targetIndex = targetCell.parent!.children!.findIndex(item => item.isEqual(targetCell))
+              const cellIndex = cell.parent!.children!.findIndex(item => item.isEqual(cell))
+              if (direction == 'left') {
+                const size = getCellSize(targetCell)
+                //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨行单元格的
+                if (cellIndex - targetIndex > size.colCount) {
+                  return false
+                }
+              }
+              if (direction == 'right') {
+                const size = getCellSize(cell)
+                //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨行单元格的
+                if (targetIndex - cellIndex > size.colCount) {
+                  return false
+                }
+              }
+              return getCellSize(targetCell).rowCount == getCellSize(cell).rowCount
+            }
+            if (direction == 'top' || direction == 'bottom') {
+              const totalRows = cell.parent!.parent!.children!
+              const rows = totalRows.filter(row => row.children!.some(n => !isHideCell(n)))
+              const onlyOneCell = rows.every(row => row.children!.filter(item => !isHideCell(item)).length == 1)
+              //只有一列
+              if (onlyOneCell) {
+                return true
+              }
+              const targetIndex = totalRows.findIndex(item => item.isEqual(targetCell.parent!))
+              const cellIndex = totalRows.findIndex(item => item.isEqual(cell.parent!))
+              if (direction == 'top') {
+                const size = getCellSize(targetCell)
+                //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨列单元格的
+                if (cellIndex - targetIndex > size.rowCount) {
+                  return false
+                }
+              }
+              if (direction == 'bottom') {
+                const size = getCellSize(cell)
+                //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨列单元格的
+                if (targetIndex - cellIndex > size.rowCount) {
+                  return false
+                }
+              }
+              return getCellSize(targetCell).colCount == getCellSize(cell).colCount
+            }
+          }
+        }
+        return false
+      }
+
+      /**
+       * 插入表格
+       */
+      const setTable = async ({ rows, columns }: { rows: number; columns: number }) => {
+        if (!this.selection.focused() || hasTable()) {
+          return
+        }
+        const rowNodes: KNodeCreateOptionType[] = []
+        const colNodes: KNodeCreateOptionType[] = []
+        for (let i = 0; i < rows; i++) {
+          const cellNodes: KNodeCreateOptionType[] = []
+          for (let j = 0; j < columns; j++) {
+            cellNodes.push({
+              type: 'block',
+              tag: 'td',
+              nested: true,
+              fixed: true,
+              children: [
+                {
+                  type: 'block',
+                  tag: this.blockRenderTag,
+                  children: [
+                    {
+                      type: 'closed',
+                      tag: 'br'
+                    }
+                  ]
+                }
+              ]
+            })
+          }
+          rowNodes.push({
             type: 'block',
-            tag: 'tbody',
+            tag: 'tr',
+            nested: true,
+            fixed: true,
+            children: cellNodes
+          })
+        }
+        for (let i = 0; i < columns; i++) {
+          colNodes.push({
+            type: 'closed',
+            tag: 'col',
+            marks: {
+              width: 'auto'
+            },
+            void: true
+          })
+        }
+        const tableNode = KNode.create({
+          type: 'block',
+          tag: 'table',
+          children: [
+            {
+              type: 'block',
+              tag: 'colgroup',
+              fixed: true,
+              nested: true,
+              void: true,
+              children: colNodes
+            },
+            {
+              type: 'block',
+              tag: 'tbody',
+              fixed: true,
+              nested: true,
+              children: rowNodes
+            }
+          ]
+        })
+        this.insertNode(tableNode, true)
+        this.setSelectionBefore(tableNode, 'all')
+        await this.updateView()
+      }
+
+      /**
+       * 取消表格
+       */
+      const unsetTable = async () => {
+        const tableNode = getTable()
+        if (!tableNode) {
+          return
+        }
+        tableNode.toEmpty()
+        await this.updateView()
+      }
+
+      /**
+       * 合并单元格
+       */
+      const mergeTableCell = async (direction: TableCellsMergeDirectionType) => {
+        if (!canMergeTableCells(direction)) {
+          return
+        }
+        //光标所在的单元格
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })!
+        //目标单元格
+        const targetCell = getTargetNotHideCell(cell, direction)!
+        //进行合并
+        mergeTwoCell(cell, targetCell, direction)
+        //视图更新
+        await this.updateView()
+      }
+
+      /**
+       * 添加行
+       */
+      const addTableRow = async (direction: 'top' | 'bottom') => {
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })
+        //光标在某个非隐藏的单元格内
+        if (cell && !isHideCell(cell)) {
+          const row = cell.parent!
+          const rows = row.parent!.children!
+          const tableSize = getTableSize(rows)
+          const newRow = KNode.create({
+            type: 'block',
+            tag: 'tr',
             nested: true,
             fixed: true,
             children: []
           })
-        }
-        //获取所有的表格行节点并设置为tbody的子节点
-        const rows = nodes
-          .filter(item => item.isMatch({ tag: 'tr' }))
-          .map(item => {
-            item.parent = tbody
-            //过滤非法的子节点
-            if (item.hasChildren()) {
-              item.children = item.children!.filter(it => it.isMatch({ tag: 'td' }) || it.isMatch({ tag: 'th' }))
-            }
-            return item
-          })
-        tbody.children = [...rows]
-        //获取表格列数
-        const { colCount } = getTableSize(rows)
-        //获取colgroup节点
-        let colgroup = nodes.find(item => item.isMatch({ tag: 'colgroup' }))
-        //colgroup节点存在
-        if (colgroup) {
-          //过滤非法的子节点
-          colgroup.children = colgroup.children!.filter(item => item.isMatch({ tag: 'col' }))
-          //遍历每个col节点
-          colgroup.children!.forEach(col => {
-            //没有标记
-            if (!col.hasMarks()) {
-              col.marks = {
-                width: 'auto'
-              }
-            }
-            //没有width标记
-            else if (!col.marks!['width']) {
-              col.marks!['width'] = 'auto'
-            }
-          })
-          //对缺少的col元素进行补全
-          const length = colgroup.children!.length
-          for (let i = 0; i < colCount - length; i++) {
-            const col = KNode.create({
-              type: 'closed',
-              tag: 'col',
-              marks: {
-                width: 'auto'
-              },
-              void: true
+          for (let i = 0; i < tableSize.colCount; i++) {
+            const newCell = KNode.create({
+              type: 'block',
+              tag: 'td',
+              nested: true,
+              fixed: true,
+              children: [
+                {
+                  type: 'closed',
+                  tag: 'br'
+                }
+              ]
             })
-            editor.addNode(col, colgroup, colgroup.children!.length)
+            this.addNode(newCell, newRow, newRow.children!.length)
           }
-        }
-        //colgroup节点不存在，则创建该节点
-        else {
-          const children: KNodeCreateOptionType[] = []
-          for (let i = colCount - 1; i >= 0; i--) {
-            children.push({
-              type: 'closed',
-              tag: 'col',
-              marks: {
-                width: 'auto'
-              },
-              void: true
-            })
+          //上面插入一行
+          if (direction == 'top') {
+            this.addNodeBefore(newRow, row)
           }
-          colgroup = KNode.create({
-            type: 'block',
-            tag: 'colgroup',
-            fixed: true,
-            nested: true,
-            void: true,
-            children: children
-          })
-        }
-        //将colgroup和tbody设为表格的子节点
-        node.children = [colgroup, tbody]
-        colgroup.parent = node
-        tbody.parent = node
-      }
-    },
-    //th转td
-    ({ node }) => {
-      if (node.isMatch({ tag: 'th' })) {
-        node.tag = 'td'
-      }
-    },
-    //针对跨行跨列的单元格，增加隐藏单元格
-    ({ editor, node }) => {
-      if (node.isMatch({ tag: 'table' })) {
-        //所有行
-        const rows = node.children!.find(item => item.isMatch({ tag: 'tbody' }))!.children!
-        //过滤表格中的隐藏单元格
-        filterHideCells(rows)
-        //重新设置表格的隐藏单元格
-        resetTableHideCells(editor, rows)
-      }
-    }
-  ],
-  afterUpdateView() {
-    //表格拖拽改变列宽
-    tableResizable(this)
-  },
-  addCommands() {
-    /**
-     * 获取光标所在的表格节点，如果光标不在一个表格节点内，返回null
-     */
-    const getTable = () => {
-      return this.getMatchNodeBySelection({
-        tag: 'table'
-      })
-    }
-
-    /**
-     * 判断光标范围内是否有表格节点
-     */
-    const hasTable = () => {
-      return this.isSelectionNodesSomeMatch({
-        tag: 'table'
-      })
-    }
-
-    /**
-     * 是否可以合并单元格
-     */
-    const canMergeTableCells = (direction: TableCellsMergeDirectionType) => {
-      if (!this.selection.focused()) {
-        return false
-      }
-      //光标所在的单元格
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })
-      //光标在一个单元格内
-      if (cell && !isHideCell(cell)) {
-        //获取指定的合并的单元格
-        const targetCell = getTargetNotHideCell(cell, direction)
-        //单元格存在
-        if (targetCell) {
-          if (direction == 'left' || direction == 'right') {
-            const rows = cell.parent!.parent!.children!.filter(row => row.children!.some(n => !isHideCell(n)))
-            //只有一行
-            if (rows.length == 1) {
-              return true
-            }
-            const targetIndex = targetCell.parent!.children!.findIndex(item => item.isEqual(targetCell))
-            const cellIndex = cell.parent!.children!.findIndex(item => item.isEqual(cell))
-            if (direction == 'left') {
-              const size = getCellSize(targetCell)
-              //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨行单元格的
-              if (cellIndex - targetIndex > size.colCount) {
-                return false
-              }
-            }
-            if (direction == 'right') {
-              const size = getCellSize(cell)
-              //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨行单元格的
-              if (targetIndex - cellIndex > size.colCount) {
-                return false
-              }
-            }
-            return getCellSize(targetCell).rowCount == getCellSize(cell).rowCount
-          }
-          if (direction == 'top' || direction == 'bottom') {
-            const totalRows = cell.parent!.parent!.children!
-            const rows = totalRows.filter(row => row.children!.some(n => !isHideCell(n)))
-            const onlyOneCell = rows.every(row => row.children!.filter(item => !isHideCell(item)).length == 1)
-            //只有一列
-            if (onlyOneCell) {
-              return true
-            }
-            const targetIndex = totalRows.findIndex(item => item.isEqual(targetCell.parent!))
-            const cellIndex = totalRows.findIndex(item => item.isEqual(cell.parent!))
-            if (direction == 'top') {
-              const size = getCellSize(targetCell)
-              //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨列单元格的
-              if (cellIndex - targetIndex > size.rowCount) {
-                return false
-              }
-            }
-            if (direction == 'bottom') {
-              const size = getCellSize(cell)
-              //这两个单元格不相邻，也就是中间有隐藏的单元格并且隐藏单元格是跨列单元格的
-              if (targetIndex - cellIndex > size.rowCount) {
-                return false
-              }
-            }
-            return getCellSize(targetCell).colCount == getCellSize(cell).colCount
-          }
-        }
-      }
-      return false
-    }
-
-    /**
-     * 插入表格
-     */
-    const setTable = async ({ rows, columns }: { rows: number; columns: number }) => {
-      if (!this.selection.focused() || hasTable()) {
-        return
-      }
-      const rowNodes: KNodeCreateOptionType[] = []
-      const colNodes: KNodeCreateOptionType[] = []
-      for (let i = 0; i < rows; i++) {
-        const cellNodes: KNodeCreateOptionType[] = []
-        for (let j = 0; j < columns; j++) {
-          cellNodes.push({
-            type: 'block',
-            tag: 'td',
-            nested: true,
-            fixed: true,
-            children: [
-              {
-                type: 'block',
-                tag: this.blockRenderTag,
-                children: [
-                  {
-                    type: 'closed',
-                    tag: 'br'
-                  }
-                ]
-              }
-            ]
-          })
-        }
-        rowNodes.push({
-          type: 'block',
-          tag: 'tr',
-          nested: true,
-          fixed: true,
-          children: cellNodes
-        })
-      }
-      for (let i = 0; i < columns; i++) {
-        colNodes.push({
-          type: 'closed',
-          tag: 'col',
-          marks: {
-            width: 'auto'
-          },
-          void: true
-        })
-      }
-      const tableNode = KNode.create({
-        type: 'block',
-        tag: 'table',
-        children: [
-          {
-            type: 'block',
-            tag: 'colgroup',
-            fixed: true,
-            nested: true,
-            void: true,
-            children: colNodes
-          },
-          {
-            type: 'block',
-            tag: 'tbody',
-            fixed: true,
-            nested: true,
-            children: rowNodes
-          }
-        ]
-      })
-      this.insertNode(tableNode, true)
-      this.setSelectionBefore(tableNode, 'all')
-      await this.updateView()
-    }
-
-    /**
-     * 取消表格
-     */
-    const unsetTable = async () => {
-      const tableNode = getTable()
-      if (!tableNode) {
-        return
-      }
-      tableNode.toEmpty()
-      await this.updateView()
-    }
-
-    /**
-     * 合并单元格
-     */
-    const mergeTableCell = async (direction: TableCellsMergeDirectionType) => {
-      if (!canMergeTableCells(direction)) {
-        return
-      }
-      //光标所在的单元格
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })!
-      //目标单元格
-      const targetCell = getTargetNotHideCell(cell, direction)!
-      //进行合并
-      mergeTwoCell(cell, targetCell, direction)
-      //视图更新
-      await this.updateView()
-    }
-
-    /**
-     * 添加行
-     */
-    const addTableRow = async (direction: 'top' | 'bottom') => {
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })
-      //光标在某个非隐藏的单元格内
-      if (cell && !isHideCell(cell)) {
-        const row = cell.parent!
-        const rows = row.parent!.children!
-        const tableSize = getTableSize(rows)
-        const newRow = KNode.create({
-          type: 'block',
-          tag: 'tr',
-          nested: true,
-          fixed: true,
-          children: []
-        })
-        for (let i = 0; i < tableSize.colCount; i++) {
-          const newCell = KNode.create({
-            type: 'block',
-            tag: 'td',
-            nested: true,
-            fixed: true,
-            children: [
-              {
-                type: 'closed',
-                tag: 'br'
-              }
-            ]
-          })
-          this.addNode(newCell, newRow, newRow.children!.length)
-        }
-        //上面插入一行
-        if (direction == 'top') {
-          this.addNodeBefore(newRow, row)
-        }
-        //下面插入一行
-        else {
-          //获取单元格尺寸
-          const cellSize = getCellSize(cell)
-          let index = 1
-          let targetRow = row
-          //处理单元格跨行的情况，获取目标行
-          while (cellSize.rowCount > 1 && index < cellSize.rowCount) {
-            const nextRow = targetRow.getNext(rows)
-            if (!nextRow) {
-              break
-            }
-            targetRow = nextRow
-            index++
-          }
-          //在目标行后插入新行
-          this.addNodeAfter(newRow, targetRow)
-          //针对新行，判断是否需要隐藏部分单元格
-          hideCellWhereInCross(newRow)
-        }
-        this.setSelectionBefore(newRow, 'all')
-      }
-      await this.updateView()
-    }
-
-    /**
-     * 删除行
-     */
-    const deleteTableRow = async () => {
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })
-      //光标在某个非隐藏的单元格内
-      if (cell && !isHideCell(cell)) {
-        //所在行
-        const row = cell.parent!
-        //表格全部行
-        const rows = row.parent!.children!
-        //表格节点
-        const table = row.parent!.parent!
-        //只有一行，删除表格
-        if (rows.length == 1) {
-          table.toEmpty()
-        }
-        //正常删除
-        else {
-          //上一行
-          const previousRow = row.getPrevious(rows)
-          //下一行
-          const nextRow = row.getNext(rows)
-          //当前行的序列
-          const rowIndex = rows.findIndex(item => item.isEqual(row))
-          //遍历该行的每一个单元格
-          row.children!.forEach((currentCell, index) => {
+          //下面插入一行
+          else {
             //获取单元格尺寸
-            const cellSize = getCellSize(currentCell)
-            //是隐藏单元格
-            if (isHideCell(currentCell)) {
-              //获取上方最近的非隐藏单元格
-              const upCell = getTargetNotHideCell(currentCell, 'top')
-              //存在非隐藏单元格
-              if (upCell) {
-                //获取非隐藏单元格所在行在所有行中的序列
-                const upIndex = rows.findIndex(item => item.isEqual(upCell.parent!))
-                //获取非隐藏单元格的大小
-                const { rowCount } = getCellSize(upCell)
-                //当前隐藏单元格被上方非隐藏单元格所覆盖
-                if (rowIndex - upIndex < rowCount) {
-                  upCell.marks!['rowspan'] = rowCount - 1
-                }
+            const cellSize = getCellSize(cell)
+            let index = 1
+            let targetRow = row
+            //处理单元格跨行的情况，获取目标行
+            while (cellSize.rowCount > 1 && index < cellSize.rowCount) {
+              const nextRow = targetRow.getNext(rows)
+              if (!nextRow) {
+                break
               }
+              targetRow = nextRow
+              index++
             }
-            //是跨行单元格并且下一行存在
-            else if (cellSize.rowCount > 1 && nextRow) {
-              let i = index
-              while (i < index + cellSize.colCount) {
-                //获取下一行对应的单元格
-                const nextRowCell = nextRow.children![i]
-                if (isHideCell(nextRowCell)) {
-                  setCellNotHide(nextRowCell)
-                  if (nextRowCell.hasMarks()) {
-                    nextRowCell.marks!['rowspan'] = cellSize.rowCount - 1
-                  } else {
-                    nextRowCell.marks = {
-                      rowspan: cellSize.rowCount - 1
-                    }
-                  }
-                }
-                i++
-              }
-            }
-          })
-          if (previousRow) {
-            this.setSelectionAfter(previousRow, 'all')
-          } else if (nextRow) {
-            this.setSelectionBefore(nextRow, 'all')
+            //在目标行后插入新行
+            this.addNodeAfter(newRow, targetRow)
+            //针对新行，判断是否需要隐藏部分单元格
+            hideCellWhereInCross(newRow)
           }
-          row.toEmpty()
+          this.setSelectionBefore(newRow, 'all')
         }
         await this.updateView()
       }
-    }
 
-    /**
-     * 添加列
-     */
-    const addTableColumn = async (direction: 'left' | 'right') => {
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })
-      //光标在某个非隐藏的单元格内
-      if (cell && !isHideCell(cell)) {
-        const row = cell.parent!
-        const tbody = row.parent!
-        const table = tbody.parent!
-        const rows = tbody.children!
-        //单元格在行中的序列
-        let cellIndex = -1
-        //左侧插入列
-        if (direction == 'left') {
-          cellIndex = row.children!.findIndex(item => {
-            return item.isEqual(cell)
-          })
-        }
-        //右侧插入列
-        if (direction == 'right') {
-          //获取单元格尺寸
-          const cellSize = getCellSize(cell)
-          let index = 1
-          let targetCell = cell
-          //处理单元格跨列的情况，获取目标列
-          while (cellSize.colCount > 1 && index < cellSize.colCount) {
-            const nextCell = targetCell.getNext(row.children!)
-            if (!nextCell) {
-              break
-            }
-            targetCell = nextCell
-            index++
+      /**
+       * 删除行
+       */
+      const deleteTableRow = async () => {
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })
+        //光标在某个非隐藏的单元格内
+        if (cell && !isHideCell(cell)) {
+          //所在行
+          const row = cell.parent!
+          //表格全部行
+          const rows = row.parent!.children!
+          //表格节点
+          const table = row.parent!.parent!
+          //只有一行，删除表格
+          if (rows.length == 1) {
+            table.toEmpty()
           }
-          cellIndex = row.children!.findIndex(item => {
-            return item.isEqual(targetCell)
-          })
-        }
-        rows!.forEach(item => {
-          const newCell = KNode.create({
-            type: 'block',
-            tag: 'td',
-            fixed: true,
-            nested: true,
-            children: [
-              {
-                type: 'closed',
-                tag: 'br'
-              }
-            ]
-          })
-          this.addNode(newCell, item, direction == 'left' ? cellIndex : cellIndex + 1)
-          if (item.isEqual(row)) {
-            this.setSelectionBefore(newCell, 'all')
-          }
-        })
-        //插入col
-        const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
-        const col = KNode.create({
-          type: 'closed',
-          tag: 'col',
-          marks: {
-            width: 'auto'
-          },
-          void: true
-        })
-        this.addNode(col, colgroup, direction == 'left' ? cellIndex : cellIndex + 1)
-        await this.updateView()
-      }
-    }
-
-    /**
-     * 删除列
-     */
-    const deleteTableColumn = async () => {
-      const cell = this.getMatchNodeBySelection({ tag: 'td' })
-      //光标在某个非隐藏的单元格内
-      if (cell && !isHideCell(cell)) {
-        //所在行
-        const row = cell.parent!
-        //表格全部行
-        const rows = row.parent!.children!
-        //表格节点
-        const table = row.parent!.parent!
-        //光标所在行只有一个单元格则删除表格
-        if (row.children!.length == 1) {
-          table.toEmpty()
-        }
-        //正常删除
-        else {
-          //前一个单元格
-          const previousCell = cell.getPrevious(row.children!)
-          //后一个单元格
-          const nextCell = cell.getNext(row.children!)
-          //光标所在的单元格在行中的序列
-          const cellIndex = row.children!.findIndex(item => {
-            return item.isEqual(cell)
-          })
-          //遍历所有的行
-          rows.forEach((item, index) => {
-            //当前行对应序列的单元格
-            const currentCell = item.children![cellIndex]
-            //获取对应单元格的大小
-            const cellSize = getCellSize(currentCell)
-            //是隐藏的单元格
-            if (isHideCell(currentCell)) {
-              //获取左侧最近的非隐藏单元格
-              const leftCell = getTargetNotHideCell(currentCell, 'left')
-              //左侧存在非隐藏单元格
-              if (leftCell) {
-                //获取单元格的序列
-                const leftIndex = item.children!.findIndex(n => n.isEqual(leftCell))
-                //获取单元格的大小
-                const { colCount } = getCellSize(leftCell)
-                //当前隐藏单元格被左侧非隐藏单元格所覆盖
-                if (cellIndex - leftIndex < colCount) {
-                  leftCell.marks!['colspan'] = colCount - 1
-                }
-              }
-            }
-            //是跨列的单元格
-            else if (cellSize.colCount > 1) {
-              let i = index
-              while (i < index + cellSize.rowCount) {
-                //获取每一行对应单元格的下一个单元格
-                const nextCell = rows[i].children![cellIndex].getNext(rows[i].children!)
-                if (nextCell && isHideCell(nextCell)) {
-                  setCellNotHide(nextCell)
-                  if (nextCell.hasMarks()) {
-                    nextCell.marks!['colspan'] = cellSize.colCount - 1
-                  } else {
-                    nextCell.marks = {
-                      colspan: cellSize.colCount - 1
-                    }
+          //正常删除
+          else {
+            //上一行
+            const previousRow = row.getPrevious(rows)
+            //下一行
+            const nextRow = row.getNext(rows)
+            //当前行的序列
+            const rowIndex = rows.findIndex(item => item.isEqual(row))
+            //遍历该行的每一个单元格
+            row.children!.forEach((currentCell, index) => {
+              //获取单元格尺寸
+              const cellSize = getCellSize(currentCell)
+              //是隐藏单元格
+              if (isHideCell(currentCell)) {
+                //获取上方最近的非隐藏单元格
+                const upCell = getTargetNotHideCell(currentCell, 'top')
+                //存在非隐藏单元格
+                if (upCell) {
+                  //获取非隐藏单元格所在行在所有行中的序列
+                  const upIndex = rows.findIndex(item => item.isEqual(upCell.parent!))
+                  //获取非隐藏单元格的大小
+                  const { rowCount } = getCellSize(upCell)
+                  //当前隐藏单元格被上方非隐藏单元格所覆盖
+                  if (rowIndex - upIndex < rowCount) {
+                    upCell.marks!['rowspan'] = rowCount - 1
                   }
                 }
-                i++
               }
+              //是跨行单元格并且下一行存在
+              else if (cellSize.rowCount > 1 && nextRow) {
+                let i = index
+                while (i < index + cellSize.colCount) {
+                  //获取下一行对应的单元格
+                  const nextRowCell = nextRow.children![i]
+                  if (isHideCell(nextRowCell)) {
+                    setCellNotHide(nextRowCell)
+                    if (nextRowCell.hasMarks()) {
+                      nextRowCell.marks!['rowspan'] = cellSize.rowCount - 1
+                    } else {
+                      nextRowCell.marks = {
+                        rowspan: cellSize.rowCount - 1
+                      }
+                    }
+                  }
+                  i++
+                }
+              }
+            })
+            if (previousRow) {
+              this.setSelectionAfter(previousRow, 'all')
+            } else if (nextRow) {
+              this.setSelectionBefore(nextRow, 'all')
             }
-            currentCell.toEmpty()
+            row.toEmpty()
+          }
+          await this.updateView()
+        }
+      }
+
+      /**
+       * 添加列
+       */
+      const addTableColumn = async (direction: 'left' | 'right') => {
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })
+        //光标在某个非隐藏的单元格内
+        if (cell && !isHideCell(cell)) {
+          const row = cell.parent!
+          const tbody = row.parent!
+          const table = tbody.parent!
+          const rows = tbody.children!
+          //单元格在行中的序列
+          let cellIndex = -1
+          //左侧插入列
+          if (direction == 'left') {
+            cellIndex = row.children!.findIndex(item => {
+              return item.isEqual(cell)
+            })
+          }
+          //右侧插入列
+          if (direction == 'right') {
+            //获取单元格尺寸
+            const cellSize = getCellSize(cell)
+            let index = 1
+            let targetCell = cell
+            //处理单元格跨列的情况，获取目标列
+            while (cellSize.colCount > 1 && index < cellSize.colCount) {
+              const nextCell = targetCell.getNext(row.children!)
+              if (!nextCell) {
+                break
+              }
+              targetCell = nextCell
+              index++
+            }
+            cellIndex = row.children!.findIndex(item => {
+              return item.isEqual(targetCell)
+            })
+          }
+          rows!.forEach(item => {
+            const newCell = KNode.create({
+              type: 'block',
+              tag: 'td',
+              fixed: true,
+              nested: true,
+              children: [
+                {
+                  type: 'closed',
+                  tag: 'br'
+                }
+              ]
+            })
+            this.addNode(newCell, item, direction == 'left' ? cellIndex : cellIndex + 1)
+            if (item.isEqual(row)) {
+              this.setSelectionBefore(newCell, 'all')
+            }
           })
-          //删除col
+          //插入col
           const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
-          colgroup.children![cellIndex].toEmpty()
-          //重置光标
-          if (previousCell) {
-            this.setSelectionAfter(previousCell, 'all')
-          } else if (nextCell) {
-            this.setSelectionBefore(nextCell, 'all')
-          }
+          const col = KNode.create({
+            type: 'closed',
+            tag: 'col',
+            marks: {
+              width: 'auto'
+            },
+            void: true
+          })
+          this.addNode(col, colgroup, direction == 'left' ? cellIndex : cellIndex + 1)
+          await this.updateView()
         }
-        //渲染
-        await this.updateView()
+      }
+
+      /**
+       * 删除列
+       */
+      const deleteTableColumn = async () => {
+        const cell = this.getMatchNodeBySelection({ tag: 'td' })
+        //光标在某个非隐藏的单元格内
+        if (cell && !isHideCell(cell)) {
+          //所在行
+          const row = cell.parent!
+          //表格全部行
+          const rows = row.parent!.children!
+          //表格节点
+          const table = row.parent!.parent!
+          //光标所在行只有一个单元格则删除表格
+          if (row.children!.length == 1) {
+            table.toEmpty()
+          }
+          //正常删除
+          else {
+            //前一个单元格
+            const previousCell = cell.getPrevious(row.children!)
+            //后一个单元格
+            const nextCell = cell.getNext(row.children!)
+            //光标所在的单元格在行中的序列
+            const cellIndex = row.children!.findIndex(item => {
+              return item.isEqual(cell)
+            })
+            //遍历所有的行
+            rows.forEach((item, index) => {
+              //当前行对应序列的单元格
+              const currentCell = item.children![cellIndex]
+              //获取对应单元格的大小
+              const cellSize = getCellSize(currentCell)
+              //是隐藏的单元格
+              if (isHideCell(currentCell)) {
+                //获取左侧最近的非隐藏单元格
+                const leftCell = getTargetNotHideCell(currentCell, 'left')
+                //左侧存在非隐藏单元格
+                if (leftCell) {
+                  //获取单元格的序列
+                  const leftIndex = item.children!.findIndex(n => n.isEqual(leftCell))
+                  //获取单元格的大小
+                  const { colCount } = getCellSize(leftCell)
+                  //当前隐藏单元格被左侧非隐藏单元格所覆盖
+                  if (cellIndex - leftIndex < colCount) {
+                    leftCell.marks!['colspan'] = colCount - 1
+                  }
+                }
+              }
+              //是跨列的单元格
+              else if (cellSize.colCount > 1) {
+                let i = index
+                while (i < index + cellSize.rowCount) {
+                  //获取每一行对应单元格的下一个单元格
+                  const nextCell = rows[i].children![cellIndex].getNext(rows[i].children!)
+                  if (nextCell && isHideCell(nextCell)) {
+                    setCellNotHide(nextCell)
+                    if (nextCell.hasMarks()) {
+                      nextCell.marks!['colspan'] = cellSize.colCount - 1
+                    } else {
+                      nextCell.marks = {
+                        colspan: cellSize.colCount - 1
+                      }
+                    }
+                  }
+                  i++
+                }
+              }
+              currentCell.toEmpty()
+            })
+            //删除col
+            const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
+            colgroup.children![cellIndex].toEmpty()
+            //重置光标
+            if (previousCell) {
+              this.setSelectionAfter(previousCell, 'all')
+            } else if (nextCell) {
+              this.setSelectionBefore(nextCell, 'all')
+            }
+          }
+          //渲染
+          await this.updateView()
+        }
+      }
+
+      return {
+        getTable,
+        hasTable,
+        canMergeTableCells,
+        setTable,
+        unsetTable,
+        mergeTableCell,
+        addTableRow,
+        deleteTableRow,
+        addTableColumn,
+        deleteTableColumn
       }
     }
-
-    return {
-      getTable,
-      hasTable,
-      canMergeTableCells,
-      setTable,
-      unsetTable,
-      mergeTableCell,
-      addTableRow,
-      deleteTableRow,
-      addTableColumn,
-      deleteTableColumn
-    }
-  }
-})
+  })

@@ -67,3 +67,42 @@ title: align 对齐方式
   ```ts
   await editor.commands.unsetAlign('center')
   ```
+
+## 代码示例
+
+<div style="margin:0 0 10px 0">
+  <button class="demo-button" @click="editor?.commands.setAlign('left')">左对齐</button>
+  <button class="demo-button" @click="editor?.commands.setAlign('center')">居中对齐</button>
+  <button class="demo-button" @click="editor?.commands.setAlign('right')">右对齐</button>
+  <button class="demo-button" @click="editor?.commands.setAlign('justify')">两端对齐</button>
+</div>
+<div ref="editorRef" style="width:100%;height:100px;"></div>
+
+<script lang="ts" setup>
+  import { useData } from 'vitepress'
+  import { onMounted, watch, ref, onBeforeUnmount } from "vue"
+  import { Editor } from "../../../lib/kaitify-core.es.js"
+
+  const { isDark } = useData()
+  const editorRef = ref<HtmlElement | undefined>()
+  const editor = ref<Editor | undefined>()
+
+  onMounted(async ()=>{
+    editor.value = await Editor.configure({
+      el: editorRef.value,
+      value: '我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本，我是一段文本',
+      dark: isDark.value,
+      placeholder:'请输入正文...'
+    })
+  })
+
+  onBeforeUnmount(()=>{
+    editor.value?.destroy()
+  })
+
+  watch(()=>isDark.value,newVal=>{
+    if(editor.value){
+        editor.value.setDark(isDark.value)
+    }
+  })
+</script>

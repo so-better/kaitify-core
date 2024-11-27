@@ -24,4 +24,4 @@ declare module '../../model' {
         unsetLink?: () => Promise<void>;
     }
 }
-export declare const LinkExtension: Extension;
+export declare const LinkExtension: () => Extension;

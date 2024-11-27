@@ -7,4 +7,4 @@ declare module '../../model' {
         redo?: () => Promise<void>;
     }
 }
-export declare const HistoryExtension: Extension;
+export declare const HistoryExtension: () => Extension;

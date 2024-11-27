@@ -129,135 +129,136 @@ const videoResizable = (editor: Editor) => {
   })
 }
 
-export const VideoExtension = Extension.create({
-  name: 'video',
-  extraKeepTags: ['video'],
-  domParseNodeCallback(node) {
-    if (node.isMatch({ tag: 'video' })) {
-      node.type = 'closed'
-    }
-    return node
-  },
-  pasteKeepMarks(node) {
-    const marks: KNodeMarksType = {}
-    if (node.isMatch({ tag: 'video' }) && node.hasMarks()) {
-      if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
-      if (node.marks!.hasOwnProperty('autoplay')) marks['autoplay'] = node.marks!['autoplay']
-      if (node.marks!.hasOwnProperty('loop')) marks['loop'] = node.marks!['loop']
-      if (node.marks!.hasOwnProperty('muted')) marks['muted'] = node.marks!['muted']
-      if (node.marks!.hasOwnProperty('controls')) marks['controls'] = node.marks!['controls']
-    }
-    return marks
-  },
-  pasteKeepStyles(node) {
-    const styles: KNodeStylesType = {}
-    if (node.isMatch({ tag: 'video' }) && node.hasStyles()) {
-      styles['width'] = node.styles!['width'] || 'auto'
-    }
-    return styles
-  },
-  formatRules: [
-    ({ editor, node }) => {
+export const VideoExtension = () =>
+  Extension.create({
+    name: 'video',
+    extraKeepTags: ['video'],
+    domParseNodeCallback(node) {
       if (node.isMatch({ tag: 'video' })) {
-        //视频必须是闭合节点
         node.type = 'closed'
-        const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-        const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-        //前一个节点不存在或者不是零宽度空白文本节点
-        if (!previousNode || !previousNode.isZeroWidthText()) {
-          const zeroWidthText = KNode.createZeroWidthText()
-          editor.addNodeBefore(zeroWidthText, node)
+      }
+      return node
+    },
+    pasteKeepMarks(node) {
+      const marks: KNodeMarksType = {}
+      if (node.isMatch({ tag: 'video' }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
+        if (node.marks!.hasOwnProperty('autoplay')) marks['autoplay'] = node.marks!['autoplay']
+        if (node.marks!.hasOwnProperty('loop')) marks['loop'] = node.marks!['loop']
+        if (node.marks!.hasOwnProperty('muted')) marks['muted'] = node.marks!['muted']
+        if (node.marks!.hasOwnProperty('controls')) marks['controls'] = node.marks!['controls']
+      }
+      return marks
+    },
+    pasteKeepStyles(node) {
+      const styles: KNodeStylesType = {}
+      if (node.isMatch({ tag: 'video' }) && node.hasStyles()) {
+        styles['width'] = node.styles!['width'] || 'auto'
+      }
+      return styles
+    },
+    formatRules: [
+      ({ editor, node }) => {
+        if (node.isMatch({ tag: 'video' })) {
+          //视频必须是闭合节点
+          node.type = 'closed'
+          const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+          const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+          //前一个节点不存在或者不是零宽度空白文本节点
+          if (!previousNode || !previousNode.isZeroWidthText()) {
+            const zeroWidthText = KNode.createZeroWidthText()
+            editor.addNodeBefore(zeroWidthText, node)
+          }
+          //后一个节点不存在或者不是零宽度空白文本节点
+          if (!nextNode || !nextNode.isZeroWidthText()) {
+            const zeroWidthText = KNode.createZeroWidthText()
+            editor.addNodeAfter(zeroWidthText, node)
+          }
         }
-        //后一个节点不存在或者不是零宽度空白文本节点
-        if (!nextNode || !nextNode.isZeroWidthText()) {
-          const zeroWidthText = KNode.createZeroWidthText()
-          editor.addNodeAfter(zeroWidthText, node)
+      }
+    ],
+    afterUpdateView() {
+      //视频选中
+      videoFocus(this)
+      //视频拖拽改变大小
+      videoResizable(this)
+    },
+    addCommands() {
+      /**
+       * 获取光标所在的视频，如果光标不在一个视频内，返回null
+       */
+      const getVideo = () => {
+        return this.getMatchNodeBySelection({
+          tag: 'video'
+        })
+      }
+      /**
+       * 判断光标范围内是否有视频
+       */
+      const hasVideo = () => {
+        return this.isSelectionNodesSomeMatch({
+          tag: 'video'
+        })
+      }
+      /**
+       * 插入视频
+       */
+      const setVideo = async (options: SetVideoOptionType) => {
+        if (!this.selection.focused()) {
+          return
         }
-      }
-    }
-  ],
-  afterUpdateView() {
-    //视频选中
-    videoFocus(this)
-    //视频拖拽改变大小
-    videoResizable(this)
-  },
-  addCommands() {
-    /**
-     * 获取光标所在的视频，如果光标不在一个视频内，返回null
-     */
-    const getVideo = () => {
-      return this.getMatchNodeBySelection({
-        tag: 'video'
-      })
-    }
-    /**
-     * 判断光标范围内是否有视频
-     */
-    const hasVideo = () => {
-      return this.isSelectionNodesSomeMatch({
-        tag: 'video'
-      })
-    }
-    /**
-     * 插入视频
-     */
-    const setVideo = async (options: SetVideoOptionType) => {
-      if (!this.selection.focused()) {
-        return
-      }
-      if (!options.src) {
-        return
-      }
-      const marks: KNodeMarksType = {
-        src: options.src
-      }
-      if (options.autoplay) {
-        marks['autoplay'] = 'autoplay'
-        marks['muted'] = 'muted'
-      }
-      const videoNode = KNode.create({
-        type: 'closed',
-        tag: 'video',
-        marks,
-        styles: {
-          width: options.width || 'auto'
+        if (!options.src) {
+          return
         }
-      })
-      this.insertNode(videoNode)
-      this.setSelectionAfter(videoNode)
-      await this.updateView()
-    }
+        const marks: KNodeMarksType = {
+          src: options.src
+        }
+        if (options.autoplay) {
+          marks['autoplay'] = 'autoplay'
+          marks['muted'] = 'muted'
+        }
+        const videoNode = KNode.create({
+          type: 'closed',
+          tag: 'video',
+          marks,
+          styles: {
+            width: options.width || 'auto'
+          }
+        })
+        this.insertNode(videoNode)
+        this.setSelectionAfter(videoNode)
+        await this.updateView()
+      }
 
-    /**
-     * 更新视频
-     */
-    const updateVideo = async (options: UpdateVideoOptionType) => {
-      if (!this.selection.focused()) {
-        return
+      /**
+       * 更新视频
+       */
+      const updateVideo = async (options: UpdateVideoOptionType) => {
+        if (!this.selection.focused()) {
+          return
+        }
+        const videoNode = getVideo()
+        if (!videoNode) {
+          return
+        }
+        if (options.controls) {
+          videoNode.marks!['controls'] = 'controls'
+        } else {
+          videoNode.marks = deleteProperty(videoNode.marks!, 'controls')
+        }
+        if (options.loop) {
+          videoNode.marks!['loop'] = 'loop'
+        } else {
+          videoNode.marks = deleteProperty(videoNode.marks!, 'loop')
+        }
+        if (options.muted) {
+          videoNode.marks!['muted'] = 'muted'
+        } else {
+          videoNode.marks = deleteProperty(videoNode.marks!, 'muted')
+        }
+        await this.updateView()
       }
-      const videoNode = getVideo()
-      if (!videoNode) {
-        return
-      }
-      if (options.controls) {
-        videoNode.marks!['controls'] = 'controls'
-      } else {
-        videoNode.marks = deleteProperty(videoNode.marks!, 'controls')
-      }
-      if (options.loop) {
-        videoNode.marks!['loop'] = 'loop'
-      } else {
-        videoNode.marks = deleteProperty(videoNode.marks!, 'loop')
-      }
-      if (options.muted) {
-        videoNode.marks!['muted'] = 'muted'
-      } else {
-        videoNode.marks = deleteProperty(videoNode.marks!, 'muted')
-      }
-      await this.updateView()
-    }
 
-    return { getVideo, hasVideo, setVideo, updateVideo }
-  }
-})
+      return { getVideo, hasVideo, setVideo, updateVideo }
+    }
+  })
