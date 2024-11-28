@@ -1880,7 +1880,7 @@ export class Editor {
     if (!this.$el) {
       return ''
     }
-    return this.$el.innerText
+    return this.$el.innerText.trim()
   }
 
   /**
