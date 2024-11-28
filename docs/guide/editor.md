@@ -118,7 +118,7 @@ editor.updateView()
 
 ##### extensions <Badge type="danger" text="Extension[]" />
 
-自定义插件数组，该属性较为复杂，可参考 [扩展](/extensions) 一节的内容
+自定义插件数组，该属性较为复杂，可参考 [扩展](/extensions/introduction) 一节的内容
 
 ##### formatRules <Badge type="danger" text="RuleFunctionType[]" />
 

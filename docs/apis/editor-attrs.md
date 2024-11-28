@@ -62,11 +62,11 @@ title: Editor 属性
 
 ##### selection <Badge type="danger" text="Selection" />
 
-虚拟光标 `Selection` 的实例对象，一个编辑器仅有一个 `Selection` 的实例对象，具体参考[Selection API](/apis/selection)
+虚拟光标 `Selection` 的实例对象，一个编辑器仅有一个 `Selection` 的实例对象，具体参考[Selection](/guide/selection)
 
 ##### history <Badge type="danger" text="History" />
 
-历史记录 `History` 的实例对象，一个编辑器仅有一个 `History` 的实例对象，具体参考[History API](/apis/history)
+历史记录 `History` 的实例对象，一个编辑器仅有一个 `History` 的实例对象，具体参考[History](/guide/history)
 
 ##### commands <Badge type="danger" text="EditorCommandsType" />
 
