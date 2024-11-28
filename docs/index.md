@@ -2,6 +2,7 @@
 lastUpdated: false
 aside: false
 layout: home
+title: 富文本编辑器
 
 hero:
   name: kaitify
