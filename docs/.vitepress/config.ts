@@ -11,7 +11,7 @@ const getExtensionsList = () => {
     if (stats.isDirectory()) {
       extensionNames.push(item)
       //创建内置扩展的md文件
-      const docPath = path.join(path.resolve(__dirname, '../../docs/extensions/buit-in'), `${item}.md`)
+      const docPath = path.join(path.resolve(__dirname, '../../docs/extensions/built-in'), `${item}.md`)
       if (!fs.existsSync(docPath)) {
         fs.writeFileSync(docPath, '', { encoding: 'utf-8' })
       }
@@ -149,7 +149,7 @@ export default defineConfig({
           items: getExtensionsList().map(name => {
             return {
               text: name,
-              link: `/extensions/buit-in/${name}`
+              link: `/extensions/built-in/${name}`
             }
           })
         }
