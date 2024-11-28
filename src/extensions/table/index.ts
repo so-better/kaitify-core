@@ -738,15 +738,15 @@ export const TableExtension = () =>
       /**
        * 插入表格
        */
-      const setTable = async ({ rows, columns }: { rows: number; columns: number }) => {
+      const setTable = async (options: { rows: number; columns: number }) => {
         if (!this.selection.focused() || hasTable()) {
           return
         }
         const rowNodes: KNodeCreateOptionType[] = []
         const colNodes: KNodeCreateOptionType[] = []
-        for (let i = 0; i < rows; i++) {
+        for (let i = 0; i < options.rows; i++) {
           const cellNodes: KNodeCreateOptionType[] = []
-          for (let j = 0; j < columns; j++) {
+          for (let j = 0; j < options.columns; j++) {
             cellNodes.push({
               type: 'block',
               tag: 'td',
@@ -774,7 +774,7 @@ export const TableExtension = () =>
             children: cellNodes
           })
         }
-        for (let i = 0; i < columns; i++) {
+        for (let i = 0; i < options.columns; i++) {
           colNodes.push({
             type: 'closed',
             tag: 'col',

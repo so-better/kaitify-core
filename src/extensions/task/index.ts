@@ -79,7 +79,7 @@ const toggleTaskStatus = function (editor: Editor) {
       const dom = editor.findDom(matchNode)
       const rect = DapElement.getElementBounding(dom)
       //在复选框范围内
-      if (event.pageX >= Math.abs(rect.left) && event.pageX <= Math.abs(rect.left + 16) && event.pageY >= Math.abs(rect.top + elm.offsetHeight / 2 - 8) && event.pageY <= Math.abs(rect.top + elm.offsetHeight / 2 + 8)) {
+      if (event.clientX >= Math.abs(rect.left) && event.clientX <= Math.abs(rect.left + 16) && event.clientY >= Math.abs(rect.top + elm.offsetHeight / 2 - 8) && event.clientY <= Math.abs(rect.top + elm.offsetHeight / 2 + 8)) {
         if (matchNode.marks!['kaitify-task'] == 'undo') {
           matchNode.marks!['kaitify-task'] = 'done'
         } else {

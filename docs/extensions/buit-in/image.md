@@ -77,9 +77,9 @@ title: image 图片
   })
   ```
 
-##### updateAttachment()
+##### updateImage()
 
-更新附件信息
+更新图片信息
 
 - 类型
 
@@ -89,7 +89,7 @@ title: image 图片
 
 - 详细信息
 
-  提供一个入参，类型为 `UpdateImageOptionType`，包含以下 3 个属性：
+  提供一个入参，类型为 `UpdateImageOptionType`，包含以下 2 个属性：
 
   - src <Badge type="danger" text="string" />：图片的链接地址，可选，不设置则不更新此属性
   - alt <Badge type="danger" text="string" />：图片加载失败显示的值，不设置或者设置为空值则移除此属性

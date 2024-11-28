@@ -237,24 +237,33 @@ export const VideoExtension = () =>
         if (!this.selection.focused()) {
           return
         }
+        if (typeof options.controls != 'boolean' && typeof options.muted != 'boolean' && typeof options.loop != 'boolean') {
+          return
+        }
         const videoNode = getVideo()
         if (!videoNode) {
           return
         }
-        if (options.controls) {
-          videoNode.marks!['controls'] = 'controls'
-        } else {
-          videoNode.marks = deleteProperty(videoNode.marks!, 'controls')
+        if (typeof options.controls == 'boolean') {
+          if (options.controls) {
+            videoNode.marks!['controls'] = 'controls'
+          } else {
+            videoNode.marks = deleteProperty(videoNode.marks!, 'controls')
+          }
         }
-        if (options.loop) {
-          videoNode.marks!['loop'] = 'loop'
-        } else {
-          videoNode.marks = deleteProperty(videoNode.marks!, 'loop')
+        if (typeof options.loop == 'boolean') {
+          if (options.loop) {
+            videoNode.marks!['loop'] = 'loop'
+          } else {
+            videoNode.marks = deleteProperty(videoNode.marks!, 'loop')
+          }
         }
-        if (options.muted) {
-          videoNode.marks!['muted'] = 'muted'
-        } else {
-          videoNode.marks = deleteProperty(videoNode.marks!, 'muted')
+        if (typeof options.muted == 'boolean') {
+          if (options.muted) {
+            videoNode.marks!['muted'] = 'muted'
+          } else {
+            videoNode.marks = deleteProperty(videoNode.marks!, 'muted')
+          }
         }
         await this.updateView()
       }
