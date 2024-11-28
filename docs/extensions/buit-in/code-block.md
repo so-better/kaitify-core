@@ -112,6 +112,28 @@ title: code-block 代码块
   await editor.commands.unsetCodeBlock()
   ```
 
+##### updateCodeBlockLanguage()
+
+更新光标所在代码块的语言类型
+
+- 类型
+
+  ```ts
+  updateCodeBlockLanguage(language?: HljsLanguageType): Promise<void>
+  ```
+
+- 详细信息
+
+  提供一个入参，类型为 `HljsLanguageType`，取值范围是 `plaintext` `json` `javascript` `java` `typescript` `python` `php` `css` `less` `scss` `html` `markdown` `objectivec` `swift` `dart` `nginx` `http` `go` `ruby` `c` `cpp` `csharp` `sql` `shell` `r` `kotlin` `rust` ，表示更新的语言值，该方法会修改所在代码块的语言类型，以达到不同的高亮效果，更新完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
+
+  如果光标不是在唯一的代码块节点内，则不会执行
+
+- 示例
+
+  ```ts
+  await editor.commands.updateCodeBlockLanguage('java')
+  ```
+
 ## 代码示例
 
 <div style="margin:0 0 10px 0">

@@ -17,7 +17,7 @@ export type SetLinkOptionType = {
  * 更新链接方法入参类型
  */
 export type UpdateLinkOptionType = {
-  href: string
+  href?: string
   newOpen?: boolean
 }
 
@@ -80,22 +80,22 @@ export const LinkExtension = () =>
       /**
        * 设置连接
        */
-      const setLink = async ({ href, text, newOpen }: SetLinkOptionType) => {
+      const setLink = async (options: SetLinkOptionType) => {
         if (!this.selection.focused() || hasLink()) {
           return
         }
-        if (!href) {
+        if (!options.href) {
           return
         }
         //起点和终点在一起
         if (this.selection.collapsed()) {
-          if (!text) {
+          if (!options.text) {
             return
           }
           const marks: KNodeMarksType = {
-            href
+            href: options.href
           }
-          if (newOpen) {
+          if (options.newOpen) {
             marks.target = '_blank'
           }
           const linkNode = KNode.create({
@@ -105,7 +105,7 @@ export const LinkExtension = () =>
             children: [
               {
                 type: 'text',
-                textContent: text
+                textContent: options.text
               }
             ]
           })
@@ -114,9 +114,9 @@ export const LinkExtension = () =>
         //起点和终点不在一起
         else {
           const marks: KNodeMarksType = {
-            href
+            href: options.href
           }
-          if (newOpen) {
+          if (options.newOpen) {
             marks.target = '_blank'
           }
           const linkNode = KNode.create({
@@ -137,22 +137,26 @@ export const LinkExtension = () =>
       /**
        * 更新链接
        */
-      const updateLink = async ({ href, newOpen }: UpdateLinkOptionType) => {
+      const updateLink = async (options: UpdateLinkOptionType) => {
         if (!this.selection.focused()) {
           return
         }
-        if (!href) {
+        if (!options.href && typeof options.newOpen != 'boolean') {
           return
         }
         const linkNode = getLink()
         if (!linkNode) {
           return
         }
-        linkNode.marks!.href = href
-        if (newOpen) {
-          linkNode.marks!.target = '_blank'
-        } else {
-          linkNode.marks = deleteProperty(linkNode.marks!, 'target')
+        if (options.href) {
+          linkNode.marks!.href = options.href
+        }
+        if (typeof options.newOpen == 'boolean') {
+          if (options.newOpen) {
+            linkNode.marks!.target = '_blank'
+          } else {
+            linkNode.marks = deleteProperty(linkNode.marks!, 'target')
+          }
         }
         await this.updateView()
       }

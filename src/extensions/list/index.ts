@@ -7,30 +7,41 @@ export type OrderedListType = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower
 
 export type UnorderListType = 'disc' | 'circle' | 'square'
 
+export type ListOptionsType = {
+  ordered?: boolean
+  listType?: OrderedListType | UnorderListType
+}
+
 declare module '../../model' {
   interface EditorCommandsType {
-    getList?: (ordered: boolean) => KNode | null
-    hasList?: (ordered: boolean) => boolean
-    allList?: (ordered: boolean) => boolean
-    setList?: (ordered: boolean) => Promise<void>
-    unsetList?: (ordered: boolean) => Promise<void>
-    updateListType?: ({ listType, ordered }: { listType: OrderedListType | UnorderListType; ordered?: boolean }) => Promise<void>
+    getList?: (options: ListOptionsType) => KNode | null
+    hasList?: (options: ListOptionsType) => boolean
+    allList?: (options: ListOptionsType) => boolean
+    setList?: (options: ListOptionsType) => Promise<void>
+    unsetList?: (options: ListOptionsType) => Promise<void>
   }
 }
 
 /**
  * 块节点转为列表
  */
-const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
+const toList = (editor: Editor, node: KNode, ordered?: boolean, listType?: OrderedListType | UnorderListType) => {
   if (!node.isBlock()) {
     return
   }
   //是列表项节点
   if (node.isMatch({ tag: 'li' })) {
     //如果是和当前要转的列表类型一致则不处理
-    if (node.parent!.isMatch({ tag: ordered ? 'ol' : 'ul' })) {
-      return
+    if (listType) {
+      if (node.parent!.isMatch({ tag: ordered ? 'ol' : 'ul', styles: { listStyleType: listType } })) {
+        return
+      }
+    } else {
+      if (node.parent!.isMatch({ tag: ordered ? 'ol' : 'ul' })) {
+        return
+      }
     }
+
     //获取列表节点
     const listNode = node.parent!
     //获取当前块节点在列表项节点里的序列
@@ -48,6 +59,11 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
       tag: ordered ? 'ol' : 'ul',
       children: []
     })
+    if (listType) {
+      newListNode.styles = {
+        listStyleType: listType
+      }
+    }
     //将复制的块节点给新的列表节点
     editor.addNode(newNode, newListNode)
     //该列表项节点是原列表节点的第一个子节点
@@ -86,6 +102,11 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
         }
       ]
     })
+    if (listType) {
+      listNode.styles = {
+        listStyleType: listType
+      }
+    }
     //将块节点的子节点给列表节点的列表项节点
     node.children!.forEach((item, index) => {
       editor.addNode(item, listNode.children![0], index)
@@ -99,6 +120,11 @@ const toList = (editor: Editor, node: KNode, ordered?: boolean) => {
     //将块节点转为列表节点
     editor.toParagraph(node)
     node.tag = ordered ? 'ol' : 'ul'
+    if (listType) {
+      node.styles = {
+        listStyleType: listType
+      }
+    }
     //创建列表项节点
     const listItem = KNode.create({
       type: 'block',
@@ -153,6 +179,50 @@ const ListItemToParagraph = (editor: Editor, node: KNode) => {
     editor.addNodeBefore(sList, node)
   }
   editor.toParagraph(node)
+}
+
+/**
+ * 节点合并处理
+ */
+const listMergeHandler = ({ editor, node }: { editor: Editor; node: KNode }) => {
+  //节点是有序列表
+  if (node.isMatch({ tag: 'ol' })) {
+    //前一个兄弟节点
+    const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
+    //前一个兄弟节点是有序列表则将当前节点的子节点都给前一个节点
+    if (previousNode && previousNode.isMatch({ tag: 'ol' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
+      const nodes = node.children!.map(item => {
+        item.parent = previousNode
+        return item
+      })
+      previousNode.children!.push(...nodes)
+      node.children = []
+      const nextNode = node.getNext(node.parent ? node.parent.children! : editor.stackNodes)
+      //如果此时后一个节点存在
+      if (nextNode) {
+        listMergeHandler({ editor, node: nextNode })
+      }
+    }
+  }
+  //节点是无序列表
+  if (node.isMatch({ tag: 'ul' })) {
+    //前一个兄弟节点
+    const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
+    //前一个兄弟节点是无序列表则将当前节点的子节点都给前一个节点
+    if (previousNode && previousNode.isMatch({ tag: 'ul' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
+      const nodes = node.children!.map(item => {
+        item.parent = previousNode
+        return item
+      })
+      previousNode.children!.push(...nodes)
+      node.children = []
+      const nextNode = node.getNext(node.parent ? node.parent.children! : editor.stackNodes)
+      //如果此时后一个节点存在
+      if (nextNode) {
+        listMergeHandler({ editor, node: nextNode })
+      }
+    }
+  }
 }
 
 export const ListExtension = () =>
@@ -212,36 +282,7 @@ export const ListExtension = () =>
         }
       },
       //列表合并处理
-      ({ editor, node }) => {
-        //节点是有序列表
-        if (node.isMatch({ tag: 'ol' })) {
-          //前一个兄弟节点
-          const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
-          //前一个兄弟节点是有序列表则将当前节点的子节点都给前一个节点
-          if (previousNode && previousNode.isMatch({ tag: 'ol' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
-            const nodes = node.children!.map(item => {
-              item.parent = previousNode
-              return item
-            })
-            previousNode.children!.push(...nodes)
-            node.children = []
-          }
-        }
-        //节点是无序列表
-        if (node.isMatch({ tag: 'ul' })) {
-          //前一个兄弟节点
-          const previousNode = node.getPrevious(node.parent ? node.parent.children! : editor.stackNodes)
-          //前一个兄弟节点是无序列表则将当前节点的子节点都给前一个节点
-          if (previousNode && previousNode.isMatch({ tag: 'ul' }) && previousNode.isEqualMarks(node) && previousNode.isEqualStyles(node)) {
-            const nodes = node.children!.map(item => {
-              item.parent = previousNode
-              return item
-            })
-            previousNode.children!.push(...nodes)
-            node.children = []
-          }
-        }
-      }
+      listMergeHandler
     ],
     pasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
@@ -270,41 +311,65 @@ export const ListExtension = () =>
       /**
        * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
        */
-      const getList = (ordered?: boolean) => {
-        return this.getMatchNodeBySelection({ tag: ordered ? 'ol' : 'ul' })
+      const getList = (options: ListOptionsType) => {
+        if (options.listType) {
+          return this.getMatchNodeBySelection({
+            tag: options.ordered ? 'ol' : 'ul',
+            styles: {
+              listStyleType: options.listType
+            }
+          })
+        }
+        return this.getMatchNodeBySelection({ tag: options.ordered ? 'ol' : 'ul' })
       }
 
       /**
        * 判断光标范围内是否有有序列表或者无序列表
        */
-      const hasList = (ordered?: boolean) => {
-        return this.isSelectionNodesSomeMatch({ tag: ordered ? 'ol' : 'ul' })
+      const hasList = (options: ListOptionsType) => {
+        if (options.listType) {
+          return this.isSelectionNodesSomeMatch({
+            tag: options.ordered ? 'ol' : 'ul',
+            styles: {
+              listStyleType: options.listType
+            }
+          })
+        }
+        return this.isSelectionNodesSomeMatch({ tag: options.ordered ? 'ol' : 'ul' })
       }
 
       /**
        * 判断光标范围内是否都是有序列表或者无序列表
        */
-      const allList = (ordered?: boolean) => {
-        return this.isSelectionNodesAllMatch({ tag: ordered ? 'ol' : 'ul' })
+      const allList = (options: ListOptionsType) => {
+        if (options.listType) {
+          return this.isSelectionNodesAllMatch({
+            tag: options.ordered ? 'ol' : 'ul',
+            styles: {
+              listStyleType: options.listType
+            }
+          })
+        }
+        return this.isSelectionNodesAllMatch({ tag: options.ordered ? 'ol' : 'ul' })
       }
 
       /**
        * 设置有序列表或者无序列表
        */
-      const setList = async (ordered?: boolean) => {
-        if (allList(ordered)) {
+      const setList = async (options: ListOptionsType) => {
+        if (allList(options)) {
           return
         }
         //起点和终点在一起
         if (this.selection.collapsed()) {
           const blockNode = this.selection.start!.node.getBlock()
-          toList(this, blockNode, ordered)
+          toList(this, blockNode, options.ordered, options.listType)
         }
         //起点和终点不在一起
         else {
           const blockNodes = getSelectionBlockNodes.apply(this)
           blockNodes.forEach(item => {
-            toList(this, item, ordered)
+            toList(this, item, options.ordered, options.listType)
           })
         }
         await this.updateView()
@@ -313,8 +378,8 @@ export const ListExtension = () =>
       /**
        * 取消有序列表或者无序列表
        */
-      const unsetList = async (ordered?: boolean) => {
-        if (!allList(ordered)) {
+      const unsetList = async (options: ListOptionsType) => {
+        if (!allList(options)) {
           return
         }
         //起点和终点在一起
@@ -334,34 +399,12 @@ export const ListExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 更新光标所在有无/无序列表的序标类型
-       */
-      const updateListType = async ({ listType, ordered }: { listType: OrderedListType | UnorderListType; ordered?: boolean }) => {
-        if (!this.selection.focused()) {
-          return
-        }
-        const listNode = getList(ordered)
-        if (!listNode) {
-          return
-        }
-        if (listNode.hasStyles()) {
-          listNode.styles!.listStyleType = listType
-        } else {
-          listNode.styles = {
-            listStyleType: listType
-          }
-        }
-        await this.updateView()
-      }
-
       return {
         getList,
         hasList,
         allList,
         setList,
-        unsetList,
-        updateListType
+        unsetList
       }
     }
   })

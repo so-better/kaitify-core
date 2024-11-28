@@ -183,7 +183,6 @@ const editor = await Editor.configure({
   })
 
   const updateAttachment = ()=>{
-    console.log(editor.value)
     if(!editor.value?.commands.getAttachment()){
       alert('请点击附件')
       return

@@ -49,14 +49,14 @@ export const HistoryExtension = () =>
     },
     addCommands() {
       /**
-       * 是否可以撤销，如果可以撤销返回对应的历史记录
+       * 是否可以撤销
        */
       const canUndo = () => {
         return this.history.records.length > 1
       }
 
       /**
-       * 是否可以重做，如果可以重做返回对应的历史记录
+       * 是否可以重做
        */
       const canRedo = () => {
         return this.history.redoRecords.length > 0

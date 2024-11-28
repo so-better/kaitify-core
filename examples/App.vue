@@ -62,11 +62,16 @@
       <fieldset>
         <legend>列表</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setList!(true)">插入有序列表</button>
-          <button @click="editor?.commands.setList!(false)">插入无序列表</button>
-          <button
-            @click="editor?.commands.updateListType!({ listType: 'lower-alpha', ordered: true })">更新有序列表序标</button>
-          <button @click="editor?.commands.updateListType!({ listType: 'square', ordered: false })">更新无序列表序标</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'decimal' })">插入有序列表1</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'cjk-ideographic' })">插入有序列表2</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'lower-alpha' })">插入有序列表3</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'lower-greek' })">插入有序列表4</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'lower-roman' })">插入有序列表5</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'upper-alpha' })">插入有序列表6</button>
+          <button @click="editor?.commands.setList!({ ordered: true, listType: 'upper-roman' })">插入有序列表6</button>
+          <button @click="editor?.commands.setList!({ ordered: false, listType: 'disc' })">插入无序列表1</button>
+          <button @click="editor?.commands.setList!({ ordered: false, listType: 'circle' })">插入无序列表2</button>
+          <button @click="editor?.commands.setList!({ ordered: false, listType: 'square' })">插入无序列表3</button>
         </div>
       </fieldset>
       <fieldset>

@@ -12,7 +12,7 @@ export type SetImageOptionType = {
  * 更新图片方法入参类型
  */
 export type UpdateImageOptionType = {
-    src: string;
+    src?: string;
     alt?: string;
 };
 declare module '../../model' {

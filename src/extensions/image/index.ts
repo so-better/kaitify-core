@@ -18,7 +18,7 @@ export type SetImageOptionType = {
  * 更新图片方法入参类型
  */
 export type UpdateImageOptionType = {
-  src: string
+  src?: string
   alt?: string
 }
 
@@ -187,22 +187,22 @@ export const ImageExtension = () =>
       /**
        * 插入图片
        */
-      const setImage = async ({ src, alt, width }: SetImageOptionType) => {
+      const setImage = async (options: SetImageOptionType) => {
         if (!this.selection.focused()) {
           return
         }
-        if (!src) {
+        if (!options.src) {
           return
         }
         const imageNode = KNode.create({
           type: 'closed',
           tag: 'img',
           marks: {
-            src,
-            alt: alt || ''
+            src: options.src,
+            alt: options.alt || ''
           },
           styles: {
-            width: width || 'auto'
+            width: options.width || 'auto'
           }
         })
         this.insertNode(imageNode)
@@ -213,11 +213,11 @@ export const ImageExtension = () =>
       /**
        * 更新图片
        */
-      const updateImage = async ({ src, alt }: UpdateImageOptionType) => {
+      const updateImage = async (options: UpdateImageOptionType) => {
         if (!this.selection.focused()) {
           return
         }
-        if (!src) {
+        if (!options.src && !options.alt) {
           return
         }
         const imageNode = getImage()
@@ -225,10 +225,12 @@ export const ImageExtension = () =>
           return
         }
         //更新url
-        imageNode.marks!.src = src
+        if (options.src) {
+          imageNode.marks!.src = options.src
+        }
         //更新alt
-        if (alt) {
-          imageNode.marks!.alt = alt
+        if (options.alt) {
+          imageNode.marks!.alt = options.alt
         } else {
           imageNode.marks = deleteProperty(imageNode.marks!, 'alt')
         }

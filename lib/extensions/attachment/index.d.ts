@@ -10,6 +10,9 @@ export type UpdateAttachmentOptionType = {
     text?: string;
     icon?: string;
 };
+export type AttachmentExtensionPropsType = {
+    icon: string;
+};
 declare module '../../model' {
     interface EditorCommandsType {
         getAttachment?: () => KNode | null;
@@ -23,4 +26,4 @@ declare module '../../model' {
         } | null;
     }
 }
-export declare const AttachmentExtension: () => Extension;
+export declare const AttachmentExtension: (props?: AttachmentExtensionPropsType) => Extension;
