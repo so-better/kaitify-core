@@ -9,6 +9,9 @@ export const onSelectionChange = async function (this: Editor) {
   if (!this.$el) {
     return
   }
+  if (!this.isEditable()) {
+    return
+  }
   //正在输入中文
   if (this.isComposition) {
     return
