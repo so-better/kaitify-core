@@ -274,7 +274,7 @@ onMounted(async () => {
     allowPasteHtml: true,
     placeholder: '请输入内容...',
     afterUpdateView() {
-      count.value = this.getText().trim().length
+      count.value = this.getContent().trim().length
     },
   })
 })

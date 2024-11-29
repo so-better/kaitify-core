@@ -496,7 +496,7 @@ export declare class Editor {
     /**
      * 获取编辑器的纯文本内容
      */
-    getText(): string;
+    getContent(): string;
     /**
      * 配置编辑器，返回创建的编辑器
      */

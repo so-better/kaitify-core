@@ -857,14 +857,14 @@ editor.updateView() //调用此方法视图才会更新
   editor.destroy()
   ```
 
-##### getText()
+##### getContent()
 
 获取编辑器的纯文本内容
 
 - 类型
 
   ```ts
-  getText(): string
+  getContent(): string
   ```
 
 - 详细信息
@@ -874,5 +874,5 @@ editor.updateView() //调用此方法视图才会更新
 - 示例
 
   ```ts
-  const text = editor.getText()
+  const content = editor.getContent()
   ```

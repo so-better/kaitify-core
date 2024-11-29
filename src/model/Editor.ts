@@ -1876,11 +1876,11 @@ export class Editor {
   /**
    * 获取编辑器的纯文本内容
    */
-  getText() {
+  getContent() {
     if (!this.$el) {
       return ''
     }
-    return this.$el.innerText.trim()
+    return this.$el.textContent ?? ''
   }
 
   /**
