@@ -6,7 +6,7 @@ title: 安装
 
 ## 下载 kaitify 本地到使用
 
-- 下载地址：[https://registry.npmmirror.com/@kaitify/core/download/@kaitify/core-0.0.1-beta.4.tgz](https://registry.npmmirror.com/@kaitify/core/download/@kaitify/core-0.0.1-beta.4.tgz)
+- 下载地址：[kaitify](https://registry.npmmirror.com/@kaitify/core/download/@kaitify/core-0.0.1-beta.4.tgz)
 - 下载完成后最终解压得到一个 package 文件夹，进入 package 文件夹后，将 package 目录下的整个 lib 目录拷贝到你的项目下
 - 在 html 页面中引入 js
 
