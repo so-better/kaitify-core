@@ -23,7 +23,7 @@ const getExtensionsList = () => {
 export default defineConfig({
   base: '/@kaitify/core/',
   title: 'kaitify',
-  description: 'kaitify是一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置扩展，来帮助你快速构建一个富文本编辑器',
+  description: '一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置扩展，来帮助你快速构建一个富文本编辑器',
   lastUpdated: true,
   head: [['link', { rel: 'icon', type: 'image/png', href: './logo.png' }]],
   themeConfig: {
