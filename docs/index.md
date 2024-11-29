@@ -21,7 +21,7 @@ hero:
 
 features:
   - title: '@kaitify/vue'
-    details: 基于@kaitify/core开发的vue富文本编辑器核心库
+    details: 基于kaitify开发的vue富文本编辑器核心库
     link: https://github.com/so-better/kaitify-vue
   - title: 'ruax'
     details: 一个轻量的前端封装异步请求的 JS 库

@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@kaitify/core</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kaitify</title>
     <script src="../lib/kaitify-core.umd.js"></script>
-</head>
+  </head>
 
-<body>
-    <div id="editor" style="height: 400px;"></div>
-</body>
-<script>
+  <body>
+    <div id="editor" style="height: 400px"></div>
+  </body>
+  <script>
     const { Editor, KNode } = window['kaitify-core']
     const editor = Editor.configure({
-        value:'hello',
-        el:'#editor'
+      value: 'hello',
+      el: '#editor'
     })
-    console.log(window['kaitify-core']);
-</script>
-
+    console.log(window['kaitify-core'])
+  </script>
 </html>
