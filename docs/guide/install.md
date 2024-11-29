@@ -24,7 +24,7 @@ title: 安装
 
 ## 通过 CDN 使用 kaitify
 
-你可以借助 script 标签直接通过 CDN 来使用 kaitify
+你可以借助 `script` 标签直接通过 CDN 来使用 `kaitify`
 
 ```html
 <!-- 引入固定版本的kaitify -->
