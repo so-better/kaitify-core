@@ -30,7 +30,7 @@ export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOp
 			tag: editor.textRenderTag,
 			namespace: node.namespace,
 			attrs: node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key },
-			styles: node.hasStyles() ? DapCommon.clone(node.styles) : {},
+			styles: node.hasStyles() ? DapCommon.clone(node.styles!) : {},
 			textContent: node.textContent
 		}
 	}
@@ -40,7 +40,7 @@ export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOp
 		tag: node.tag!,
 		namespace: node.namespace,
 		attrs: node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key },
-		styles: node.hasStyles() ? DapCommon.clone(node.styles) : {},
+		styles: node.hasStyles() ? DapCommon.clone(node.styles!) : {},
 		children: node.hasChildren() ? node.children!.map(item => getNodeRenderOptions(editor, item)) : []
 	}
 }
