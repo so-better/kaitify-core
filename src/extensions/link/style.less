@@ -2,6 +2,7 @@
   a {
     color: #06c27c;
     text-decoration: none;
+    pointer-events: none;
 
     &:hover {
       text-decoration: underline;
@@ -11,6 +12,7 @@
   //非编辑状态下
   &:not([contenteditable='true']) {
     a {
+      pointer-events: all;
       &:hover {
         cursor: pointer;
       }
