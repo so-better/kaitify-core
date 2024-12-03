@@ -7,11 +7,8 @@
   -webkit-font-smoothing: antialiased;
   text-size-adjust: none;
   line-height: var(--kaitify-line-height);
-  border: 1px solid var(--kaitify-border-color);
-  border-radius: var(--kaitify-border-radius);
   background: var(--kaitify-background-color);
   padding: var(--kaitify-padding);
-  transition: border-color 500ms;
   overflow-x: hidden;
   overflow-y: auto;
   outline: none;
@@ -30,9 +27,6 @@
 
   //编辑状态下才有的样式
   &[contenteditable='true'] {
-    &:focus {
-      border-color: var(--kaitify-theme);
-    }
     &[kaitify-placeholder].kaitify-showplaceholder::before {
       content: attr(kaitify-placeholder);
       position: absolute;

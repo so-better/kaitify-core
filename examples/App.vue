@@ -250,7 +250,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode, AttachmentExtension } from '../lib/kaitify-core.es'
+import { Editor, KNode, AttachmentExtension } from '../src'
 import { content } from "./content"
 
 const count = ref<number>(0)
