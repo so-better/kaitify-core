@@ -1,4 +1,4 @@
-.Kaitify {
+.kaitify {
   span[kaitify-math] {
     display: inline-block;
     padding: var(--kaitify-small-padding) var(--kaitify-padding);
@@ -6,7 +6,7 @@
     margin: 0 var(--kaitify-sides-between);
     transition: all 300ms;
     max-width: 100%;
-    background: var(--kaitify-lightest-theme);
+    background: #f6f9ff;
 
     &:hover {
       cursor: pointer !important;
@@ -18,4 +18,8 @@
       overflow: hidden;
     }
   }
+}
+
+:root[kaitify-dark] .kaitify span[kaitify-math] {
+  background: #29292d;
 }

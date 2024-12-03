@@ -63,8 +63,8 @@ const videoFocus = (editor: Editor) => {
  */
 const videoResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact('.Kaitify video').unset()
-  interact('.Kaitify video').resizable({
+  interact('.kaitify video').unset()
+  interact('.kaitify video').resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘

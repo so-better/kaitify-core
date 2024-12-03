@@ -1892,7 +1892,7 @@ export class Editor {
     //初始化编辑器dom
     editor.$el = initEditorDom(options.el)
     //初始化设置编辑器样式
-    editor.$el.classList.add('Kaitify')
+    editor.$el.classList.add('kaitify')
     //设置是否深色模式
     if (options.dark) editor.setDark(options.dark)
     //初始化设置编辑器默认提示文本

@@ -994,9 +994,9 @@ export const handlerForNormalInsertParagraph = function (this: Editor) {
 export const setPlaceholder = function (this: Editor) {
   //编辑器内只有一个块节点且是只有占位符的段落
   if (this.stackNodes.length == 1 && this.isParagraph(this.stackNodes[0]) && this.stackNodes[0].allIsPlaceholder()) {
-    this.$el!.classList.add('showPlaceholder')
+    this.$el!.classList.add('kaitify-showplaceholder')
   } else {
-    this.$el!.classList.remove('showPlaceholder')
+    this.$el!.classList.remove('kaitify-showplaceholder')
   }
 }
 

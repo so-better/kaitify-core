@@ -373,8 +373,8 @@ const getMaxWidth = (element: HTMLElement): number => {
  */
 const tableResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact('.Kaitify table td').unset()
-  interact('.Kaitify table td').resizable({
+  interact('.kaitify table td').unset()
+  interact('.kaitify table td').resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘

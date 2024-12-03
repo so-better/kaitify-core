@@ -62,8 +62,8 @@ const imageFocus = (editor: Editor) => {
  */
 const imageResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact('.Kaitify img').unset()
-  interact('.Kaitify img').resizable({
+  interact('.kaitify img').unset()
+  interact('.kaitify img').resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘
