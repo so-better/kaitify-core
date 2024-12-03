@@ -5,7 +5,7 @@ import path from 'path'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 export default defineConfig({
-  plugins: [vue(), dts(), cssInjectedByJsPlugin({ topExecutionPriority: false })],
+  plugins: [vue(), dts(), cssInjectedByJsPlugin({ topExecutionPriority: true })],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
