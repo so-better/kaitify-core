@@ -213,9 +213,11 @@ editor.updateView()
 kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不需要，你可以通过 css 样式覆盖去修改。或者你可以通过修改 `:root` 下的 css 变量来修改：
 
 ```less
+@theme: #308af3;
+
 :root {
   //主题色
-  --kaitify-theme: #4bb4ba;
+  --kaitify-theme: @theme;
   //最浅主题色，通常用于悬浮效果
   --kaitify-lightest-theme: fade(@theme, 10);
   //更浅主题色，通常用于激活效果
@@ -250,11 +252,11 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
 
 :root[kaitify-dark] {
   //字体颜色
-  --kaitify-font-color: #e7e7e7;
+  --kaitify-font-color: #f5f5f5;
   //边框颜色
-  --kaitify-border-color: #4a4a4a;
+  --kaitify-border-color: #3b3b3b;
   //背景色
-  --kaitify-background-color: #1a1a1a;
+  --kaitify-background-color: #1b1b1f;
 }
 ```
 
