@@ -72,4 +72,4 @@ const editor = await Editor.configure({
 })
 ```
 
-除了通过 `formatRules` 属性来配置自定义的格式化规则，还可以通过自定义扩展的方式，来配置扩展的格式化规则，以达到我们的目的，这里暂且不提，具体可以参阅 [如何自己创建一个扩展？](/extensions/custom-extension.html)
+除了通过 `formatRules` 属性来配置自定义的格式化规则，还可以通过自定义扩展的方式，来配置扩展的格式化规则，以达到我们的目的，这里暂且不提，具体可以参阅 [如何自己创建一个扩展？](/extensions/custom-extension)

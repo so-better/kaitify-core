@@ -18,7 +18,7 @@ title: Editor 方法
   ```
 - 详细信息
 
-  提供一个入参，TS 类型为 `EditorConfigureOptionType`，用以对创建的编辑器进行配置，具体可参考 [编辑器构建参数](/guide/editor.html#编辑器构建参数)
+  提供一个入参，TS 类型为 `EditorConfigureOptionType`，用以对创建的编辑器进行配置，具体可参考 [编辑器构建参数](/guide/editor#编辑器构建参数)
 
 - 示例
 

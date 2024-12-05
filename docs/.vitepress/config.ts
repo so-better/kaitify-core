@@ -25,6 +25,7 @@ export default defineConfig({
   title: 'kaitify',
   description: '一个基于原生JS的富文本编辑器核心库，提供了强大的API和内置扩展，来帮助你快速构建一个富文本编辑器',
   lastUpdated: true,
+  cleanUrls: true,
   head: [
     ['link', { rel: 'icon', type: 'image/png', href: '/docs/kaitify-core/logo.png' }],
     ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no' }]

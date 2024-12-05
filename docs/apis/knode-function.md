@@ -79,20 +79,20 @@ title: KNode 方法
 
 - 详细信息
 
-  提供一个入参，类型为 `KNodeCreateOptionType`，具体参数可参阅 [节点构建参数 KNodeCreateOptionType](/guide/knode.html#节点构建参数-knodecreateoptiontype)，该方法会返回一个 `Knode` 节点实例
+  提供一个入参，类型为 `KNodeCreateOptionType`，具体参数可参阅 [节点构建参数 KNodeCreateOptionType](/guide/knode#节点构建参数-knodecreateoptiontype)，该方法会返回一个 `Knode` 节点实例
 
 - 示例
 
   ```ts
   const node = KNode.create({
-  	type: 'block',
-  	tag: 'p',
-  	children: [
-  		{
-  			type: 'text',
-  			textContent: 'hello'
-  		}
-  	]
+    type: 'block',
+    tag: 'p',
+    children: [
+      {
+        type: 'text',
+        textContent: 'hello'
+      }
+    ]
   })
   ```
 
@@ -128,15 +128,15 @@ title: KNode 方法
 
 - 详细信息
 
-  提供一个入参，类型为 `ZeroWidthTextKNodeCreateOptionType`，具体参数可参阅 [零宽度无断空白文本节点](/guide/knode.html#零宽度无断空白文本节点)，该方法会返回一个零宽度无断空白文本节点
+  提供一个入参，类型为 `ZeroWidthTextKNodeCreateOptionType`，具体参数可参阅 [零宽度无断空白文本节点](/guide/knode#零宽度无断空白文本节点)，该方法会返回一个零宽度无断空白文本节点
 
 - 示例
 
   ```ts
   const node = KNode.createZeroWidthText({
-  	styles: {
-  		fontSize: '20px'
-  	}
+    styles: {
+      fontSize: '20px'
+    }
   })
   ```
 
@@ -322,7 +322,7 @@ title: KNode 方法
 
 - 详细信息
 
-  判断当前节点是否为空节点，返回一个 `boolean` 值，关于空节点可参阅 [什么是空节点？](/guide/knode.html#空节点)
+  判断当前节点是否为空节点，返回一个 `boolean` 值，关于空节点可参阅 [什么是空节点？](/guide/knode#空节点)
 
 - 示例
 
@@ -342,7 +342,7 @@ title: KNode 方法
 
 - 详细信息
 
-  判断当前节点是否零宽度无断空白文本节点，返回一个 `boolean` 值，关于零宽度无断空白文本节点可参阅 [什么是零宽度无断空白文本节点？](/guide/knode.html#零宽度无断空白文本节点)
+  判断当前节点是否零宽度无断空白文本节点，返回一个 `boolean` 值，关于零宽度无断空白文本节点可参阅 [什么是零宽度无断空白文本节点？](/guide/knode#零宽度无断空白文本节点)
 
 - 示例
 
@@ -362,7 +362,7 @@ title: KNode 方法
 
 - 详细信息
 
-  判断当前节点是否占位符节点，返回一个 `boolean` 值，关于占位符节点可参阅 [什么是占位符节点？](/guide/knode.html#占位符节点)
+  判断当前节点是否占位符节点，返回一个 `boolean` 值，关于占位符节点可参阅 [什么是占位符节点？](/guide/knode#占位符节点)
 
 - 示例
 
@@ -489,18 +489,18 @@ title: KNode 方法
 
   ```ts
   const node = KNode.create({
-  	type: 'text',
-  	styles: {
-  		fontWeight: 'bold'
-  	},
-  	textContent: 'hello，我是node'
+    type: 'text',
+    styles: {
+      fontWeight: 'bold'
+    },
+    textContent: 'hello，我是node'
   })
   const targetNode = KNode.create({
-  	type: 'text',
-  	styles: {
-  		color: '#f30'
-  	},
-  	textContent: 'hello，我是targetNode'
+    type: 'text',
+    styles: {
+      color: '#f30'
+    },
+    textContent: 'hello，我是targetNode'
   })
   const isEqualStyles = node.isEqualStyles(targetNode) //false
   ```
@@ -523,18 +523,18 @@ title: KNode 方法
 
   ```ts
   const node = KNode.create({
-  	type: 'text',
-  	marks: {
-  		'data-index': '1'
-  	},
-  	textContent: 'hello，我是node'
+    type: 'text',
+    marks: {
+      'data-index': '1'
+    },
+    textContent: 'hello，我是node'
   })
   const targetNode = KNode.create({
-  	type: 'text',
-  	marks: {
-  		'data-index': '2'
-  	},
-  	textContent: 'hello，我是targetNode'
+    type: 'text',
+    marks: {
+      'data-index': '2'
+    },
+    textContent: 'hello，我是targetNode'
   })
   const isEqualMarks = node.isEqualMarks(targetNode) //false
   ```
@@ -734,17 +734,17 @@ title: KNode 方法
   ```ts
   //判断节点是否p标签且拥有fontSize="20px"的样式
   const match = node.isMatch({
-  	tag: 'p',
-  	styles: {
-  		fontSize: '20px'
-  	}
+    tag: 'p',
+    styles: {
+      fontSize: '20px'
+    }
   })
   //判断节点是否拥有p标签且拥有fontSize样式
   const match = node.isMatch({
-  	tag: 'p',
-  	styles: {
-  		fontSize: true
-  	}
+    tag: 'p',
+    styles: {
+      fontSize: true
+    }
   })
   ```
 
@@ -769,7 +769,7 @@ title: KNode 方法
   ```ts
   //判断当前节点是否在p节点下，如果是返回这个p节点
   const matchNode = node.getMatchNode({
-  	tag: 'p'
+    tag: 'p'
   })
   ```
 
