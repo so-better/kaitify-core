@@ -3,9 +3,9 @@ examples/
 public/
 docs/
 src/
-index.html
 
 # 忽略指定文件
+index.html
 vite.config.ts
 tsconfig.json
 tsconfig.node.json
