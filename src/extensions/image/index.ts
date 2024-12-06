@@ -111,7 +111,7 @@ const imageResizable = (editor: Editor) => {
         //设置百分比宽度
         const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
         //获取图片节点
-        const node = DapData.get(event.target, 'node')
+        const node = DapData.get<KNode>(event.target, 'node')
         //设置节点的styles
         if (node.hasStyles()) {
           node.styles!.width = `${percentWidth}%`

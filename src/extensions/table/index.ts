@@ -423,7 +423,7 @@ const tableResizable = (editor: Editor) => {
         //获取宽度
         const { width } = event.rect
         //获取暂存的col元素
-        const colDom = DapData.get(event.target, 'colDom') as HTMLElement
+        const colDom = DapData.get<HTMLElement>(event.target, 'colDom')
         //设置宽度
         colDom.setAttribute('width', `${width}px`)
       },
@@ -436,7 +436,7 @@ const tableResizable = (editor: Editor) => {
         //设置百分比宽度
         const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
         //获取暂存的col节点
-        const col = DapData.get(event.target, 'col') as KNode
+        const col = DapData.get<KNode>(event.target, 'col')
         //设置节点的styles
         if (col.hasStyles()) {
           col.marks!.width = `${percentWidth}%`
