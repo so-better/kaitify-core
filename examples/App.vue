@@ -257,17 +257,8 @@ const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
 
 onMounted(async () => {
-  const res = await fetch('https://www.so-better.cn/api/doc/getById', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      docId: 237
-    })
-  }).then(res => res.json())
   editor.value = await Editor.configure({
-    value: (res.data.docContent).replaceAll('data-editify-hljs', 'kaitify-hljs'),
+    value: '<ul><li>hello<ul><li>hello<ul><li>444</li></ul></li><li>4444</li></ul></li></ul><ol><li>hello<ol><li>hello<ol><li>444</li></ol></li><li>4444</li></ol></li></ol>',
     extensions: [AttachmentExtension({ icon: 'https://www.so-better.cn/static/attachments/h9PNcA0uJkWOZx971URJzLvn.jpg' })],
     el: '#editor',
     editable: true,

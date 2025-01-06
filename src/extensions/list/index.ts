@@ -245,14 +245,6 @@ export const ListExtension = () =>
         if (node.isMatch({ tag: 'ol' }) || node.isMatch({ tag: 'ul' })) {
           //必须是块节点
           node.type = 'block'
-          //固定设置序标在内侧
-          if (node.hasStyles()) {
-            node.styles!.listStylePosition = 'inside'
-          } else {
-            node.styles = {
-              listStylePosition: 'inside'
-            }
-          }
         }
       },
       //列表项处理
