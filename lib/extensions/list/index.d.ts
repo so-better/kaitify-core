@@ -13,6 +13,11 @@ declare module '../../model' {
         allList?: (options: ListOptionsType) => boolean;
         setList?: (options: ListOptionsType) => Promise<void>;
         unsetList?: (options: ListOptionsType) => Promise<void>;
+        canCreateInnerList?: () => {
+            node: KNode;
+            previousNode: KNode;
+        } | null;
+        createInnerList?: () => Promise<void>;
     }
 }
 export declare const ListExtension: () => Extension;

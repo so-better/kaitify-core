@@ -1,4 +1,4 @@
-import { Editor, KNode, KNodeStylesType } from '@/model'
+import { Editor, KNode, KNodeMatchOptionType, KNodeStylesType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import './style.less'
@@ -19,6 +19,8 @@ declare module '../../model' {
     allList?: (options: ListOptionsType) => boolean
     setList?: (options: ListOptionsType) => Promise<void>
     unsetList?: (options: ListOptionsType) => Promise<void>
+    canCreateInnerList?: () => { node: KNode; previousNode: KNode } | null
+    createInnerList?: () => Promise<void>
   }
 }
 
@@ -225,6 +227,13 @@ const listMergeHandler = ({ editor, node }: { editor: Editor; node: KNode }) => 
   }
 }
 
+/**
+ * 键盘Tab是否按下
+ */
+const isOnlyTab = (e: KeyboardEvent) => {
+  return e.key.toLocaleLowerCase() == 'tab' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
+}
+
 export const ListExtension = () =>
   Extension.create({
     name: 'list',
@@ -245,6 +254,14 @@ export const ListExtension = () =>
         if (node.isMatch({ tag: 'ol' }) || node.isMatch({ tag: 'ul' })) {
           //必须是块节点
           node.type = 'block'
+          //没有设置序标样式则设置默认的样式
+          if (!node.hasStyles()) {
+            node.styles = {
+              listStyleType: node.isMatch({ tag: 'ol' }) ? 'decimal' : 'disc'
+            }
+          } else if (!node.styles!.listStyleType) {
+            node.styles!.listStyleType = node.isMatch({ tag: 'ol' }) ? 'decimal' : 'disc'
+          }
         }
       },
       //列表项处理
@@ -299,50 +316,59 @@ export const ListExtension = () =>
       }
       return true
     },
+    onKeydown(event) {
+      if (isOnlyTab(event)) {
+        const result = this.commands.canCreateInnerList?.()
+        if (!!result) {
+          event.preventDefault()
+          this.commands.createInnerList?.()
+        }
+      }
+    },
     addCommands() {
       /**
        * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
        */
       const getList = (options: ListOptionsType) => {
-        if (options.listType) {
-          return this.getMatchNodeBySelection({
-            tag: options.ordered ? 'ol' : 'ul',
-            styles: {
-              listStyleType: options.listType
-            }
-          })
+        const params: KNodeMatchOptionType = {
+          tag: options.ordered ? 'ol' : 'ul'
         }
-        return this.getMatchNodeBySelection({ tag: options.ordered ? 'ol' : 'ul' })
+        if (options.listType) {
+          params.styles = {
+            listStyleType: options.listType
+          }
+        }
+        return this.getMatchNodeBySelection(params)
       }
 
       /**
        * 判断光标范围内是否有有序列表或者无序列表
        */
       const hasList = (options: ListOptionsType) => {
-        if (options.listType) {
-          return this.isSelectionNodesSomeMatch({
-            tag: options.ordered ? 'ol' : 'ul',
-            styles: {
-              listStyleType: options.listType
-            }
-          })
+        const params: KNodeMatchOptionType = {
+          tag: options.ordered ? 'ol' : 'ul'
         }
-        return this.isSelectionNodesSomeMatch({ tag: options.ordered ? 'ol' : 'ul' })
+        if (options.listType) {
+          params.styles = {
+            listStyleType: options.listType
+          }
+        }
+        return this.isSelectionNodesSomeMatch(params)
       }
 
       /**
        * 判断光标范围内是否都是有序列表或者无序列表
        */
       const allList = (options: ListOptionsType) => {
-        if (options.listType) {
-          return this.isSelectionNodesAllMatch({
-            tag: options.ordered ? 'ol' : 'ul',
-            styles: {
-              listStyleType: options.listType
-            }
-          })
+        const params: KNodeMatchOptionType = {
+          tag: options.ordered ? 'ol' : 'ul'
         }
-        return this.isSelectionNodesAllMatch({ tag: options.ordered ? 'ol' : 'ul' })
+        if (options.listType) {
+          params.styles = {
+            listStyleType: options.listType
+          }
+        }
+        return this.isSelectionNodesAllMatch(params)
       }
 
       /**
@@ -391,12 +417,76 @@ export const ListExtension = () =>
         await this.updateView()
       }
 
+      /**
+       * 是否可以生成内嵌列表
+       */
+      const canCreateInnerList = () => {
+        const node = this.getMatchNodeBySelection({ tag: 'li' })
+        if (!node || !node.parent) {
+          return null
+        }
+        const previousNode = node.getPrevious(node.parent.children!)
+        if (!previousNode || !previousNode.isMatch({ tag: 'li' })) {
+          return null
+        }
+        return { node, previousNode }
+      }
+
+      /**
+       * 根据当前光标所在的li节点生成一个内嵌列表
+       */
+      const createInnerList = async () => {
+        const result = canCreateInnerList()
+        if (!result) {
+          return
+        }
+        const { node, previousNode } = result
+        //如果前一个列表项节点的子节点不存在块节点，则创建一个段落包裹
+        if (!previousNode.children!.some(item => item.isBlock())) {
+          //创建一个段落
+          const paragraph = KNode.create({
+            tag: this.blockRenderTag,
+            type: 'block',
+            marks: {},
+            styles: {},
+            fixed: false,
+            nested: false,
+            locked: false,
+            namespace: ''
+          })
+          //将前一个列表项的子节点都放到段落里去
+          paragraph.children = previousNode.children
+          paragraph.children!.forEach(child => {
+            child.parent = paragraph
+          })
+          //将段落作为前一个列表项节点的唯一子节点
+          previousNode.children = [paragraph]
+          paragraph.parent = previousNode
+        }
+        //克隆当前列表节点
+        const innerList = node.parent!.clone(false)
+        //查找当前列表项节点在列表节点的序列
+        const index = node.parent!.children!.findIndex(item => item.isEqual(node))
+        //移除列表节点中的当前列表项
+        node.parent!.children!.splice(index, 1)
+        //将当前列表项加入到克隆的列表节点里
+        node.parent = innerList
+        innerList.children = [node]
+        //将克隆的列表节点加入到前一个列表项节点里
+        innerList.parent = previousNode
+        previousNode.children!.push(innerList)
+        //更新视图
+        await this.updateView()
+      }
+
       return {
         getList,
         hasList,
         allList,
         setList,
-        unsetList
+        unsetList,
+        canCreateInnerList,
+        createInnerList
       }
     }
   })

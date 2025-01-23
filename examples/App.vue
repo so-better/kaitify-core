@@ -258,7 +258,7 @@ const editor = ref<Editor | null>(null)
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: '<ul><li>hello<ul><li>hello<ul><li>444</li></ul></li><li>4444</li></ul></li></ul><ol><li>hello<ol><li>hello<ol><li>444</li></ol></li><li>4444</li></ol></li></ol>',
+    value: '<ol><li>一级分类1<ol><li>二级分类1<ol><li>三级分类1</li><li>三级分类2</li><li>三级分类3</li></ol></li><li>二级分类2</li></ol></li><li>一级分类2</li></ol>',
     extensions: [AttachmentExtension({ icon: 'https://www.so-better.cn/static/attachments/h9PNcA0uJkWOZx971URJzLvn.jpg' })],
     el: '#editor',
     editable: true,

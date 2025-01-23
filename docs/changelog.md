@@ -5,6 +5,12 @@ title: 更新日志
 
 # 更新日志
 
+## 0.0.1-beta.15 <Badge type="tip" text='2025.01.23' />
+
+- 列表优化：现在会给默认的列表节点设置 `listStyleType` 样式
+- 列表拓展新增 `canCreateInnerList` 和 `createInnertList` 命令
+- 列表拓展新增键盘事件：在可以生成内嵌列表时，按下 tab 键会执行 `createInnertList` 命令
+
 ## v0.0.1-beta.13 <Badge type="tip" text='2025.01.06' />
 
 - 优化列表渲染，序标改为外侧，设置左侧内边距

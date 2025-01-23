@@ -155,6 +155,51 @@ title: list 列表
   })
   ```
 
+##### canCreateInnerList()
+
+光标所在位置是否可以生成内嵌列表
+
+- 类型
+
+  ```ts
+  canCreateInnerList(): { node: KNode; previousNode: KNode } | null
+  ```
+
+- 详细信息
+
+  当光标在唯一的一个列表项节点上时，如果该列表项节点前一个节点也是列表项节点，则该节点可以生成一个新的内嵌列表
+
+  如果可以生成内嵌列表，该方法返回当前的列表项节点和前一个列表项节点，否则返回 `null`
+
+- 示例
+
+  ```ts
+  const { node, previousNode } = editor.commands.canCreateInnerList()
+  ```
+
+##### createInnerList()
+
+生成内嵌列表
+
+- 类型
+
+  ```ts
+  createInnerList(): Promise<void>
+  ```
+
+- 详细信息
+
+  该方法用于在可以生成内嵌列表的情况下，生成一个新的内嵌列表，并更新编辑器视图
+
+- 示例
+
+  ```ts
+  const result = editor.commands.canCreateInnerList()
+  if (!!result) {
+    editor.commands.createInnerList()
+  }
+  ```
+
 ## 代码示例
 
 <div style="margin:0 0 10px 0">
@@ -162,6 +207,7 @@ title: list 列表
   <button class="demo-button" @click="editor?.commands.setList({ ordered: false })">插入无序列表</button>
   <button class="demo-button" @click="editor?.commands.unsetList({ ordered: true })">取消有序列表</button>
   <button class="demo-button" @click="editor?.commands.unsetList({ ordered: false })">取消无序列表</button>
+  <button class="demo-button" @click="editor?.commands.createInnerList()">生成内嵌列表</button>
 </div>
 <div ref="editorRef" style="width:100%;height:200px;"></div>
 
