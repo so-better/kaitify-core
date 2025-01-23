@@ -234,6 +234,30 @@ const isOnlyTab = (e: KeyboardEvent) => {
   return e.key.toLocaleLowerCase() == 'tab' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
 }
 
+/**
+ * 获取需要取消列表项设置的列表项节点
+ */
+const getUnsetListItemNode = (matchNode: KNode | null, options: ListOptionsType) => {
+  while (true) {
+    if (!matchNode) {
+      break
+    }
+    const params: KNodeMatchOptionType = {
+      tag: options.ordered ? 'ol' : 'ul'
+    }
+    if (options.listType) {
+      params.styles = {
+        listStyleType: options.listType
+      }
+    }
+    if (matchNode.parent!.isMatch(params)) {
+      break
+    }
+    matchNode = matchNode.parent!.getMatchNode({ tag: 'li' })
+  }
+  return matchNode
+}
+
 export const ListExtension = () =>
   Extension.create({
     name: 'list',
@@ -403,14 +427,14 @@ export const ListExtension = () =>
         //起点和终点在一起
         if (this.selection.collapsed()) {
           const blockNode = this.selection.start!.node.getBlock()
-          const matchNode = blockNode.getMatchNode({ tag: 'li' })
+          const matchNode = getUnsetListItemNode(blockNode.getMatchNode({ tag: 'li' }), options)
           if (matchNode) ListItemToParagraph(this, matchNode)
         }
         //起点和终点不在一起
         else {
           const blockNodes = getSelectionBlockNodes.apply(this)
           blockNodes.forEach(item => {
-            const matchNode = item.getMatchNode({ tag: 'li' })
+            const matchNode = getUnsetListItemNode(item.getMatchNode({ tag: 'li' }), options)
             if (matchNode) ListItemToParagraph(this, matchNode)
           })
         }
