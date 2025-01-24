@@ -259,7 +259,7 @@ const editor = ref<Editor | null>(null)
 onMounted(async () => {
   editor.value = await Editor.configure({
     value: '<ol><li>一级分类1<ol><li>二级分类1<ol><li>三级分类1</li><li>三级分类2</li><li>三级分类3</li></ol></li><li>二级分类2</li></ol></li><li>一级分类2</li></ol>',
-    extensions: [AttachmentExtension({ icon: 'https://www.so-better.cn/static/attachments/h9PNcA0uJkWOZx971URJzLvn.jpg' })],
+    extensions: [],
     el: '#editor',
     editable: true,
     allowPasteHtml: true,

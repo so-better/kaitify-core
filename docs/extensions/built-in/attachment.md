@@ -151,7 +151,7 @@ const editor = await Editor.configure({
 ## 代码示例
 
 <div style="margin:0 0 10px 0">
-  <button class="demo-button" @click="editor?.commands.setAttachment({ url:'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg',text:'一张风景图'})" :disabled="!editable">插入附件</button>
+  <button class="demo-button" @click="editor?.commands.setAttachment({ url:'https://www.so-better.cn/docs/kaitify-core/logo.png',text:'LOGO'})" :disabled="!editable">插入附件</button>
   <button class="demo-button" @click="updateAttachment" :disabled="!editable">更新附件信息</button>
   <button class="demo-button" @click="getInfo" :disabled="!editable">获取附件信息</button>
   <button class="demo-button" @click="editable=!editable">{{ editable ? '禁用编辑器':'启用编辑器' }}</button>
@@ -187,7 +187,7 @@ const editor = await Editor.configure({
       alert('请点击附件')
       return
     }
-    editor.value?.commands.updateAttachment({ text:'一张风景图.jpg' })
+    editor.value?.commands.updateAttachment({ text:'这是一个logo图片' })
   }
 
   const getInfo = ()=>{
