@@ -81,6 +81,7 @@ export const HeadingExtension = () =>
         5: 'h5',
         6: 'h6'
       }
+
       /**
        * 获取光标所在的标题，如果光标不在一个标题内，返回null
        */

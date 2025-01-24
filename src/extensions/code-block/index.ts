@@ -127,6 +127,13 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
   }
 }
 
+/**
+ * 键盘Tab是否按下
+ */
+const isOnlyTab = (e: KeyboardEvent) => {
+  return e.key.toLocaleLowerCase() == 'tab' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
+}
+
 export const CodeBlockExtension = () =>
   Extension.create({
     name: 'codeBlock',
@@ -146,9 +153,7 @@ export const CodeBlockExtension = () =>
     },
     beforePatchNodeToFormat(node) {
       const codeBlockNode = node.getMatchNode({ tag: 'pre' })
-      if (codeBlockNode) {
-        return codeBlockNode
-      }
+      if (codeBlockNode) return codeBlockNode
       return node
     },
     formatRules: [
@@ -200,6 +205,16 @@ export const CodeBlockExtension = () =>
         }
       }
     ],
+    onKeydown(event) {
+      if (isOnlyTab(event)) {
+        const codeBlock = this.commands.getCodeBlock?.()
+        if (!!codeBlock) {
+          event.preventDefault()
+          this.insertText('  ')
+          this.updateView()
+        }
+      }
+    },
     addCommands() {
       /**
        * 获取光标所在的代码块节点，如果光标不在一个代码块节点内，返回null
