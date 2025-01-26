@@ -54,7 +54,7 @@ title: Editor 属性
 
 ##### extensions <Badge type="danger" text="Extension[]" />
 
-此为只读属性，表示编辑器已注册的插件数组
+此为只读属性，表示编辑器已注册的扩展数组
 
 ##### formatRules <Badge type="danger" text="RuleFunctionType[]" />
 
