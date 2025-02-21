@@ -876,3 +876,23 @@ editor.updateView() //调用此方法视图才会更新
   ```ts
   const content = editor.getContent()
   ```
+
+##### getHTML()
+
+获取编辑器的 `html` 内容
+
+- 类型
+
+  ```ts
+  getHTML(): string
+  ```
+
+- 详细信息
+
+  该方法会返回一个包含 `style` 标签和 `div` 标签的 `html` 内容。自行展示 `html` 内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+
+- 示例
+
+  ```ts
+  const html = editor.getHTML() //html可以直接插入到某个元素内进行展示
+  ```

@@ -1884,6 +1884,26 @@ export class Editor {
   }
 
   /**
+   * 获取编辑器的html内容，该方法会返回一个包含style标签和div标签的html内容。自行展示html内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+   */
+  getHTML() {
+    let styles = ''
+    for (const sheet of document.styleSheets) {
+      try {
+        for (const rule of sheet.cssRules) {
+          styles += `${rule.cssText}\n`
+        }
+      } catch (e) {
+        console.warn('无法访问样式表')
+      }
+    }
+    if (!styles || !this.$el) {
+      return ''
+    }
+    return `<style>${styles}</style><div class="kaitify">${this.$el.innerHTML}</div>`
+  }
+
+  /**
    * 配置编辑器，返回创建的编辑器
    */
   static async configure(options: EditorConfigureOptionType) {

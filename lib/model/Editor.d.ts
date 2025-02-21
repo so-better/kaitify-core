@@ -498,6 +498,10 @@ export declare class Editor {
      */
     getContent(): string;
     /**
+     * 获取编辑器的html内容，该方法会返回一个包含style标签和div标签的html内容。自行展示html内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+     */
+    getHTML(): string;
+    /**
      * 配置编辑器，返回创建的编辑器
      */
     static configure(options: EditorConfigureOptionType): Promise<Editor>;

@@ -5,6 +5,7 @@
         <legend>自定义操作</legend>
         <div class="toolbar">
           <button>当前编辑器内容字数：{{ count }}</button>
+          <button @click="getHtml">获取HTML</button>
           <button @click="insertNode">插入节点</button>
         </div>
       </fieldset>
@@ -244,7 +245,8 @@
       </fieldset>
     </div>
     <div class="right">
-      <div id="editor" style="height: 100%;"></div>
+      <div id="editor" style="height: 50%;"></div>
+      <iframe style="height: 50%;border: 1px solid #ccc;width: 100%;" :srcdoc="html"></iframe>
     </div>
   </div>
 </template>
@@ -255,6 +257,7 @@ import { content } from "./content"
 
 const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
+const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
@@ -272,7 +275,11 @@ onMounted(async () => {
 
 const insertNode = () => {
   editor.value!.selection.start!.node.getRootBlock().children = []
-  editor.value?.updateView()
+  editor.value!.updateView()
+}
+
+const getHtml = () => {
+  html.value = editor.value!.getHTML()
 }
 </script>
 <style lang="less">

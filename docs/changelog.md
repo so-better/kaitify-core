@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.18 <Badge type="tip" text='2025.02.21' />
+
+- 新增 `getHTML` 函数获取编辑器 `html` 内容
+
 ## v0.0.1-beta.17 <Badge type="tip" text='2025.01.24' />
 
 - 代码块拓展新增键盘事件：在代码块内按下 `Tab` 键会插入 2 个空格
