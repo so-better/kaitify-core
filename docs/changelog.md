@@ -5,7 +5,7 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.1-beta.18 <Badge type="tip" text='2025.02.21' />
+## v0.0.1-beta.18 <Badge type="tip" text='2025.03.04' />
 
 - 新增 `getHTML` 函数获取编辑器 `html` 内容
 
