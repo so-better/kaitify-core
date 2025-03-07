@@ -274,8 +274,10 @@ onMounted(async () => {
 })
 
 const insertNode = () => {
-  editor.value!.selection.start!.node.getRootBlock().children = []
-  editor.value!.updateView()
+  // editor.value!.selection.start!.node.getRootBlock().children = []
+  // editor.value!.updateView()
+  console.log(editor.value?.getFocusNodesBySelection('all'));
+
 }
 
 const getHtml = () => {
