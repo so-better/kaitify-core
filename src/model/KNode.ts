@@ -202,12 +202,12 @@ export class KNode {
       return !this.textContent
     }
     if (this.isInline() || this.isBlock()) {
-      return (
-        !this.hasChildren() ||
-        this.children!.every(item => {
-          return item.isEmpty()
-        })
-      )
+      if (!this.hasChildren()) {
+        return true
+      }
+      return this.children!.every(item => {
+        return item.isEmpty()
+      })
     }
     return false
   }
@@ -569,7 +569,7 @@ export class KNode {
       return [this]
     }
     if (this.hasChildren()) {
-      return this.children!.map(item => item.getFocusNodes(type)).flat()
+      return this.children!.flatMap(item => item.getFocusNodes(type))
     }
     return []
   }
