@@ -78,7 +78,7 @@ export const setDomObserve = (editor: Editor) => {
           //更新文本内容
           parentNode.textContent = mutationRecord.target.textContent || ''
           //更新光标
-          if (editor.isSelectionInNode(parentNode)) {
+          if (editor.isSelectionInTargetNode(parentNode)) {
             updateSelection.apply(editor)
           }
           //这里先取消dom监听

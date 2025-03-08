@@ -53,7 +53,7 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
     return
   }
   //如果光标的起点在代码块内对光标的起点进行重新定位
-  if (editor.isSelectionInNode(node, 'start')) {
+  if (editor.isSelectionInTargetNode(node, 'start')) {
     //获取起点所在文本节点的在所有文本节点中的序列
     const startIndex = textNodes.findIndex(n => editor.selection.start!.node.isEqual(n))
     //起点在整个代码内容中的位置
@@ -75,7 +75,7 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
     }
   }
   //如果光标的终点在代码块内对光标的终点进行重新定位
-  if (editor.isSelectionInNode(node, 'end')) {
+  if (editor.isSelectionInTargetNode(node, 'end')) {
     //获取终点所在文本节点的在所有文本节点中的序列
     const endIndex = textNodes.findIndex(n => editor.selection.end!.node.isEqual(n))
     //终点在整个代码内容中的位置
@@ -189,8 +189,8 @@ export const CodeBlockExtension = () =>
               //更新光标位置
               updateSelection(editor, node, textNodes, nodes)
             } else {
-              const selectionStartInNode = editor.isSelectionInNode(node, 'start')
-              const selectionEndInNode = editor.isSelectionInNode(node, 'end')
+              const selectionStartInNode = editor.isSelectionInTargetNode(node, 'start')
+              const selectionEndInNode = editor.isSelectionInTargetNode(node, 'end')
               const placeholderNode = KNode.createPlaceholder()
               node.children = [placeholderNode]
               placeholderNode.parent = node

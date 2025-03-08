@@ -168,11 +168,11 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
             editor.addNodeAfter(zeroWidthText, node)
           }
           //重置光标
-          if (editor.isSelectionInNode(node, 'start')) {
+          if (editor.isSelectionInTargetNode(node, 'start')) {
             const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
             if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
           }
-          if (editor.isSelectionInNode(node, 'end')) {
+          if (editor.isSelectionInTargetNode(node, 'end')) {
             const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
             if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
           }

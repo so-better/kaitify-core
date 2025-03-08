@@ -130,7 +130,7 @@ export const onComposition = async function (this: Editor, e: Event) {
       //更新文本内容
       parentNode.textContent = element.textContent || ''
       //更新光标
-      if (this.isSelectionInNode(parentNode)) {
+      if (this.isSelectionInTargetNode(parentNode)) {
         updateSelection.apply(this)
       }
       //移除非法的文本
