@@ -331,14 +331,14 @@ title: Editor 方法
   editor.addNodeAfter(newNode, node)
   ```
 
-##### getLastSelectionNodeInChildren()
+##### getLastSelectionNode()
 
 获取某个节点（包括自身）内的最后一个可以设置光标点的节点
 
 - 类型
 
   ```ts
-  getLastSelectionNodeInChildren(node: KNode): KNode | null
+  getLastSelectionNode(node: KNode): KNode | null
   ```
 
 - 详细信息
@@ -348,17 +348,17 @@ title: Editor 方法
 - 示例
 
   ```ts
-  const node = editor.getLastSelectionNodeInChildren(targetNode)
+  const node = editor.getLastSelectionNode(targetNode)
   ```
 
-##### getFirstSelectionNodeInChildren()
+##### getFirstSelectionNode()
 
 获取某个节点（包括自身）内的第一个可以设置光标点的节点
 
 - 类型
 
   ```ts
-  getFirstSelectionNodeInChildren(node: KNode): KNode | null
+  getFirstSelectionNode(node: KNode): KNode | null
   ```
 
 - 详细信息
@@ -368,7 +368,7 @@ title: Editor 方法
 - 示例
 
   ```ts
-  const node = editor.getLastSelectionNodeInChildren(targetNode)
+  const node = editor.getLastSelectionNode(targetNode)
   ```
 
 ##### getPreviousSelectionNode()
@@ -471,14 +471,14 @@ title: Editor 方法
   editor.updateSelectionRecently('start')
   ```
 
-##### isSelectionInNode()
+##### isSelectionInTargetNode()
 
 判断光标是否在某个节点内
 
 - 类型
 
   ```ts
-  isSelectionInNode(node: KNode, type?: "all" | "start" | "end"): boolean
+  isSelectionInTargetNode(node: KNode, type?: "all" | "start" | "end"): boolean
   ```
 
 - 详细信息
@@ -489,7 +489,7 @@ title: Editor 方法
 
   ```ts
   //判断光标起点是否在node节点内
-  const flag = editor.isSelectionInNode(node, 'start')
+  const flag = editor.isSelectionInTargetNode(node, 'start')
   ```
 
 ##### getSelectedNodes()

@@ -623,14 +623,14 @@ title: KNode 方法
   const cloneNode = node.clone(false) //仅克隆自身
   ```
 
-##### firstTextClosedInNode()
+##### firstInTargetNode()
 
 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有可聚焦节点中的第一个
 
 - 类型
 
   ```ts
-  firstTextClosedInNode: (node: KNode) => boolean
+  firstInTargetNode: (node: KNode) => boolean
   ```
 
 - 详细信息
@@ -642,17 +642,17 @@ title: KNode 方法
 - 示例
 
   ```ts
-  const isFirst = node.firstTextClosedInNode(targetNode)
+  const isFirst = node.firstInTargetNode(targetNode)
   ```
 
-##### lastTextClosedInNode()
+##### lastInTargetNode()
 
 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有可聚焦节点中的最后一个
 
 - 类型
 
   ```ts
-  lastTextClosedInNode: (node: KNode) => boolean
+  lastInTargetNode: (node: KNode) => boolean
   ```
 
 - 详细信息
@@ -664,7 +664,7 @@ title: KNode 方法
 - 示例
 
   ```ts
-  const isFirst = node.lastTextClosedInNode(targetNode)
+  const isFirst = node.lastInTargetNode(targetNode)
   ```
 
 ##### getPrevious()
