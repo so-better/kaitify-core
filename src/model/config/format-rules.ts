@@ -19,7 +19,9 @@ export const fomratBlockTagParse: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
- * 针对子节点中的块节点：行内节点的子节点中含有块节点则该节点转为块节点；子节点中的其他节点也转为块节点
+ * 针对子节点中的块节点：
+ * 1. 子节点中含有块节点则该节点转为块节点；
+ * 2. 子节点中含有块节点，则其他节点也转为块节点
  */
 export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
   //当前节点存在子节点

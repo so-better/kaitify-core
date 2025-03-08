@@ -261,7 +261,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: '<div><p><span style="font-weight:bold;">333</span><span>3222</span></p><p><span style="font-weight:bold;">333</span><span>3222</span></p><p><span style="font-weight:bold;">333</span><span>3222</span></p></div><p><span style="font-weight:bold;">333</span><span>3222</span></p>',
+    value: `<div><span>3<div>xxxx</div>33</span><div>222</div></div>`,
     extensions: [],
     el: '#editor',
     editable: true,

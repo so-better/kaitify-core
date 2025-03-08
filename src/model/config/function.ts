@@ -378,23 +378,29 @@ export const convertToBlock = function (this: Editor, node: KNode) {
   if (node.isBlock()) {
     return
   }
-  const newNode = node.clone(true)
-  //该节点是文本节点和闭合节点，处理光标问题
+  //文本节点和闭合节点处理
   if (node.isText() || node.isClosed()) {
-    if (this.isSelectionInTargetNode(node, 'start')) {
-      this.selection.start!.node = newNode
+    //节点在父节点或者编辑器中的序列
+    const index = node.parent ? node.parent.children!.findIndex(item => item.isEqual(node)) : this.stackNodes.findIndex(item => item.isEqual(node))
+    //创建段落
+    const paragraph = KNode.create({
+      type: 'block',
+      tag: this.blockRenderTag
+    })
+    //如果父节点存在则设置为段落的父节点
+    if (node.parent) {
+      paragraph.parent = node.parent
     }
-    if (this.isSelectionInTargetNode(node, 'end')) {
-      this.selection.end!.node = newNode
-    }
+    //将节点从父节点或者编辑器中移除并使用段落替代
+    node.parent ? node.parent.children!.splice(index, 1, paragraph) : this.stackNodes.splice(index, 1, paragraph)
+    //设置节点为段落的子节点
+    paragraph.children = [node]
+    node.parent = paragraph
   }
-  node.type = 'block'
-  node.tag = this.blockRenderTag
-  node.marks = undefined
-  node.styles = undefined
-  node.textContent = undefined
-  node.children = [newNode]
-  newNode.parent = node
+  //行内节点处理
+  else if (node.isInline()) {
+    node.type = 'block'
+  }
 }
 
 /**
