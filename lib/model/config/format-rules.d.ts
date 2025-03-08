@@ -12,7 +12,9 @@ export type RuleFunctionType = (state: {
  */
 export declare const fomratBlockTagParse: RuleFunctionType;
 /**
- * 针对子节点中的块节点：行内节点的子节点中含有块节点则该节点转为块节点；子节点中的其他节点也转为块节点
+ * 针对子节点中的块节点：
+ * 1. 子节点中含有块节点则该节点转为块节点；
+ * 2. 子节点中含有块节点，则其他节点也转为块节点
  */
 export declare const formatBlockInChildren: RuleFunctionType;
 /**
@@ -27,6 +29,10 @@ export declare const formatPlaceholderMerge: RuleFunctionType;
  * 针对节点自身：将文本节点内连续的零宽度无断空白字符合并（光标可能会更新）
  */
 export declare const formatZeroWidthTextMerge: RuleFunctionType;
+/**
+ * 针对节点自身：统一将文本节点内的\r\n换成\n，解决Windows兼容问题
+ */
+export declare const formatLineBreakText: RuleFunctionType;
 /**
  * 针对节点的子节点数组：兄弟节点合并策略（光标可能会更新）
  */

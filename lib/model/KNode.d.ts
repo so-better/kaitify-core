@@ -184,7 +184,7 @@ export declare class KNode {
      */
     isEqualMarks(node: KNode): boolean;
     /**
-     * 【API】判断当前节点是否在拥有代码块样式的块级节点内（包括自身）
+     * 【API】判断当前节点是否在拥有代码块样式的块级节点内（包括自身），是的话返回该块级节点，否则返回null
      */
     isInCodeBlockStyle(): KNode | null;
     /**
@@ -206,11 +206,11 @@ export declare class KNode {
     /**
      * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
      */
-    firstTextClosedInNode: (node: KNode) => boolean;
+    firstInTargetNode: (node: KNode) => boolean;
     /**
      * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个
      */
-    lastTextClosedInNode(node: KNode): boolean;
+    lastInTargetNode(node: KNode): boolean;
     /**
      * 【API】获取当前节点在某个节点数组中的前一个非空节点
      */
@@ -228,7 +228,10 @@ export declare class KNode {
      */
     getMatchNode(options: KNodeMatchOptionType): KNode | null;
     /**
-     * 【API】获取当前节点下的所有可聚焦的节点，如果自身符合也会包括在内，type是all获取闭合节点和文本节点，type是closed获取闭合节点，type是text获取文本节点
+     * 【API】获取当前节点下的所有可聚焦的节点，如果自身符合也会包括在内
+     * 1. type 是 all 获取闭合节点和文本节点；
+     * 2. type 是 closed 获取闭合节点；
+     * 3. type 是 text 获取文本节点
      */
     getFocusNodes: (type?: "all" | "closed" | "text" | undefined) => KNode[];
     /**

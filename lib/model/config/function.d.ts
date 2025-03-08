@@ -59,7 +59,7 @@ export declare const handlerForPasteKeepMarksAndStyles: (this: Editor, nodes: KN
  */
 export declare const handlerForPasteFiles: (this: Editor, files: FileList) => Promise<void>;
 /**
- * 处理某个节点数组，针对为空的块级节点补充占位符
+ * 处理某个节点数组，针对为空的块级节点补充占位符，目前仅用于粘贴处理
  */
 export declare const fillPlaceholderToEmptyBlock: (this: Editor, nodes: KNode[]) => void;
 /**
@@ -71,7 +71,7 @@ export declare const handlerForPasteDrop: (this: Editor, dataTransfer: DataTrans
  */
 export declare const removeBlockFromParentToSameLevel: (this: Editor, node: KNode) => void;
 /**
- * 光标所在的块节点不是只有占位，且非固定块节点，非代码块样式的块节点，在该块节点内正常换行方法
+ * 光标所在的块节点不是只有占位符，且非固定块节点，非代码块样式的块节点，在该块节点内正常换行方法
  */
 export declare const handlerForNormalInsertParagraph: (this: Editor) => void;
 /**

@@ -408,11 +408,11 @@ export declare class Editor {
     /**
      * 获取某个节点内的最后一个可以设置光标点的节点，包括自身
      */
-    getLastSelectionNodeInChildren(node: KNode): KNode | null;
+    getLastSelectionNode(node: KNode): KNode | null;
     /**
      * 获取某个节点内的第一个可以设置光标点的节点，包括自身
      */
-    getFirstSelectionNodeInChildren(node: KNode): KNode | null;
+    getFirstSelectionNode(node: KNode): KNode | null;
     /**
      * 查找指定节点之前可以设置为光标点的非空节点，不包括自身
      */
@@ -436,7 +436,7 @@ export declare class Editor {
     /**
      * 判断光标是否在某个节点内，start表示只判断起点，end表示只判断终点，all表示起点和终点都判断
      */
-    isSelectionInNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean;
+    isSelectionInTargetNode(node: KNode, type?: 'all' | 'start' | 'end' | undefined): boolean;
     /**
      * 获取光标选区内的节点数据
      */
@@ -466,7 +466,12 @@ export declare class Editor {
      */
     insertText(text: string): void;
     /**
-     * 向选区进行换行，如果所在块节点只有占位符并且块节点不是段落则会转为段落
+     * 向选区进行换行
+     * 1. 所在块节点只有占位符并且块节点不是段落则会转为段落
+     * 2. 非代码块样式内换行是插入换行符\n
+     * 2. 光标所在块节点是固定块节点，则无法换行
+     * 3. 光标所在块节点只有占位符，并且其存在父节点，且父节点不是固定块节点，会从父节点抽离到与父节点同级
+     * 4. 光标所在块节点只有占位符，并且不存在父节点，且不是段落，则会转为段落
      */
     insertParagraph(): void;
     /**

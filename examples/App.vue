@@ -261,7 +261,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<div><span>3<div>xxxx</div>33</span><div>222</div></div>`,
+    value: content,
     extensions: [],
     el: '#editor',
     editable: true,
@@ -271,8 +271,6 @@ onMounted(async () => {
       count.value = this.getContent().trim().length
     },
   })
-  console.log(editor.value.getLastSelectionNode(editor.value.stackNodes[0]));
-
 })
 
 const insertNode = () => {
