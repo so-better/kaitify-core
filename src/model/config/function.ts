@@ -821,7 +821,7 @@ export const handlerForPasteFiles = async function (this: Editor, files: FileLis
  */
 export const fillPlaceholderToEmptyBlock = function (this: Editor, nodes: KNode[]) {
   const stack = nodes.slice().reverse()
-  while (stack.length) {
+  while (stack.length > 0) {
     //取出栈顶节点
     const node = stack.pop()!
     //如果不是块级节点，直接跳过

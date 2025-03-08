@@ -707,7 +707,7 @@ export class Editor {
   /**
    * 获取某个节点内的最后一个可以设置光标点的节点，包括自身
    */
-  getLastSelectionNode(node: KNode): KNode | null {
+  getLastSelectionNode(node: KNode) {
     const stack: KNode[] = [node] // 使用栈存储待处理的节点
     while (stack.length > 0) {
       const currentNode = stack.pop()! // 取出栈顶节点
@@ -730,7 +730,7 @@ export class Editor {
   /**
    * 获取某个节点内的第一个可以设置光标点的节点，包括自身
    */
-  getFirstSelectionNode(node: KNode): KNode | null {
+  getFirstSelectionNode(node: KNode) {
     const stack: KNode[] = [node] // 使用栈存储待处理的节点
     while (stack.length > 0) {
       const currentNode = stack.pop()! // 取出栈顶节点
@@ -753,8 +753,8 @@ export class Editor {
   /**
    * 查找指定节点之前可以设置为光标点的非空节点，不包括自身
    */
-  getPreviousSelectionNode(node: KNode): KNode | null {
-    let currentNode: KNode | null | undefined = node
+  getPreviousSelectionNode(node: KNode) {
+    let currentNode: KNode | undefined = node
     while (currentNode) {
       const nodes = currentNode.parent ? currentNode.parent.children! : this.stackNodes // 缓存节点数组
       const previousNode = currentNode.getPrevious(nodes) // 获取前一个节点
@@ -781,8 +781,8 @@ export class Editor {
   /**
    * 查找指定节点之后可以设置为光标点的非空节点，不包括自身
    */
-  getNextSelectionNode(node: KNode): KNode | null {
-    let currentNode: KNode | null | undefined = node
+  getNextSelectionNode(node: KNode) {
+    let currentNode: KNode | undefined = node
     while (currentNode) {
       const nodes = currentNode.parent ? currentNode.parent.children! : this.stackNodes // 缓存节点数组
       const nextNode = currentNode.getNext(nodes) // 获取后一个节点
