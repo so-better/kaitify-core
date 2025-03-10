@@ -5,8 +5,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本的字体是否与入参一致
+     */
     isFontFamily?: (value: string) => boolean
+    /**
+     * 设置字体
+     */
     setFontFamily?: (value: string) => Promise<void>
+    /**
+     * 取消字体
+     */
     unsetFontFamily?: (value: string) => Promise<void>
   }
 }
@@ -44,15 +53,10 @@ export const FontFamilyExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 光标所在文本的字体是否与入参一致
-       */
       const isFontFamily = (value: string) => {
         return this.commands.isTextStyle!('fontFamily', value)
       }
-      /**
-       * 设置字体
-       */
+
       const setFontFamily = async (value: string) => {
         if (isFontFamily(value)) {
           return
@@ -61,9 +65,7 @@ export const FontFamilyExtension = () =>
           fontFamily: value
         })
       }
-      /**
-       * 取消字体
-       */
+
       const unsetFontFamily = async (value: string) => {
         if (!isFontFamily(value)) {
           return

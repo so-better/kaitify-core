@@ -22,10 +22,25 @@ export type AttachmentExtensionPropsType = {
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 获取光标所在的附件节点，如果光标不在一个附件节点内，返回null
+     */
     getAttachment?: () => KNode | null
+    /**
+     * 判断光标范围内是否有附件节点
+     */
     hasAttachment?: () => boolean
+    /**
+     * 插入附件
+     */
     setAttachment?: (options: SetAttachmentOptionType) => Promise<void>
+    /**
+     * 更新附件
+     */
     updateAttachment?: (options: UpdateAttachmentOptionType) => Promise<void>
+    /**
+     * 获取附件信息
+     */
     getAttachmentInfo?: () => { url: string; text: string; icon: string } | null
   }
 }
@@ -184,9 +199,6 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
       downloadAttachment(this)
     },
     addCommands() {
-      /**
-       * 获取光标所在的附件节点，如果光标不在一个附件节点内，返回null
-       */
       const getAttachment = () => {
         return this.getMatchNodeBySelection({
           tag: 'span',
@@ -196,9 +208,6 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         })
       }
 
-      /**
-       * 判断光标范围内是否有附件节点
-       */
       const hasAttachment = () => {
         return this.isSelectionNodesSomeMatch({
           tag: 'span',
@@ -208,9 +217,6 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         })
       }
 
-      /**
-       * 插入附件
-       */
       const setAttachment = async (options: SetAttachmentOptionType) => {
         if (!this.selection.focused() || hasAttachment()) {
           return
@@ -229,9 +235,6 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         await this.updateView()
       }
 
-      /**
-       * 更新附件
-       */
       const updateAttachment = async (options: UpdateAttachmentOptionType) => {
         if (!this.selection.focused()) {
           return
@@ -263,9 +266,6 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         await this.updateView()
       }
 
-      /**
-       * 获取附件信息
-       */
       const getAttachmentInfo = () => {
         if (!this.selection.focused()) {
           return null

@@ -1,16 +1,35 @@
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
+import { isOnlyTab } from '@/tools'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
 import './style.less'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 获取光标所在的代码块节点，如果光标不在一个代码块节点内，返回null
+     */
     getCodeBlock?: () => KNode | null
+    /**
+     * 判断光标范围内是否有代码块节点
+     */
     hasCodeBlock?: () => boolean
+    /**
+     * 光标范围内是否都是代码块节点
+     */
     allCodeBlock?: () => boolean
+    /**
+     * 设置代码块
+     */
     setCodeBlock?: () => Promise<void>
+    /**
+     * 取消代码块
+     */
     unsetCodeBlock?: () => Promise<void>
+    /**
+     * 更新光标所在代码块的语言类型
+     */
     updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>
   }
 }
@@ -127,13 +146,6 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
   }
 }
 
-/**
- * 键盘Tab是否按下
- */
-const isOnlyTab = (e: KeyboardEvent) => {
-  return e.key.toLocaleLowerCase() == 'tab' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
-}
-
 export const CodeBlockExtension = () =>
   Extension.create({
     name: 'codeBlock',
@@ -216,36 +228,24 @@ export const CodeBlockExtension = () =>
       }
     },
     addCommands() {
-      /**
-       * 获取光标所在的代码块节点，如果光标不在一个代码块节点内，返回null
-       */
       const getCodeBlock = () => {
         return this.getMatchNodeBySelection({
           tag: 'pre'
         })
       }
 
-      /**
-       * 判断光标范围内是否有代码块节点
-       */
       const hasCodeBlock = () => {
         return this.isSelectionNodesSomeMatch({
           tag: 'pre'
         })
       }
 
-      /**
-       * 光标范围内是否都是代码块节点
-       */
       const allCodeBlock = () => {
         return this.isSelectionNodesAllMatch({
           tag: 'pre'
         })
       }
 
-      /**
-       * 设置代码块
-       */
       const setCodeBlock = async () => {
         if (allCodeBlock()) {
           return
@@ -265,9 +265,6 @@ export const CodeBlockExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消代码块
-       */
       const unsetCodeBlock = async () => {
         if (!allCodeBlock()) {
           return
@@ -288,9 +285,6 @@ export const CodeBlockExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 更新光标所在代码块的语言类型
-       */
       const updateCodeBlockLanguage = async (language?: HljsLanguageType) => {
         if (!this.selection.focused()) {
           return

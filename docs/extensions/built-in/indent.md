@@ -4,12 +4,32 @@ title: indent 缩进
 
 # indent 缩进
 
-支持缩进属性的渲染，提供增加缩进、减少缩进的能力
+支持缩进属性的渲染，提供增加缩进、减少缩进的能力。
 
 > [!TIP] Tips
-> 不建议在代码块样式的块节点内增加缩进或者减少缩进，如果需要与快捷键 `Tab / Shift + Tab` 绑定，你需要好好考虑一下，一般来说代码块内我们按下 Tab 只希望能够插入 2 个或者 4 个空格
+> 通过 `Tab` 按键可以增加缩进，通过 `Shift + Tab` 按键可以减少缩进，当然前提是必须允许使用缩进功能，即 `canUseIndent` 方法返回的结果为 true 时
 
 ## Commands 命令
+
+##### canUseIndent()
+
+是否可以使用缩进功能
+
+- 类型
+
+  ```ts
+  canUseIndent(): boolean
+  ```
+
+- 详细信息
+
+  该方法返回一个布尔值，根据光标位置判断此刻是否可以使用缩进功能
+
+- 示例
+
+  ```ts
+  const canUseIndent = editor.commands.canUseIndent()
+  ```
 
 ##### setIncreaseIndent()
 

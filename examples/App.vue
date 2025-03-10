@@ -261,7 +261,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: content,
+    value: `<p><br/></p>`,
     extensions: [],
     el: '#editor',
     editable: true,

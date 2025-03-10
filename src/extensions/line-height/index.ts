@@ -5,8 +5,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在的块节点是否都是符合的行高
+     */
     isLineHeight?: (value: string | number) => boolean
+    /**
+     * 设置行高
+     */
     setLineHeight?: (value: string | number) => Promise<void>
+    /**
+     * 取消行高
+     */
     unsetLineHeight?: (value: string | number) => Promise<void>
   }
 }
@@ -33,9 +42,6 @@ export const LineHeightExtension = () =>
       return styles
     },
     addCommands() {
-      /**
-       * 光标所在的块节点是否都是符合的行高
-       */
       const isLineHeight = (value: string | number) => {
         if (!this.selection.focused()) {
           return false
@@ -52,9 +58,6 @@ export const LineHeightExtension = () =>
         })
       }
 
-      /**
-       * 设置行高
-       */
       const setLineHeight = async (value: string | number) => {
         if (isLineHeight(value)) {
           return
@@ -82,9 +85,6 @@ export const LineHeightExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消行高
-       */
       const unsetLineHeight = async (value: string | number) => {
         if (!isLineHeight(value)) {
           return

@@ -7,10 +7,25 @@ export type HeadingLevelType = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 获取光标所在的标题，如果光标不在一个标题内，返回null
+     */
     getHeading?: (level: HeadingLevelType) => KNode | null
+    /**
+     * 判断光标范围内是否有标题
+     */
     hasHeading?: (level: HeadingLevelType) => boolean
+    /**
+     * 光标范围内是否都是标题
+     */
     allHeading?: (level: HeadingLevelType) => boolean
+    /**
+     * 设置标题
+     */
     setHeading?: (level: HeadingLevelType) => Promise<void>
+    /**
+     * 取消标题
+     */
     unsetHeading?: (level: HeadingLevelType) => Promise<void>
   }
 }
@@ -82,36 +97,24 @@ export const HeadingExtension = () =>
         6: 'h6'
       }
 
-      /**
-       * 获取光标所在的标题，如果光标不在一个标题内，返回null
-       */
       const getHeading = (level: HeadingLevelType) => {
         return this.getMatchNodeBySelection({
           tag: headingLevelMap[level]
         })
       }
 
-      /**
-       * 判断光标范围内是否有标题
-       */
       const hasHeading = (level: HeadingLevelType) => {
         return this.isSelectionNodesSomeMatch({
           tag: headingLevelMap[level]
         })
       }
 
-      /**
-       * 光标范围内是否都是标题
-       */
       const allHeading = (level: HeadingLevelType) => {
         return this.isSelectionNodesAllMatch({
           tag: headingLevelMap[level]
         })
       }
 
-      /**
-       * 设置标题
-       */
       const setHeading = async (level: HeadingLevelType) => {
         if (allHeading(level)) {
           return
@@ -131,9 +134,6 @@ export const HeadingExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消标题
-       */
       const unsetHeading = async (level: HeadingLevelType) => {
         if (!allHeading(level)) {
           return

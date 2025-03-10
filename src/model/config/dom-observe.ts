@@ -169,7 +169,7 @@ export const setDomObserve = (editor: Editor) => {
     if (hasUpdate) {
       //删除非法dom
       illegalDoms.forEach(item => {
-        item.parentNode?.removeChild(item)
+        ;(item as HTMLElement).remove()
       })
       //更新视图
       editor.updateView()

@@ -5,6 +5,12 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.20 <Badge type="tip" text='2025.03.10' />
+
+- 代码优化，解决了 Grammarly 插入的问题
+- `indent` 拓展新增 `canUseIndent` 指令，用于判断是否可以使用缩进功能
+- `indent` 拓展新增键盘事件：`tab` 键按下增加缩进；`shift+tab` 键按下减少缩进
+
 ## v0.0.1-beta.19 <Badge type="tip" text='2025.03.08' />
 
 - 对 `KNode` 的实例方法 `clone` `fullClone` `getFocusNodes` 进行了优化

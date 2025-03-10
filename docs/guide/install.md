@@ -6,7 +6,7 @@ title: 安装
 
 ## 下载 kaitify 本地到使用
 
-- 下载地址：[kaitify](https://registry.npmmirror.com/@kaitify/core/download/@kaitify/core-0.0.1-beta.19.tgz)
+- 下载地址：[kaitify](https://registry.npmmirror.com/@kaitify/core/download/@kaitify/core-0.0.1-beta.20.tgz)
 - 下载完成后最终解压得到一个 package 文件夹，进入 package 文件夹后，将 package 目录下的整个 lib 目录拷贝到你的项目下
 - 在 html 页面中引入 js
 
@@ -28,7 +28,7 @@ title: 安装
 
 ```html
 <!-- 引入固定版本的kaitify -->
-<script src="https://unpkg.com/@kaitify/core@0.0.1-beta.19/lib/kaitify-core.umd.js"></script>
+<script src="https://unpkg.com/@kaitify/core@0.0.1-beta.20/lib/kaitify-core.umd.js"></script>
 <!-- 始终引入最新的kaitify -->
 <script src="https://unpkg.com/@kaitify/core/lib/kaitify-core.umd.js"></script>
 ```
@@ -50,21 +50,21 @@ title: 安装
 npm install @kaitify/core
 
 # 安装指定版本
-npm install @kaitify/core@0.0.1-beta.19
+npm install @kaitify/core@0.0.1-beta.20
 ```
 
 ```bash [yarn]
 yarn install @kaitify/core
 
 # 安装指定版本
-yarn install @kaitify/core@0.0.1-beta.19
+yarn install @kaitify/core@0.0.1-beta.20
 ```
 
 ```bash [pnpm]
 pnpm install @kaitify/core
 
 # 安装指定版本
-pnpm install @kaitify/core@0.0.1-beta.19
+pnpm install @kaitify/core@0.0.1-beta.20
 ```
 
 :::

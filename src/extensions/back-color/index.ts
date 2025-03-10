@@ -3,8 +3,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本的背景颜色是否与入参一致
+     */
     isBackColor?: (value: string) => boolean
+    /**
+     * 设置背景颜色
+     */
     setBackColor?: (value: string) => Promise<void>
+    /**
+     * 取消背景颜色
+     */
     unsetBackColor?: (value: string) => Promise<void>
   }
 }
@@ -20,15 +29,10 @@ export const BackColorExtension = () =>
       return styles
     },
     addCommands() {
-      /**
-       * 光标所在文本的背景颜色是否与入参一致
-       */
       const isBackColor = (value: string) => {
         return this.commands.isTextStyle!('backgroundColor', value) || this.commands.isTextStyle!('background', value)
       }
-      /**
-       * 设置背景颜色
-       */
+
       const setBackColor = async (value: string) => {
         if (isBackColor(value)) {
           return
@@ -37,9 +41,7 @@ export const BackColorExtension = () =>
           backgroundColor: value
         })
       }
-      /**
-       * 取消背景颜色
-       */
+
       const unsetBackColor = async (value: string) => {
         if (!isBackColor(value)) {
           return

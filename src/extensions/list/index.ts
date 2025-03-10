@@ -1,5 +1,6 @@
 import { Editor, KNode, KNodeMatchOptionType, KNodeStylesType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
+import { isOnlyTab } from '@/tools'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -14,12 +15,33 @@ export type ListOptionsType = {
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
+     */
     getList?: (options: ListOptionsType) => KNode | null
+    /**
+     * 判断光标范围内是否有有序列表或者无序列表
+     */
     hasList?: (options: ListOptionsType) => boolean
+    /**
+     * 判断光标范围内是否都是有序列表或者无序列表
+     */
     allList?: (options: ListOptionsType) => boolean
+    /**
+     * 设置有序列表或者无序列表
+     */
     setList?: (options: ListOptionsType) => Promise<void>
+    /**
+     * 取消有序列表或者无序列表
+     */
     unsetList?: (options: ListOptionsType) => Promise<void>
+    /**
+     * 是否可以生成内嵌列表
+     */
     canCreateInnerList?: () => { node: KNode; previousNode: KNode } | null
+    /**
+     * 根据当前光标所在的li节点生成一个内嵌列表
+     */
     createInnerList?: () => Promise<void>
   }
 }
@@ -228,13 +250,6 @@ const listMergeHandler = ({ editor, node }: { editor: Editor; node: KNode }) => 
 }
 
 /**
- * 键盘Tab是否按下
- */
-const isOnlyTab = (e: KeyboardEvent) => {
-  return e.key.toLocaleLowerCase() == 'tab' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
-}
-
-/**
  * 获取需要取消列表项设置的列表项节点
  */
 const getUnsetListItemNode = (matchNode: KNode | null, options: ListOptionsType) => {
@@ -350,9 +365,6 @@ export const ListExtension = () =>
       }
     },
     addCommands() {
-      /**
-       * 获取光标所在的有序列表或者无序列表，如果光标不在一个有序列表或者无序列表内，返回null
-       */
       const getList = (options: ListOptionsType) => {
         const params: KNodeMatchOptionType = {
           tag: options.ordered ? 'ol' : 'ul'
@@ -365,9 +377,6 @@ export const ListExtension = () =>
         return this.getMatchNodeBySelection(params)
       }
 
-      /**
-       * 判断光标范围内是否有有序列表或者无序列表
-       */
       const hasList = (options: ListOptionsType) => {
         const params: KNodeMatchOptionType = {
           tag: options.ordered ? 'ol' : 'ul'
@@ -380,9 +389,6 @@ export const ListExtension = () =>
         return this.isSelectionNodesSomeMatch(params)
       }
 
-      /**
-       * 判断光标范围内是否都是有序列表或者无序列表
-       */
       const allList = (options: ListOptionsType) => {
         const params: KNodeMatchOptionType = {
           tag: options.ordered ? 'ol' : 'ul'
@@ -395,9 +401,6 @@ export const ListExtension = () =>
         return this.isSelectionNodesAllMatch(params)
       }
 
-      /**
-       * 设置有序列表或者无序列表
-       */
       const setList = async (options: ListOptionsType) => {
         if (allList(options)) {
           return
@@ -417,9 +420,6 @@ export const ListExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消有序列表或者无序列表
-       */
       const unsetList = async (options: ListOptionsType) => {
         if (!allList(options)) {
           return
@@ -441,9 +441,6 @@ export const ListExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 是否可以生成内嵌列表
-       */
       const canCreateInnerList = () => {
         const node = this.getMatchNodeBySelection({ tag: 'li' })
         if (!node || !node.parent) {
@@ -456,9 +453,6 @@ export const ListExtension = () =>
         return { node, previousNode }
       }
 
-      /**
-       * 根据当前光标所在的li节点生成一个内嵌列表
-       */
       const createInnerList = async () => {
         const result = canCreateInnerList()
         if (!result) {

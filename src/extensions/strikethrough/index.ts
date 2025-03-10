@@ -4,8 +4,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本是否删除线
+     */
     isStrikethrough?: () => boolean
+    /**
+     * 设置删除线
+     */
     setStrikethrough?: () => Promise<void>
+    /**
+     * 取消删除线
+     */
     unsetStrikethrough?: () => Promise<void>
   }
 }
@@ -42,15 +51,10 @@ export const StrikethroughExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 光标所在文本是否删除线
-       */
       const isStrikethrough = () => {
         return this.commands.isTextStyle!('textDecoration', 'line-through') || this.commands.isTextStyle!('textDecorationLine', 'line-through')
       }
-      /**
-       * 设置删除线
-       */
+
       const setStrikethrough = async () => {
         if (isStrikethrough()) {
           return
@@ -59,9 +63,7 @@ export const StrikethroughExtension = () =>
           textDecorationLine: 'line-through'
         })
       }
-      /**
-       * 取消删除线
-       */
+
       const unsetStrikethrough = async () => {
         if (!isStrikethrough()) {
           return

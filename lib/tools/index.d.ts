@@ -47,3 +47,11 @@ export declare const delay: (num?: number | undefined) => Promise<void>;
  * 删除对象的某个属性
  */
 export declare const deleteProperty: <T>(val: any, propertyName: string) => T;
+/**
+ * 键盘Tab是否按下
+ */
+export declare const isOnlyTab: (e: KeyboardEvent) => boolean;
+/**
+ * 键盘Tab和shift是否一起按下
+ */
+export declare const isTabWithShift: (e: KeyboardEvent) => boolean;

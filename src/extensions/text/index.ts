@@ -4,12 +4,33 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 判断光标所在文本是否具有某个样式
+     */
     isTextStyle?: (styleName: string, styleValue?: string | number) => boolean
+    /**
+     * 判断光标所在文本是否具有某个标记
+     */
     isTextMark?: (markName: string, markValue?: string | number) => boolean
+    /**
+     * 设置光标所在文本样式
+     */
     setTextStyle?: (styles: KNodeStylesType, updateView?: boolean) => Promise<void>
+    /**
+     * 设置光标所在文本标记
+     */
     setTextMark?: (marks: KNodeMarksType, updateView?: boolean) => Promise<void>
+    /**
+     * 移除光标所在文本样式
+     */
     removeTextStyle?: (styleNames?: string[], updateView?: boolean) => Promise<void>
+    /**
+     * 移除光标所在文本标记
+     */
     removeTextMark?: (markNames?: string[], updateView?: boolean) => Promise<void>
+    /**
+     * 清除格式
+     */
     clearFormat?: () => Promise<void>
   }
 }
@@ -108,9 +129,6 @@ export const TextExtension = () =>
   Extension.create({
     name: 'text',
     addCommands() {
-      /**
-       * 判断光标所在文本是否具有某个样式
-       */
       const isTextStyle = (styleName: string, styleValue?: string | number) => {
         if (!this.selection.focused()) {
           return false
@@ -129,9 +147,6 @@ export const TextExtension = () =>
         return !!textArray.length && textArray.every(item => isTextNodeStyle(item, styleName, styleValue))
       }
 
-      /**
-       * 判断光标所在文本是否具有某个标记
-       */
       const isTextMark = (markName: string, markValue?: string | number) => {
         if (!this.selection.focused()) {
           return false
@@ -150,9 +165,6 @@ export const TextExtension = () =>
         return !!textArray.length && textArray.every(item => isTextNodeMark(item, markName, markValue))
       }
 
-      /**
-       * 设置光标所在文本样式
-       */
       const setTextStyle = async (styles: KNodeStylesType, updateView: boolean | undefined = true) => {
         if (!this.selection.focused()) {
           return
@@ -208,9 +220,6 @@ export const TextExtension = () =>
         if (updateView) await this.updateView()
       }
 
-      /**
-       * 设置光标所在文本标记
-       */
       const setTextMark = async (marks: KNodeMarksType, updateView: boolean | undefined = true) => {
         if (!this.selection.focused()) {
           return
@@ -266,9 +275,6 @@ export const TextExtension = () =>
         if (updateView) await this.updateView()
       }
 
-      /**
-       * 移除光标所在文本样式
-       */
       const removeTextStyle = async (styleNames?: string[], updateView: boolean | undefined = true) => {
         if (!this.selection.focused()) {
           return
@@ -302,9 +308,6 @@ export const TextExtension = () =>
         if (updateView) await this.updateView()
       }
 
-      /**
-       * 移除光标所在文本标记
-       */
       const removeTextMark = async (markNames?: string[], updateView: boolean | undefined = true) => {
         if (!this.selection.focused()) {
           return
@@ -338,9 +341,6 @@ export const TextExtension = () =>
         if (updateView) await this.updateView()
       }
 
-      /**
-       * 清除格式
-       */
       const clearFormat = async () => {
         await removeTextMark(undefined, false)
         await removeTextStyle()

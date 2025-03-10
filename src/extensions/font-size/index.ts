@@ -3,8 +3,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本的字号大小是否与入参一致
+     */
     isFontSize?: (value: string) => boolean
+    /**
+     * 设置字号
+     */
     setFontSize?: (value: string) => Promise<void>
+    /**
+     * 取消字号
+     */
     unsetFontSize?: (value: string) => Promise<void>
   }
 }
@@ -20,15 +29,10 @@ export const FontSizeExtension = () =>
       return styles
     },
     addCommands() {
-      /**
-       * 光标所在文本的字号大小是否与入参一致
-       */
       const isFontSize = (value: string) => {
         return this.commands.isTextStyle!('fontSize', value)
       }
-      /**
-       * 设置字号
-       */
+
       const setFontSize = async (value: string) => {
         if (isFontSize(value)) {
           return
@@ -37,9 +41,7 @@ export const FontSizeExtension = () =>
           fontSize: value
         })
       }
-      /**
-       * 取消字号
-       */
+
       const unsetFontSize = async (value: string) => {
         if (!isFontSize(value)) {
           return

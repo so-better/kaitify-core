@@ -7,8 +7,17 @@ export type AlignValueType = 'left' | 'right' | 'center' | 'justify'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在的块节点是否都是符合的对齐方式
+     */
     isAlign?: (value: AlignValueType) => boolean
+    /**
+     * 设置对齐方式
+     */
     setAlign?: (value: AlignValueType) => Promise<void>
+    /**
+     * 取消对齐方式
+     */
     unsetAlign?: (value: AlignValueType) => Promise<void>
   }
 }
@@ -35,9 +44,6 @@ export const AlignExtension = () =>
       return styles
     },
     addCommands() {
-      /**
-       * 光标所在的块节点是否都是符合的对齐方式
-       */
       const isAlign = (value: AlignValueType) => {
         if (!this.selection.focused()) {
           return false
@@ -54,9 +60,6 @@ export const AlignExtension = () =>
         })
       }
 
-      /**
-       * 设置对齐方式
-       */
       const setAlign = async (value: AlignValueType) => {
         if (isAlign(value)) {
           return
@@ -84,9 +87,6 @@ export const AlignExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消对齐方式
-       */
       const unsetAlign = async (value: AlignValueType) => {
         if (!isAlign(value)) {
           return

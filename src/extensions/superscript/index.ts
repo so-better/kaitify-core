@@ -4,8 +4,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本是否上标
+     */
     isSuperscript?: () => boolean
+    /**
+     * 设置上标
+     */
     setSuperscript?: () => Promise<void>
+    /**
+     * 取消上标
+     */
     unsetSuperscript?: () => Promise<void>
   }
 }
@@ -41,15 +50,10 @@ export const SuperscriptExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 光标所在文本是否上标
-       */
       const isSuperscript = () => {
         return this.commands.isTextStyle!('verticalAlign', 'super')
       }
-      /**
-       * 设置上标
-       */
+
       const setSuperscript = async () => {
         if (isSuperscript()) {
           return
@@ -58,9 +62,7 @@ export const SuperscriptExtension = () =>
           verticalAlign: 'super'
         })
       }
-      /**
-       * 取消上标
-       */
+
       const unsetSuperscript = async () => {
         if (!isSuperscript()) {
           return

@@ -3,8 +3,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本的颜色是否与入参一致
+     */
     isColor?: (value: string) => boolean
+    /**
+     * 设置颜色
+     */
     setColor?: (value: string) => Promise<void>
+    /**
+     * 取消颜色
+     */
     unsetColor?: (value: string) => Promise<void>
   }
 }
@@ -20,15 +29,10 @@ export const ColorExtension = () =>
       return styles
     },
     addCommands() {
-      /**
-       * 光标所在文本的颜色是否与入参一致
-       */
       const isColor = (value: string) => {
         return this.commands.isTextStyle!('color', value)
       }
-      /**
-       * 设置颜色
-       */
+
       const setColor = async (value: string) => {
         if (isColor(value)) {
           return
@@ -37,9 +41,7 @@ export const ColorExtension = () =>
           color: value
         })
       }
-      /**
-       * 取消颜色
-       */
+
       const unsetColor = async (value: string) => {
         if (!isColor(value)) {
           return

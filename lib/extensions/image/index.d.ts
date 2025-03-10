@@ -17,9 +17,21 @@ export type UpdateImageOptionType = {
 };
 declare module '../../model' {
     interface EditorCommandsType {
+        /**
+         * 获取光标所在的图片，如果光标不在一张图片内，返回null
+         */
         getImage?: () => KNode | null;
+        /**
+         * 判断光标范围内是否有图片
+         */
         hasImage?: () => boolean;
+        /**
+         * 插入图片
+         */
         setImage?: (options: SetImageOptionType) => Promise<void>;
+        /**
+         * 更新图片
+         */
         updateImage?: (options: UpdateImageOptionType) => Promise<void>;
     }
 }

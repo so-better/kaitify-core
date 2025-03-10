@@ -18,9 +18,21 @@ export type UpdateVideoOptionType = {
 };
 declare module '../../model' {
     interface EditorCommandsType {
+        /**
+         * 获取光标所在的视频，如果光标不在一个视频内，返回null
+         */
         getVideo?: () => KNode | null;
+        /**
+         * 判断光标范围内是否有视频
+         */
         hasVideo?: () => boolean;
+        /**
+         * 插入视频
+         */
         setVideo?: (options: SetVideoOptionType) => Promise<void>;
+        /**
+         * 更新视频
+         */
         updateVideo?: (options: UpdateVideoOptionType) => Promise<void>;
     }
 }

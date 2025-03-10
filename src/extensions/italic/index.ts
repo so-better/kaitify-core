@@ -4,8 +4,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本是否斜体
+     */
     isItalic?: () => boolean
+    /**
+     * 设置斜体
+     */
     setItalic?: () => Promise<void>
+    /**
+     * 取消斜体
+     */
     unsetItalic?: () => Promise<void>
   }
 }
@@ -41,15 +50,10 @@ export const ItalicExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 光标所在文本是否斜体
-       */
       const isItalic = () => {
         return this.commands.isTextStyle!('fontStyle', 'italic')
       }
-      /**
-       * 设置斜体
-       */
+
       const setItalic = async () => {
         if (isItalic()) {
           return
@@ -58,9 +62,7 @@ export const ItalicExtension = () =>
           fontStyle: 'italic'
         })
       }
-      /**
-       * 取消斜体
-       */
+
       const unsetItalic = async () => {
         if (!isItalic()) {
           return

@@ -4,6 +4,9 @@ import './style.less'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 设置分隔线
+     */
     setHorizontal?: () => Promise<void>
   }
 }
@@ -26,9 +29,6 @@ export const HorizontalExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 设置分隔线
-       */
       const setHorizontal = async () => {
         const node = KNode.create({
           type: 'closed',

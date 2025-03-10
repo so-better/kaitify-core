@@ -235,7 +235,7 @@ export class Editor {
   /**
    * 扩展数组【初始化后不可修改】【open】
    */
-  extensions: Extension[] = [TextExtension(), ImageExtension(), VideoExtension(), HistoryExtension(), BoldExtension(), ItalicExtension(), StrikethroughExtension(), UnderlineExtension(), SuperscriptExtension(), SubscriptExtension(), CodeExtension(), FontSizeExtension(), FontFamilyExtension(), ColorExtension(), BackColorExtension(), LinkExtension(), AlignExtension(), LineHeightExtension(), IndentExtension(), HorizontalExtension(), BlockquoteExtension(), HeadingExtension(), ListExtension(), TaskExtension(), MathExtension(), CodeBlockExtension(), AttachmentExtension(), TableExtension()]
+  extensions: Extension[] = [TextExtension(), ImageExtension(), VideoExtension(), HistoryExtension(), BoldExtension(), ItalicExtension(), StrikethroughExtension(), UnderlineExtension(), SuperscriptExtension(), SubscriptExtension(), CodeExtension(), FontSizeExtension(), FontFamilyExtension(), ColorExtension(), BackColorExtension(), LinkExtension(), AlignExtension(), LineHeightExtension(), HorizontalExtension(), BlockquoteExtension(), HeadingExtension(), ListExtension(), IndentExtension(), TaskExtension(), MathExtension(), CodeBlockExtension(), AttachmentExtension(), TableExtension()]
   /**
    * 编辑器的节点数组格式化规则【初始化后不可修改】【open】
    */

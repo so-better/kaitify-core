@@ -4,8 +4,17 @@ import { Extension } from '../Extension'
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 光标所在文本是否下划线
+     */
     isUnderline?: () => boolean
+    /**
+     * 设置下划线
+     */
     setUnderline?: () => Promise<void>
+    /**
+     * 取消下划线
+     */
     unsetUnderline?: () => Promise<void>
   }
 }
@@ -42,15 +51,10 @@ export const UnderlineExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 光标所在文本是否下划线
-       */
       const isUnderline = () => {
         return this.commands.isTextStyle!('textDecoration', 'underline') || this.commands.isTextStyle!('textDecorationLine', 'underline')
       }
-      /**
-       * 设置下划线
-       */
+
       const setUnderline = async () => {
         if (isUnderline()) {
           return
@@ -59,9 +63,7 @@ export const UnderlineExtension = () =>
           textDecorationLine: 'underline'
         })
       }
-      /**
-       * 取消下划线
-       */
+
       const unsetUnderline = async () => {
         if (!isUnderline()) {
           return

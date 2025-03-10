@@ -23,10 +23,25 @@ export type UpdateLinkOptionType = {
 
 declare module '../../model' {
   interface EditorCommandsType {
+    /**
+     * 获取光标所在的链接，如果光标不在一个链接内，返回null
+     */
     getLink?: () => KNode | null
+    /**
+     * 判断光标范围内是否有链接
+     */
     hasLink?: () => boolean
+    /**
+     * 设置连接
+     */
     setLink?: (options: SetLinkOptionType) => Promise<void>
+    /**
+     * 更新链接
+     */
     updateLink?: (options: UpdateLinkOptionType) => Promise<void>
+    /**
+     * 取消链接
+     */
     unsetLink?: () => Promise<void>
   }
 }
@@ -61,25 +76,16 @@ export const LinkExtension = () =>
       }
     ],
     addCommands() {
-      /**
-       * 获取光标所在的链接，如果光标不在一个链接内，返回null
-       */
       const getLink = () => {
         return this.getMatchNodeBySelection({ tag: 'a' })
       }
 
-      /**
-       * 判断光标范围内是否有链接
-       */
       const hasLink = () => {
         return this.isSelectionNodesSomeMatch({
           tag: 'a'
         })
       }
 
-      /**
-       * 设置连接
-       */
       const setLink = async (options: SetLinkOptionType) => {
         if (!this.selection.focused() || hasLink()) {
           return
@@ -134,9 +140,6 @@ export const LinkExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 更新链接
-       */
       const updateLink = async (options: UpdateLinkOptionType) => {
         if (!this.selection.focused()) {
           return
@@ -161,9 +164,6 @@ export const LinkExtension = () =>
         await this.updateView()
       }
 
-      /**
-       * 取消链接
-       */
       const unsetLink = async () => {
         if (!this.selection.focused()) {
           return
