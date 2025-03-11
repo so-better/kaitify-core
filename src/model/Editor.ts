@@ -527,6 +527,13 @@ export class Editor {
   }
 
   /**
+   * 判断编辑器是否为空，这里的空指的是编辑器内只有一个段落，并且段落里只有占位符
+   */
+  isEmpty() {
+    return this.stackNodes.length == 1 && this.isParagraph(this.stackNodes[0]) && this.stackNodes[0].allIsPlaceholder()
+  }
+
+  /**
    * dom转KNode
    */
   domParseNode(dom: Node) {

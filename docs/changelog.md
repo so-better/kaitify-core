@@ -5,6 +5,12 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.22 <Badge type="tip" text='2025.03.11' />
+
+- 修复了一个中文输入的 bug
+- `Editor` 新增实例方法 `isEmpty`，用以判断编辑器内容是否为空
+- 优化了 `placeholder` 占位内容的显示机制，在输入中文时隐藏 `placeholder`
+
 ## v0.0.1-beta.20 <Badge type="tip" text='2025.03.10' />
 
 - 代码优化，解决了 Grammarly 插入的问题

@@ -174,6 +174,26 @@ title: Editor 方法
   const isDark = editor.isDark()
   ```
 
+##### isEmpty()
+
+判断编辑器是否为空
+
+- 类型
+
+  ```ts
+  isEmpty(): boolean
+  ```
+
+- 详细信息
+
+  返回一个 `boolean` 值，如果为 `true` 值则表明编辑器内只有一个段落，且该段落内只包含占位符，无其他内容
+
+- 示例
+
+  ```ts
+  const isEmpty = editor.isEmpty()
+  ```
+
 ##### domParseNode()
 
 将 `dom` 转为 `KNode` 节点

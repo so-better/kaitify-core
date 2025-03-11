@@ -1,6 +1,6 @@
 import { delay } from '@/tools'
 import { Editor } from '../Editor'
-import { handlerForPasteDrop, redressSelection, updateSelection } from './function'
+import { handlerForPasteDrop, redressSelection, setPlaceholder, updateSelection } from './function'
 
 /**
  * 监听外部改变selection
@@ -112,16 +112,18 @@ export const onComposition = async function (this: Editor, e: Event) {
   if (event.type == 'compositionstart') {
     //改变标识
     this.isComposition = true
+    //设置placeholder
+    setPlaceholder.apply(this)
   }
   //输入中文结束后
   else if (event.type == 'compositionend') {
     //获取真实光标
     const realSelection = window.getSelection()!
     const range = realSelection.getRangeAt(0)
-    //获取真实光标所在的真实dom，一定是文本
-    const element = range.endContainer
+    //获取真实光标所在的真实dom（一般来说是文本，如果不是文本则是输入法删除）
+    const element = range.endContainer.nodeType == 3 ? range.endContainer : range.endContainer.childNodes[range.endOffset > 0 ? range.endOffset - 1 : 0]
     //父元素
-    const parentElement = element.parentNode! as HTMLElement
+    const parentElement = element.parentElement!
     //获取对应的节点
     const parentNode = this.findNode(parentElement)
     //是文本节点且文本不一致
@@ -158,6 +160,8 @@ export const onComposition = async function (this: Editor, e: Event) {
     }
     //改变标识
     this.isComposition = false
+    //设置placeholder
+    setPlaceholder.apply(this)
   }
 }
 

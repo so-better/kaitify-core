@@ -378,6 +378,10 @@ export declare class Editor {
      */
     isDark(): boolean;
     /**
+     * 判断编辑器是否为空，这里的空指的是编辑器内只有一个段落，并且段落里只有占位符
+     */
+    isEmpty(): boolean;
+    /**
      * dom转KNode
      */
     domParseNode(dom: Node): KNode;
