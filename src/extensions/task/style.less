@@ -13,15 +13,32 @@
     &::before {
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 3px;
       content: '';
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       border: 1px solid var(--kaitify-theme);
       border-radius: var(--kaitify-border-radius);
       user-select: none;
       touch-action: none;
+      transition: background 200ms;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 4.5px;
+      width: 0px;
+      height: 0px;
+      margin-top: 5px;
+      border: solid var(--kaitify-theme);
+      border-width: 0;
+      transform: rotate(45deg);
+      border-color: #fff;
+      user-select: none;
+      touch-action: none;
+      transition: width 100ms ease-in-out, height 200ms ease-in-out, margin-top 200ms ease-in-out;
     }
 
     &[kaitify-task='done'] {
@@ -32,19 +49,10 @@
       }
 
       &::after {
-        content: '';
-        position: absolute;
-        left: 2px;
-        top: 50%;
+        margin-top: 0;
         width: 5px;
         height: 10px;
-        margin-top: -2.5px;
-        border: solid var(--kaitify-theme);
         border-width: 0 2px 2px 0;
-        transform: rotate(45deg) translateY(-50%);
-        border-color: #fff;
-        user-select: none;
-        touch-action: none;
       }
     }
   }
