@@ -7,6 +7,22 @@
           <button>当前编辑器内容字数：{{ count }}</button>
           <button @click="getHtml">获取HTML</button>
           <button @click="insertNode">插入节点</button>
+          <button
+            @click="()=>{
+            editor?.insertParagraph!()
+            editor?.updateView()
+          }"
+          >
+            换行
+          </button>
+          <button
+            @click="()=>{
+            editor?.insertText!('插入的文本')
+            editor?.updateView()
+          }"
+          >
+            插入文本
+          </button>
         </div>
       </fieldset>
       <fieldset>
