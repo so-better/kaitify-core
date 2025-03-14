@@ -79,11 +79,11 @@ export const mergeBlock = function (this: Editor, node: KNode, target: KNode) {
     return
   }
   const uneditableNode = node.getUneditable()
-  //是用户操作的删除行为并且前一个块节点是不可编辑的，则直接删除前一个块节点
-  if (this.isUserDelection && uneditableNode) {
+  //前一个块节点是不可编辑的，则直接删除前一个块节点
+  if (uneditableNode) {
     uneditableNode.toEmpty()
   }
-  //否则走正常删除逻辑
+  //否则走正常合并逻辑
   else {
     const nodes = target.children!.map(item => {
       item.parent = node

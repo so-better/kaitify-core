@@ -79,10 +79,8 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
     if (event.inputType == 'deleteByCut' && !this.allowCut) {
       return
     }
-    this.isUserDelection = true
     this.delete()
     await this.updateView()
-    this.isUserDelection = false
   }
   //插入段落
   else if (event.inputType == 'insertParagraph' || event.inputType == 'insertLineBreak') {

@@ -92,6 +92,36 @@ const downloadAttachment = (editor: Editor) => {
   })
 }
 
+/**
+ * 设置附件选中
+ */
+const attachmentFocus = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.attachment_focus')
+  DapEvent.on(editor.$el!, 'click.attachment_focus', e => {
+    //编辑器不可编辑状态下不设置
+    if (!editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: 'span',
+      marks: {
+        'kaitify-attachment': true
+      }
+    })
+    if (matchNode) {
+      editor.setSelectionBefore(matchNode, 'start')
+      editor.setSelectionAfter(matchNode, 'end')
+      editor.updateRealSelection()
+    }
+  })
+}
+
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
   Extension.create({
     name: 'attachment',
@@ -197,6 +227,8 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
     afterUpdateView() {
       //下载附件
       downloadAttachment(this)
+      //点击选中
+      attachmentFocus(this)
     },
     addCommands() {
       const getAttachment = () => {

@@ -1,6 +1,6 @@
 import KaTex from 'katex'
-import { common as DapCommon } from 'dap-util'
-import { KNode, KNodeMarksType, KNodeStylesType } from '@/model'
+import { common as DapCommon, event as DapEvent } from 'dap-util'
+import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { Extension } from '../Extension'
 import 'katex/dist/katex.css'
 import './style.less'
@@ -24,6 +24,36 @@ declare module '../../model' {
      */
     updateMath?: (value: string) => Promise<void>
   }
+}
+
+/**
+ * 设置数学公式选中
+ */
+const mathFocus = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.math_focus')
+  DapEvent.on(editor.$el!, 'click.math_focus', e => {
+    //编辑器不可编辑状态下不设置
+    if (!editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: 'span',
+      marks: {
+        'kaitify-math': true
+      }
+    })
+    if (matchNode) {
+      editor.setSelectionBefore(matchNode, 'start')
+      editor.setSelectionAfter(matchNode, 'end')
+      editor.updateRealSelection()
+    }
+  })
 }
 
 export const MathExtension = () =>
@@ -163,6 +193,9 @@ export const MathExtension = () =>
         }
       }
     ],
+    afterUpdateView() {
+      mathFocus(this)
+    },
     addCommands() {
       const getMath = () => {
         return this.getMatchNodeBySelection({

@@ -360,10 +360,6 @@ export class Editor {
    */
   internalCauseSelectionChange: boolean = false
   /**
-   * 是否用户操作的删除行为，如果是用户操作的删除行为，则在处理不可编辑的节点是会删除该节点，如果是API调用的删除方法则走正常的删除逻辑【不可修改】
-   */
-  isUserDelection: boolean = false
-  /**
    * dom监听【不可修改】
    */
   domObserver: MutationObserver | null = null
@@ -1241,6 +1237,27 @@ export class Editor {
     //起点和终点在一个位置
     if (this.selection.collapsed()) {
       const node = this.selection.start!.node
+      const uneditableNode = node.getUneditable()
+      //在不可编辑的节点里
+      if (!!uneditableNode) {
+        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
+        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
+        //存在后一个可设置光标的节点，则更新光标
+        if (nextSelectionNode) {
+          this.setSelectionBefore(nextSelectionNode, 'all')
+        }
+        //存在前一个可设置光标的节点，则更新光标
+        else if (prevSelectionNode) {
+          this.setSelectionAfter(prevSelectionNode, 'all')
+        }
+        //都不存在则删除该不可编辑的节点
+        else {
+          this.delete()
+        }
+        //重新执行
+        this.insertText(text)
+        return
+      }
       const offset = this.selection.start!.offset
       //不是在拥有代码块样式的块级节点内，则将空格转换成&nbsp;
       if (!node.isInCodeBlockStyle()) {
@@ -1288,6 +1305,27 @@ export class Editor {
     if (this.selection.collapsed()) {
       //光标所在节点
       const node = this.selection.start!.node
+      const uneditableNode = node.getUneditable()
+      //在不可编辑的节点里
+      if (!!uneditableNode) {
+        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
+        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
+        //存在后一个可设置光标的节点，则更新光标
+        if (nextSelectionNode) {
+          this.setSelectionBefore(nextSelectionNode, 'all')
+        }
+        //存在前一个可设置光标的节点，则更新光标
+        else if (prevSelectionNode) {
+          this.setSelectionAfter(prevSelectionNode, 'all')
+        }
+        //都不存在则删除该不可编辑的节点
+        else {
+          this.delete()
+        }
+        //重新执行
+        this.insertParagraph()
+        return
+      }
       //光标所在块节点
       const blockNode = node.getBlock()
       //如果在代码块样式内
@@ -1355,6 +1393,27 @@ export class Editor {
     if (this.selection.collapsed()) {
       //光标所在节点
       const selectionNode = this.selection.start!.node
+      const uneditableNode = selectionNode.getUneditable()
+      //在不可编辑的节点里
+      if (!!uneditableNode) {
+        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
+        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
+        //存在后一个可设置光标的节点，则更新光标
+        if (nextSelectionNode) {
+          this.setSelectionBefore(nextSelectionNode, 'all')
+        }
+        //存在前一个可设置光标的节点，则更新光标
+        else if (prevSelectionNode) {
+          this.setSelectionAfter(prevSelectionNode, 'all')
+        }
+        //都不存在则删除该不可编辑的节点
+        else {
+          this.delete()
+        }
+        //重新执行
+        this.insertNode(node)
+        return
+      }
       //光标偏移值
       const offset = this.selection.start!.offset
       //光标所在节点的块节点
@@ -1435,9 +1494,16 @@ export class Editor {
     if (this.selection.collapsed()) {
       const node = this.selection.start!.node
       const uneditableNode = node.getUneditable()
-      //是用户操作的删除行为并且在不可编辑的节点里，则直接删除该不可编辑的节点
-      if (this.isUserDelection && uneditableNode) {
-        uneditableNode.toEmpty()
+      //在不可编辑的节点里
+      if (!!uneditableNode) {
+        //如果该节点是固定块节点，则清空内容
+        if (uneditableNode.isBlock() && uneditableNode.fixed) {
+          emptyFixedBlock.apply(this, [uneditableNode])
+        }
+        //非固定块节点直接删除
+        else if (!uneditableNode.isEmpty()) {
+          uneditableNode.toEmpty()
+        }
       }
       //否则走正常删除逻辑
       else {
@@ -1592,26 +1658,41 @@ export class Editor {
       const endBlockNode = this.selection.end!.node.getBlock()
       result.forEach(item => {
         const { node, offset } = item
-        //是数组的情况，说明node是文本节点，需要进行裁剪
-        if (offset) {
-          node.textContent = node.textContent!.substring(0, offset[0]) + node.textContent!.substring(offset[1])
-        }
-        //说明节点都在选区内
-        else {
-          //固定状态的块节点，进行清空处理
-          if (node.isBlock() && node.fixed) {
-            emptyFixedBlock.apply(this, [node])
+        const uneditableNode = node.getUneditable()
+        //在不可编辑的节点里
+        if (!!uneditableNode) {
+          //如果该节点是固定块节点，则清空内容
+          if (uneditableNode.isBlock() && uneditableNode.fixed) {
+            emptyFixedBlock.apply(this, [uneditableNode])
           }
-          //其他节点置空进行删除
+          //非固定块节点直接删除
+          else if (!uneditableNode.isEmpty()) {
+            uneditableNode.toEmpty()
+          }
+        }
+        //走正常的删除逻辑
+        else {
+          //是数组的情况，说明node是文本节点，需要进行裁剪
+          if (offset) {
+            node.textContent = node.textContent!.substring(0, offset[0]) + node.textContent!.substring(offset[1])
+          }
+          //说明节点都在选区内
           else {
-            node.toEmpty()
+            //固定状态的块节点，进行清空处理
+            if (node.isBlock() && node.fixed) {
+              emptyFixedBlock.apply(this, [node])
+            }
+            //其他节点置空进行删除
+            else {
+              node.toEmpty()
+            }
           }
         }
       })
       //起点和终点在同一个块节点下
       if (startBlockNode.isEqual(endBlockNode)) {
-        //块节点为空创建占位符
-        if (startBlockNode.isEmpty()) {
+        //块节点为空且不是不可编辑的则创建占位符
+        if (startBlockNode.isEmpty() && !startBlockNode.getUneditable()) {
           const placeholder = KNode.createPlaceholder()
           this.addNode(placeholder, startBlockNode)
           this.setSelectionBefore(placeholder)

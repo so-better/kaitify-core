@@ -9,6 +9,14 @@
           <button @click="insertNode">插入节点</button>
           <button
             @click="()=>{
+            editor?.delete!()
+            editor?.updateView()
+          }"
+          >
+            删除
+          </button>
+          <button
+            @click="()=>{
             editor?.insertParagraph!()
             editor?.updateView()
           }"
@@ -273,7 +281,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<div kaitify-task="done"><span>3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333</span></div><div kaitify-task="done"><span>333333333333333333333333333</span></div><div kaitify-task="done" style="line-height:3;"><span>333333333333333333333333333</span></div>`,
+    value: `<p>3333</p>`,
     extensions: [],
     el: '#editor',
     editable: true,
@@ -286,9 +294,13 @@ onMounted(async () => {
 })
 
 const insertNode = () => {
-  // editor.value!.selection.start!.node.getRootBlock().children = []
-  // editor.value!.updateView()
-  console.log(editor.value?.getFocusNodesBySelection('all'))
+  editor.value!.insertNode(
+    KNode.create({
+      type: 'text',
+      textContent: '被插入的文本节点'
+    })
+  )
+  editor.value!.updateView()
 }
 
 const getHtml = () => {
