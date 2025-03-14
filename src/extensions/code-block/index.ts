@@ -227,6 +227,40 @@ export const CodeBlockExtension = () =>
         }
       }
     },
+    onInsertParagraph(node) {
+      //获取代码块节点
+      const codeBlockNode = node.getMatchNode({
+        tag: 'pre'
+      })
+      //在代码块节点内并且光标所在节点是文本节点
+      if (!!codeBlockNode && this.selection.start!.node.isText()) {
+        //获取父节点
+        const parentNode = this.selection.start!.node.parent!
+        //获取前一个兄弟节点
+        const previousNode = this.selection.start!.node.getPrevious(parentNode.children!)
+        //获取后一个兄弟节点
+        const nextNode = this.selection.start!.node.getNext(parentNode.children!)
+        //前一个兄弟节点存在并且是文本节点并且是以两个换行符结尾（换行符之间有空白文本字符），并且后一个兄弟节点不存在
+        if (previousNode && previousNode.isText() && /\n(\s*)\n$/.test(previousNode.textContent!) && !nextNode) {
+          //清除这两个换行符
+          previousNode.textContent = previousNode.textContent!.replace(/\n(\s*)\n$/, '')
+          //插入段落到代码块节点后
+          const paragraph = KNode.create({
+            type: 'block',
+            tag: this.blockRenderTag,
+            children: [
+              {
+                type: 'closed',
+                tag: 'br'
+              }
+            ]
+          })
+          this.addNodeAfter(paragraph, codeBlockNode)
+          //重新设置光标
+          this.setSelectionBefore(paragraph, 'all')
+        }
+      }
+    },
     addCommands() {
       const getCodeBlock = () => {
         return this.getMatchNodeBySelection({

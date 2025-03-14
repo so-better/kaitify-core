@@ -281,7 +281,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<p>3333</p>`,
+    value: `<table><tr><th>2</th><th>3</th></tr></table>`,
     extensions: [],
     el: '#editor',
     editable: true,

@@ -660,6 +660,21 @@ export const TableExtension = () =>
           node.tag = 'td'
         }
       },
+      //td内无段落则加入段落
+      ({ node, editor }) => {
+        if (node.isMatch({ tag: 'td' }) && !node.children!.some(item => item.isBlock())) {
+          const pararaph = KNode.create({
+            type: 'block',
+            tag: editor.blockRenderTag
+          })
+          pararaph.children = node.children!.map(item => {
+            item.parent = pararaph
+            return item
+          })
+          node.children = [pararaph]
+          pararaph.parent = node
+        }
+      },
       //针对跨行跨列的单元格，增加隐藏单元格
       ({ editor, node }) => {
         if (node.isMatch({ tag: 'table' })) {
@@ -675,6 +690,43 @@ export const TableExtension = () =>
     afterUpdateView() {
       //表格拖拽改变列宽
       tableResizable(this)
+    },
+    onInsertParagraph(node) {
+      //获取表格节点
+      const tableNode = node.getMatchNode({
+        tag: 'table'
+      })
+      //表格节点存在并且光标所在节点是表格节点的最后一个可聚焦节点
+      if (!!tableNode && this.selection.start!.node.lastInTargetNode(tableNode)) {
+        //获取光标所在的块节点，也就是表格内的最后一行最后一列内的最后一个块节点
+        const blockNode = this.selection.start!.node.getBlock()
+        //光标所在块节点的父节点
+        const parent = blockNode.parent!
+        //光标所在块节点的前一个兄弟节点
+        const pBlock = blockNode.getPrevious(parent.children!)
+        //光标所在块节点的前二个兄弟节点
+        const ppBlock = pBlock ? pBlock.getPrevious(parent.children!) : null
+        //后两个节点都是段落，且是只有占位符的段落，且ppBlock存在
+        if (this.isParagraph(blockNode) && blockNode.allIsPlaceholder() && pBlock && this.isParagraph(pBlock) && pBlock.allIsPlaceholder() && ppBlock) {
+          //后两个块节点置空
+          blockNode.toEmpty()
+          pBlock.toEmpty()
+          //创建段落添加到表格后
+          const pararaph = KNode.create({
+            type: 'block',
+            tag: this.blockRenderTag,
+            children: [
+              {
+                type: 'closed',
+                tag: 'br'
+              }
+            ]
+          })
+          this.addNodeAfter(pararaph, tableNode)
+          //重新设置光标
+          this.setSelectionBefore(pararaph)
+        }
+      }
     },
     addCommands() {
       const getTable = () => {
