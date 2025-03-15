@@ -281,7 +281,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<table><tr><th>2</th><th>3</th></tr></table>`,
+    value: `<div style='font-size:40px;'><ul><li>列表1</li><li>列表2</li></ul><ol><li>列表1</li><li>列表2</li></ol></div><h1><ul><li>列表1</li><li>列表2</li></ul><ol><li>列表1</li><li>列表2</li></ol></h1>`,
     extensions: [],
     el: '#editor',
     editable: true,
