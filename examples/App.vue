@@ -25,6 +25,12 @@
           }">
             插入文本
           </button>
+          <button @click="() => {
+            console.log('光标是否在视图内', editor?.isSelectionInView());
+
+          }">
+            光标是否在视图内
+          </button>
         </div>
       </fieldset>
       <fieldset>

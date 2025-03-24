@@ -507,6 +507,10 @@ export declare class Editor {
      */
     getHTML(): string;
     /**
+     * 判断光标是否完全在可视范围内
+     */
+    isSelectionInView(): boolean;
+    /**
      * 配置编辑器，返回创建的编辑器
      */
     static configure(options: EditorConfigureOptionType): Promise<Editor>;

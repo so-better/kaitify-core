@@ -1973,6 +1973,57 @@ export class Editor {
   }
 
   /**
+   * 判断光标是否完全在可视范围内
+   */
+  isSelectionInView() {
+    if (this.selection.focused()) {
+      const focusDom = this.findDom(this.selection.end!.node)
+      const isInView = (scrollElement: HTMLElement) => {
+        const scrollHeight = DapElement.getScrollHeight(scrollElement)
+        const scrollWidth = DapElement.getScrollWidth(scrollElement)
+        //存在横向或者垂直滚动条
+        if (scrollElement.clientHeight < scrollHeight || scrollElement.clientWidth < scrollWidth) {
+          const selection = window.getSelection()!
+          const range = selection.getRangeAt(0)
+          const rects = range.getClientRects()
+          let target: Range | HTMLElement = range
+          if (rects.length == 0) {
+            target = focusDom
+          }
+          const childRect = target.getBoundingClientRect()
+          const parentRect = scrollElement.getBoundingClientRect()
+          //存在垂直滚动条
+          if (scrollElement.clientHeight < scrollHeight) {
+            //如果光标所在节点不在视图内
+            if (childRect.top < parentRect.top || childRect.bottom > parentRect.bottom) {
+              return false
+            }
+          }
+          //存在横向滚动条
+          if (scrollElement.clientWidth < scrollWidth) {
+            //如果光标所在节点不在视图内
+            if (childRect.left < parentRect.left || childRect.right > parentRect.right) {
+              return false
+            }
+          }
+        }
+        return true
+      }
+      let inView = true
+      let dom = focusDom
+      while (DapElement.isElement(dom) && dom != document.documentElement) {
+        if (!isInView(dom)) {
+          inView = false
+          break
+        }
+        dom = dom.parentNode as HTMLElement
+      }
+      return inView
+    }
+    return true
+  }
+
+  /**
    * 配置编辑器，返回创建的编辑器
    */
   static async configure(options: EditorConfigureOptionType) {

@@ -5,9 +5,10 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.1-beta.25 <Badge type="tip" text='2025.03.24' />
+## v0.0.1-beta.26 <Badge type="tip" text='2025.03.24' />
 
 - 优化 `unicode` 字符删除时的操作逻辑，例如 `emoji` 表情包删除的优化
+- 新增 `isSelectionInView` 函数：用以判断光标是否完全在可视范围内
 
 ## v0.0.1-beta.24 <Badge type="tip" text='2025.03.15' />
 

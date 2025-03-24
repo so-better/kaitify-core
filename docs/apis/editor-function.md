@@ -916,3 +916,23 @@ editor.updateView() //调用此方法视图才会更新
   ```ts
   const html = editor.getHTML() //html可以直接插入到某个元素内进行展示
   ```
+
+##### isSelectionInView()
+
+判断编辑器的光标是否完全在可视范围内
+
+- 类型
+
+  ```ts
+  isSelectionInView(): boolean
+  ```
+
+- 详细信息
+
+  该方法会返回一个布尔值，用以判断光标是否完整地都处于编辑器的可视范围内
+
+- 示例
+
+  ```ts
+  const inView = editor.isSelectionInView()
+  ```
