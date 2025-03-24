@@ -1587,13 +1587,17 @@ export class Editor {
           }
           //在文本节点内
           else if (node.isText()) {
-            //获取删除的字符
-            const deleteChart = node.textContent!.substring(offset - 1, offset)
+            //从0到删除操作的位置的字符串转为数组，这是为了能够完整删除unicode字符
+            const charArray = Array.from(node.textContent!.substring(0, offset))
+            //删除的字符，同时修改chartArray
+            const deleteChart = charArray.pop()!
+            //删除的字符长度
+            const deleteChartLength = deleteChart.length
             //进行删除
-            node.textContent = node.textContent!.substring(0, offset - 1) + node.textContent!.substring(offset)
+            node.textContent = charArray.join('') + node.textContent!.substring(offset)
             //更新光标到删除后的位置
-            this.selection.start!.offset = offset - 1
-            this.selection.end!.offset = offset - 1
+            this.selection.start!.offset = offset - deleteChartLength
+            this.selection.end!.offset = offset - deleteChartLength
             //删除的是空白字符，再次删除
             if (isZeroWidthText(deleteChart)) {
               this.delete()

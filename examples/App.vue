@@ -7,28 +7,22 @@
           <button>当前编辑器内容字数：{{ count }}</button>
           <button @click="getHtml">获取HTML</button>
           <button @click="insertNode">插入节点</button>
-          <button
-            @click="()=>{
+          <button @click="() => {
             editor?.delete!()
             editor?.updateView()
-          }"
-          >
+          }">
             删除
           </button>
-          <button
-            @click="()=>{
+          <button @click="() => {
             editor?.insertParagraph!()
             editor?.updateView()
-          }"
-          >
+          }">
             换行
           </button>
-          <button
-            @click="()=>{
+          <button @click="() => {
             editor?.insertText!('插入的文本')
             editor?.updateView()
-          }"
-          >
+          }">
             插入文本
           </button>
         </div>
@@ -71,7 +65,8 @@
       <fieldset>
         <legend>链接</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setLink!({ href: 'https://www.baidu.com', newOpen: true, text: '百度一下，你就知道' })">插入链接</button>
+          <button
+            @click="editor?.commands.setLink!({ href: 'https://www.baidu.com', newOpen: true, text: '百度一下，你就知道' })">插入链接</button>
           <button @click="editor?.commands.unsetLink!()">取消链接</button>
           <button @click="editor?.commands.updateLink!({ href: 'https://www.so-better.cn' })">更新链接</button>
         </div>
@@ -185,13 +180,15 @@
       <fieldset>
         <legend>图片</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg!/fh/333/quality/95/unsharp/true/compress/true', alt: '图片加载失败', width: '200px' })">插入图片</button>
+          <button
+            @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg!/fh/333/quality/95/unsharp/true/compress/true', alt: '图片加载失败', width: '200px' })">插入图片</button>
         </div>
       </fieldset>
       <fieldset>
         <legend>视频</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true })">插入视频</button>
+          <button
+            @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true })">插入视频</button>
           <button @click="editor?.commands.updateVideo!({ controls: true, loop: true })">更新视频</button>
         </div>
       </fieldset>
@@ -235,7 +232,8 @@
       <fieldset>
         <legend>附件</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setAttachment!({ url: 'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg', text: '附件图片' })">上传附件</button>
+          <button
+            @click="editor?.commands.setAttachment!({ url: 'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg', text: '附件图片' })">上传附件</button>
           <button @click="editor?.commands.updateAttachment!({ url: '#', text: '附件2' })">更新附件</button>
         </div>
       </fieldset>
@@ -281,14 +279,14 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<div style='font-size:40px;'><ul><li>列表1</li><li>列表2</li></ul><ol><li>列表1</li><li>列表2</li></ol></div><h1><ul><li>列表1</li><li>列表2</li></ul><ol><li>列表1</li><li>列表2</li></ol></h1>`,
+    value: `333`,
     extensions: [],
     el: '#editor',
     editable: true,
     allowPasteHtml: true,
     placeholder: '请输入内容...',
     afterUpdateView() {
-      count.value = this.getContent().trim().length
+      count.value = Array.from(this.getContent().trim()).length
     }
   })
 })
