@@ -319,10 +319,18 @@ const getHtml = () => {
 
 const illegaInsert = (num: 0 | 1) => {
   if (num === 0) {
-    document.execCommand('insertText', false, '非法文本')
+    const range = document.getSelection()!.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(document.createTextNode('非法文本'));
   }
   else {
-    document.execCommand('insertHTML', false, '<span>非法dom</span>')
+    const range = document.getSelection()!.getRangeAt(0);
+    range.deleteContents();
+    for (let i = 0; i < 2; i++) {
+      const elm = document.createElement('p')
+      elm.innerHTML = `非法dom${i + 1}`
+      range.insertNode(elm);
+    }
   }
 }
 </script>
