@@ -31,6 +31,12 @@
           }">
             光标是否在视图内
           </button>
+          <button @click="illegaInsert(0)">
+            非法插入文本
+          </button>
+          <button @click="illegaInsert(1)">
+            非法插入dom
+          </button>
         </div>
       </fieldset>
       <fieldset>
@@ -309,6 +315,15 @@ const insertNode = () => {
 
 const getHtml = () => {
   html.value = editor.value!.getHTML()
+}
+
+const illegaInsert = (num: 0 | 1) => {
+  if (num === 0) {
+    document.execCommand('insertText', false, '非法文本')
+  }
+  else {
+    document.execCommand('insertHTML', false, '<span>非法dom</span>')
+  }
 }
 </script>
 <style lang="less">

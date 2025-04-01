@@ -118,7 +118,7 @@ export const onComposition = async function (this: Editor, e: Event) {
     //获取真实光标
     const realSelection = window.getSelection()!
     const range = realSelection.getRangeAt(0)
-    //获取真实光标所在的真实dom（一般来说是文本，如果不是文本则是输入法删除）
+    //获取真实光标所在的真实dom（一般来说是文本，如果不是文本则是输入法删除行为）
     const element = range.endContainer.nodeType == 3 ? range.endContainer : range.endContainer.childNodes[range.endOffset > 0 ? range.endOffset - 1 : 0]
     //父元素
     const parentElement = element.parentElement!
@@ -126,15 +126,12 @@ export const onComposition = async function (this: Editor, e: Event) {
     const parentNode = this.findNode(parentElement)
     //是文本节点且文本不一致
     if (parentNode.isText() && parentNode.textContent != element.textContent) {
-      const textContent = parentNode.textContent || ''
       //更新文本内容
       parentNode.textContent = element.textContent || ''
       //更新光标
       if (this.isSelectionInTargetNode(parentNode)) {
         updateSelection.apply(this)
       }
-      //移除非法的文本
-      element.textContent = textContent
       //更新视图
       await this.updateView()
     }
