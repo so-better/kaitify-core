@@ -5,6 +5,11 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.27 <Badge type="tip" text='2025.04.02' />
+
+- 优化编辑器对非法 `dom` 插入/删除/更新的处理，以适配 `Grammarly` 等第三方插件对 `dom` 的修改
+- 其他代码优化
+
 ## v0.0.1-beta.26 <Badge type="tip" text='2025.03.24' />
 
 - 优化 `unicode` 字符删除时的操作逻辑，例如 `emoji` 表情包删除的优化
@@ -28,7 +33,7 @@ title: 更新日志
 
 ## v0.0.1-beta.20 <Badge type="tip" text='2025.03.10' />
 
-- 代码优化，解决了 Grammarly 插入的问题
+- 代码优化，解决了 `Grammarly` 插入的问题
 - `indent` 拓展新增 `canUseIndent` 指令，用于判断是否可以使用缩进功能
 - `indent` 拓展新增键盘事件：`tab` 键按下增加缩进；`shift+tab` 键按下减少缩进
 
