@@ -4,6 +4,13 @@ import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
 /**
+ * 非法dom更新数据类型
+ */
+export type EditorObserverUpdateDataType = {
+    elm: Node;
+    type: 'add' | 'remove' | 'update';
+};
+/**
  * 编辑器获取光标范围内节点数据的类型
  */
 export type EditorSelectedType = {
@@ -510,6 +517,14 @@ export declare class Editor {
      * 判断光标是否完全在可视范围内
      */
     isSelectionInView(): boolean;
+    /**
+     * 移除对编辑器的dom监听
+     */
+    removeDomObserve(): void;
+    /**
+     * 设置对编辑器的dom监听，主要解决非法dom插入问题
+     */
+    setDomObserve(): void;
     /**
      * 配置编辑器，返回创建的编辑器
      */

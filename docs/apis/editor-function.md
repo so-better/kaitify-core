@@ -936,3 +936,47 @@ editor.updateView() //调用此方法视图才会更新
   ```ts
   const inView = editor.isSelectionInView()
   ```
+
+##### setDomObserve()
+
+监听编辑器内非法插入、删除、更改的 `dom`
+
+- 类型
+
+  ```ts
+  setDomObserve(): void
+  ```
+
+- 详细信息
+
+  该方法会对编辑器内的不在节点数组内的非法 `dom` 进行处理，以确保编辑器的内容符合预期
+
+  该方法在 `updateView` 和 `review` 方法中会进行调用，所以如果你使用了这两个方法无需重复使用该方法
+
+- 示例
+
+  ```ts
+  editor.setDomObserve()
+  ```
+
+##### removeDomObserve()
+
+取消监听编辑器内非法插入、删除、更改的 `dom`
+
+- 类型
+
+  ```ts
+  removeDomObserve(): void
+  ```
+
+- 详细信息
+
+  该方法会取消对编辑器内的不在节点数组内的非法 `dom` 的监听，此时如果有非法 `dom` 的插入等操作，编辑器将不会进行适当的处理
+
+  当你需要进行一些适当的 `dom` 操作但是又不希望编辑器监听进行处理，你可以使用该方法，但是你必须确保在最后恢复监听并同步节点的行为
+
+- 示例
+
+  ```ts
+  editor.removeDomObserve()
+  ```

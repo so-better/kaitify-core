@@ -430,6 +430,8 @@ const tableResizable = (editor: Editor) => {
           event.interaction.stop()
           return
         }
+        //取消dom监听
+        editor.removeDomObserve()
         //禁用dragstart
         DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
         //获取单元格节点

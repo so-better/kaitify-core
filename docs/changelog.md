@@ -5,6 +5,12 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.28 <Badge type="tip" text='2025.04.03' />
+
+- `Editor` 新增实例方法 `setDomObserve`，用于监听编辑器内的非法 `dom` 操作
+- `Editor` 新增实例方法 `removeDomObserve`，用于取消监听编辑器内的非法 `dom` 操作
+- 修复了 `Image` 和 `Video` 拓展内的图片和视频无法拖拽改变大小的 bug
+
 ## v0.0.1-beta.27 <Badge type="tip" text='2025.04.02' />
 
 - 优化编辑器对非法 `dom` 插入/删除/更新的处理，以适配 `Grammarly` 等第三方插件对 `dom` 的修改

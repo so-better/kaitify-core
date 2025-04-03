@@ -132,8 +132,6 @@ export const onComposition = async function (this: Editor, e: Event) {
       if (this.isSelectionInTargetNode(parentNode)) {
         updateSelection.apply(this)
       }
-      //更新视图
-      await this.updateView()
     }
     //不是文本节点
     else if (!parentNode.isText()) {
@@ -150,13 +148,11 @@ export const onComposition = async function (this: Editor, e: Event) {
       if (this.selection.focused()) {
         this.setSelectionAfter(node, 'all')
       }
-      //更新视图
-      await this.updateView()
     }
     //改变标识
     this.isComposition = false
-    //设置placeholder
-    setPlaceholder.apply(this)
+    //更新视图
+    await this.updateView()
   }
 }
 
