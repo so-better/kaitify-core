@@ -5,6 +5,11 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.29 <Badge type="tip" text='2025.04.07' />
+
+- `Editor` 的实例方法 `review` 新增第二个参数，表示是否不加入历史记录
+- 其他方法逻辑细节优化
+
 ## v0.0.1-beta.28 <Badge type="tip" text='2025.04.03' />
 
 - `Editor` 新增实例方法 `setDomObserve`，用于监听编辑器内的非法 `dom` 操作

@@ -24,8 +24,8 @@ title: Editor 方法
 
   ```ts
   const editor = await Editor.configure({
-    el: '#editor',
-    value: '<p>hello</p>'
+  	el: '#editor',
+  	value: '<p>hello</p>'
   })
   ```
 
@@ -318,8 +318,8 @@ title: Editor 方法
   ```ts
   //假设node是编辑器内已知的一个节点，这里将新创建的节点添加到它前面
   const newNode = KNode.create({
-    type: 'text',
-    textContent: '新节点'
+  	type: 'text',
+  	textContent: '新节点'
   })
   editor.addNodeBefore(newNode, node)
   ```
@@ -345,8 +345,8 @@ title: Editor 方法
   ```ts
   //假设node是编辑器内已知的一个节点，这里将新创建的节点添加到它前面
   const newNode = KNode.create({
-    type: 'text',
-    textContent: '新节点'
+  	type: 'text',
+  	textContent: '新节点'
   })
   editor.addNodeAfter(newNode, node)
   ```
@@ -557,20 +557,20 @@ title: Editor 方法
   ```ts
   //判断光标是否都在同一个节点tag为p，且标记data-p的值是p1的节点内
   const node = editor.getMatchNodeBySelection({
-    tag: 'p',
-    marks: {
-      'data-p': 'p1'
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': 'p1'
+  	}
   })
   ```
 
   ```ts
   //判断光标是否都在同一个节点tag为p，且拥有data-p标记的节点内
   const node = editor.getMatchNodeBySelection({
-    tag: 'p',
-    marks: {
-      'data-p': true
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': true
+  	}
   })
   ```
 
@@ -595,20 +595,20 @@ title: Editor 方法
   ```ts
   //判断光标是否都在节点tag为p，且标记data-p的值是p1的节点内
   const flag = editor.isSelectionNodesAllMatch({
-    tag: 'p',
-    marks: {
-      'data-p': 'p1'
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': 'p1'
+  	}
   })
   ```
 
   ```ts
   //判断光标是否都在节点tag为p，且拥有data-p标记的节点内
   const flag = editor.isSelectionNodesAllMatch({
-    tag: 'p',
-    marks: {
-      'data-p': true
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': true
+  	}
   })
   ```
 
@@ -633,20 +633,20 @@ title: Editor 方法
   ```ts
   //判断光标范围内的节点是否有在tag为p，且标记data-p的值是p1的节点内的
   const flag = editor.isSelectionNodesSomeMatch({
-    tag: 'p',
-    marks: {
-      'data-p': 'p1'
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': 'p1'
+  	}
   })
   ```
 
   ```ts
   //判断光标范围内的节点是否有在tag为p，且拥有data-p标记的节点内的
   const flag = editor.isSelectionNodesSomeMatch({
-    tag: 'p',
-    marks: {
-      'data-p': true
-    }
+  	tag: 'p',
+  	marks: {
+  		'data-p': true
+  	}
   })
   ```
 
@@ -756,8 +756,8 @@ title: Editor 方法
 
 ```ts
 const node = KNode.create({
-  type: 'text',
-  textContent: '插入的节点'
+	type: 'text',
+	textContent: '插入的节点'
 })
 editor.insertNode(node)
 editor.updateView() //调用此方法视图才会更新
@@ -843,12 +843,14 @@ editor.updateView() //调用此方法视图才会更新
 - 类型
 
   ```ts
-  review(value: string): Promise<void>
+  review(value: string, unPushHistory: boolean | undefined = false): Promise<void>
   ```
 
 - 详细信息
 
-  提供一个入参，类型为 `string`，表示一段富文本内容，该方法会将编辑器的内容重置成该富文本内容，重新进行视图渲染，需要注意的是，该方法不会触发 `onChange`
+  第一个入参类型为 `string`，表示一段富文本内容；第二个入参类型为 `boolean`，表示在更新视图后是否加入到历史记录中去，如果是 `true` 则表示不加入到历史记录，是 `false` 则表示加入历史记录。
+
+  该方法会将编辑器的内容重置成该富文本内容，重新进行视图渲染，需要注意的是，该方法不会触发 `onChange` 事件
 
 - 示例
 

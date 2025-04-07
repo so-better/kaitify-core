@@ -375,7 +375,7 @@ export class Editor {
 	 * 如果编辑器内有滚动条，滚动编辑器到光标可视范围
 	 */
 	scrollViewToSelection() {
-		if (this.selection.focused()) {
+		if (this.selection.focused() && this.isEditable()) {
 			const focusDom = this.findDom(this.selection.end!.node)
 			const scrollFunction = async (scrollEl: HTMLElement) => {
 				const scrollHeight = DapElement.getScrollHeight(scrollEl)
@@ -1858,6 +1858,9 @@ export class Editor {
 	 * 根据selection更新编辑器真实光标
 	 */
 	async updateRealSelection() {
+		if (!this.isEditable()) {
+			return
+		}
 		const realSelection = window.getSelection()
 		if (!realSelection) {
 			return
@@ -1907,9 +1910,11 @@ export class Editor {
 	}
 
 	/**
-	 * 重新渲染编辑器视图，不会触发onChange
+	 * 重新渲染编辑器视图
+	 * 1. 不会触发onChange事件；
+	 * 2. 不会渲染真实光标
 	 */
-	async review(value: string) {
+	async review(value: string, unPushHistory: boolean | undefined = false) {
 		//视图更新前回调
 		if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
 		//根据value设置节点数组
@@ -1930,8 +1935,10 @@ export class Editor {
 		if (useDefault) defaultUpdateView.apply(this, [true])
 		//视图更新完毕后重新设置dom监听
 		this.setDomObserve()
-		//设置历史记录
-		this.history.setState(this.stackNodes, this.selection)
+		//如果unPushHistory为false，则加入历史记录
+		if (!unPushHistory) {
+			this.history.setState(this.stackNodes, this.selection)
+		}
 		//更新旧节点数组
 		this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
 		//视图更新后回调

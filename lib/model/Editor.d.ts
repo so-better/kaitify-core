@@ -498,9 +498,11 @@ export declare class Editor {
      */
     updateRealSelection(): Promise<void>;
     /**
-     * 重新渲染编辑器视图，不会触发onChange
+     * 重新渲染编辑器视图
+     * 1. 不会触发onChange事件；
+     * 2. 不会渲染真实光标
      */
-    review(value: string): Promise<void>;
+    review(value: string, unPushHistory?: boolean | undefined): Promise<void>;
     /**
      * 销毁编辑器的方法
      */
