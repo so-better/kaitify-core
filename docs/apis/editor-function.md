@@ -843,14 +843,12 @@ editor.updateView() //调用此方法视图才会更新
 - 类型
 
   ```ts
-  review(value: string, unPushHistory?: boolean): Promise<void>
+  review(value: string): Promise<void>
   ```
 
 - 详细信息
 
-  第一个入参类型为 `string`，表示一段富文本内容；第二个入参类型为 `boolean`，表示在更新视图后是否加入到历史记录中去，如果是 `true` 则表示不加入到历史记录，是 `false` 则表示加入历史记录，默认为 `false`
-
-  该方法会将编辑器的内容重置成该富文本内容，重新进行视图渲染，需要注意的是，该方法不会触发 `onChange` 事件
+  提供一个入参，类型为 `string`，表示一段富文本内容，该方法会将编辑器的内容重置成该富文本内容，重新进行视图渲染，需要注意的是，该方法不会触发 `onChange`
 
 - 示例
 
