@@ -1914,7 +1914,7 @@ export class Editor {
 	 * 1. 不会触发onChange事件；
 	 * 2. 不会渲染真实光标
 	 */
-	async review(value: string, unPushHistory: boolean | undefined = false) {
+	async review(value: string) {
 		//视图更新前回调
 		if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
 		//根据value设置节点数组
@@ -1935,10 +1935,8 @@ export class Editor {
 		if (useDefault) defaultUpdateView.apply(this, [true])
 		//视图更新完毕后重新设置dom监听
 		this.setDomObserve()
-		//如果unPushHistory为false，则加入历史记录
-		if (!unPushHistory) {
-			this.history.setState(this.stackNodes, this.selection)
-		}
+		//设置历史记录
+		this.history.setState(this.stackNodes, this.selection)
 		//更新旧节点数组
 		this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
 		//视图更新后回调

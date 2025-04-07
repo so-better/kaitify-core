@@ -502,7 +502,7 @@ export declare class Editor {
      * 1. 不会触发onChange事件；
      * 2. 不会渲染真实光标
      */
-    review(value: string, unPushHistory?: boolean | undefined): Promise<void>;
+    review(value: string): Promise<void>;
     /**
      * 销毁编辑器的方法
      */
