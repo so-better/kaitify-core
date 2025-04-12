@@ -44,7 +44,7 @@ export type KNodeCreateOptionType = {
     children?: KNodeCreateOptionType[];
 };
 /**
- * 创建零宽度无断空白文本节点的入参类型
+ * 创建零宽度空白文本节点的入参类型
  */
 export type ZeroWidthTextKNodeCreateOptionType = {
     marks?: KNodeMarksType;
@@ -148,7 +148,7 @@ export declare class KNode {
      */
     isEmpty(): boolean;
     /**
-     * 【API】是否零宽度无断空白文本节点
+     * 【API】是否零宽度空白文本节点
      */
     isZeroWidthText(): boolean;
     /**
@@ -239,7 +239,7 @@ export declare class KNode {
      */
     static create(options: KNodeCreateOptionType): KNode;
     /**
-     * 【API】创建零宽度无断空白文本节点
+     * 【API】创建零宽度空白文本节点
      */
     static createZeroWidthText(options?: ZeroWidthTextKNodeCreateOptionType): KNode;
     /**

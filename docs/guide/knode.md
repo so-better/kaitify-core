@@ -14,14 +14,14 @@ title: KNode
 
 ```ts
 const node = KNode.create({
-  type: 'block',
-  tag: 'p',
-  children: [
-    {
-      type: 'text',
-      textContent: '这是一个段落'
-    }
-  ]
+	type: 'block',
+	tag: 'p',
+	children: [
+		{
+			type: 'text',
+			textContent: '这是一个段落'
+		}
+	]
 })
 ```
 
@@ -80,11 +80,11 @@ const node = KNode.create({
 
 子节点构建参数数组，文本节点和闭合节点无需设置此属性
 
-## 零宽度无断空白文本节点
+## 零宽度空白文本节点
 
-编辑器设定了一个非常特殊的文本节点，该节点内容没有长度，在页面表现上仅仅是一个光标的占位大小，我们称之为“零宽度无断空白文本节点”。这类节点在很多场景下有非常特殊的用途。
+编辑器设定了一个非常特殊的文本节点，该节点内容没有长度，在页面表现上仅仅是一个光标的占位大小，我们称之为“零宽度空白文本节点”。这类节点在很多场景下有非常特殊的用途。
 
-那么如何创建一个零宽度无断空白文本节点呢？
+那么如何创建一个零宽度空白文本节点呢？
 
 可以通过`KNode.createZeroWidthText`方法来创建：
 
@@ -96,19 +96,19 @@ const zeroTextNode = KNode.createZeroWidthText(options)
 
 ##### marks <Badge type="danger" text='KNodeMarksType' />
 
-同创建节点入参的 `marks` 属性，表示零宽度无断空白文本节点的标记
+同创建节点入参的 `marks` 属性，表示零宽度空白文本节点的标记
 
 ##### styles <Badge type="danger" text='KNodeStylesType' />
 
-同创建节点入参的 `styles` 属性，表示零宽度无断空白文本节点的样式
+同创建节点入参的 `styles` 属性，表示零宽度空白文本节点的样式
 
 ##### namespace <Badge type="danger" text='string' />
 
-同创建节点入参的 `namespace` 属性，表示零宽度无断空白文本节点的命名空间
+同创建节点入参的 `namespace` 属性，表示零宽度空白文本节点的命名空间
 
 ##### locked <Badge type="danger" text='boolean' />
 
-同创建节点入参的 `locked` 属性，表示零宽度无断空白文本节点是否锁定
+同创建节点入参的 `locked` 属性，表示零宽度空白文本节点是否锁定
 
 ## 占位符节点
 
@@ -123,8 +123,8 @@ const placeholderNode = KNode.createPlaceholder()
 
 ```ts
 const placeholderNode = KNode.create({
-  type: 'closed',
-  tag: 'br'
+	type: 'closed',
+	tag: 'br'
 })
 ```
 

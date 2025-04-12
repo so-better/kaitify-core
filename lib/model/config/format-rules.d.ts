@@ -18,7 +18,7 @@ export declare const fomratBlockTagParse: RuleFunctionType;
  */
 export declare const formatBlockInChildren: RuleFunctionType;
 /**
- * 针对节点自身：处理不可编辑的非块级节点：在两侧添加零宽度无断空白字符 & 重置不可编辑节点内的光标位置
+ * 针对节点自身：处理不可编辑的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
  */
 export declare const formatUneditableNoodes: RuleFunctionType;
 /**
@@ -26,13 +26,17 @@ export declare const formatUneditableNoodes: RuleFunctionType;
  */
 export declare const formatPlaceholderMerge: RuleFunctionType;
 /**
- * 针对节点自身：将文本节点内连续的零宽度无断空白字符合并（光标可能会更新）
+ * 针对节点自身：
+ * 1. 统一将文本节点内的\r\n换成\n，解决Windows兼容问题
+ * 2. 统一将文本节点内的&nbsp;（\u00A0）换成普通空格
+ * 3. 统一将文本节点内的零宽度无断空格换成零宽度空格（\uFEFF -> \u200B）
+ * 4. 统一将文本节点内的\n后面加上零宽度空白字符
+ */
+export declare const formatLineBreakSpaceText: RuleFunctionType;
+/**
+ * 针对节点自身：将文本节点内连续的零宽度空白字符合并（光标可能会更新）
  */
 export declare const formatZeroWidthTextMerge: RuleFunctionType;
-/**
- * 针对节点自身：统一将文本节点内的\r\n换成\n，解决Windows兼容问题
- */
-export declare const formatLineBreakText: RuleFunctionType;
 /**
  * 针对节点的子节点数组：兄弟节点合并策略（光标可能会更新）
  */

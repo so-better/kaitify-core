@@ -8,11 +8,11 @@ export declare const createUniqueKey: () => number;
  */
 export declare const createGuid: () => number;
 /**
- * 判断字符串是否零宽度无断空白字符
+ * 判断字符串是否零宽度空白字符
  */
 export declare const isZeroWidthText: (val: string) => boolean;
 /**
- * 获取一个零宽度无断空白字符
+ * 获取一个零宽度空白字符
  */
 export declare const getZeroWidthText: () => string;
 /**
