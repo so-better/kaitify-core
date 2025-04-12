@@ -12,6 +12,15 @@ import { defaultUpdateView } from '@/view/js-render'
 import { checkNodes, emptyFixedBlock, formatNodes, handlerForNormalInsertParagraph, mergeBlock, mergeExtensions, redressSelection, registerExtension, removeBlockFromParentToSameLevel, setPlaceholder } from './config/function'
 
 /**
+ * 中文输入的记录数据类型
+ */
+export type EditorCompositionDataType = {
+	isInput: boolean
+	oldHtml?: string
+	newHtml?: string
+}
+
+/**
  * 非法dom更新数据类型
  */
 export type EditorObserverUpdateDataType = {
@@ -359,9 +368,13 @@ export class Editor {
 	 */
 	oldStackNodes: KNode[] = []
 	/**
-	 * 是否在输入中文【不可修改】
+	 * 中文输入的记录数据【不可修改】
 	 */
-	isComposition: boolean = false
+	compositionData: EditorCompositionDataType = {
+		isInput: false,
+		oldHtml: undefined,
+		newHtml: undefined
+	}
 	/**
 	 * 是否编辑器内部渲染真实光标引起selctionChange事件【不可修改】
 	 */
@@ -1825,7 +1838,7 @@ export class Editor {
 		//设置placeholder
 		setPlaceholder.apply(this)
 		//旧的html值
-		const oldHtml = this.$el.innerHTML
+		const oldHtml = this.compositionData.oldHtml ?? this.$el.innerHTML
 		//视图更新之前取消dom监听，以免干扰更新dom
 		this.removeDomObserve()
 		//此处进行视图的更新
@@ -1835,7 +1848,7 @@ export class Editor {
 		//视图更新完毕后重新设置dom监听
 		this.setDomObserve()
 		//新的html值
-		const newHtml = this.$el.innerHTML
+		const newHtml = this.compositionData.newHtml ?? this.$el.innerHTML
 		//html值发生变化
 		if (oldHtml != newHtml) {
 			if (typeof this.onChange == 'function') {
@@ -2062,7 +2075,7 @@ export class Editor {
 		this.removeDomObserve()
 		this.domObserver = new MutationObserver(mutationList => {
 			//中文输入的情况下不处理
-			if (this.isComposition) {
+			if (this.compositionData.isInput) {
 				return
 			}
 			//需要更新的数据
