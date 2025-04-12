@@ -904,12 +904,14 @@ editor.updateView() //调用此方法视图才会更新
 - 类型
 
   ```ts
-  getHTML(): string
+  getHTML(filterCssText?: (cssText: string) => boolean): string
   ```
 
 - 详细信息
 
   该方法会返回一个包含 `style` 标签和 `div` 标签的 `html` 内容。自行展示 `html` 内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+
+  该方法提供一个入参，是一个函数，用于自定义需要保留的样式的逻辑，只需要返回一个布尔值即可
 
 - 示例
 

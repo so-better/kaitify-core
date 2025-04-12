@@ -4,6 +4,14 @@ import { History } from './History';
 import { RuleFunctionType } from './config/format-rules';
 import { Extension } from '../extensions';
 /**
+ * 中文输入的记录数据类型
+ */
+export type EditorCompositionDataType = {
+    isInput: boolean;
+    oldHtml?: string;
+    newHtml?: string;
+};
+/**
  * 非法dom更新数据类型
  */
 export type EditorObserverUpdateDataType = {
@@ -341,9 +349,9 @@ export declare class Editor {
      */
     oldStackNodes: KNode[];
     /**
-     * 是否在输入中文【不可修改】
+     * 中文输入的记录数据【不可修改】
      */
-    isComposition: boolean;
+    compositionData: EditorCompositionDataType;
     /**
      * 是否编辑器内部渲染真实光标引起selctionChange事件【不可修改】
      */
@@ -513,8 +521,9 @@ export declare class Editor {
     getContent(): string;
     /**
      * 获取编辑器的html内容，该方法会返回一个包含style标签和div标签的html内容。自行展示html内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+     * cssText用于自定义哪些样式需要保留
      */
-    getHTML(): string;
+    getHTML(filterCssText?: (cssText: string) => boolean): string;
     /**
      * 判断光标是否完全在可视范围内
      */
