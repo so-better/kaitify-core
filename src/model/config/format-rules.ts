@@ -1,5 +1,5 @@
 import { string as DapString } from 'dap-util'
-import { isZeroWidthText } from '@/tools'
+import { getZeroWidthText, isZeroWidthText } from '@/tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
 import { applyMergeNode, convertToBlock, getAllowMergeNode } from './function'
@@ -141,6 +141,21 @@ export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
+ * 针对节点自身：
+ * 1. 统一将文本节点内的\r\n换成\n，解决Windows兼容问题
+ * 2. 统一将文本节点内的&nbsp;（\u00A0）换成普通空格
+ * 3. 统一将文本节点内的零宽度无断空格换成零宽度空格（\uFEFF -> \u200B）
+ */
+export const formatLineBreakText: RuleFunctionType = ({ node }) => {
+	if (node.isText() && !node.isEmpty()) {
+		node.textContent = node
+			.textContent!.replace(/\r\n/g, '\n')
+			.replace(/\u00A0/g, ' ')
+			.replace(/\uFEFF/g, getZeroWidthText())
+	}
+}
+
+/**
  * 针对节点自身：将文本节点内连续的零宽度空白字符合并（光标可能会更新）
  */
 export const formatZeroWidthTextMerge: RuleFunctionType = ({ editor, node }) => {
@@ -169,15 +184,6 @@ export const formatZeroWidthTextMerge: RuleFunctionType = ({ editor, node }) => 
 			i++
 		}
 		node.textContent = val
-	}
-}
-
-/**
- * 针对节点自身：统一将文本节点内的\r\n换成\n，解决Windows兼容问题
- */
-export const formatLineBreakText: RuleFunctionType = ({ node }) => {
-	if (node.isText() && !node.isEmpty()) {
-		node.textContent = node.textContent!.replace(/\r\n/g, '\n')
 	}
 }
 

@@ -292,7 +292,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `333`,
+    value: `333\n33333<p kaitify-node=\"91\"><span kaitify-node=\"92\" style=\"font-weight: bold; font-size: 18px;\">Publications</span></p ><p kaitify-node=\"93\" style=\"line-height: 2.5;\"><span kaitify-node=\"94\" style=\"font-size: 14px; font-weight: bold;\">Lastest metaRLK article</span><span kaitify-node=\"95\"> </span></p ><p kaitify-node=\"96\" style=\"line-height: 2;\"><span kaitify-node=\"98\">Curation,&nbsp;nomenclature,&nbsp;and&nbsp;topological&nbsp;classification&nbsp;of&nbsp;receptor&nbsp;like&nbsp;kinases&nbsp;from&nbsp;528&nbsp;plant&nbsp;species&nbsp;for&nbsp;novel&nbsp;domain&nbsp;discovery&nbsp;and&nbsp;functional&nbsp;inference[J].&nbsp;Molecular&nbsp;Plant,&nbsp;2024,&nbsp;17(4):&nbsp;658-671.&nbsp;&nbsp; </span></p>`,
     extensions: [],
     el: '#editor',
     editable: true,
