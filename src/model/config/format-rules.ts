@@ -145,13 +145,46 @@ export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {
  * 1. 统一将文本节点内的\r\n换成\n，解决Windows兼容问题
  * 2. 统一将文本节点内的&nbsp;（\u00A0）换成普通空格
  * 3. 统一将文本节点内的零宽度无断空格换成零宽度空格（\uFEFF -> \u200B）
+ * 4. 统一将文本节点内的\n后面加上零宽度空白字符
  */
-export const formatLineBreakText: RuleFunctionType = ({ node }) => {
+export const formatLineBreakSpaceText: RuleFunctionType = ({ editor, node }) => {
 	if (node.isText() && !node.isEmpty()) {
+		//先执行1/2/3点的替换逻辑
 		node.textContent = node
 			.textContent!.replace(/\r\n/g, '\n')
 			.replace(/\u00A0/g, ' ')
 			.replace(/\uFEFF/g, getZeroWidthText())
+		//第4点替换之前先判断起点和终点是否在\n上
+		let startInBreak = false
+		let endInBreak = false
+		if (editor.selection.focused()) {
+			if (editor.selection.start!.node.isEqual(node)) {
+				const offset = editor.selection.start!.offset > 0 ? editor.selection.start!.offset - 1 : 0
+				const chart = node.textContent![offset]
+				startInBreak = chart === '\n'
+			}
+			if (editor.selection.end!.node.isEqual(node)) {
+				const offset = editor.selection.end!.offset > 0 ? editor.selection.end!.offset - 1 : 0
+				const chart = node.textContent![offset]
+				endInBreak = chart === '\n'
+			}
+		}
+		//执行第4点的替换逻辑：给\n后面加上零宽度空白字符
+		node.textContent = node.textContent!.replace(/\n/g, (chart, index) => {
+			const nextChart = node.textContent![index + 1]
+			if (!nextChart || !isZeroWidthText(nextChart)) {
+				chart = chart + getZeroWidthText()
+			}
+			return chart
+		})
+		//如果起点在\n上则将起点移动到后面的零宽度空白字符上
+		if (startInBreak) {
+			editor.selection.start!.offset += 1
+		}
+		//如果终点在\n上则将起点移动到后面的零宽度空白字符上
+		if (endInBreak) {
+			editor.selection.end!.offset += 1
+		}
 	}
 }
 

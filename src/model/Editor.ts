@@ -3,7 +3,7 @@ import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNo
 import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse, formatLineBreakText } from './config/format-rules'
+import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onCut, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
@@ -255,7 +255,7 @@ export class Editor {
 	/**
 	 * 编辑器的节点数组格式化规则【初始化后不可修改】【open】
 	 */
-	formatRules: RuleFunctionType[] = [fomratBlockTagParse, formatBlockInChildren, formatUneditableNoodes, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakText, formatSiblingNodesMerge, formatParentNodeMerge]
+	formatRules: RuleFunctionType[] = [fomratBlockTagParse, formatBlockInChildren, formatUneditableNoodes, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakSpaceText, formatSiblingNodesMerge, formatParentNodeMerge]
 	/**
 	 * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
 	 */
@@ -1343,9 +1343,6 @@ export class Editor {
 			//如果在代码块样式内
 			if (!!node.isInCodeBlockStyle()) {
 				this.insertText('\n')
-				const zeroWidthText = KNode.createZeroWidthText()
-				this.insertNode(zeroWidthText)
-				this.setSelectionAfter(zeroWidthText, 'all')
 				if (typeof this.onInsertParagraph == 'function') {
 					this.onInsertParagraph.apply(this, [blockNode])
 				}
