@@ -1,49 +1,50 @@
 .kaitify {
-  display: block;
-  position: relative;
-  font-size: var(--kaitify-font-size);
-  font-family: var(--kaitify-font-family);
-  color: var(--kaitify-font-color);
-  -webkit-font-smoothing: antialiased;
-  text-size-adjust: none;
-  line-height: var(--kaitify-line-height);
-  background: var(--kaitify-background-color);
-  padding: var(--kaitify-padding);
-  overflow-x: hidden;
-  overflow-y: auto;
-  outline: none;
+	display: block;
+	position: relative;
+	font-size: var(--kaitify-font-size);
+	font-family: var(--kaitify-font-family);
+	color: var(--kaitify-font-color);
+	-webkit-font-smoothing: antialiased;
+	text-size-adjust: none;
+	line-height: var(--kaitify-line-height);
+	background: var(--kaitify-background-color);
+	padding: var(--kaitify-padding);
+	overflow-x: hidden;
+	overflow-y: auto;
+	outline: none;
+	white-space: break-spaces; //使用该样式处理空格
 
-  ::selection {
-    background: var(--kaitify-lighter-theme);
-  }
+	::selection {
+		background: var(--kaitify-lighter-theme);
+	}
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+		outline: none;
+	}
 
-  //编辑状态下才有的样式
-  &[contenteditable='true'] {
-    &[kaitify-placeholder].kaitify-showplaceholder::before {
-      content: attr(kaitify-placeholder);
-      position: absolute;
-      left: auto;
-      top: auto;
-      line-height: var(--kaitify-line-height);
-      opacity: 0.5;
-      cursor: text;
-      vertical-align: middle;
-    }
+	//编辑状态下才有的样式
+	&[contenteditable='true'] {
+		&[kaitify-placeholder].kaitify-showplaceholder::before {
+			content: attr(kaitify-placeholder);
+			position: absolute;
+			left: auto;
+			top: auto;
+			line-height: var(--kaitify-line-height);
+			opacity: 0.5;
+			cursor: text;
+			vertical-align: middle;
+		}
 
-    [contenteditable='false']:hover {
-      cursor: not-allowed;
-    }
-  }
+		[contenteditable='false']:hover {
+			cursor: not-allowed;
+		}
+	}
 }
 
 html[kaitify-dark] {
-  color-scheme: dark;
+	color-scheme: dark;
 }

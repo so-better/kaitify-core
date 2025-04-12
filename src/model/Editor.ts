@@ -1279,14 +1279,6 @@ export class Editor {
 				return
 			}
 			const offset = this.selection.start!.offset
-			//不是在拥有代码块样式的块级节点内，则将空格转换成&nbsp;
-			if (!node.isInCodeBlockStyle()) {
-				text = text.replace(/\s/g, () => {
-					const span = document.createElement('span')
-					span.innerHTML = '&nbsp;'
-					return span.innerText
-				})
-			}
 			//光标所在节点是文本节点
 			if (node.isText()) {
 				node.textContent = node.textContent!.substring(0, offset) + text + node.textContent!.substring(offset)
