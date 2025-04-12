@@ -1,67 +1,67 @@
 .kaitify {
-  div[kaitify-task] {
-    display: block;
-    position: relative;
-    margin: 0 0 var(--kaitify-large-margin) 0;
-    padding: 0 0 0 26px;
-    width: 100%;
+	div[kaitify-task] {
+		display: block;
+		position: relative;
+		margin: 0 0 var(--kaitify-large-margin) 0;
+		padding: 0 0 0 26px;
+		width: 100%;
 
-    &:last-child {
-      margin-bottom: 0 !important;
-    }
+		&:last-child {
+			margin-bottom: 0 !important;
+		}
 
-    &::before {
-      position: absolute;
-      left: 0;
-      top: 3px;
-      content: '';
-      width: 15px;
-      height: 15px;
-      border: 1px solid var(--kaitify-theme);
-      border-radius: var(--kaitify-border-radius);
-      user-select: none;
-      touch-action: none;
-      transition: background 200ms;
-    }
+		&::before {
+			position: absolute;
+			left: 0;
+			top: 3px;
+			content: '';
+			width: 15px;
+			height: 15px;
+			border: 1px solid var(--kaitify-theme);
+			border-radius: var(--kaitify-border-radius);
+			user-select: none;
+			touch-action: none;
+			transition: background 200ms;
+		}
 
-    &::after {
-      content: '';
-      position: absolute;
-      left: 5px;
-      top: 4.5px;
-      width: 0px;
-      height: 0px;
-      margin-top: 5px;
-      border: solid var(--kaitify-theme);
-      border-width: 0;
-      transform: rotate(45deg);
-      border-color: #fff;
-      user-select: none;
-      touch-action: none;
-      transition: width 100ms ease-in-out, height 200ms ease-in-out, margin-top 200ms ease-in-out;
-    }
+		&::after {
+			content: '';
+			position: absolute;
+			left: 5px;
+			top: 4.5px;
+			width: 0px;
+			height: 0px;
+			margin-top: 5px;
+			border-style: solid;
+			border-width: 0;
+			transform: rotate(45deg);
+			border-color: #fff;
+			user-select: none;
+			touch-action: none;
+			transition: width 100ms ease-in-out, height 200ms ease-in-out, margin-top 200ms ease-in-out;
+		}
 
-    &[kaitify-task='done'] {
-      text-decoration: line-through;
+		&[kaitify-task='done'] {
+			text-decoration: line-through;
 
-      &::before {
-        background: var(--kaitify-theme);
-      }
+			&::before {
+				background: var(--kaitify-theme);
+			}
 
-      &::after {
-        margin-top: 0;
-        width: 5px;
-        height: 10px;
-        border-width: 0 2px 2px 0;
-      }
-    }
-  }
+			&::after {
+				margin-top: 0;
+				width: 5px;
+				height: 10px;
+				border-width: 0 2px 2px 0;
+			}
+		}
+	}
 
-  &[contenteditable='true'] {
-    div[kaitify-task] {
-      &::before {
-        cursor: pointer;
-      }
-    }
-  }
+	&[contenteditable='true'] {
+		div[kaitify-task] {
+			&::before {
+				cursor: pointer;
+			}
+		}
+	}
 }

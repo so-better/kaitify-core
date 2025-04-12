@@ -1966,21 +1966,27 @@ export class Editor {
 
 	/**
 	 * 获取编辑器的html内容，该方法会返回一个包含style标签和div标签的html内容。自行展示html内容时可保证样式与编辑器一致，但是对于附件等有交互事件的元素交互事件会失效
+	 * cssText用于自定义哪些样式需要保留
 	 */
-	getHTML() {
-		let styles = ''
-		for (const sheet of document.styleSheets) {
-			try {
-				for (const rule of sheet.cssRules) {
-					styles += `${rule.cssText}\n`
+	getHTML(filterCssText?: (cssText: string) => boolean) {
+		//收集所有有效的样式规则
+		const styles = Array.from(document.styleSheets)
+			.flatMap(sheet => {
+				try {
+					return Array.from(sheet.cssRules)
+						.map(rule => rule.cssText)
+						.filter(cssText => cssText.indexOf('kaitify') > -1 || cssText.indexOf('katex') > -1 || filterCssText?.(cssText))
+				} catch (e) {
+					console.warn('Unable to access style sheet:', sheet.href)
+					return []
 				}
-			} catch (e) {
-				console.warn('无法访问样式表')
-			}
-		}
+			})
+			.join('\n')
+		//检查有效性
 		if (!styles || !this.$el) {
 			return ''
 		}
+		//返回带样式的HTML
 		return `<style>${styles}</style><div class="kaitify">${this.$el.innerHTML}</div>`
 	}
 
