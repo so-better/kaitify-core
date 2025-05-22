@@ -299,7 +299,7 @@ onMounted(async () => {
     allowPasteHtml: true,
     placeholder: '请输入内容...',
     afterUpdateView() {
-      count.value = Array.from(this.getContent().trim()).length
+      count.value = Array.from(this.getContent(true, true).trim()).length
     },
     onSelectionUpdate(sel) {
       console.log(sel.start!.node, sel.start!.offset);

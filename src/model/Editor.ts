@@ -1957,13 +1957,20 @@ export class Editor {
 	}
 
 	/**
-	 * 获取编辑器的纯文本内容
+	 * 获取编辑器的纯文本内容，excludeBreak表示是否排除换行符\n，excludeZeroWidthText表示是否排除零宽度空白字符
 	 */
-	getContent() {
+	getContent(excludeBreak = false, excludeZeroWidthText = false) {
 		if (!this.$el) {
 			return ''
 		}
-		return this.$el.textContent?.split(getZeroWidthText()).join('') ?? ''
+		let text = this.$el.textContent ?? ''
+		if (excludeBreak) {
+			text = text.split('\n').join('')
+		}
+		if (excludeZeroWidthText) {
+			text = text.split(getZeroWidthText()).join('')
+		}
+		return text
 	}
 
 	/**
