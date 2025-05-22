@@ -1,6 +1,6 @@
 import { event as DapEvent, element as DapElement } from 'dap-util'
 import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNodeStylesType } from './KNode'
-import { createGuid, delay, getDomAttributes, getDomStyles, initEditorDom, isContains, isZeroWidthText } from '../tools'
+import { createGuid, delay, getDomAttributes, getDomStyles, getZeroWidthText, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { Selection } from './Selection'
 import { History } from './History'
 import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText } from './config/format-rules'
@@ -1963,7 +1963,7 @@ export class Editor {
 		if (!this.$el) {
 			return ''
 		}
-		return this.$el.textContent ?? ''
+		return this.$el.textContent?.split(getZeroWidthText()).join('') ?? ''
 	}
 
 	/**

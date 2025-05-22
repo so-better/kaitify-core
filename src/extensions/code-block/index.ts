@@ -1,351 +1,356 @@
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
-import { isOnlyTab } from '@/tools'
+import { isOnlyTab, isZeroWidthText } from '@/tools'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
 import './style.less'
 
 declare module '../../model' {
-  interface EditorCommandsType {
-    /**
-     * 获取光标所在的代码块节点，如果光标不在一个代码块节点内，返回null
-     */
-    getCodeBlock?: () => KNode | null
-    /**
-     * 判断光标范围内是否有代码块节点
-     */
-    hasCodeBlock?: () => boolean
-    /**
-     * 光标范围内是否都是代码块节点
-     */
-    allCodeBlock?: () => boolean
-    /**
-     * 设置代码块
-     */
-    setCodeBlock?: () => Promise<void>
-    /**
-     * 取消代码块
-     */
-    unsetCodeBlock?: () => Promise<void>
-    /**
-     * 更新光标所在代码块的语言类型
-     */
-    updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>
-  }
+	interface EditorCommandsType {
+		/**
+		 * 获取光标所在的代码块节点，如果光标不在一个代码块节点内，返回null
+		 */
+		getCodeBlock?: () => KNode | null
+		/**
+		 * 判断光标范围内是否有代码块节点
+		 */
+		hasCodeBlock?: () => boolean
+		/**
+		 * 光标范围内是否都是代码块节点
+		 */
+		allCodeBlock?: () => boolean
+		/**
+		 * 设置代码块
+		 */
+		setCodeBlock?: () => Promise<void>
+		/**
+		 * 取消代码块
+		 */
+		unsetCodeBlock?: () => Promise<void>
+		/**
+		 * 更新光标所在代码块的语言类型
+		 */
+		updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>
+	}
 }
 
 /**
  * 块节点转为代码块
  */
 const toCodeBlock = (editor: Editor, node: KNode) => {
-  if (!node.isBlock()) {
-    return
-  }
-  //是固定的块节点或者内嵌套的块节点
-  if (node.fixed || node.nested) {
-    //创建代码块节点
-    const codeBlockNode = KNode.create({
-      type: 'block',
-      tag: 'pre',
-      children: []
-    })
-    //将块节点的子节点给代码块节点
-    node.children!.forEach((item, index) => {
-      editor.addNode(item, codeBlockNode, index)
-    })
-    //将代码块节点添加到块节点下
-    codeBlockNode.parent = node
-    node.children = [codeBlockNode]
-  }
-  //非固定块节点
-  else {
-    editor.toParagraph(node)
-    node.tag = 'pre'
-  }
+	if (!node.isBlock()) {
+		return
+	}
+	//是固定的块节点或者内嵌套的块节点
+	if (node.fixed || node.nested) {
+		//创建代码块节点
+		const codeBlockNode = KNode.create({
+			type: 'block',
+			tag: 'pre',
+			children: []
+		})
+		//将块节点的子节点给代码块节点
+		node.children!.forEach((item, index) => {
+			editor.addNode(item, codeBlockNode, index)
+		})
+		//将代码块节点添加到块节点下
+		codeBlockNode.parent = node
+		node.children = [codeBlockNode]
+	}
+	//非固定块节点
+	else {
+		editor.toParagraph(node)
+		node.tag = 'pre'
+	}
 }
 
 /**
  * 更新代码块内的光标位置
  */
 const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNodes: KNode[]) => {
-  if (!editor.selection.focused()) {
-    return
-  }
-  //如果光标的起点在代码块内对光标的起点进行重新定位
-  if (editor.isSelectionInTargetNode(node, 'start')) {
-    //获取起点所在文本节点的在所有文本节点中的序列
-    const startIndex = textNodes.findIndex(n => editor.selection.start!.node.isEqual(n))
-    //起点在整个代码内容中的位置
-    const offset = textNodes.filter((_n, i) => i < startIndex).reduce((total, item) => total + item.textContent!.length, 0) + editor.selection.start!.offset
-    //获取代码块下新的子孙节点中全部的文本节点
-    const newTextNodes = KNode.flat(newNodes).filter(n => n.isText() && !n.isEmpty())
-    let i = 0
-    let index = 0
-    //遍历
-    while (i < newTextNodes.length) {
-      let newIndex = index + newTextNodes[i].textContent!.length
-      if (offset >= index && offset <= newIndex) {
-        editor.selection.start!.node = newTextNodes[i]
-        editor.selection.start!.offset = offset - index
-        break
-      }
-      i++
-      index = newIndex
-    }
-  }
-  //如果光标的终点在代码块内对光标的终点进行重新定位
-  if (editor.isSelectionInTargetNode(node, 'end')) {
-    //获取终点所在文本节点的在所有文本节点中的序列
-    const endIndex = textNodes.findIndex(n => editor.selection.end!.node.isEqual(n))
-    //终点在整个代码内容中的位置
-    const offset = textNodes.filter((_n, i) => i < endIndex).reduce((total, item) => total + item.textContent!.length, 0) + editor.selection.end!.offset
-    //获取全部的新文本节点
-    const newTextNodes = KNode.flat(newNodes).filter(n => n.isText() && !n.isEmpty())
-    let i = 0
-    let index = 0
-    //遍历
-    while (i < newTextNodes.length) {
-      let newIndex = index + newTextNodes[i].textContent!.length
-      if (offset >= index && offset <= newIndex) {
-        editor.selection.end!.node = newTextNodes[i]
-        editor.selection.end!.offset = offset - index
-        break
-      }
-      i++
-      index = newIndex
-    }
-  }
+	if (!editor.selection.focused()) {
+		return
+	}
+	//如果光标的起点在代码块内对光标的起点进行重新定位
+	if (editor.isSelectionInTargetNode(node, 'start')) {
+		//获取起点所在文本节点的在所有文本节点中的序列
+		const startIndex = textNodes.findIndex(n => editor.selection.start!.node.isEqual(n))
+		//起点在整个代码内容中的位置
+		const offset = textNodes.filter((_n, i) => i < startIndex).reduce((total, item) => total + item.textContent!.length, 0) + editor.selection.start!.offset
+		//获取代码块下新的子孙节点中全部的文本节点
+		const newTextNodes = KNode.flat(newNodes).filter(n => n.isText() && !n.isEmpty())
+		let i = 0
+		let index = 0
+		//遍历
+		while (i < newTextNodes.length) {
+			let newIndex = index + newTextNodes[i].textContent!.length
+			if (offset >= index && offset <= newIndex) {
+				editor.selection.start!.node = newTextNodes[i]
+				editor.selection.start!.offset = offset - index
+				break
+			}
+			i++
+			index = newIndex
+		}
+	}
+	//如果光标的终点在代码块内对光标的终点进行重新定位
+	if (editor.isSelectionInTargetNode(node, 'end')) {
+		//获取终点所在文本节点的在所有文本节点中的序列
+		const endIndex = textNodes.findIndex(n => editor.selection.end!.node.isEqual(n))
+		//终点在整个代码内容中的位置
+		const offset = textNodes.filter((_n, i) => i < endIndex).reduce((total, item) => total + item.textContent!.length, 0) + editor.selection.end!.offset
+		//获取全部的新文本节点
+		const newTextNodes = KNode.flat(newNodes).filter(n => n.isText() && !n.isEmpty())
+		let i = 0
+		let index = 0
+		//遍历
+		while (i < newTextNodes.length) {
+			let newIndex = index + newTextNodes[i].textContent!.length
+			if (offset >= index && offset <= newIndex) {
+				editor.selection.end!.node = newTextNodes[i]
+				editor.selection.end!.offset = offset - index
+				break
+			}
+			i++
+			index = newIndex
+		}
+	}
 }
 
 /**
  * 判断代码块是否需要更新
  */
 const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent: string) => {
-  try {
-    const domPre = editor.findDom(node)
-    if (domPre && domPre.nodeName.toLocaleLowerCase() == 'pre') {
-      //语言不一致
-      const oldLanguage = domPre.getAttribute('kaitify-hljs') || ''
-      if (oldLanguage != language) {
-        return true
-      }
-      //文本内容不一致
-      const oldTextContent = domPre.innerText
-      if (oldTextContent != textContent) {
-        return true
-      }
-      //子孙节点数量不一致（防止在代码块里插入非文本节点，比如图片等）
-      if (KNode.flat(node.children!).length != domPre.querySelectorAll('*').length) {
-        return true
-      }
-      return false
-    }
-    return true
-  } catch (error) {
-    return true
-  }
+	try {
+		const domPre = editor.findDom(node)
+		if (domPre && domPre.nodeName.toLocaleLowerCase() == 'pre') {
+			//语言不一致
+			const oldLanguage = domPre.getAttribute('kaitify-hljs') || ''
+			if (oldLanguage != language) {
+				return true
+			}
+			//文本内容不一致
+			const oldTextContent = domPre.innerText
+			if (oldTextContent != textContent) {
+				return true
+			}
+			//子孙节点数量不一致（防止在代码块里插入非文本节点，比如图片等）
+			if (KNode.flat(node.children!).length != domPre.querySelectorAll('*').length) {
+				return true
+			}
+			return false
+		}
+		return true
+	} catch (error) {
+		return true
+	}
 }
 
 export const CodeBlockExtension = () =>
-  Extension.create({
-    name: 'codeBlock',
-    extraKeepTags: ['pre'],
-    domParseNodeCallback(node) {
-      if (node.isMatch({ tag: 'pre' })) {
-        node.type = 'block'
-      }
-      return node
-    },
-    pasteKeepMarks(node) {
-      const marks: KNodeMarksType = {}
-      if (node.isMatch({ tag: 'pre' }) && node.hasMarks()) {
-        if (node.marks!.hasOwnProperty('kaitify-hljs')) marks['kaitify-hljs'] = node.marks!['kaitify-hljs']
-      }
-      return marks
-    },
-    beforePatchNodeToFormat(node) {
-      const codeBlockNode = node.getMatchNode({ tag: 'pre' })
-      if (codeBlockNode) return codeBlockNode
-      return node
-    },
-    formatRules: [
-      //代码块高亮处理
-      ({ editor, node }) => {
-        if (node.isMatch({ tag: 'pre' }) && node.hasChildren()) {
-          //代码块必须是块节点
-          if (!node.isBlock()) node.type = 'block'
-          //获取语言类型
-          let language = (node.marks?.['kaitify-hljs'] || '') as string
-          //语言存在但不是列表内的
-          if (language && !HljsLanguages.some(item => item == language)) {
-            language = ''
-          }
-          //获取代码块内的所有文本节点
-          const textNodes = KNode.flat(node.children!).filter(item => item.isText() && !item.isEmpty())
-          //获取代码块内的代码文本值
-          const textContent = textNodes.reduce((val, item) => {
-            return val + item.textContent
-          }, '')
-          //只有代码块语言改变和内容改变才需要重新进行高亮处理
-          if (isNeedUpdate(editor, node, language, textContent)) {
-            //将文本节点的内容转为经过hljs处理的内容
-            const html = getHljsHtml(textContent, language)
-            if (html) {
-              //将经过hljs处理的内容转为节点数组
-              const nodes = editor.htmlParseNode(html)
-              //将新的文本节点全部加入到代码块的子节点数组中
-              node.children = nodes.map(item => {
-                item.parent = node
-                return item
-              })
-              //更新光标位置
-              updateSelection(editor, node, textNodes, nodes)
-            } else {
-              const selectionStartInNode = editor.isSelectionInTargetNode(node, 'start')
-              const selectionEndInNode = editor.isSelectionInTargetNode(node, 'end')
-              const placeholderNode = KNode.createPlaceholder()
-              node.children = [placeholderNode]
-              placeholderNode.parent = node
-              if (selectionStartInNode) {
-                editor.setSelectionBefore(placeholderNode, 'start')
-              }
-              if (selectionEndInNode) {
-                editor.setSelectionBefore(placeholderNode, 'end')
-              }
-            }
-          }
-        }
-      }
-    ],
-    onKeydown(event) {
-      if (isOnlyTab(event)) {
-        const codeBlock = this.commands.getCodeBlock?.()
-        if (!!codeBlock) {
-          event.preventDefault()
-          this.insertText('  ')
-          this.updateView()
-        }
-      }
-    },
-    onInsertParagraph(node) {
-      //获取代码块节点
-      const codeBlockNode = node.getMatchNode({
-        tag: 'pre'
-      })
-      //在代码块节点内并且光标所在节点是文本节点
-      if (!!codeBlockNode && this.selection.start!.node.isText()) {
-        //获取父节点
-        const parentNode = this.selection.start!.node.parent!
-        //获取前一个兄弟节点
-        const previousNode = this.selection.start!.node.getPrevious(parentNode.children!)
-        //获取后一个兄弟节点
-        const nextNode = this.selection.start!.node.getNext(parentNode.children!)
-        //前一个兄弟节点存在并且是文本节点并且是以两个换行符结尾（换行符之间有空白文本字符），并且后一个兄弟节点不存在
-        if (previousNode && previousNode.isText() && /\n(\s*)\n$/.test(previousNode.textContent!) && !nextNode) {
-          //清除这两个换行符
-          previousNode.textContent = previousNode.textContent!.replace(/\n(\s*)\n$/, '')
-          //插入段落到代码块节点后
-          const paragraph = KNode.create({
-            type: 'block',
-            tag: this.blockRenderTag,
-            children: [
-              {
-                type: 'closed',
-                tag: 'br'
-              }
-            ]
-          })
-          this.addNodeAfter(paragraph, codeBlockNode)
-          //重新设置光标
-          this.setSelectionBefore(paragraph, 'all')
-        }
-      }
-    },
-    addCommands() {
-      const getCodeBlock = () => {
-        return this.getMatchNodeBySelection({
-          tag: 'pre'
-        })
-      }
+	Extension.create({
+		name: 'codeBlock',
+		extraKeepTags: ['pre'],
+		domParseNodeCallback(node) {
+			if (node.isMatch({ tag: 'pre' })) {
+				node.type = 'block'
+			}
+			return node
+		},
+		pasteKeepMarks(node) {
+			const marks: KNodeMarksType = {}
+			if (node.isMatch({ tag: 'pre' }) && node.hasMarks()) {
+				if (node.marks!.hasOwnProperty('kaitify-hljs')) marks['kaitify-hljs'] = node.marks!['kaitify-hljs']
+			}
+			return marks
+		},
+		beforePatchNodeToFormat(node) {
+			const codeBlockNode = node.getMatchNode({ tag: 'pre' })
+			if (codeBlockNode) return codeBlockNode
+			return node
+		},
+		formatRules: [
+			//代码块高亮处理
+			({ editor, node }) => {
+				if (node.isMatch({ tag: 'pre' }) && node.hasChildren()) {
+					//代码块必须是块节点
+					if (!node.isBlock()) node.type = 'block'
+					//获取语言类型
+					let language = (node.marks?.['kaitify-hljs'] || '') as string
+					//语言存在但不是列表内的
+					if (language && !HljsLanguages.some(item => item == language)) {
+						language = ''
+					}
+					//获取代码块内的所有文本节点
+					const textNodes = KNode.flat(node.children!).filter(item => item.isText() && !item.isEmpty())
+					//获取代码块内的代码文本值
+					const textContent = textNodes.reduce((val, item) => {
+						return val + item.textContent
+					}, '')
+					//只有代码块语言改变和内容改变才需要重新进行高亮处理
+					if (isNeedUpdate(editor, node, language, textContent)) {
+						//将文本节点的内容转为经过hljs处理的内容
+						const html = getHljsHtml(textContent, language)
+						if (html) {
+							//将经过hljs处理的内容转为节点数组
+							const nodes = editor.htmlParseNode(html)
+							//将新的文本节点全部加入到代码块的子节点数组中
+							node.children = nodes.map(item => {
+								item.parent = node
+								return item
+							})
+							//更新光标位置
+							updateSelection(editor, node, textNodes, nodes)
+						} else {
+							const selectionStartInNode = editor.isSelectionInTargetNode(node, 'start')
+							const selectionEndInNode = editor.isSelectionInTargetNode(node, 'end')
+							const placeholderNode = KNode.createPlaceholder()
+							node.children = [placeholderNode]
+							placeholderNode.parent = node
+							if (selectionStartInNode) {
+								editor.setSelectionBefore(placeholderNode, 'start')
+							}
+							if (selectionEndInNode) {
+								editor.setSelectionBefore(placeholderNode, 'end')
+							}
+						}
+					}
+				}
+			}
+		],
+		onKeydown(event) {
+			if (isOnlyTab(event)) {
+				const codeBlock = this.commands.getCodeBlock?.()
+				if (!!codeBlock) {
+					event.preventDefault()
+					this.insertText('  ')
+					this.updateView()
+				}
+			}
+		},
+		onInsertParagraph(node) {
+			//获取代码块节点
+			const codeBlockNode = node.getMatchNode({
+				tag: 'pre'
+			})
+			//在代码块节点内并且光标所在节点是文本节点
+			if (!!codeBlockNode && this.selection.start!.node.isText()) {
+				const index = this.selection.start!.offset === 0 ? 0 : this.selection.start!.offset - 1
+				const textContent = this.selection.start!.node.textContent!
+				//当前字符
+				const currentChar = textContent.charAt(index)
+				//当前字符前一个字符
+				const p1Char = index - 1 >= 0 ? textContent.charAt(index - 1) : null
+				//当前字符前两个字符
+				const p2Char = index - 2 >= 0 ? textContent.charAt(index - 2) : null
+				//当前字符是否文本节点的最后一个字符
+				const isLastChar = index === textContent.length - 1
+				//当前节点是否该代码块内最后一个节点
+				const isLastText = this.selection.start!.node.lastInTargetNode(codeBlockNode)
+				if (currentChar === '\n' && p1Char !== null && p2Char !== null && isZeroWidthText(p1Char) && p2Char === '\n' && isLastChar && isLastText) {
+					//清除这两个换行符和后面的零宽度字符
+					this.selection.start!.node.textContent = this.selection.start!.node.textContent!.slice(0, index - 2)
+					//插入段落到代码块节点后
+					const paragraph = KNode.create({
+						type: 'block',
+						tag: this.blockRenderTag,
+						children: [
+							{
+								type: 'closed',
+								tag: 'br'
+							}
+						]
+					})
+					this.addNodeAfter(paragraph, codeBlockNode)
+					//重新设置光标
+					this.setSelectionBefore(paragraph, 'all')
+				}
+			}
+		},
+		addCommands() {
+			const getCodeBlock = () => {
+				return this.getMatchNodeBySelection({
+					tag: 'pre'
+				})
+			}
 
-      const hasCodeBlock = () => {
-        return this.isSelectionNodesSomeMatch({
-          tag: 'pre'
-        })
-      }
+			const hasCodeBlock = () => {
+				return this.isSelectionNodesSomeMatch({
+					tag: 'pre'
+				})
+			}
 
-      const allCodeBlock = () => {
-        return this.isSelectionNodesAllMatch({
-          tag: 'pre'
-        })
-      }
+			const allCodeBlock = () => {
+				return this.isSelectionNodesAllMatch({
+					tag: 'pre'
+				})
+			}
 
-      const setCodeBlock = async () => {
-        if (allCodeBlock()) {
-          return
-        }
-        //起点和终点在一起
-        if (this.selection.collapsed()) {
-          const blockNode = this.selection.start!.node.getBlock()
-          toCodeBlock(this, blockNode)
-        }
-        //起点和终点不在一起
-        else {
-          const blockNodes = getSelectionBlockNodes.apply(this)
-          blockNodes.forEach(item => {
-            toCodeBlock(this, item)
-          })
-        }
-        await this.updateView()
-      }
+			const setCodeBlock = async () => {
+				if (allCodeBlock()) {
+					return
+				}
+				//起点和终点在一起
+				if (this.selection.collapsed()) {
+					const blockNode = this.selection.start!.node.getBlock()
+					toCodeBlock(this, blockNode)
+				}
+				//起点和终点不在一起
+				else {
+					const blockNodes = getSelectionBlockNodes.apply(this)
+					blockNodes.forEach(item => {
+						toCodeBlock(this, item)
+					})
+				}
+				await this.updateView()
+			}
 
-      const unsetCodeBlock = async () => {
-        if (!allCodeBlock()) {
-          return
-        }
-        //起点和终点在一起
-        if (this.selection.collapsed()) {
-          const matchNode = this.selection.start!.node.getMatchNode({ tag: 'pre' })
-          if (matchNode) this.toParagraph(matchNode)
-        }
-        //起点和终点不在一起
-        else {
-          const blockNodes = getSelectionBlockNodes.apply(this)
-          blockNodes.forEach(item => {
-            const matchNode = item.getMatchNode({ tag: 'pre' })
-            if (matchNode) this.toParagraph(matchNode)
-          })
-        }
-        await this.updateView()
-      }
+			const unsetCodeBlock = async () => {
+				if (!allCodeBlock()) {
+					return
+				}
+				//起点和终点在一起
+				if (this.selection.collapsed()) {
+					const matchNode = this.selection.start!.node.getMatchNode({ tag: 'pre' })
+					if (matchNode) this.toParagraph(matchNode)
+				}
+				//起点和终点不在一起
+				else {
+					const blockNodes = getSelectionBlockNodes.apply(this)
+					blockNodes.forEach(item => {
+						const matchNode = item.getMatchNode({ tag: 'pre' })
+						if (matchNode) this.toParagraph(matchNode)
+					})
+				}
+				await this.updateView()
+			}
 
-      const updateCodeBlockLanguage = async (language?: HljsLanguageType) => {
-        if (!this.selection.focused()) {
-          return
-        }
-        const codeBlockNode = getCodeBlock()
-        if (!codeBlockNode) {
-          return
-        }
-        if (codeBlockNode.hasMarks()) {
-          codeBlockNode.marks!['kaitify-hljs'] = language || ''
-        } else {
-          codeBlockNode.marks = {
-            'kaitify-hljs': language || ''
-          }
-        }
-        await this.updateView()
-      }
+			const updateCodeBlockLanguage = async (language?: HljsLanguageType) => {
+				if (!this.selection.focused()) {
+					return
+				}
+				const codeBlockNode = getCodeBlock()
+				if (!codeBlockNode) {
+					return
+				}
+				if (codeBlockNode.hasMarks()) {
+					codeBlockNode.marks!['kaitify-hljs'] = language || ''
+				} else {
+					codeBlockNode.marks = {
+						'kaitify-hljs': language || ''
+					}
+				}
+				await this.updateView()
+			}
 
-      return {
-        getCodeBlock,
-        hasCodeBlock,
-        allCodeBlock,
-        setCodeBlock,
-        unsetCodeBlock,
-        updateCodeBlockLanguage
-      }
-    }
-  })
+			return {
+				getCodeBlock,
+				hasCodeBlock,
+				allCodeBlock,
+				setCodeBlock,
+				unsetCodeBlock,
+				updateCodeBlockLanguage
+			}
+		}
+	})
 
 export * from './hljs'

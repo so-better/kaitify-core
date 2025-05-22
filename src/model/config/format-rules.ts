@@ -154,19 +154,18 @@ export const formatLineBreakSpaceText: RuleFunctionType = ({ editor, node }) => 
 			.textContent!.replace(/\r\n/g, '\n')
 			.replace(/\u00A0/g, ' ')
 			.replace(/\uFEFF/g, getZeroWidthText())
-		//第4点替换之前先判断起点和终点是否在\n上
-		let startInBreak = false
-		let endInBreak = false
+		//第4点替换之前先判断起点和终点前面有几个\n\u200B
+		let startPrevNumber = 0
+		let endPrevNumber = 0
+		const regExp = new RegExp(`\\n(?!${getZeroWidthText()})`, 'g')
 		if (editor.selection.focused()) {
 			if (editor.selection.start!.node.isEqual(node)) {
-				const offset = editor.selection.start!.offset > 0 ? editor.selection.start!.offset - 1 : 0
-				const chart = node.textContent![offset]
-				startInBreak = chart === '\n'
+				const preText = editor.selection.start!.offset > 0 ? node.textContent!.slice(0, editor.selection.start!.offset) : ''
+				startPrevNumber = (preText.match(regExp) || []).length
 			}
 			if (editor.selection.end!.node.isEqual(node)) {
-				const offset = editor.selection.end!.offset > 0 ? editor.selection.end!.offset - 1 : 0
-				const chart = node.textContent![offset]
-				endInBreak = chart === '\n'
+				const preText = editor.selection.end!.offset > 0 ? node.textContent!.slice(0, editor.selection.end!.offset) : ''
+				endPrevNumber = (preText.match(regExp) || []).length
 			}
 		}
 		//执行第4点的替换逻辑：给\n后面加上零宽度空白字符
@@ -178,12 +177,12 @@ export const formatLineBreakSpaceText: RuleFunctionType = ({ editor, node }) => 
 			return chart
 		})
 		//如果起点在\n上则将起点移动到后面的零宽度空白字符上
-		if (startInBreak) {
-			editor.selection.start!.offset += 1
+		if (startPrevNumber > 0) {
+			editor.selection.start!.offset += startPrevNumber
 		}
 		//如果终点在\n上则将起点移动到后面的零宽度空白字符上
-		if (endInBreak) {
-			editor.selection.end!.offset += 1
+		if (endPrevNumber > 0) {
+			editor.selection.end!.offset += endPrevNumber
 		}
 	}
 }
