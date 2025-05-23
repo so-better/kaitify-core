@@ -301,10 +301,6 @@ onMounted(async () => {
     afterUpdateView() {
       count.value = Array.from(this.getContent(true, true).trim()).length
     },
-    onSelectionUpdate(sel) {
-      console.log(sel.start!.node, sel.start!.offset);
-
-    }
   })
 })
 

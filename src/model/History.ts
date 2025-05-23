@@ -108,6 +108,7 @@ export class History {
    * 更新当前记录的编辑器的光标
    */
   updateSelection(selection: Selection) {
+    if (this.records.length === 0) return
     const record = this.records[this.records.length - 1]
     const newSelection = this.cloneSelection(record.nodes, selection)
     this.records[this.records.length - 1].selection = newSelection
