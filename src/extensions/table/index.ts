@@ -409,6 +409,8 @@ const tableResizable = (editor: Editor) => {
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
+    //设置可拖拽区域宽度
+    margin: 5,
     //设置鼠标样式
     cursorChecker(_action, _interactable, element, _interacting) {
       return editor.isEditable() && element.nextElementSibling ? 'ew-resize' : 'default'

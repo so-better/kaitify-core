@@ -81,6 +81,8 @@ const videoResizable = (editor: Editor) => {
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
+    //设置可拖拽区域宽度
+    margin: 5,
     //设置鼠标样式
     cursorChecker() {
       return editor.isEditable() ? 'ew-resize' : 'default'

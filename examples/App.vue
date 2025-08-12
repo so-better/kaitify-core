@@ -193,7 +193,7 @@
         <legend>图片</legend>
         <div class="toolbar">
           <button
-            @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg!/fh/333/quality/95/unsharp/true/compress/true', alt: '图片加载失败', width: '200px' })">插入图片</button>
+            @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg', alt: '图片加载失败', width: '200px' })">插入图片</button>
         </div>
       </fieldset>
       <fieldset>
