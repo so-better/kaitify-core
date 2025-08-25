@@ -261,16 +261,16 @@
         <div class="toolbar">
           <button @click="editor?.commands.setTable!({ rows: 5, columns: 5 })">插入 5 x 5 表格</button>
           <button @click="editor?.commands.unsetTable!()">删除表格</button>
-          <button @click="editor?.commands.addColumn!('right')">向右插入列</button>
-          <button @click="editor?.commands.addColumn!('left')">向左插入列</button>
-          <button @click="editor?.commands.addRow!('top')">向上插入行</button>
-          <button @click="editor?.commands.addRow!('bottom')">向下插入行</button>
-          <button @click="editor?.commands.mergeCell!('left')">向左合并单元格</button>
-          <button @click="editor?.commands.mergeCell!('right')">向右合并单元格</button>
-          <button @click="editor?.commands.mergeCell!('top')">向上合并单元格</button>
-          <button @click="editor?.commands.mergeCell!('bottom')">向下合并单元格</button>
-          <button @click="editor?.commands.deleteRow!()">删除行</button>
-          <button @click="editor?.commands.deleteColumn!()">删除列</button>
+          <button @click="editor?.commands.addTableColumn!('right')">向右插入列</button>
+          <button @click="editor?.commands.addTableColumn!('left')">向左插入列</button>
+          <button @click="editor?.commands.addTableRow!('top')">向上插入行</button>
+          <button @click="editor?.commands.addTableRow!('bottom')">向下插入行</button>
+          <button @click="editor?.commands.mergeTableCell!('left')">向左合并单元格</button>
+          <button @click="editor?.commands.mergeTableCell!('right')">向右合并单元格</button>
+          <button @click="editor?.commands.mergeTableCell!('top')">向上合并单元格</button>
+          <button @click="editor?.commands.mergeTableCell!('bottom')">向下合并单元格</button>
+          <button @click="editor?.commands.deleteTableRow!()">删除行</button>
+          <button @click="editor?.commands.deleteTableColumn!()">删除列</button>
         </div>
       </fieldset>
     </div>
@@ -292,7 +292,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<pre kaitify-node="18"><span kaitify-node="1228">4\n\u200B\n\u200B3</span></pre>`,
+    value: ``,
     extensions: [],
     el: '#editor',
     editable: true,
