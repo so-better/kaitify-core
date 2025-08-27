@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.35 <Badge type="tip" text='2025.08.27' />
+
+- `Attachment` `Math` 和 `Horizontal`拓展的表现优化
+
 ## v0.0.1-beta.34 <Badge type="tip" text='2025.08.27' />
 
 - `Video` `Image` `Table`等扩展设定可拖拽的边缘大小

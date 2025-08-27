@@ -292,7 +292,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: ``,
+    value: `<hr/>`,
     extensions: [],
     el: '#editor',
     editable: true,

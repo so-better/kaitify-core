@@ -115,9 +115,13 @@ const attachmentFocus = (editor: Editor) => {
       }
     })
     if (matchNode) {
-      editor.setSelectionBefore(matchNode, 'start')
-      editor.setSelectionAfter(matchNode, 'end')
-      editor.updateRealSelection()
+      const previousNode = editor.getPreviousSelectionNode(matchNode)
+      const nextNode = editor.getNextSelectionNode(matchNode)
+      if (previousNode && nextNode) {
+        editor.setSelectionAfter(previousNode, 'start')
+        editor.setSelectionBefore(nextNode, 'end')
+        editor.updateRealSelection()
+      }
     }
   })
 }
@@ -195,10 +199,8 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
               }
             }
           })
-          //没有不可编辑标记的话需要设置
-          if (node.marks!['contenteditable'] != 'false') {
-            node.marks!['contenteditable'] = 'false'
-          }
+          //设置不可编辑标记
+          node.marks!['contenteditable'] = 'false'
           //两侧设置空白元素
           const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
           const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
@@ -214,12 +216,28 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
           }
           //重置光标
           if (editor.isSelectionInTargetNode(node, 'start')) {
-            const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-            if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
+            //如果起点位置在该附件的开始处
+            if (editor.selection.start && editor.selection.start.offset === 0) {
+              const newTextNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+              if (newTextNode) editor.setSelectionAfter(newTextNode, 'start')
+            }
+            //不在开始处，则说明在末尾处
+            else {
+              const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+              if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
+            }
           }
           if (editor.isSelectionInTargetNode(node, 'end')) {
-            const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-            if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
+            //如果终点位置在该附件的开始处
+            if (editor.selection.end && editor.selection.end.offset === 0) {
+              const newTextNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
+              if (newTextNode) editor.setSelectionAfter(newTextNode, 'end')
+            }
+            //不在开始处，则说明在末尾处
+            else {
+              const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
+              if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
+            }
           }
         }
       }
