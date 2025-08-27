@@ -5,6 +5,11 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.34 <Badge type="tip" text='2025.08.27' />
+
+- `Video` `Image` `Table`等扩展设定可拖拽的边缘大小
+- 代码优化
+
 ## v0.0.1-beta.33 <Badge type="tip" text='2025.05.23' />
 
 - `getContent` 方法新增两个入参，分别表示是否排除 `\n` 换行符、是否排除零宽度空白字符
