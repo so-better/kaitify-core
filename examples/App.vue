@@ -245,8 +245,9 @@
         <legend>附件</legend>
         <div class="toolbar">
           <button
-            @click="editor?.commands.setAttachment!({ url: 'https://www.so-better.cn/static/attachments/QM6cgjq8GPzY1_c2Ol1GIS68.jpg', text: '附件图片' })">上传附件</button>
-          <button @click="editor?.commands.updateAttachment!({ url: '#', text: '附件2' })">更新附件</button>
+            @click="editor?.commands.setAttachment!({ url: 'https://img1.baidu.com/it/u=1097951435,212878480&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1428', text: '附件图片' })">上传附件</button>
+          <button
+            @click="editor?.commands.updateAttachment!({ url: 'https://img0.baidu.com/it/u=269587204,3994517811&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1345', text: '附件图片2' })">更新附件</button>
         </div>
       </fieldset>
       <fieldset>
