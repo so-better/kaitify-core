@@ -285,7 +285,7 @@
 import { onMounted, ref } from 'vue'
 import { Editor, KNode, AttachmentExtension } from '../src'
 import { content } from './content'
-import { delay } from '../src/tools'
+import { delay, isContains } from '../src/tools'
 
 const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
@@ -321,18 +321,22 @@ const getHtml = () => {
 
 const illegaInsert = async (num: 0 | 1) => {
   if (num === 0) {
-    const range = document.getSelection()!.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(document.createTextNode('非法文本'));
+    const range = document.getSelection()?.getRangeAt(0);
+    if (range && editor.value && isContains(editor.value.$el!, range.commonAncestorContainer)) {
+      range.deleteContents();
+      range.insertNode(document.createTextNode('非法文本'));
+    }
   }
   else {
     for (let i = 0; i < 10; i++) {
       const elm = document.createElement('p')
       elm.innerHTML = `非法dom${i + 1}`
-      const range = document.getSelection()!.getRangeAt(0);
-      range.deleteContents();
-      range.insertNode(elm);
-      await delay()
+      const range = document.getSelection()?.getRangeAt(0);
+      if (range && editor.value && isContains(editor.value.$el!, range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(elm);
+        await delay()
+      }
     }
   }
 }
