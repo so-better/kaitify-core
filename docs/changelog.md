@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.37 <Badge type="tip" text='2025.09.03' />
+
+- 修复了当段落进行缩进时，行内代码、图片、视频、数学公式等样式为 `inline-block` 的元素也进行了缩进的问题
+
 ## v0.0.1-beta.36 <Badge type="tip" text='2025.09.03' />
 
 - 优化了 `Attachment` 的样式
