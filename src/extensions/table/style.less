@@ -1,3 +1,6 @@
+@backColor: #f1f2f3;
+@darkBackColor: #2a2a2a;
+
 .kaitify {
   table {
     display: table;
@@ -15,7 +18,7 @@
     }
 
     tr:first-child {
-      background: #f1f2f3;
+      background: @backColor;
 
       td {
         font-weight: bold;
@@ -23,7 +26,7 @@
     }
 
     tr:nth-child(2n + 3) {
-      background: fade(#f1f2f3, 20);
+      background: fade(@backColor, 20);
     }
   }
 
@@ -34,7 +37,7 @@
         transition: background 300ms;
 
         &:hover {
-          background: fade(#f1f2f3, 50);
+          background: fade(@backColor, 50);
         }
       }
     }
@@ -44,7 +47,7 @@
 :root[kaitify-dark] .kaitify {
   table {
     tr:first-child {
-      background: #2a2a2a;
+      background: @darkBackColor;
 
       td {
         font-weight: bold;
@@ -52,7 +55,7 @@
     }
 
     tr:nth-child(2n + 3) {
-      background: fade(#2a2a2a, 20);
+      background: fade(@darkBackColor, 20);
     }
   }
 
@@ -63,7 +66,7 @@
         transition: background 300ms;
 
         &:hover {
-          background: fade(#2a2a2a, 50);
+          background: fade(@darkBackColor, 50);
         }
       }
     }

@@ -1,15 +1,18 @@
+@import url(../code-block/var.less);
+
 .kaitify code {
-	display: inline-block;
-	padding: 4px;
-	margin: 0 var(--kaitify-sides-between);
-	border-radius: var(--kaitify-border-radius);
-	font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
-	background: #fafcff;
-	border: 1px solid #ebebeb;
-	color: var(--kaitify-font-color);
-	line-height: 1;
+  display: inline-block;
+  padding: 3px;
+  margin: 0 var(--kaitify-sides-between);
+  border-radius: var(--kaitify-border-radius);
+  font-family: Consolas, monospace, Monaco, Andale Mono, Ubuntu Mono;
+  background: @backColor;
+  border: 1px solid @borderColor;
+  color: var(--kaitify-font-color);
+  line-height: 1;
 }
 
 :root[kaitify-dark] .kaitify code {
-	background: #29292d;
+  background: @darkBackColor;
+  border-color: @darkBorderColor;
 }

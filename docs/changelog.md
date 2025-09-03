@@ -5,9 +5,20 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.1-beta.36 <Badge type="tip" text='2025.09.03' />
+
+- 优化了 `Attachment` 的样式
+- 优化了 `Blockquote` 的样式
+- 优化了 `Code` 的样式
+- 优化了 `CodeBlock` 的样式
+- 优化了 `Link` 的样式
+- 优化了 `Math` 的样式
+- 优化了 `Table` 的样式
+- 引用节点优化：在创建时如果子节点无块节点，会在引用内创建一个段落节点
+
 ## v0.0.1-beta.35 <Badge type="tip" text='2025.08.27' />
 
-- `Attachment` `Math` 和 `Horizontal`拓展的表现优化
+- `Attachment` `Math` 和 `Horizontal`扩展的表现优化
 
 ## v0.0.1-beta.34 <Badge type="tip" text='2025.08.27' />
 
@@ -36,7 +47,7 @@ title: 更新日志
 
 - `Editor` 新增实例方法 `setDomObserve`，用于监听编辑器内的非法 `dom` 操作
 - `Editor` 新增实例方法 `removeDomObserve`，用于取消监听编辑器内的非法 `dom` 操作
-- 修复了 `Image` 和 `Video` 拓展内的图片和视频无法拖拽改变大小的 bug
+- 修复了 `Image` 和 `Video` 扩展内的图片和视频无法拖拽改变大小的 bug
 
 ## v0.0.1-beta.27 <Badge type="tip" text='2025.04.02' />
 
@@ -50,7 +61,7 @@ title: 更新日志
 
 ## v0.0.1-beta.24 <Badge type="tip" text='2025.03.15' />
 
-- 待办拓展优化：勾选的动画效果优化和样式优化（现在复选框始终只会显示在待办的顶部，而不是和之前一样居中）
+- 待办扩展优化：勾选的动画效果优化和样式优化（现在复选框始终只会显示在待办的顶部，而不是和之前一样居中）
 - 优化不可编辑节点的整体逻辑，在删除、换行、插入等操作时都被视为整体进行处理
 - 编辑可编辑下单击附件和数学公式会选中附件和数学公式
 - 代码块换行逻辑优化：代码块内最后一行如果没有内容，此时再进行换行会在整个代码块后进行换行
@@ -67,8 +78,8 @@ title: 更新日志
 ## v0.0.1-beta.20 <Badge type="tip" text='2025.03.10' />
 
 - 代码优化，解决了 `Grammarly` 插入的问题
-- `indent` 拓展新增 `canUseIndent` 指令，用于判断是否可以使用缩进功能
-- `indent` 拓展新增键盘事件：`tab` 键按下增加缩进；`shift+tab` 键按下减少缩进
+- `indent` 扩展新增 `canUseIndent` 指令，用于判断是否可以使用缩进功能
+- `indent` 扩展新增键盘事件：`tab` 键按下增加缩进；`shift+tab` 键按下减少缩进
 
 ## v0.0.1-beta.19 <Badge type="tip" text='2025.03.08' />
 
@@ -89,15 +100,15 @@ title: 更新日志
 
 ## v0.0.1-beta.17 <Badge type="tip" text='2025.01.24' />
 
-- 代码块拓展新增键盘事件：在代码块内按下 `Tab` 键会插入 2 个空格
+- 代码块扩展新增键盘事件：在代码块内按下 `Tab` 键会插入 2 个空格
 - 部分代码优化
 
 ## v0.0.1-beta.16 <Badge type="tip" text='2025.01.23' />
 
 - 列表优化：现在会给默认的列表节点设置 `listStyleType` 样式
-- 列表拓展 `unsetList` 方法问题修复
-- 列表拓展新增 `canCreateInnerList` 和 `createInnertList` 命令
-- 列表拓展新增键盘事件：在可以生成内嵌列表时，按下 `Tab` 键会执行 `createInnertList` 命令
+- 列表扩展 `unsetList` 方法问题修复
+- 列表扩展新增 `canCreateInnerList` 和 `createInnertList` 命令
+- 列表扩展新增键盘事件：在可以生成内嵌列表时，按下 `Tab` 键会执行 `createInnertList` 命令
 
 ## v0.0.1-beta.13 <Badge type="tip" text='2025.01.06' />
 

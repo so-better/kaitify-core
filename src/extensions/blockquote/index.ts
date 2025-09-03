@@ -35,6 +35,8 @@ const toBlockquote = (editor: Editor, node: KNode) => {
   if (!node.isBlock()) {
     return
   }
+  //子节点非块节点
+  const notBlock = !node.children![0].isBlock()
   //是固定的块节点或者内嵌套的块节点
   if (node.fixed || node.nested) {
     //创建引用节点
@@ -43,10 +45,28 @@ const toBlockquote = (editor: Editor, node: KNode) => {
       tag: 'blockquote',
       children: []
     })
-    //将块节点的子节点给引用节点
-    node.children!.forEach((item, index) => {
-      editor.addNode(item, blockquoteNode, index)
-    })
+    //子节点无块节点
+    if (notBlock) {
+      //创建一个段落节点
+      const paragraph = KNode.create({
+        type: 'block',
+        tag: editor.blockRenderTag,
+        children: []
+      })
+      //将块节点的子节点给段落节点
+      node.children!.forEach((item, index) => {
+        editor.addNode(item, paragraph, index)
+      })
+      //将段落节点加入到引用节点
+      editor.addNode(paragraph, blockquoteNode)
+    }
+    //子节点有块节点
+    else {
+      //将块节点的子节点给引用节点
+      node.children!.forEach((item, index) => {
+        editor.addNode(item, blockquoteNode, index)
+      })
+    }
     //将引用节点添加到块节点下
     blockquoteNode.parent = node
     node.children = [blockquoteNode]
@@ -55,6 +75,22 @@ const toBlockquote = (editor: Editor, node: KNode) => {
   else {
     editor.toParagraph(node)
     node.tag = 'blockquote'
+    //子节点无块节点
+    if (notBlock) {
+      //创建一个段落节点
+      const paragraph = KNode.create({
+        type: 'block',
+        tag: editor.blockRenderTag,
+        children: []
+      })
+      //将引用节点的子节点给段落节点
+      node.children!.forEach((item, index) => {
+        editor.addNode(item, paragraph, index)
+      })
+      //将段落节点加入到引用节点
+      paragraph.parent = node
+      node.children = [paragraph]
+    }
   }
 }
 

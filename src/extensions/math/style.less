@@ -1,3 +1,6 @@
+@backColor: #f1f2f3;
+@darkBackColor: #2a2a2a;
+
 .kaitify {
   span[kaitify-math] {
     display: inline-block;
@@ -9,7 +12,7 @@
 
     &:hover {
       cursor: pointer !important;
-      background: #f6f9ff;
+      background: fade(@backColor, 50);
     }
 
     .katex {
@@ -21,6 +24,6 @@
 
 :root[kaitify-dark] .kaitify span[kaitify-math] {
   &:hover {
-    background: #29292d;
+    background: fade(@darkBackColor, 50);
   }
 }

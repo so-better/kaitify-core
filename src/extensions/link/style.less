@@ -1,6 +1,8 @@
+@import url(./var.less);
+
 .kaitify {
   a {
-    color: #06c27c;
+    color: @color;
     text-decoration: none;
     pointer-events: none;
 
@@ -13,8 +15,11 @@
   &:not([contenteditable='true']) {
     a {
       pointer-events: all;
+      transition: all 300ms;
+
       &:hover {
         cursor: pointer;
+        color: fade(@color, 80);
       }
     }
   }

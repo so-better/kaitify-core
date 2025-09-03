@@ -293,7 +293,7 @@ const html = ref('')
 
 onMounted(async () => {
   editor.value = await Editor.configure({
-    value: `<hr/>`,
+    value: `<p>这里输入正文</p>`,
     extensions: [],
     el: '#editor',
     editable: true,
