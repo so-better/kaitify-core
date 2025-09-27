@@ -23,13 +23,13 @@ export const BoldExtension = () =>
   Extension.create({
     name: 'bold',
     extraKeepTags: ['b', 'strong'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'b' }) || node.isMatch({ tag: 'strong' })) {
         node.type = 'inline'
       }
       return node
     },
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('fontWeight')) styles.fontWeight = node.styles!.fontWeight

@@ -124,7 +124,7 @@ editor.updateView()
 
 自定义节点数组格式化规则，可参考 [格式化规则](/guide/format-rules) 一节的内容
 
-##### domParseNodeCallback <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
+##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
 
 自定义 `dom` 转为非文本节点的后续处理，该属性方法主要作用于编辑器将字符串内容转为 KNode 节点数组时，生成每个节点的回调时期，在该方法里你可以对该节点进行自定义操作，修改内容，只需要将最终的节点返回即可
 
@@ -184,27 +184,27 @@ editor.updateView()
 
 编辑器失焦时触发
 
-##### pasteKeepMarks <Badge type="danger" text="(this: Editor, node: KNode) => KNodeMarksType" />
+##### onPasteKeepMarks <Badge type="danger" text="(this: Editor, node: KNode) => KNodeMarksType" />
 
 粘贴 `html` 时，对于节点标记保留的自定义方法
 
-##### pasteKeepStyles <Badge type="danger" text="(this: Editor, node: KNode) => KNodeStylesType" />
+##### onPasteKeepStyles <Badge type="danger" text="(this: Editor, node: KNode) => KNodeStylesType" />
 
 粘贴 `html` 时，对于节点样式保留的自定义方法
 
-##### beforeUpdateView <Badge type="danger" text="(this: Editor) => void" />
+##### onBeforeUpdateView <Badge type="danger" text="(this: Editor) => void" />
 
 视图更新前回调方法
 
-##### afterUpdateView <Badge type="danger" text="(this: Editor) => void" />
+##### onAfterUpdateView <Badge type="danger" text="(this: Editor) => void" />
 
 视图更新后回调方法
 
-##### onDetachMentBlockFromParentCallback <Badge type="danger" text="(this: Editor, node: KNode) => boolean" />
+##### onDetachMentBlockFromParent <Badge type="danger" text="(this: Editor, node: KNode) => boolean" />
 
 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回 `true` 则表示继续使用默认逻辑，会将该节点转为段落，返回 `false` 则不走默认逻辑，需要自定义处理
 
-##### beforePatchNodeToFormat <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
+##### onBeforePatchNodeToFormat <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
 
 编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
 

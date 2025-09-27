@@ -23,7 +23,7 @@ declare module '../../model' {
 export const IndentExtension = () =>
   Extension.create({
     name: 'indent',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isBlock() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('textIndent')) styles.textIndent = node.styles!.textIndent

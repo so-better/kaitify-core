@@ -34,7 +34,7 @@ const clearLineHeight = (blockNode: KNode, value: string | number) => {
 export const LineHeightExtension = () =>
   Extension.create({
     name: 'lineHeight',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isBlock() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('lineHeight')) styles.lineHeight = node.styles!.lineHeight

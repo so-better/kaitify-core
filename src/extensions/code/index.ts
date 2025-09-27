@@ -32,7 +32,7 @@ export const CodeExtension = () =>
   Extension.create({
     name: 'code',
     extraKeepTags: ['code'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'code' })) {
         node.type = 'inline'
       }

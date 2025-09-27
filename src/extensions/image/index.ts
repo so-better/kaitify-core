@@ -147,7 +147,7 @@ export const ImageExtension = () =>
   Extension.create({
     name: 'image',
     extraKeepTags: ['img'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'img' })) {
         node.type = 'closed'
       }
@@ -160,7 +160,7 @@ export const ImageExtension = () =>
         }
       }
     ],
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
         if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
@@ -168,14 +168,14 @@ export const ImageExtension = () =>
       }
       return marks
     },
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
         styles['width'] = node.styles!['width'] || 'auto'
       }
       return styles
     },
-    afterUpdateView() {
+    onAfterUpdateView() {
       //图片选中
       imageFocus(this)
       //图片拖拽改变大小

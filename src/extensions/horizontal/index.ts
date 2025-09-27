@@ -49,7 +49,7 @@ export const HorizontalExtension = () =>
   Extension.create({
     name: 'horizontal',
     extraKeepTags: ['hr'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'hr' })) {
         node.type = 'closed'
       }
@@ -109,7 +109,7 @@ export const HorizontalExtension = () =>
         }
       }
     ],
-    afterUpdateView() {
+    onAfterUpdateView() {
       horizontalFocus(this)
     },
     addCommands() {

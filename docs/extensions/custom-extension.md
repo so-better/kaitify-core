@@ -52,9 +52,9 @@ const editor = await Editor.configure({
 
 自定义节点数组格式化规则，同编辑器构建参数 `formatRules`
 
-##### domParseNodeCallback <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
+##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
 
-自定义 `dom` 转为非文本节点的后续处理，同编辑器构建参数 `domParseNodeCallback`
+自定义 `dom` 转为非文本节点的后续处理，同编辑器构建参数 `onDomParseNode`
 
 ##### onSelectionUpdate <Badge type="danger" text="(this: Editor, selection: Selection) => void" />
 
@@ -84,29 +84,29 @@ const editor = await Editor.configure({
 
 编辑器失焦时触发，同编辑器构建参数 `onBlur`
 
-##### pasteKeepMarks <Badge type="danger" text="(this: Editor, node: KNode) => KNodeMarksType" />
+##### onPasteKeepMarks <Badge type="danger" text="(this: Editor, node: KNode) => KNodeMarksType" />
 
-粘贴 `html` 时，对于节点标记保留的自定义方法，同编辑器构建参数 `pasteKeepMarks`
+粘贴 `html` 时，对于节点标记保留的自定义方法，同编辑器构建参数 `onPasteKeepMarks`
 
-##### pasteKeepStyles <Badge type="danger" text="(this: Editor, node: KNode) => KNodeStylesType" />
+##### onPasteKeepStyles <Badge type="danger" text="(this: Editor, node: KNode) => KNodeStylesType" />
 
-粘贴 `html` 时，对于节点样式保留的自定义方法，同编辑器构建参数 `pasteKeepStyles`
+粘贴 `html` 时，对于节点样式保留的自定义方法，同编辑器构建参数 `onPasteKeepStyles`
 
-##### beforeUpdateView <Badge type="danger" text="(this: Editor) => void" />
+##### onBeforeUpdateView <Badge type="danger" text="(this: Editor) => void" />
 
-视图更新前回调方法，同编辑器构建参数 `beforeUpdateView`
+视图更新前回调方法，同编辑器构建参数 `onBeforeUpdateView`
 
-##### afterUpdateView <Badge type="danger" text="(this: Editor) => void" />
+##### onAfterUpdateView <Badge type="danger" text="(this: Editor) => void" />
 
-视图更新后回调方法，同编辑器构建参数 `afterUpdateView`
+视图更新后回调方法，同编辑器构建参数 `onAfterUpdateView`
 
-##### onDetachMentBlockFromParentCallback <Badge type="danger" text="(this: Editor, node: KNode) => boolean" />
+##### onDetachMentBlockFromParent <Badge type="danger" text="(this: Editor, node: KNode) => boolean" />
 
-在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，同编辑器构建参数 `onDetachMentBlockFromParentCallback`
+在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，同编辑器构建参数 `onDetachMentBlockFromParent`
 
-##### beforePatchNodeToFormat <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
+##### onBeforePatchNodeToFormat <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
 
-编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，同编辑器构建参数 `beforePatchNodeToFormat`
+编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，同编辑器构建参数 `onBeforePatchNodeToFormat`
 
 ##### addCommands <Badge type="danger" text="((this: Editor) => EditorCommandsType) | undefined" />
 

@@ -22,7 +22,7 @@ declare module '../../model' {
 export const UnderlineExtension = () =>
   Extension.create({
     name: 'underline',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('textDecoration')) styles.textDecoration = node.styles!.textDecoration
@@ -31,7 +31,7 @@ export const UnderlineExtension = () =>
       return styles
     },
     extraKeepTags: ['u'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'u' })) {
         node.type = 'inline'
       }

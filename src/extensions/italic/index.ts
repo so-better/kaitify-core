@@ -22,7 +22,7 @@ declare module '../../model' {
 export const ItalicExtension = () =>
   Extension.create({
     name: 'italic',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('fontStyle')) styles.fontStyle = node.styles!.fontStyle
@@ -30,7 +30,7 @@ export const ItalicExtension = () =>
       return styles
     },
     extraKeepTags: ['i'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'i' })) {
         node.type = 'inline'
       }

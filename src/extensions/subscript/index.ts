@@ -22,7 +22,7 @@ declare module '../../model' {
 export const SubscriptExtension = () =>
   Extension.create({
     name: 'subscript',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('verticalAlign')) styles.verticalAlign = node.styles!.verticalAlign
@@ -30,7 +30,7 @@ export const SubscriptExtension = () =>
       return styles
     },
     extraKeepTags: ['sub'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'sub' })) {
         node.type = 'inline'
       }

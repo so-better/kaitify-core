@@ -98,7 +98,7 @@ export const BlockquoteExtension = () =>
   Extension.create({
     name: 'blockquote',
     extraKeepTags: ['blockquote'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'blockquote' })) {
         node.type = 'block'
       }

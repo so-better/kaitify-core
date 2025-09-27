@@ -110,7 +110,7 @@ const toggleTaskStatus = function (editor: Editor) {
 export const TaskExtension = () =>
   Extension.create({
     name: 'task',
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       if (
         node.isMatch({
@@ -124,7 +124,7 @@ export const TaskExtension = () =>
       }
       return marks
     },
-    afterUpdateView() {
+    onAfterUpdateView() {
       //切换待办状态
       toggleTaskStatus(this)
     },

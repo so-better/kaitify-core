@@ -22,7 +22,7 @@ declare module '../../model' {
 export const SuperscriptExtension = () =>
   Extension.create({
     name: 'superscript',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('verticalAlign')) styles.verticalAlign = node.styles!.verticalAlign
@@ -30,7 +30,7 @@ export const SuperscriptExtension = () =>
       return styles
     },
     extraKeepTags: ['sup'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'sup' })) {
         node.type = 'inline'
       }

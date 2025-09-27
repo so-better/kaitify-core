@@ -98,7 +98,7 @@ export type EditorConfigureOptionType = {
   /**
    * 自定义dom转为非文本节点的后续处理
    */
-  domParseNodeCallback?: (this: Editor, node: KNode) => KNode
+  onDomParseNode?: (this: Editor, node: KNode) => KNode
   /**
    * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图
    */
@@ -158,27 +158,27 @@ export type EditorConfigureOptionType = {
   /**
    * 节点粘贴保留标记的自定义方法
    */
-  pasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
+  onPasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
   /**
    * 节点粘贴保留样式的自定义方法
    */
-  pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
+  onPasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
   /**
    * 视图更新前回调方法
    */
-  beforeUpdateView?: (this: Editor) => void
+  onBeforeUpdateView?: (this: Editor) => void
   /**
    * 视图更新后回调方法
    */
-  afterUpdateView?: (this: Editor) => void
+  onAfterUpdateView?: (this: Editor) => void
   /**
    * 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
    */
-  onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean
+  onDetachMentBlockFromParent?: (this: Editor, node: KNode) => boolean
   /**
    * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
    */
-  beforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
+  onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
 
   /*--------------------------以下不作为编辑器内部属性-------------------------------*/
 
@@ -259,7 +259,7 @@ export class Editor {
   /**
    * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
    */
-  domParseNodeCallback?: (this: Editor, node: KNode) => KNode
+  onDomParseNode?: (this: Editor, node: KNode) => KNode
   /**
    * 视图渲染时触发，如果返回true则表示继续使用默认逻辑，返回false则不走默认逻辑，需要自定义渲染视图【初始化后不可修改】
    */
@@ -319,27 +319,27 @@ export class Editor {
   /**
    * 节点粘贴保留标记的自定义方法【初始化后不可修改】
    */
-  pasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
+  onPasteKeepMarks?: (this: Editor, node: KNode) => KNodeMarksType
   /**
    * 节点粘贴保留样式的自定义方法【初始化后不可修改】
    */
-  pasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
+  onPasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType
   /**
    * 视图更新前回调方法【初始化后不可修改】
    */
-  beforeUpdateView?: (this: Editor) => void
+  onBeforeUpdateView?: (this: Editor) => void
   /**
    * 视图更新后回调方法【初始化后不可修改】
    */
-  afterUpdateView?: (this: Editor) => void
+  onAfterUpdateView?: (this: Editor) => void
   /**
    * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
    */
-  onDetachMentBlockFromParentCallback?: (this: Editor, node: KNode) => boolean
+  onDetachMentBlockFromParent?: (this: Editor, node: KNode) => boolean
   /**
    * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可【初始化后不可修改】
    */
-  beforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
+  onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
 
   /*---------------------下面的属性都是不属于创建编辑器的参数---------------------------*/
 
@@ -628,8 +628,8 @@ export class Editor {
       })
     }
     //转换后的回调处理，在这里可以自定义处理节点
-    if (typeof this.domParseNodeCallback == 'function') {
-      node = this.domParseNodeCallback.apply(this, [node])
+    if (typeof this.onDomParseNode == 'function') {
+      node = this.onDomParseNode.apply(this, [node])
     }
     return node
   }
@@ -1354,7 +1354,7 @@ export class Editor {
           //将块节点从父节点中抽离到父节点同级
           removeBlockFromParentToSameLevel.apply(this, [blockNode])
           //是否走默认逻辑
-          const useDefault = typeof this.onDetachMentBlockFromParentCallback == 'function' ? this.onDetachMentBlockFromParentCallback.apply(this, [blockNode]) : true
+          const useDefault = typeof this.onDetachMentBlockFromParent == 'function' ? this.onDetachMentBlockFromParent.apply(this, [blockNode]) : true
           //走默认逻辑，将非段落的块节点转为段落
           if (useDefault && !this.isParagraph(blockNode)) {
             this.toParagraph(blockNode)
@@ -1540,7 +1540,7 @@ export class Editor {
                 //将块节点从父节点中抽离到父节点同级
                 removeBlockFromParentToSameLevel.apply(this, [blockNode])
                 //是否走默认逻辑
-                const useDefault = typeof this.onDetachMentBlockFromParentCallback == 'function' ? this.onDetachMentBlockFromParentCallback.apply(this, [blockNode]) : true
+                const useDefault = typeof this.onDetachMentBlockFromParent == 'function' ? this.onDetachMentBlockFromParent.apply(this, [blockNode]) : true
                 //走默认逻辑，将非段落的块节点转为段落
                 if (useDefault && !this.isParagraph(blockNode)) {
                   this.toParagraph(blockNode)
@@ -1560,7 +1560,7 @@ export class Editor {
               //将块节点从父节点中抽离到父节点同级
               removeBlockFromParentToSameLevel.apply(this, [blockNode])
               //是否走默认逻辑
-              const useDefault = typeof this.onDetachMentBlockFromParentCallback == 'function' ? this.onDetachMentBlockFromParentCallback.apply(this, [blockNode]) : true
+              const useDefault = typeof this.onDetachMentBlockFromParent == 'function' ? this.onDetachMentBlockFromParent.apply(this, [blockNode]) : true
               //走默认逻辑，将非段落的块节点转为段落
               if (useDefault && !this.isParagraph(blockNode)) {
                 this.toParagraph(blockNode)
@@ -1752,7 +1752,7 @@ export class Editor {
       return
     }
     //视图更新前回调
-    if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
+    if (typeof this.onBeforeUpdateView == 'function') this.onBeforeUpdateView.apply(this)
     //克隆旧节点数组，防止在patch过程中旧节点数组中存在null，影响后续的视图更新
     const oldStackNodes = this.oldStackNodes.map(item => item.fullClone())
     //这里存放格式化过的节点数组，后续进行判断避免重复格式化造成资源浪费和性能问题
@@ -1776,8 +1776,8 @@ export class Editor {
       //是否有需要格式化的节点
       if (node) {
         //针对需要格式化的节点存在一些特殊处理
-        if (typeof this.beforePatchNodeToFormat == 'function') {
-          node = this.beforePatchNodeToFormat.apply(this, [node])
+        if (typeof this.onBeforePatchNodeToFormat == 'function') {
+          node = this.onBeforePatchNodeToFormat.apply(this, [node])
         }
         //判断该节点是否格式化过
         const hasUpdate = hasUpdateNodes.some(n => {
@@ -1853,7 +1853,7 @@ export class Editor {
     //此处进行光标的渲染
     if (updateRealSelection) await this.updateRealSelection()
     //视图更新后回调
-    if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
+    if (typeof this.onAfterUpdateView == 'function') this.onAfterUpdateView.apply(this)
   }
 
   /**
@@ -1917,7 +1917,7 @@ export class Editor {
    */
   async review(value: string) {
     //视图更新前回调
-    if (typeof this.beforeUpdateView == 'function') this.beforeUpdateView.apply(this)
+    if (typeof this.onBeforeUpdateView == 'function') this.onBeforeUpdateView.apply(this)
     //根据value设置节点数组
     this.stackNodes = this.htmlParseNode(value || '')
     //将节点数组进行格式化
@@ -1941,7 +1941,7 @@ export class Editor {
     //更新旧节点数组
     this.oldStackNodes = this.stackNodes.map(item => item.fullClone())
     //视图更新后回调
-    if (typeof this.afterUpdateView == 'function') this.afterUpdateView.apply(this)
+    if (typeof this.onAfterUpdateView == 'function') this.onAfterUpdateView.apply(this)
   }
 
   /**
@@ -2253,7 +2253,7 @@ export class Editor {
     if (options.extraKeepTags) editor.extraKeepTags = [...editor.extraKeepTags, ...options.extraKeepTags]
     if (options.extensions) editor.extensions = mergeExtensions.apply(editor, [options.extensions])
     if (options.formatRules) editor.formatRules = [...options.formatRules, ...editor.formatRules]
-    if (options.domParseNodeCallback) editor.domParseNodeCallback = options.domParseNodeCallback
+    if (options.onDomParseNode) editor.onDomParseNode = options.onDomParseNode
     if (options.onUpdateView) editor.onUpdateView = options.onUpdateView
     if (options.onPasteText) editor.onPasteText = options.onPasteText
     if (options.onPasteHtml) editor.onPasteHtml = options.onPasteHtml
@@ -2268,12 +2268,12 @@ export class Editor {
     if (options.onKeyup) editor.onKeyup = options.onKeyup
     if (options.onFocus) editor.onFocus = options.onFocus
     if (options.onBlur) editor.onBlur = options.onBlur
-    if (options.pasteKeepMarks) editor.pasteKeepMarks = options.pasteKeepMarks
-    if (options.pasteKeepStyles) editor.pasteKeepStyles = options.pasteKeepStyles
-    if (options.beforeUpdateView) editor.beforeUpdateView = options.beforeUpdateView
-    if (options.afterUpdateView) editor.afterUpdateView = options.afterUpdateView
-    if (options.onDetachMentBlockFromParentCallback) editor.onDetachMentBlockFromParentCallback = options.onDetachMentBlockFromParentCallback
-    if (options.beforePatchNodeToFormat) editor.beforePatchNodeToFormat = options.beforePatchNodeToFormat
+    if (options.onPasteKeepMarks) editor.onPasteKeepMarks = options.onPasteKeepMarks
+    if (options.onPasteKeepStyles) editor.onPasteKeepStyles = options.onPasteKeepStyles
+    if (options.onBeforeUpdateView) editor.onBeforeUpdateView = options.onBeforeUpdateView
+    if (options.onAfterUpdateView) editor.onAfterUpdateView = options.onAfterUpdateView
+    if (options.onDetachMentBlockFromParent) editor.onDetachMentBlockFromParent = options.onDetachMentBlockFromParent
+    if (options.onBeforePatchNodeToFormat) editor.onBeforePatchNodeToFormat = options.onBeforePatchNodeToFormat
     //注册扩展
     editor.extensions.forEach(item => registerExtension.apply(editor, [item]))
     //设置编辑器是否可编辑

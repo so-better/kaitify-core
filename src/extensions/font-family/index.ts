@@ -23,7 +23,7 @@ declare module '../../model' {
 export const FontFamilyExtension = () =>
   Extension.create({
     name: 'fontFamily',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('fontFamily')) styles.fontFamily = node.styles!.fontFamily
@@ -31,7 +31,7 @@ export const FontFamilyExtension = () =>
       return styles
     },
     extraKeepTags: ['font'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'font' })) {
         node.type = 'inline'
       }

@@ -22,7 +22,7 @@ declare module '../../model' {
 export const StrikethroughExtension = () =>
   Extension.create({
     name: 'strikethrough',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('textDecoration')) styles.textDecoration = node.styles!.textDecoration
@@ -31,7 +31,7 @@ export const StrikethroughExtension = () =>
       return styles
     },
     extraKeepTags: ['del'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'del' })) {
         node.type = 'inline'
       }

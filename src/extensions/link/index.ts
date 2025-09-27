@@ -50,13 +50,13 @@ export const LinkExtension = () =>
   Extension.create({
     name: 'link',
     extraKeepTags: ['a'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'a' })) {
         node.type = 'inline'
       }
       return node
     },
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       if (node.isMatch({ tag: 'a' }) && node.hasMarks()) {
         if (node.marks!.hasOwnProperty('href')) marks['href'] = node.marks!['href']

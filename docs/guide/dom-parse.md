@@ -28,15 +28,15 @@ title: DOM转换规则
 
 最终，`domParseNode` 会返回给你一个 `KNode` 节点
 
-## DOM 转换后回调 domParseNodeCallback
+## DOM 转换后回调 onDomParseNode
 
-如果上述返回的节点并不完全符合你的需求，或者在预期之外，我们还提供了一个 `domParseNodeCallback` 方法，在 `domParseNode` 方法返回节点时再进行处理
+如果上述返回的节点并不完全符合你的需求，或者在预期之外，我们还提供了一个 `onDomParseNode` 方法，在 `domParseNode` 方法返回节点时再进行处理
 ，以确保最终返回的节点符合要求
 
 ```ts
 const editor = await Editor.configure({
   value: '<p><br/></p>',
-  domParseNodeCallback(node) {
+  onDomParseNode(node) {
     //有data-inline的节点都转为行内节点
     if (node.hasMarks() && node.marks['data-inline']) {
       node.type = 'inline'

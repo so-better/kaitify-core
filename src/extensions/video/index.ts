@@ -149,13 +149,13 @@ export const VideoExtension = () =>
   Extension.create({
     name: 'video',
     extraKeepTags: ['video'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'video' })) {
         node.type = 'closed'
       }
       return node
     },
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       if (node.isMatch({ tag: 'video' }) && node.hasMarks()) {
         if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
@@ -166,7 +166,7 @@ export const VideoExtension = () =>
       }
       return marks
     },
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isMatch({ tag: 'video' }) && node.hasStyles()) {
         styles['width'] = node.styles!['width'] || 'auto'
@@ -193,7 +193,7 @@ export const VideoExtension = () =>
         }
       }
     ],
-    afterUpdateView() {
+    onAfterUpdateView() {
       //视频选中
       videoFocus(this)
       //视频拖拽改变大小

@@ -129,21 +129,21 @@ const attachmentFocus = (editor: Editor) => {
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
   Extension.create({
     name: 'attachment',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
         styles.backgroundImage = node.styles!.backgroundImage
       }
       return styles
     },
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
         marks['kaitify-attachment'] = node.marks!['kaitify-attachment']
       }
       return marks
     },
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
         //锁定节点
         node.locked = true
@@ -242,7 +242,7 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         }
       }
     ],
-    afterUpdateView() {
+    onAfterUpdateView() {
       //下载附件
       downloadAttachment(this)
       //点击选中

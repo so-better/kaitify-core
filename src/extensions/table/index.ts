@@ -490,7 +490,7 @@ export const TableExtension = () =>
   Extension.create({
     name: 'table',
     extraKeepTags: ['table', 'tfoot', 'tbody', 'thead', 'tr', 'th', 'td', 'col', 'colgroup'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'table' })) {
         node.type = 'block'
       }
@@ -519,7 +519,7 @@ export const TableExtension = () =>
       }
       return node
     },
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       //表格单元格保留display样式
       if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
@@ -527,7 +527,7 @@ export const TableExtension = () =>
       }
       return styles
     },
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       //表格单元格rowspan和colspan属性保留
       if (node.isMatch({ tag: 'td' }) || node.isMatch({ tag: 'th' })) {
@@ -691,7 +691,7 @@ export const TableExtension = () =>
         }
       }
     ],
-    afterUpdateView() {
+    onAfterUpdateView() {
       //表格拖拽改变列宽
       tableResizable(this)
     },

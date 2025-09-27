@@ -277,7 +277,7 @@ export const ListExtension = () =>
   Extension.create({
     name: 'list',
     extraKeepTags: ['ul', 'ol', 'li'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'ul' }) || node.isMatch({ tag: 'ol' })) {
         node.type = 'block'
       }
@@ -332,7 +332,7 @@ export const ListExtension = () =>
       //列表合并处理
       listMergeHandler
     ],
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       //保留序标类型样式
       if ((node.isMatch({ tag: 'ol' }) || node.isMatch({ tag: 'ul' })) && node.hasStyles()) {
@@ -340,7 +340,7 @@ export const ListExtension = () =>
       }
       return styles
     },
-    onDetachMentBlockFromParentCallback(node) {
+    onDetachMentBlockFromParent(node) {
       //父节点存在并且是列表节点
       if (node.parent && (node.parent.isMatch({ tag: 'ol' }) || node.parent.isMatch({ tag: 'ul' }))) {
         //将该节点转为列表项节点

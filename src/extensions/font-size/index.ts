@@ -21,7 +21,7 @@ declare module '../../model' {
 export const FontSizeExtension = () =>
   Extension.create({
     name: 'fontSize',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('fontSize')) styles.fontSize = node.styles!.fontSize

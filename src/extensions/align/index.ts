@@ -36,7 +36,7 @@ const clearAlign = (blockNode: KNode, value: AlignValueType) => {
 export const AlignExtension = () =>
   Extension.create({
     name: 'align',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isBlock() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('textAlign')) styles.textAlign = node.styles!.textAlign

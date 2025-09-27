@@ -21,7 +21,7 @@ declare module '../../model' {
 export const ColorExtension = () =>
   Extension.create({
     name: 'color',
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       if (node.isText() && node.hasStyles()) {
         if (node.styles!.hasOwnProperty('color')) styles.color = node.styles!.color

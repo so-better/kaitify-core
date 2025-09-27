@@ -63,7 +63,7 @@ const mathFocus = (editor: Editor) => {
 export const MathExtension = () =>
   Extension.create({
     name: 'math',
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (
         node.isMatch({
           tag: 'span',
@@ -95,7 +95,7 @@ export const MathExtension = () =>
       }
       return node
     },
-    pasteKeepMarks(node) {
+    onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
       //数学公式内的标记全部保留
       if (
@@ -110,7 +110,7 @@ export const MathExtension = () =>
       }
       return marks
     },
-    pasteKeepStyles(node) {
+    onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
       //数学公式内的样式全部保留
       if (
@@ -125,7 +125,7 @@ export const MathExtension = () =>
       }
       return styles
     },
-    beforePatchNodeToFormat(node) {
+    onBeforePatchNodeToFormat(node) {
       const mathNode = node.getMatchNode({
         tag: 'span',
         marks: {
@@ -213,7 +213,7 @@ export const MathExtension = () =>
         }
       }
     ],
-    afterUpdateView() {
+    onAfterUpdateView() {
       mathFocus(this)
     },
     addCommands() {

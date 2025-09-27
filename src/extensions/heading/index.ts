@@ -73,7 +73,7 @@ export const HeadingExtension = () =>
   Extension.create({
     name: 'heading',
     extraKeepTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-    domParseNodeCallback(node) {
+    onDomParseNode(node) {
       if (node.isMatch({ tag: 'h1' }) || node.isMatch({ tag: 'h2' }) || node.isMatch({ tag: 'h3' }) || node.isMatch({ tag: 'h4' }) || node.isMatch({ tag: 'h5' }) || node.isMatch({ tag: 'h6' })) {
         node.type = 'block'
       }
