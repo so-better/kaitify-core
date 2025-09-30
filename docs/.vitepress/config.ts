@@ -48,7 +48,6 @@ export default defineConfig({
         link: 'https://www.so-better.cn/run?lib=kaitify-core',
         target: '_blank'
       },
-      { text: '反馈', link: 'https://www.so-better.cn/feedback', target: '_blank' },
       { text: '更新日志', link: '/changelog' }
     ],
     sidebar: {
