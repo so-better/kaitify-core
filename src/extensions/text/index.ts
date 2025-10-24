@@ -120,9 +120,14 @@ const isTextNodeStyle = (node: KNode, styleName: string, styleValue?: string | n
       const arr = DapColor.hex2rgb(ownValue)
       ownValue = `rgb(${arr[0]},${arr[1]},${arr[2]})`
     }
+    //如果styles根本没有这个属性，则只需要判断目标值是否为空字符串，样式中空字符串代表没有样式
+    if (ownValue === undefined) {
+      return styleValue === ''
+    }
     return ownValue == styleValue
   }
-  return false
+  //如果没有styles，则只需要判断目标值是否为空字符串，样式中空字符串代表没有样式
+  return styleValue === ''
 }
 
 export const TextExtension = () =>

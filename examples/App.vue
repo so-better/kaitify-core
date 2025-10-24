@@ -7,36 +7,41 @@
           <button>当前编辑器内容字数：{{ count }}</button>
           <button @click="getHtml">获取HTML</button>
           <button @click="insertNode">插入节点</button>
-          <button @click="() => {
+          <button
+            @click="() => {
             editor?.delete!()
             editor?.updateView()
-          }">
+          }"
+          >
             删除
           </button>
-          <button @click="() => {
+          <button
+            @click="() => {
             editor?.insertParagraph!()
             editor?.updateView()
-          }">
+          }"
+          >
             换行
           </button>
-          <button @click="() => {
+          <button
+            @click="() => {
             editor?.insertText!('插入的文本')
             editor?.updateView()
-          }">
+          }"
+          >
             插入文本
           </button>
-          <button @click="() => {
-            console.log('光标是否在视图内', editor?.isSelectionInView());
-
-          }">
+          <button
+            @click="
+              () => {
+                console.log('光标是否在视图内', editor?.isSelectionInView())
+              }
+            "
+          >
             光标是否在视图内
           </button>
-          <button @click="illegaInsert(0)">
-            非法插入文本
-          </button>
-          <button @click="illegaInsert(1)">
-            非法插入dom
-          </button>
+          <button @click="illegaInsert(0)">非法插入文本</button>
+          <button @click="illegaInsert(1)">非法插入dom</button>
         </div>
       </fieldset>
       <fieldset>
@@ -70,6 +75,14 @@
       <fieldset>
         <legend>行高</legend>
         <div class="toolbar">
+          <button
+            @click="()=>{
+            console.log(editor?.commands.isLineHeight!(3));
+            
+          }"
+          >
+            比较
+          </button>
           <button @click="editor?.commands.setLineHeight!(3)">设置3行高</button>
           <button @click="editor?.commands.unsetLineHeight!(3)">取消3行高</button>
         </div>
@@ -77,8 +90,7 @@
       <fieldset>
         <legend>链接</legend>
         <div class="toolbar">
-          <button
-            @click="editor?.commands.setLink!({ href: 'https://www.baidu.com', newOpen: true, text: '百度一下，你就知道' })">插入链接</button>
+          <button @click="editor?.commands.setLink!({ href: 'https://www.baidu.com', newOpen: true, text: '百度一下，你就知道' })">插入链接</button>
           <button @click="editor?.commands.unsetLink!()">取消链接</button>
           <button @click="editor?.commands.updateLink!({ href: 'https://www.so-better.cn' })">更新链接</button>
         </div>
@@ -178,6 +190,14 @@
       <fieldset>
         <legend>字号</legend>
         <div class="toolbar">
+          <button
+            @click="()=>{
+            console.log(editor?.commands.isFontSize!(''));
+            
+          }"
+          >
+            比较
+          </button>
           <button @click="editor?.commands.setFontSize!('28px')">设置28px字号</button>
           <button @click="editor?.commands.unsetFontSize!('28px')">取消设置28px字号</button>
         </div>
@@ -192,15 +212,13 @@
       <fieldset>
         <legend>图片</legend>
         <div class="toolbar">
-          <button
-            @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg', alt: '图片加载失败', width: '200px' })">插入图片</button>
+          <button @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg', alt: '图片加载失败', width: '200px' })">插入图片</button>
         </div>
       </fieldset>
       <fieldset>
         <legend>视频</legend>
         <div class="toolbar">
-          <button
-            @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true })">插入视频</button>
+          <button @click="editor?.commands.setVideo!({ src: 'https://bpic.588ku.com/video_listen/588ku_preview/24/04/01/09/49/06/video660a12925fe74.mp4', width: '200px', autoplay: true })">插入视频</button>
           <button @click="editor?.commands.updateVideo!({ controls: true, loop: true })">更新视频</button>
         </div>
       </fieldset>
@@ -244,10 +262,8 @@
       <fieldset>
         <legend>附件</legend>
         <div class="toolbar">
-          <button
-            @click="editor?.commands.setAttachment!({ url: 'https://img1.baidu.com/it/u=1097951435,212878480&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1428', text: '附件图片' })">上传附件</button>
-          <button
-            @click="editor?.commands.updateAttachment!({ url: 'https://img0.baidu.com/it/u=269587204,3994517811&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1345', text: '附件图片2' })">更新附件</button>
+          <button @click="editor?.commands.setAttachment!({ url: 'https://img1.baidu.com/it/u=1097951435,212878480&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1428', text: '附件图片' })">上传附件</button>
+          <button @click="editor?.commands.updateAttachment!({ url: 'https://img0.baidu.com/it/u=269587204,3994517811&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1345', text: '附件图片2' })">更新附件</button>
         </div>
       </fieldset>
       <fieldset>
@@ -283,8 +299,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode, AttachmentExtension } from '../src'
-import { content } from './content'
+import { Editor, KNode } from '../src'
 import { delay, isContains } from '../src/tools'
 
 const count = ref<number>(0)
@@ -299,9 +314,9 @@ onMounted(async () => {
     editable: true,
     allowPasteHtml: true,
     placeholder: '请输入内容...',
-    afterUpdateView() {
+    onAfterUpdateView() {
       count.value = Array.from(this.getContent(true, true).trim()).length
-    },
+    }
   })
 })
 
@@ -321,20 +336,19 @@ const getHtml = () => {
 
 const illegaInsert = async (num: 0 | 1) => {
   if (num === 0) {
-    const range = document.getSelection()?.getRangeAt(0);
+    const range = document.getSelection()?.getRangeAt(0)
     if (range && editor.value && isContains(editor.value.$el!, range.commonAncestorContainer)) {
-      range.deleteContents();
-      range.insertNode(document.createTextNode('非法文本'));
+      range.deleteContents()
+      range.insertNode(document.createTextNode('非法文本'))
     }
-  }
-  else {
+  } else {
     for (let i = 0; i < 10; i++) {
       const elm = document.createElement('p')
       elm.innerHTML = `非法dom${i + 1}`
-      const range = document.getSelection()?.getRangeAt(0);
+      const range = document.getSelection()?.getRangeAt(0)
       if (range && editor.value && isContains(editor.value.$el!, range.commonAncestorContainer)) {
-        range.deleteContents();
-        range.insertNode(elm);
+        range.deleteContents()
+        range.insertNode(elm)
         await delay()
       }
     }
