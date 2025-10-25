@@ -5,9 +5,10 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.2-beta.1 <Badge type="tip" text='2025.10.24' />
+## v0.0.2-beta.2 <Badge type="tip" text='2025.10.25' />
 
 - 优化编辑器对样式的判断，如果是空字符串则默认无样式
+- 优化 `List` 内置扩展的样式
 
 ## v0.0.1 <Badge type="tip" text='2025.09.27' />
 
