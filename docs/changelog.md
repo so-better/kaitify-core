@@ -5,10 +5,11 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.2-beta.4 <Badge type="tip" text='2025.10.26' />
+## v0.0.2-beta.5 <Badge type="tip" text='2025.10.26' />
 
 - 优化编辑器的 `destroy` 方法，修复了原来销毁后再创建出现问题的 bug
 - 编辑器的主题颜色全部挂载在容器上，而不是 `document` 上，另外编辑器的主题颜色不再受全局影响
+- 编辑器构建入参新增 `onCreate` 和 `onCreated` 参数
 
 ## v0.0.2-beta.2 <Badge type="tip" text='2025.10.25' />
 

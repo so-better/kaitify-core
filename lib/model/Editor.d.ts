@@ -187,6 +187,14 @@ export type EditorConfigureOptionType = {
      * 是否深色模式
      */
     dark?: boolean;
+    /**
+     * 编辑器初始创建时触发
+     */
+    onCreate?: (editor: Editor) => void;
+    /**
+     * 编辑器初始创建完成后触发
+     */
+    onCreated?: (editor: Editor) => void;
 };
 /**
  * 编辑器核心类

@@ -202,6 +202,14 @@ export type EditorConfigureOptionType = {
    * 是否深色模式
    */
   dark?: boolean
+  /**
+   * 编辑器初始创建时触发
+   */
+  onCreate?: (editor: Editor) => void
+  /**
+   * 编辑器初始创建完成后触发
+   */
+  onCreated?: (editor: Editor) => void
 }
 
 /**
@@ -1950,25 +1958,28 @@ export class Editor {
   destroy() {
     //取消dom监听
     this.removeDomObserve()
-    //移除初始化标记
-    DapData.remove(this.$el!, 'kaitify-init')
-    //移除class
-    this.$el!.classList.remove('kaitify')
-    //移除placeholder
-    this.$el!.removeAttribute('kaitify-placeholder')
-    //移除dark
-    this.setDark(false)
-    //去除可编辑效果
-    this.setEditable(false)
-    //清空内容
-    this.$el!.innerHTML = ''
+    if (this.$el) {
+      //移除初始化标记
+      DapData.remove(this.$el, 'kaitify-init')
+      //移除class
+      this.$el.classList.remove('kaitify')
+      //移除placeholder
+      this.$el.removeAttribute('kaitify-placeholder')
+      //移除dark
+      this.setDark(false)
+      //去除可编辑效果
+      this.setEditable(false)
+      //清空内容
+      this.$el.innerHTML = ''
+      //移除绑定在元素上的事件
+      DapEvent.off(this.$el, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')
+    }
     //重置selection
     this.selection = new Selection()
     //重置history
     this.history = new History()
-    //移除相关监听事件
+    //移除document相关事件
     DapEvent.off(document, `selectionchange.kaitify_${this.guid}`)
-    DapEvent.off(this.$el!, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')
   }
 
   /**
@@ -2249,6 +2260,8 @@ export class Editor {
   static async configure(options: EditorConfigureOptionType) {
     //创建编辑器
     const editor = new Editor()
+    //onCreate事件触发
+    if (options.onCreate) options.onCreate(editor)
     //初始化编辑器dom
     editor.$el = initEditorDom(options.el)
     //初始化设置编辑器样式
@@ -2317,6 +2330,8 @@ export class Editor {
     DapEvent.on(editor.$el, 'copy.kaitify', onCopy.bind(editor))
     //监听编辑器剪切
     DapEvent.on(editor.$el, 'cut.kaitify', onCut.bind(editor))
+    //onCreated事件触发
+    if (options.onCreated) options.onCreated(editor)
     //返回编辑器实例
     return editor
   }

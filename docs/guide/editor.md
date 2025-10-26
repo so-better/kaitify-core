@@ -208,6 +208,14 @@ editor.updateView()
 
 编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
 
+##### onCreate <Badge type="danger" text="(editor: Editor) => void" />
+
+编辑器初始创建时触发，回调参数即当前创建的编辑器实例
+
+##### onCreated <Badge type="danger" text="(editor: Editor) => void" />
+
+编辑器初始创建完成后触发，回调参数即当前创建的编辑器实例
+
 ## 修改默认样式
 
 kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不需要，你可以通过 css 样式覆盖去修改。或者你可以通过修改 `:root` 下的 css 变量来修改：

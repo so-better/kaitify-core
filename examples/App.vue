@@ -306,8 +306,8 @@ const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
 const html = ref('')
 
-onMounted(async () => {
-  editor.value = await Editor.configure({
+onMounted(() => {
+  Editor.configure({
     value: `<p>这里输入正文</p>`,
     extensions: [],
     el: '#editor',
@@ -316,6 +316,9 @@ onMounted(async () => {
     placeholder: '请输入内容...',
     onAfterUpdateView() {
       count.value = Array.from(this.getContent(true, true).trim()).length
+    },
+    onCreate(ed) {
+      editor.value = ed
     }
   })
 })
@@ -336,10 +339,19 @@ const getHtml = async () => {
     editor.value.destroy()
     editor.value = null
   } else {
-    editor.value = await Editor.configure({
+    Editor.configure({
       value: `<p>这里输入正文</p>`,
+      extensions: [],
       el: '#editor',
-      editable: true
+      editable: true,
+      allowPasteHtml: true,
+      placeholder: '请输入内容...',
+      onAfterUpdateView() {
+        count.value = Array.from(this.getContent(true, true).trim()).length
+      },
+      onCreate(ed) {
+        editor.value = ed
+      }
     })
   }
 
