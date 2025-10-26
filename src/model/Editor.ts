@@ -539,7 +539,7 @@ export class Editor {
    * 是否深色模式
    */
   isDark() {
-    return document.documentElement.hasAttribute('kaitify-dark')
+    return this.$el!.hasAttribute('kaitify-dark')
   }
 
   /**
