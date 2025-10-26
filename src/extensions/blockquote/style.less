@@ -3,19 +3,21 @@
 @darkColor: #d2d2d2;
 @darkBorderColor: #4e4e4e;
 
-.kaitify blockquote {
-  line-height: var(--kaitify-line-height);
-  margin: 0 0 var(--kaitify-large-margin) 0 !important;
-  padding: var(--kaitify-small-padding) 0 var(--kaitify-small-padding) var(--kaitify-large-padding);
-  border-left: 5px solid @borderColor;
-  color: @color;
+.kaitify {
+  blockquote {
+    line-height: var(--kaitify-line-height);
+    margin: 0 0 var(--kaitify-large-margin) 0 !important;
+    padding: var(--kaitify-small-padding) 0 var(--kaitify-small-padding) var(--kaitify-large-padding);
+    border-left: 5px solid @borderColor;
+    color: @color;
 
-  &:last-child {
-    margin-bottom: 0 !important;
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
   }
-}
 
-:root[kaitify-dark] .kaitify blockquote {
-  color: @darkColor;
-  border-left-color: @darkBorderColor;
+  &[kaitify-dark] blockquote {
+    color: @darkColor;
+    border-left-color: @darkBorderColor;
+  }
 }

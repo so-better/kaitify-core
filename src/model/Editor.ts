@@ -1,4 +1,4 @@
-import { event as DapEvent, element as DapElement } from 'dap-util'
+import { event as DapEvent, element as DapElement, data as DapData } from 'dap-util'
 import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNodeStylesType } from './KNode'
 import { createGuid, delay, getDomAttributes, getDomStyles, getZeroWidthText, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { Selection } from './Selection'
@@ -529,9 +529,9 @@ export class Editor {
    */
   setDark(dark: boolean) {
     if (dark) {
-      document.documentElement.setAttribute('kaitify-dark', '')
+      this.$el!.setAttribute('kaitify-dark', '')
     } else {
-      document.documentElement.removeAttribute('kaitify-dark')
+      this.$el!.removeAttribute('kaitify-dark')
     }
   }
 
@@ -1948,8 +1948,24 @@ export class Editor {
    * 销毁编辑器的方法
    */
   destroy() {
+    //取消dom监听
+    this.removeDomObserve()
+    //移除初始化标记
+    DapData.remove(this.$el!, 'kaitify-init')
+    //移除class
+    this.$el!.classList.remove('kaitify')
+    //移除placeholder
+    this.$el!.removeAttribute('kaitify-placeholder')
+    //移除dark
+    this.setDark(false)
     //去除可编辑效果
     this.setEditable(false)
+    //清空内容
+    this.$el!.innerHTML = ''
+    //重置selection
+    this.selection = new Selection()
+    //重置history
+    this.history = new History()
     //移除相关监听事件
     DapEvent.off(document, `selectionchange.kaitify_${this.guid}`)
     DapEvent.off(this.$el!, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')

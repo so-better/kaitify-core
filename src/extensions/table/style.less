@@ -42,31 +42,31 @@
       }
     }
   }
-}
 
-:root[kaitify-dark] .kaitify {
-  table {
-    tr:first-child {
-      background: @darkBackColor;
+  &[kaitify-dark] {
+    table {
+      tr:first-child {
+        background: @darkBackColor;
 
-      td {
-        font-weight: bold;
+        td {
+          font-weight: bold;
+        }
+      }
+
+      tr:nth-child(2n + 3) {
+        background: fade(@darkBackColor, 20);
       }
     }
 
-    tr:nth-child(2n + 3) {
-      background: fade(@darkBackColor, 20);
-    }
-  }
+    //非编辑状态下
+    &:not([contenteditable='true']) {
+      table {
+        tr:not(:first-child) {
+          transition: background 300ms;
 
-  //非编辑状态下
-  &:not([contenteditable='true']) {
-    table {
-      tr:not(:first-child) {
-        transition: background 300ms;
-
-        &:hover {
-          background: fade(@darkBackColor, 50);
+          &:hover {
+            background: fade(@darkBackColor, 50);
+          }
         }
       }
     }

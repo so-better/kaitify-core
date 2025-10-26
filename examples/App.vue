@@ -330,8 +330,30 @@ const insertNode = () => {
   editor.value!.updateView()
 }
 
-const getHtml = () => {
-  html.value = editor.value!.getHTML()
+const getHtml = async () => {
+  // html.value = editor.value!.getHTML()
+  if (editor.value) {
+    editor.value.destroy()
+    editor.value = null
+  } else {
+    editor.value = await Editor.configure({
+      value: `<p>这里输入正文</p>`,
+      el: '#editor',
+      editable: true
+    })
+  }
+
+  // setTimeout(async () => {
+  //   debugger
+  //   editor.value = await Editor.configure({
+  //     value: `<p>这里输入正文</p>`,
+  //     extensions: [],
+  //     el: '#editor',
+  //     editable: true,
+  //     allowPasteHtml: true,
+  //     placeholder: '请输入内容...'
+  //   })
+  // }, 3000)
 }
 
 const illegaInsert = async (num: 0 | 1) => {
