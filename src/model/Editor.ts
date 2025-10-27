@@ -537,9 +537,9 @@ export class Editor {
    */
   setDark(dark: boolean) {
     if (dark) {
-      this.$el?.setAttribute('kaitify-dark', '')
+      this.$el?.classList.add('kaitify-dark')
     } else {
-      this.$el?.removeAttribute('kaitify-dark')
+      this.$el?.classList.remove('kaitify-dark')
     }
   }
 
@@ -547,7 +547,7 @@ export class Editor {
    * 是否深色模式
    */
   isDark() {
-    return this.$el?.hasAttribute('kaitify-dark') ?? false
+    return this.$el?.classList.contains('kaitify-dark') ?? false
   }
 
   /**

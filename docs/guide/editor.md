@@ -218,12 +218,12 @@ editor.updateView()
 
 ## 修改默认样式
 
-kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不需要，你可以通过 css 样式覆盖去修改。或者你可以通过修改 `:root` 下的 css 变量来修改：
+kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不需要，你可以通过 css 样式覆盖去修改。或者你可以通过修改 `.kaitify` 下的 css 变量来修改：
 
 ```less
 @theme: #308af3;
 
-:root {
+.kaitify {
   //主题色
   --kaitify-theme: @theme;
   //最浅主题色，通常用于悬浮效果
@@ -258,7 +258,7 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
   --kaitify-font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Hiragino KaKu Gothic Pro, Microsoft YaHei, Arial, sans-serif;
 }
 
-:root[kaitify-dark] {
+.kaitify.kaitify-dark {
   //字体颜色
   --kaitify-font-color: #f5f5f5;
   //边框颜色
