@@ -1969,8 +1969,6 @@ export class Editor {
       this.setDark(false)
       //去除可编辑效果
       this.setEditable(false)
-      //清空内容
-      this.$el.innerHTML = ''
       //移除绑定在元素上的事件
       DapEvent.off(this.$el, 'beforeinput.kaitify compositionstart.kaitify compositionupdate.kaitify compositionend.kaitify keydown.kaitify keyup.kaitify copy.kaitify focus.kaitify blur.kaitify')
     }
