@@ -529,7 +529,7 @@ export class Editor {
    * 判断编辑器是否可编辑
    */
   isEditable() {
-    return this.$el?.getAttribute('contenteditable') == 'true'
+    return this.$el?.getAttribute('contenteditable') === 'true'
   }
 
   /**
@@ -537,9 +537,9 @@ export class Editor {
    */
   setDark(dark: boolean) {
     if (dark) {
-      this.$el!.setAttribute('kaitify-dark', '')
+      this.$el?.setAttribute('kaitify-dark', '')
     } else {
-      this.$el!.removeAttribute('kaitify-dark')
+      this.$el?.removeAttribute('kaitify-dark')
     }
   }
 
@@ -547,7 +547,7 @@ export class Editor {
    * 是否深色模式
    */
   isDark() {
-    return this.$el!.hasAttribute('kaitify-dark')
+    return this.$el?.hasAttribute('kaitify-dark') ?? false
   }
 
   /**
