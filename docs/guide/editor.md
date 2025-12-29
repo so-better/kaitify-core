@@ -227,11 +227,11 @@ kaitify 构建的富文本编辑器会有自带的默认的样式，如果你不
   //主题色
   --kaitify-theme: @theme;
   //最浅主题色，通常用于悬浮效果
-  --kaitify-lightest-theme: fade(@theme, 10);
+  --kaitify-lightest-theme: fade(@theme, 10%);
   //更浅主题色，通常用于激活效果
-  --kaitify-lighter-theme: fade(@theme, 20);
+  --kaitify-lighter-theme: fade(@theme, 20%);
   //浅主题色，用于选区颜色
-  --kaitify-light-theme: fade(@theme, 30);
+  --kaitify-light-theme: fade(@theme, 30%);
   //字体颜色
   --kaitify-font-color: #505050;
   //边框颜色
