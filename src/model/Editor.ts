@@ -622,7 +622,7 @@ export class Editor {
     }
     let node = KNode.create(config)
     //如果不是闭合节点则设置子节点
-    if (!closed) {
+    if (!node.isClosed()) {
       Array.from(dom.childNodes).forEach(child => {
         if (child.nodeType == 1 || child.nodeType == 3) {
           const childNode = this.domParseNode(child)
@@ -638,6 +638,7 @@ export class Editor {
     //转换后的回调处理，在这里可以自定义处理节点
     if (typeof this.onDomParseNode == 'function') {
       node = this.onDomParseNode.apply(this, [node])
+      console.log('node', node)
     }
     return node
   }

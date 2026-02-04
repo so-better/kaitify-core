@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.2-beta.9 <Badge type="tip" text='2026.02.04' />
+
+- 修复代码编写错误
+
 ## v0.0.2-beta.8 <Badge type="tip" text='2025.10.27' />
 
 - 优化编辑器的 `destroy` 方法，修复了原来销毁后再创建出现问题的 bug
