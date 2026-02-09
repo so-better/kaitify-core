@@ -179,6 +179,10 @@ export type EditorConfigureOptionType = {
    * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
    */
   onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
+  /**
+   * 编辑器进行光标纠正时触发，在这里可以修改虚拟光标的位置
+   */
+  onRedressSelection?: (this: Editor) => void
 
   /*--------------------------以下不作为编辑器内部属性-------------------------------*/
 
@@ -348,6 +352,10 @@ export class Editor {
    * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可【初始化后不可修改】
    */
   onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode
+  /**
+   * 编辑器进行光标纠正时触发，在这里可以修改虚拟光标的位置
+   */
+  onRedressSelection?: (this: Editor) => void
 
   /*---------------------下面的属性都是不属于创建编辑器的参数---------------------------*/
 
@@ -638,7 +646,6 @@ export class Editor {
     //转换后的回调处理，在这里可以自定义处理节点
     if (typeof this.onDomParseNode == 'function') {
       node = this.onDomParseNode.apply(this, [node])
-      console.log('node', node)
     }
     return node
   }
@@ -2302,6 +2309,7 @@ export class Editor {
     if (options.onAfterUpdateView) editor.onAfterUpdateView = options.onAfterUpdateView
     if (options.onDetachMentBlockFromParent) editor.onDetachMentBlockFromParent = options.onDetachMentBlockFromParent
     if (options.onBeforePatchNodeToFormat) editor.onBeforePatchNodeToFormat = options.onBeforePatchNodeToFormat
+    if (options.onRedressSelection) editor.onRedressSelection = options.onRedressSelection
     //注册扩展
     editor.extensions.forEach(item => registerExtension.apply(editor, [item]))
     //设置编辑器是否可编辑

@@ -43,9 +43,9 @@ export declare const registerExtension: (this: Editor, extension: Extension) => 
  */
 export declare const updateSelection: (this: Editor) => boolean;
 /**
- * 纠正光标位置，返回布尔值表示是否存在纠正行为
+ * 纠正光标位置
  */
-export declare const redressSelection: (this: Editor) => boolean;
+export declare const redressSelection: (this: Editor) => void;
 /**
  * 初始化校验编辑器的节点数组，如果编辑器的节点数组为空或者都是空节点，则初始化创建一个只有占位符的段落
  */

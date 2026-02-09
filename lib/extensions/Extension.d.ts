@@ -76,6 +76,10 @@ export type ExtensionCreateOptionType = {
      */
     onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode;
     /**
+     * 编辑器进行光标纠正时触发，在这里可以修改虚拟光标的位置
+     */
+    onRedressSelection?: (this: Editor) => void;
+    /**
      * 自定义命令
      */
     addCommands?: (this: Editor) => EditorCommandsType;
@@ -160,6 +164,10 @@ export declare class Extension {
      * 编辑器updateView执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，回调参数即当前需要被格式化的节点，该方法返回一个节点，返回的节点将会被格式化，如果你不需要任何特殊处理，返回入参提供的节点即可
      */
     onBeforePatchNodeToFormat?: (this: Editor, node: KNode) => KNode;
+    /**
+     * 编辑器进行光标纠正时触发，在这里可以修改虚拟光标的位置
+     */
+    onRedressSelection?: (this: Editor) => void;
     /**
      * 自定义命令
      */

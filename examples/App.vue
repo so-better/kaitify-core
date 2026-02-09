@@ -8,26 +8,32 @@
           <button @click="getHtml">获取HTML</button>
           <button @click="insertNode">插入节点</button>
           <button
-            @click="() => {
-            editor?.delete!()
-            editor?.updateView()
-          }"
+            @click="
+              () => {
+                editor?.delete!()
+                editor?.updateView()
+              }
+            "
           >
             删除
           </button>
           <button
-            @click="() => {
-            editor?.insertParagraph!()
-            editor?.updateView()
-          }"
+            @click="
+              () => {
+                editor?.insertParagraph!()
+                editor?.updateView()
+              }
+            "
           >
             换行
           </button>
           <button
-            @click="() => {
-            editor?.insertText!('插入的文本')
-            editor?.updateView()
-          }"
+            @click="
+              () => {
+                editor?.insertText!('插入的文本')
+                editor?.updateView()
+              }
+            "
           >
             插入文本
           </button>
@@ -76,10 +82,11 @@
         <legend>行高</legend>
         <div class="toolbar">
           <button
-            @click="()=>{
-            console.log(editor?.commands.isLineHeight!(3));
-            
-          }"
+            @click="
+              () => {
+                console.log(editor?.commands.isLineHeight!(3))
+              }
+            "
           >
             比较
           </button>
@@ -191,10 +198,11 @@
         <legend>字号</legend>
         <div class="toolbar">
           <button
-            @click="()=>{
-            console.log(editor?.commands.isFontSize!(''));
-            
-          }"
+            @click="
+              () => {
+                console.log(editor?.commands.isFontSize!(''))
+              }
+            "
           >
             比较
           </button>
@@ -299,7 +307,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor, Extension, KNode } from '../src'
 import { delay, isContains } from '../src/tools'
 
 const count = ref<number>(0)

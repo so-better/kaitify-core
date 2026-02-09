@@ -5,6 +5,12 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.2-beta.10 <Badge type="tip" text='2026.02.09' />
+
+- 编辑器构建参数新增 `onRedressSelection` 属性，用于编辑器光标纠正时触发对编辑器虚拟光标进行修改优化
+- 扩展新增参数 `onRedressSelection` 属性，同上
+- `Table` 扩展进行了优化，解决单元格内容选择时误选中前一个单元格末尾处的体验问题
+
 ## v0.0.2-beta.9 <Badge type="tip" text='2026.02.04' />
 
 - 修复代码编写错误

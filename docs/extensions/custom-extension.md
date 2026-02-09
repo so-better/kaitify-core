@@ -108,6 +108,10 @@ const editor = await Editor.configure({
 
 编辑器 `updateView` 执行时，通过比对新旧节点数组获取需要格式化的节点，在这些节点被格式化前，触发此方法，同编辑器构建参数 `onBeforePatchNodeToFormat`
 
+##### onRedressSelection <Badge type="danger" text="(this: Editor) => void" />
+
+编辑器进行光标纠正时触发，在这里可以修改虚拟光标的位置
+
 ##### addCommands <Badge type="danger" text="((this: Editor) => EditorCommandsType) | undefined" />
 
 自定义扩展命令，添加的命令可以通过 `editor.commands` 来调用

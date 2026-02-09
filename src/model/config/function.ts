@@ -585,6 +585,13 @@ export const registerExtension = function (this: Editor, extension: Extension) {
       return node
     }
   }
+  if (extension.onRedressSelection) {
+    const fn = this.onRedressSelection
+    this.onRedressSelection = () => {
+      extension.onRedressSelection!.apply(this)
+      if (fn) fn.apply(this)
+    }
+  }
   if (extension.addCommands) {
     const commands = extension.addCommands.apply(this)
     this.commands = { ...this.commands, ...commands }
@@ -684,27 +691,26 @@ export const updateSelection = function (this: Editor) {
 }
 
 /**
- * 纠正光标位置，返回布尔值表示是否存在纠正行为
+ * 纠正光标位置
  */
 export const redressSelection = function (this: Editor) {
   if (!this.selection.focused()) {
-    return false
+    return
   }
-  let startNode = this.selection.start!.node
-  let endNode = this.selection.end!.node
-  let startOffset = this.selection.start!.offset
-  let endOffset = this.selection.end!.offset
-
+  const startNode = this.selection.start!.node
+  const endNode = this.selection.end!.node
+  const startOffset = this.selection.start!.offset
+  const endOffset = this.selection.end!.offset
   //起点和终点是相邻的两个节点并且位置紧邻则纠正光标位置
   const startNextNode = this.getNextSelectionNode(startNode)
   if (startNextNode && startNextNode.isEqual(endNode) && startOffset == (startNode.isText() ? startNode.textContent!.length : 1) && endOffset == 0) {
-    endNode = startNode
-    endOffset = startOffset
-    this.selection.end!.node = endNode
-    this.selection.end!.offset = endOffset
-    return true
+    this.selection.end!.node = startNode
+    this.selection.end!.offset = startOffset
   }
-  return false
+  //纠正光标钩子
+  if (this.onRedressSelection) {
+    this.onRedressSelection.apply(this)
+  }
 }
 
 /**

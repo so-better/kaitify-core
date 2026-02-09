@@ -732,6 +732,21 @@ export const TableExtension = () =>
         }
       }
     },
+    onRedressSelection() {
+      if (this.selection.focused()) {
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        if (!!startNode.getMatchNode({ tag: 'td' }) && !!endNode.getMatchNode({ tag: 'td' })) {
+          const startOffset = this.selection.start!.offset
+          //起点和终点是相邻的两个单元格节点并且光标起点在前一个单元格的末尾处
+          const startNextNode = this.getNextSelectionNode(startNode)
+          if (startNextNode && startNextNode.isEqual(endNode) && startOffset == (startNode.isText() ? startNode.textContent!.length : 1)) {
+            this.selection.start!.node = endNode
+            this.selection.start!.offset = 0
+          }
+        }
+      }
+    },
     addCommands() {
       const getTable = () => {
         return this.getMatchNodeBySelection({
