@@ -43,12 +43,17 @@ export default defineConfig({
       { text: '指南', link: '/guide/introduction', activeMatch: '/guide' },
       { text: 'API', link: '/apis/editor-attrs', activeMatch: '/apis' },
       { text: '扩展', link: '/extensions/introduction', activeMatch: '/extensions' },
+      { text: '更新日志', link: '/changelog' },
       {
         text: '在线体验',
         link: 'https://www.so-better.cn/run?lib=kaitify-core',
         target: '_blank'
       },
-      { text: '更新日志', link: '/changelog' }
+      {
+        text: '联系作者',
+        link: 'https://www.so-better.cn/author',
+        target: '_blank'
+      }
     ],
     sidebar: {
       '/guide': [
