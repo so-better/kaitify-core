@@ -590,7 +590,12 @@ export const TableExtension = () =>
               item.parent = tbody
               //过滤非法的子节点
               if (item.hasChildren()) {
-                item.children = item.children!.filter(it => it.isMatch({ tag: 'td' }) || it.isMatch({ tag: 'th' }))
+                item.children = item.children!.map(it => {
+                  if (!it.isMatch({ tag: 'td' }) && !it.isMatch({ tag: 'th' })) {
+                    it.toEmpty()
+                  }
+                  return it
+                })
               }
               return item
             })

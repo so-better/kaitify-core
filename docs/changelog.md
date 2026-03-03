@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.2-beta.11 <Badge type="tip" text='2026.03.03' />
+
+- 修复 `Table` 在格式化时候的一些bug
+
 ## v0.0.2-beta.10 <Badge type="tip" text='2026.02.09' />
 
 - 编辑器构建参数新增 `onRedressSelection` 属性，用于编辑器光标纠正时触发对编辑器虚拟光标进行修改优化
