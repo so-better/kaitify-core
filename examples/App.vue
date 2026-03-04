@@ -307,8 +307,9 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, Extension, KNode } from '../src'
+import { Editor, KNode } from '../src'
 import { delay, isContains } from '../src/tools'
+import { content, simpleContent } from './content'
 
 const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
@@ -316,7 +317,7 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: `<p>这里输入正文</p>`,
+    value: content,
     extensions: [],
     el: '#editor',
     editable: true,

@@ -584,11 +584,9 @@ export class Editor {
     const styles = getDomStyles(dom as HTMLElement) //样式
     const tag = dom.nodeName.toLocaleLowerCase() //标签名称
     const namespace = (dom as HTMLElement).namespaceURI //命名空间
-    //如果是需要置为空的标签返回空文本节点
+    //如果是需要置为空的标签返回零宽度空白文本节点
     if (this.emptyRenderTags.includes(tag)) {
-      return KNode.create({
-        type: 'text'
-      })
+      return KNode.createZeroWidthText()
     }
     //如果是默认的文本节点标签并且内部只有文本，则返回文本节点
     if (tag == this.textRenderTag && dom.childNodes.length && Array.from(dom.childNodes).every(childNode => childNode.nodeType == 3)) {
@@ -1436,7 +1434,7 @@ export class Editor {
           this.delete()
         }
         //重新执行
-        this.insertNode(node)
+        this.insertNode(node, cover)
         return
       }
       //光标偏移值

@@ -506,6 +506,12 @@ export const TableExtension = () =>
         if (isHideCell(node)) {
           node.void = true
         }
+        //没有子节点则创建默认占位符，兼容<td></td>场景
+        if (!node.hasChildren()) {
+          const placeholderNode = KNode.createPlaceholder()
+          node.children = [placeholderNode]
+          placeholderNode.parent = node
+        }
       }
       if (node.isMatch({ tag: 'colgroup' })) {
         node.type = 'block'
