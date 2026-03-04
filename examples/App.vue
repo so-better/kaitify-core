@@ -333,12 +333,12 @@ onMounted(() => {
 })
 
 const insertNode = () => {
-  editor.value!.insertNode(
-    KNode.create({
-      type: 'text',
-      textContent: '被插入的文本节点'
-    })
-  )
+  const change_content = `<p>bbbb</p>`
+  const theNodes = editor.value!.htmlParseNode(change_content)
+  console.log(1122, theNodes)
+  for (const theNode of theNodes) {
+    editor.value!.insertNode(theNode, true)
+  }
   editor.value!.updateView()
 }
 

@@ -506,8 +506,8 @@ export const TableExtension = () =>
         if (isHideCell(node)) {
           node.void = true
         }
-        //没有子节点则创建默认占位符，兼容<td></td>场景
-        if (!node.hasChildren()) {
+        //没有子节点或者子节点都是空节点，则创建默认占位符，兼容<td></td>场景
+        if (!node.hasChildren() || node.children!.every(child => child.isEmpty())) {
           const placeholderNode = KNode.createPlaceholder()
           node.children = [placeholderNode]
           placeholderNode.parent = node

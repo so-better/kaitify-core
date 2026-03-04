@@ -5,11 +5,10 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.2-beta.12 <Badge type="tip" text='2026.03.04' />
+## v0.0.2-beta.13 <Badge type="tip" text='2026.03.04' />
 
 - `insertNode` 方法修复当光标在不可编辑器节点中时处理后重新执行时cover丢失的问题
-- `Table` 扩展优化：当td中没有子节点时创建默认占位符
-- `domParseNode` 方法优化：如果是需要置为空的标签，会转为零宽度空白文本节点，原来是直接转为空节点
+- `Table` 扩展优化：在onDomParseNode处理中当td中没有子节点或者子节点都是空节点时时创建默认占位符
 
 ## v0.0.2-beta.11 <Badge type="tip" text='2026.03.03' />
 
