@@ -89,6 +89,11 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
         editor.selection.start!.offset = offset - index
         break
       }
+      //始终没匹配到位置，到了最后一个，发现offset超出最后一个文本的位置，则默认放到最后一个文本末尾
+      if (offset >= index && i == newTextNodes.length - 1) {
+        editor.selection.start!.node = newTextNodes[i]
+        editor.selection.start!.offset = newTextNodes[i].textContent!.length
+      }
       i++
       index = newIndex
     }
@@ -110,6 +115,11 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
         editor.selection.end!.node = newTextNodes[i]
         editor.selection.end!.offset = offset - index
         break
+      }
+      //始终没匹配到位置，到了最后一个，发现offset超出最后一个文本的位置，则默认放到最后一个文本末尾
+      if (offset >= index && i == newTextNodes.length - 1) {
+        editor.selection.end!.node = newTextNodes[i]
+        editor.selection.end!.offset = newTextNodes[i].textContent!.length
       }
       i++
       index = newIndex
