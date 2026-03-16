@@ -317,7 +317,7 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: content,
+    value: '<p>hello</p><pre>const a = new block();</pre><p>kai ling</p>',
     extensions: [],
     el: '#editor',
     editable: true,
