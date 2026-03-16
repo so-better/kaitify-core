@@ -149,11 +149,26 @@ export const formatPlaceholderMerge: RuleFunctionType = ({ editor, node }) => {
  */
 export const formatLineBreakSpaceText: RuleFunctionType = ({ editor, node }) => {
   if (node.isText() && !node.isEmpty()) {
+    const originalText = node.textContent!
     //先执行1/2/3点的替换逻辑
-    node.textContent = node
-      .textContent!.replace(/\r\n/g, '\n')
+    node.textContent = originalText
+      .replace(/\r\n/g, '\n')
       .replace(/\u00A0/g, ' ')
       .replace(/\uFEFF/g, getZeroWidthText())
+    //步骤1中 \r\n -> \n 会导致文本长度缩短，需要同步修正光标 offset
+    if (editor.selection.focused()) {
+      if (editor.selection.start!.node.isEqual(node)) {
+        //统计 offset 之前有多少个 \r\n，每个使 offset 减1
+        const preText = originalText.slice(0, editor.selection.start!.offset)
+        const crlfCount = (preText.match(/\r\n/g) || []).length
+        editor.selection.start!.offset -= crlfCount
+      }
+      if (editor.selection.end!.node.isEqual(node)) {
+        const preText = originalText.slice(0, editor.selection.end!.offset)
+        const crlfCount = (preText.match(/\r\n/g) || []).length
+        editor.selection.end!.offset -= crlfCount
+      }
+    }
     //第4点替换之前先判断起点和终点前面有几个\n\u200B
     let startPrevNumber = 0
     let endPrevNumber = 0

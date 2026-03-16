@@ -321,7 +321,7 @@ onMounted(() => {
     extensions: [],
     el: '#editor',
     editable: true,
-    allowPasteHtml: true,
+    allowPasteHtml: false,
     placeholder: '请输入内容...',
     onAfterUpdateView() {
       count.value = Array.from(this.getContent(true, true).trim()).length
