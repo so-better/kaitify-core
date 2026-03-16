@@ -861,7 +861,6 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
   const text = dataTransfer.getData('text/plain')
   //文件数组
   const files = dataTransfer.files
-  debugger
   //设置了优先粘贴文件，则处理文件粘贴
   if (files.length && this.priorityPasteFiles) {
     await handlerForPasteFiles.apply(this, [files])
