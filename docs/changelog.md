@@ -5,6 +5,10 @@ title: 更新日志
 
 # 更新日志
 
+## v0.0.2-beta.14 <Badge type="tip" text='2026.03.16' />
+
+- 修复代码块内容高亮处理时可能引起的光标位置bug
+
 ## v0.0.2-beta.13 <Badge type="tip" text='2026.03.04' />
 
 - `insertNode` 方法修复当光标在不可编辑器节点中时处理后重新执行时cover丢失的问题
