@@ -235,6 +235,8 @@
         <div class="toolbar">
           <button @click="editor?.commands.setCodeBlock!()">插入代码块</button>
           <button @click="editor?.commands.unsetCodeBlock!()">取消代码块</button>
+          <button @click="editor?.commands.updateCodeBlockLanguage!('go')">更新代码块语言为go</button>
+          <button @click="editor?.commands.updateCodeBlockLanguage!('typescript')">更新代码块语言为typescript</button>
         </div>
       </fieldset>
       <fieldset>
@@ -317,7 +319,7 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: '<p>hello</p><pre>const a = new block();</pre><p>kai ling</p>',
+    value: '<p>hello</p><div kaitify-code-block><pre>const a = new block();</pre><pre>const a = new block();</pre><pre>const a = new block();</pre></div><p>kai ling</p>',
     extensions: [],
     el: '#editor',
     editable: true,
