@@ -136,7 +136,7 @@ export type EditorConfigureOptionType = {
    */
   onInsertParagraph?: (this: Editor, node: KNode) => void
   /**
-   * 完成删除时触发
+   * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作
    */
   onDeleteComplete?: (this: Editor) => void
   /**
@@ -309,7 +309,7 @@ export class Editor {
    */
   onInsertParagraph?: (this: Editor, node: KNode) => void
   /**
-   * 完成删除时触发【初始化后不可修改】
+   * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作【初始化后不可修改】
    */
   onDeleteComplete?: (this: Editor) => void
   /**
@@ -1747,6 +1747,10 @@ export class Editor {
         }
       }
     }
+    //触发事件
+    if (typeof this.onDeleteComplete == 'function') {
+      this.onDeleteComplete.apply(this)
+    }
     //如果起点所在节点为空则更新起点
     if (this.selection.start!.node.isEmpty()) {
       this.updateSelectionRecently('start')
@@ -1754,10 +1758,6 @@ export class Editor {
     //合并起点和终点
     this.selection.end!.node = this.selection.start!.node
     this.selection.end!.offset = this.selection.start!.offset
-    //触发事件
-    if (typeof this.onDeleteComplete == 'function') {
-      this.onDeleteComplete.apply(this)
-    }
   }
 
   /**

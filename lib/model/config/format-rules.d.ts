@@ -18,7 +18,7 @@ export declare const fomratBlockTagParse: RuleFunctionType;
  */
 export declare const formatBlockInChildren: RuleFunctionType;
 /**
- * 针对节点自身：处理不可编辑的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
+ * 针对节点自身：处理不可编辑的可见的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
  */
 export declare const formatUneditableNoodes: RuleFunctionType;
 /**

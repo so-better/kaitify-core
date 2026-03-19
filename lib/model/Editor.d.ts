@@ -124,7 +124,7 @@ export type EditorConfigureOptionType = {
      */
     onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**
-     * 完成删除时触发
+     * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作
      */
     onDeleteComplete?: (this: Editor) => void;
     /**
@@ -293,7 +293,7 @@ export declare class Editor {
      */
     onInsertParagraph?: (this: Editor, node: KNode) => void;
     /**
-     * 完成删除时触发【初始化后不可修改】
+     * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作【初始化后不可修改】
      */
     onDeleteComplete?: (this: Editor) => void;
     /**

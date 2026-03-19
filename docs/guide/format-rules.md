@@ -28,7 +28,7 @@ title: 格式化规则
 
 ##### 规则 3
 
-如果节点是不可编辑的，则查找使其不可编辑的目标节点，针对该目标节点，如果是非块节点，则在两侧加上零宽度空白文本节点，且保证光标始终不在不可编辑的节点内部
+如果节点是不可编辑的，则查找使其不可编辑的目标节点，针对该目标节点，如果是非块节点且可见，则在两侧加上零宽度空白文本节点，且保证光标始终不在不可编辑的节点内部
 
 ##### 规则 4
 
@@ -61,21 +61,21 @@ title: 格式化规则
 
 ```ts
 const editor = await Editor.configure({
-	value: '<p><br/></p>',
-	formatRules: [
-		//给每一个块节点设置背景色红色
-		({ node }) => {
-			if (node.isBlock()) {
-				if (node.hasStyles()) {
-					node.styles.background = 'red'
-				} else {
-					node.styles = {
-						background: 'red'
-					}
-				}
-			}
-		}
-	]
+  value: '<p><br/></p>',
+  formatRules: [
+    //给每一个块节点设置背景色红色
+    ({ node }) => {
+      if (node.isBlock()) {
+        if (node.hasStyles()) {
+          node.styles.background = 'red'
+        } else {
+          node.styles = {
+            background: 'red'
+          }
+        }
+      }
+    }
+  ]
 })
 ```
 

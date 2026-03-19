@@ -309,7 +309,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Editor, KNode } from '../src'
+import { Editor, KNode, CodeBlockExtension } from '../src'
 import { delay, isContains } from '../src/tools'
 import { content, simpleContent } from './content'
 
@@ -319,8 +319,14 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: '<p>hello</p><div kaitify-code-block><pre>const a = new block();</pre><pre>const a = new block();</pre><pre>const a = new block();</pre></div><p>kai ling</p>',
-    extensions: [],
+    value: '<p>hello</p><pre><span kaitify-code-span><span>const a = 1;\nconst a = 1;</span></span></pre><p>kai ling</p>',
+    extensions: [
+      CodeBlockExtension({
+        handleCopy: code => {
+          console.log('复制的code', code)
+        }
+      })
+    ],
     el: '#editor',
     editable: true,
     allowPasteHtml: false,

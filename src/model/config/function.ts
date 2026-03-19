@@ -117,6 +117,10 @@ export const getAllowMergeNode = function (this: Editor, node: KNode, type: 'par
     if (!previousNode) {
       return null
     }
+    //目标节点被锁定
+    if (previousNode.locked) {
+      return null
+    }
     //文本节点
     if (node.isText()) {
       //可以和前一个节点合并
@@ -142,6 +146,10 @@ export const getAllowMergeNode = function (this: Editor, node: KNode, type: 'par
     if (!nextNode) {
       return null
     }
+    //目标节点被锁定
+    if (nextNode.locked) {
+      return null
+    }
     //文本节点
     if (node.isText()) {
       //可以和后一个节点合并
@@ -164,6 +172,10 @@ export const getAllowMergeNode = function (this: Editor, node: KNode, type: 'par
   if (type == 'parent') {
     //父节点不止一个子节点
     if (node.parent!.children!.length > 1) {
+      return null
+    }
+    //父节点被锁定
+    if (node.parent!.locked) {
       return null
     }
     //文本节点

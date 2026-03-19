@@ -29,5 +29,11 @@ declare module '../../model' {
         updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>;
     }
 }
-export declare const CodeBlockExtension: () => Extension;
+export type CodeBlockExtensionPropsType = {
+    /**
+     * 复制代码的具体实现
+     */
+    handleCopy?: (code: string) => void;
+};
+export declare const CodeBlockExtension: (props?: CodeBlockExtensionPropsType) => Extension;
 export * from './hljs';

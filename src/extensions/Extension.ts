@@ -33,7 +33,7 @@ export type ExtensionCreateOptionType = {
    */
   onInsertParagraph?: (this: Editor, node: KNode) => void
   /**
-   * 完成删除回调
+   * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作
    */
   onDeleteComplete?: (this: Editor) => void
   /**
@@ -123,7 +123,7 @@ export class Extension {
    */
   onInsertParagraph?: (this: Editor, node: KNode) => void
   /**
-   * 完成删除回调
+   * 完成删除回调，此时还没有对起点和终点进行合并操作，也没有进行判空操作
    */
   onDeleteComplete?: (this: Editor) => void
   /**

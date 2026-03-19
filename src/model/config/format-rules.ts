@@ -43,11 +43,11 @@ export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
 }
 
 /**
- * 针对节点自身：处理不可编辑的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
+ * 针对节点自身：处理不可编辑的可见的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
  */
 export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
   const uneditableNode = node.getUneditable()
-  if (uneditableNode && !uneditableNode.isEmpty() && !uneditableNode.isBlock()) {
+  if (uneditableNode && !uneditableNode.void && !uneditableNode.isEmpty() && !uneditableNode.isBlock()) {
     const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
     const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
     //前一个节点不存在或者不是零宽度空白文本节点

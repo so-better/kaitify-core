@@ -1,6 +1,7 @@
+import { event as DapEvent, common as DapCommon } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
-import { isOnlyTab, isZeroWidthText } from '@/tools'
+import { getZeroWidthText, isOnlyTab, isZeroWidthText } from '@/tools'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
 import './style.less'
@@ -34,6 +35,48 @@ declare module '../../model' {
   }
 }
 
+export type CodeBlockExtensionPropsType = {
+  /**
+   * 复制代码的具体实现
+   */
+  handleCopy?: (code: string) => void
+}
+
+/**
+ * 创建CodeSpan节点
+ */
+const createCodeSpanNode = () => {
+  return KNode.create({
+    type: 'inline',
+    tag: 'span',
+    locked: true,
+    marks: {
+      'kaitify-code-span': ''
+    },
+    children: [
+      {
+        type: 'text',
+        textContent: getZeroWidthText()
+      }
+    ]
+  })
+}
+
+/**
+ * 创建CodeCopy节点
+ */
+const createCodeCopyNode = () => {
+  return KNode.create({
+    type: 'closed',
+    tag: 'span',
+    void: true,
+    marks: {
+      'kaitify-code-copy': '',
+      contenteditable: 'false'
+    }
+  })
+}
+
 /**
  * 块节点转为代码块
  */
@@ -49,9 +92,15 @@ const toCodeBlock = (editor: Editor, node: KNode) => {
       tag: 'pre',
       children: []
     })
+    //创建codeSpan和codeCopy节点
+    const codeSpanNode = createCodeSpanNode()
+    const codeCopyNode = createCodeCopyNode()
+    codeBlockNode.children = [codeSpanNode, codeCopyNode]
+    codeSpanNode.parent = codeBlockNode
+    codeCopyNode.parent = codeBlockNode
     //将块节点的子节点给代码块节点
     node.children!.forEach((item, index) => {
-      editor.addNode(item, codeBlockNode, index)
+      editor.addNode(item, codeSpanNode, index)
     })
     //将代码块节点添加到块节点下
     codeBlockNode.parent = node
@@ -59,13 +108,26 @@ const toCodeBlock = (editor: Editor, node: KNode) => {
   }
   //非固定块节点
   else {
+    //转为段落
     editor.toParagraph(node)
+    //创建codeSpan和codeCopy节点
+    const codeSpanNode = createCodeSpanNode()
+    const codeCopyNode = createCodeCopyNode()
+    //将块节点的子节点给代码块节点
+    node.children!.forEach((item, index) => {
+      editor.addNode(item, codeSpanNode, index)
+    })
+    //转为代码块节点
     node.tag = 'pre'
+    //将codeSpan加入到代码块节点
+    node.children = [codeSpanNode, codeCopyNode]
+    codeSpanNode.parent = node
+    codeCopyNode.parent = node
   }
 }
 
 /**
- * 更新代码块内的光标位置
+ * 更新代码块内的光标位置，node传入的是codeSpan节点
  */
 const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNodes: KNode[]) => {
   if (!editor.selection.focused()) {
@@ -128,7 +190,7 @@ const updateSelection = (editor: Editor, node: KNode, textNodes: KNode[], newNod
 }
 
 /**
- * 判断代码块是否需要更新
+ * 判断代码块是否需要更新，node传入的是pre节点
  */
 const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent: string) => {
   try {
@@ -140,8 +202,7 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
         return true
       }
       //文本内容不一致
-      const oldTextContent = domPre.innerText
-      if (oldTextContent != textContent) {
+      if (domPre.textContent != textContent) {
         return true
       }
       //子孙节点数量不一致（防止在代码块里插入非文本节点，比如图片等）
@@ -156,7 +217,47 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
   }
 }
 
-export const CodeBlockExtension = () =>
+/**
+ * 复制按钮点击
+ */
+const handleCodeCopy = (editor: Editor, handleCopy?: CodeBlockExtensionPropsType['handleCopy']) => {
+  DapEvent.off(editor.$el!, 'click.codeBlock_copy')
+  DapEvent.on(editor.$el!, 'click.codeBlock_copy', async e => {
+    //可编辑状态下无法点击
+    if (editor.isEditable()) {
+      return
+    }
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const codeCopyNode = node.getMatchNode({
+      tag: 'span',
+      marks: {
+        'kaitify-code-copy': true
+      }
+    })
+    //点击的是代码复制按钮
+    if (codeCopyNode) {
+      //获取代码块节点
+      const codeBlockNode = codeCopyNode.getMatchNode({ tag: 'pre' })
+      if (!codeBlockNode) return
+      //获取代码内容所在的codeSpan节点
+      const codeSpanNode = codeBlockNode.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } }))
+      if (!codeSpanNode) return
+      //获取代码块的代码内容
+      const textNodes = codeSpanNode.getFocusNodes('text')
+      const content = textNodes.reduce((total, current) => {
+        return total + (current.textContent ?? '')
+      }, '')
+      handleCopy ? handleCopy(content) : DapCommon.copyText(content)
+    }
+  })
+}
+
+export const CodeBlockExtension = (props?: CodeBlockExtensionPropsType) =>
   Extension.create({
     name: 'codeBlock',
     extraKeepTags: ['pre'],
@@ -164,12 +265,27 @@ export const CodeBlockExtension = () =>
       if (node.isMatch({ tag: 'pre' })) {
         node.type = 'block'
       }
+      if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } })) {
+        node.type = 'inline'
+        node.locked = true
+      }
+      if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
+        node.type = 'closed'
+        node.void = true
+        node.marks!['contenteditable'] = 'false'
+      }
       return node
     },
     onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
-      if (node.isMatch({ tag: 'pre' }) && node.hasMarks()) {
-        if (node.marks!.hasOwnProperty('kaitify-hljs')) marks['kaitify-hljs'] = node.marks!['kaitify-hljs']
+      if (node.isMatch({ tag: 'pre' }) && node.hasMarks() && node.marks!.hasOwnProperty('kaitify-hljs')) {
+        marks['kaitify-hljs'] = node.marks!['kaitify-hljs']
+      }
+      if (node.isMatch({ tag: 'span' }) && node.hasMarks() && node.marks!.hasOwnProperty('kaitify-code-span')) {
+        marks['kaitify-code-span'] = node.marks!['kaitify-code-span']
+      }
+      if (node.isMatch({ tag: 'span' }) && node.hasMarks() && node.marks!.hasOwnProperty('kaitify-code-copy')) {
+        marks['kaitify-code-copy'] = node.marks!['kaitify-code-copy']
       }
       return marks
     },
@@ -178,20 +294,68 @@ export const CodeBlockExtension = () =>
       if (codeBlockNode) return codeBlockNode
       return node
     },
+    onAfterUpdateView() {
+      //复制代码
+      handleCodeCopy(this, props?.handleCopy)
+    },
     formatRules: [
+      //代码块相关的节点类型设置
+      ({ node }) => {
+        if (node.isMatch({ tag: 'pre' })) {
+          node.type = 'block'
+        }
+        if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } })) {
+          node.type = 'inline'
+          node.locked = true
+        }
+        if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
+          node.type = 'closed'
+          node.void = true
+          node.marks!['contenteditable'] = 'false'
+        }
+      },
+      //代码块结构处理
+      ({ editor, node }) => {
+        if (node.isMatch({ tag: 'pre' })) {
+          //存在子节点
+          if (node.hasChildren()) {
+            let codeSpanNode = node.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } }))
+            let codeCopyNode = node.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } }))
+            if (!codeSpanNode) codeSpanNode = createCodeSpanNode()
+            if (!codeCopyNode) codeCopyNode = createCodeCopyNode()
+            const otherChildren = node.children!.filter(item => !item.isEqual(codeSpanNode) && !item.isEqual(codeCopyNode))
+            //将非codeSpan和codeCopy的子节点添加到codeSpan中去
+            otherChildren.forEach(item => {
+              editor.addNode(item, codeSpanNode, codeSpanNode.children?.length)
+            })
+            node.children = [codeSpanNode, codeCopyNode]
+            codeSpanNode.parent = node
+            codeCopyNode.parent = node
+          }
+          //不存在子节点
+          else {
+            const codeSpanNode = createCodeSpanNode()
+            const codeCopyNode = createCodeCopyNode()
+            node.children = [codeSpanNode, codeCopyNode]
+            codeSpanNode.parent = node
+            codeCopyNode.parent = node
+          }
+        }
+      },
       //代码块高亮处理
       ({ editor, node }) => {
         if (node.isMatch({ tag: 'pre' }) && node.hasChildren()) {
-          //代码块必须是块节点
-          if (!node.isBlock()) node.type = 'block'
           //获取语言类型
           let language = (node.marks?.['kaitify-hljs'] || '') as string
           //语言存在但不是列表内的
           if (language && !HljsLanguages.some(item => item == language)) {
             language = ''
           }
+          //获取codeSpan节点
+          const codeSpanNode = node.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } }))
+          if (!codeSpanNode) return
           //获取代码块内的所有文本节点
-          const textNodes = KNode.flat(node.children!).filter(item => item.isText() && !item.isEmpty())
+          const textNodes = KNode.flat(codeSpanNode.children!).filter(item => item.isText() && !item.isEmpty())
           //获取代码块内的代码文本值
           const textContent = textNodes.reduce((val, item) => {
             return val + item.textContent
@@ -204,18 +368,18 @@ export const CodeBlockExtension = () =>
               //将经过hljs处理的内容转为节点数组
               const nodes = editor.htmlParseNode(html)
               //将新的文本节点全部加入到代码块的子节点数组中
-              node.children = nodes.map(item => {
-                item.parent = node
+              codeSpanNode.children = nodes.map(item => {
+                item.parent = codeSpanNode
                 return item
               })
               //更新光标位置
-              updateSelection(editor, node, textNodes, nodes)
+              updateSelection(editor, codeSpanNode, textNodes, nodes)
             } else {
               const selectionStartInNode = editor.isSelectionInTargetNode(node, 'start')
               const selectionEndInNode = editor.isSelectionInTargetNode(node, 'end')
               const placeholderNode = KNode.createPlaceholder()
-              node.children = [placeholderNode]
-              placeholderNode.parent = node
+              codeSpanNode.children = [placeholderNode]
+              placeholderNode.parent = codeSpanNode
               if (selectionStartInNode) {
                 editor.setSelectionBefore(placeholderNode, 'start')
               }
@@ -242,8 +406,10 @@ export const CodeBlockExtension = () =>
       const codeBlockNode = node.getMatchNode({
         tag: 'pre'
       })
+      //获取代码块节点下的codeSpan节点
+      const codeSpanNode = codeBlockNode?.children?.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } }))
       //在代码块节点内并且光标所在节点是文本节点
-      if (!!codeBlockNode && this.selection.start!.node.isText()) {
+      if (!!codeBlockNode && !!codeSpanNode && this.selection.start!.node.isText()) {
         const index = this.selection.start!.offset === 0 ? 0 : this.selection.start!.offset - 1
         const textContent = this.selection.start!.node.textContent!
         //当前字符
@@ -255,7 +421,7 @@ export const CodeBlockExtension = () =>
         //当前字符是否文本节点的最后一个字符
         const isLastChar = index === textContent.length - 1
         //当前节点是否该代码块内最后一个节点
-        const isLastText = this.selection.start!.node.lastInTargetNode(codeBlockNode)
+        const isLastText = this.selection.start!.node.lastInTargetNode(codeSpanNode)
         if (currentChar === '\n' && p1Char !== null && p2Char !== null && isZeroWidthText(p1Char) && p2Char === '\n' && isLastChar && isLastText) {
           //清除这两个换行符和后面的零宽度字符
           this.selection.start!.node.textContent = this.selection.start!.node.textContent!.slice(0, index - 2)
@@ -273,6 +439,18 @@ export const CodeBlockExtension = () =>
           this.addNodeAfter(paragraph, codeBlockNode)
           //重新设置光标
           this.setSelectionBefore(paragraph, 'all')
+        }
+      }
+    },
+    onDeleteComplete() {
+      const codeBlockNode = this.selection.start!.node.getMatchNode({ tag: 'pre' })
+      if (codeBlockNode) {
+        const codeSpanNode = codeBlockNode.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } }))
+        if (codeSpanNode && codeSpanNode.getFocusNodes('all').every(item => item.isEmpty())) {
+          const zeroWidthText = KNode.createZeroWidthText()
+          zeroWidthText.parent = codeSpanNode
+          codeSpanNode.children = [zeroWidthText]
+          this.setSelectionAfter(zeroWidthText, 'start')
         }
       }
     },

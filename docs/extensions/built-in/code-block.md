@@ -134,11 +134,39 @@ title: code-block 代码块
   await editor.commands.updateCodeBlockLanguage('java')
   ```
 
+## 扩展配置
+
+`codeBlock` 扩展支持进行配置
+
+```ts
+import { CodeBlockExtension } from '@kaitify/core'
+
+const editor = await Editor.configure({
+  el: '#editor',
+  value: '',
+  placeholder: '请输入正文...',
+  extensions: [
+    CodeBlockExtension({
+      handleCopy: code => {
+        //在这里自定义处理代码文本的粘贴
+      }
+    })
+  ]
+})
+```
+
+配置项：
+
+##### handleCopy <Badge type="danger" text="string" />
+
+默认的代码复制逻辑仅在本地运行或者https安全域名上才能进行复制，不过你可以通过该属性来自定义复制的逻辑，回调参数是当前代码块的代码内容
+
 ## 代码示例
 
 <div style="margin:0 0 10px 0">
   <button class="demo-button" @click="editor?.commands.setCodeBlock()">设置代码块</button>
   <button class="demo-button" @click="editor?.commands.unsetCodeBlock()">取消代码块</button>
+  <button class="demo-button" @click="editor?.setEditable(!editor?.isEditable())">禁用/启用编辑器</button>
 </div>
 <div ref="editorRef" style="width:100%;height:200px;"></div>
 
