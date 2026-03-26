@@ -8,8 +8,13 @@ title: 更新日志
 ## v0.0.2-beta.19 <Badge type="tip" text='2026.03.26' />
 
 - 闭合节点设计更新：现在针对闭合节点，其对应的真实dom内部被视为黑盒，即编辑器不管理闭合节点对应的真实dom的内部元素
-- 针对闭合节点的新设计，优化findNode方法设计
+- 针对闭合节点的新设计，优化 `findNode` 方法设计
 - 针对闭合节点的新设计，优化了根据真实光标更新虚拟光标的方法设计
+- 统一处理 `contenteditable="false"` 的元素为 `closed` 节点，其内部元素编辑器不进行管理
+- 在渲染阶段会给 `closed` 节点统一加上 `contenteditable="false"` 属性
+- 移除 `KNode.getUneditable()` 方法
+- `formatUneditableNoodes`（规则3）格式化规则移除
+- `Editor` 中 `insertText`、`insertParagraph`、`insertNode`、`delete` 的 `uneditable` 检测逻辑移除
 
 ## v0.0.2-beta.18 <Badge type="tip" text='2026.03.19' />
 

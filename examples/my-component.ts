@@ -6,7 +6,6 @@ class MyComponent extends HTMLElement {
   }
 
   render() {
-    this.contentEditable = 'false'
     this.innerHTML = `<span>${this.getAttribute('url') || '未知地址'}</span>`
   }
 

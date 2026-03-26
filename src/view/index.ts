@@ -35,11 +35,16 @@ export const getNodeRenderOptions = (editor: Editor, node: KNode): KNodeRenderOp
 		}
 	}
 	//其他节点
+	const attrs: KNodeMarksType = node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key }
+	//闭合节点统一加上 contenteditable="false"
+	if (node.isClosed()) {
+		attrs['contenteditable'] = 'false'
+	}
 	return {
 		key: node.key,
 		tag: node.tag!,
 		namespace: node.namespace,
-		attrs: node.hasMarks() ? DapCommon.clone({ ...node.marks, [NODE_MARK]: node.key }) : { [NODE_MARK]: node.key },
+		attrs,
 		styles: node.hasStyles() ? DapCommon.clone(node.styles!) : {},
 		children: node.hasChildren() ? node.children!.map(item => getNodeRenderOptions(editor, item)) : []
 	}

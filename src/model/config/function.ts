@@ -78,20 +78,12 @@ export const mergeBlock = function (this: Editor, node: KNode, target: KNode) {
   if (node.isEmpty() || target.isEmpty()) {
     return
   }
-  const uneditableNode = node.getUneditable()
-  //前一个块节点是不可编辑的，则直接删除前一个块节点
-  if (uneditableNode) {
-    uneditableNode.toEmpty()
-  }
-  //否则走正常合并逻辑
-  else {
-    const nodes = target.children!.map(item => {
-      item.parent = node
-      return item
-    })
-    node.children!.push(...nodes)
-    target.children = []
-  }
+  const nodes = target.children!.map(item => {
+    item.parent = node
+    return item
+  })
+  node.children!.push(...nodes)
+  target.children = []
 }
 
 /**
@@ -718,10 +710,6 @@ export const handlerForPasteKeepMarksAndStyles = function (this: Editor, nodes: 
     const styles: KNodeStylesType = {}
     //处理需要保留的标记
     if (node.hasMarks()) {
-      //contenteditable属性保留
-      if (node.marks!.hasOwnProperty('contenteditable')) {
-        marks['contenteditable'] = node.marks!['contenteditable']
-      }
       //name属性保留
       if (node.marks!.hasOwnProperty('name')) {
         marks['name'] = node.marks!['name']

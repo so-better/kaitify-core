@@ -3,7 +3,7 @@ import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNo
 import { createGuid, delay, getDomAttributes, getDomStyles, getZeroWidthText, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatUneditableNoodes, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText } from './config/format-rules'
+import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onCut, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
@@ -267,7 +267,7 @@ export class Editor {
   /**
    * 编辑器的节点数组格式化规则【初始化后不可修改】【open】
    */
-  formatRules: RuleFunctionType[] = [fomratBlockTagParse, formatBlockInChildren, formatUneditableNoodes, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakSpaceText, formatSiblingNodesMerge, formatParentNodeMerge]
+  formatRules: RuleFunctionType[] = [fomratBlockTagParse, formatBlockInChildren, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakSpaceText, formatSiblingNodesMerge, formatParentNodeMerge]
   /**
    * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
    */
@@ -634,6 +634,12 @@ export class Editor {
       config.children = []
     }
     let node = KNode.create(config)
+    //如果元素带有 contenteditable="false"，强制转为闭合节点，并移除该属性（渲染时由框架统一添加）
+    if (node.hasMarks() && node.marks!['contenteditable'] === 'false') {
+      node.type = 'closed'
+      node.children = undefined
+      delete node.marks!['contenteditable']
+    }
     //如果不是闭合节点则设置子节点
     if (!node.isClosed()) {
       Array.from(dom.childNodes).forEach(child => {
@@ -1278,27 +1284,6 @@ export class Editor {
     //起点和终点在一个位置
     if (this.selection.collapsed()) {
       const node = this.selection.start!.node
-      const uneditableNode = node.getUneditable()
-      //在不可编辑的节点里
-      if (!!uneditableNode) {
-        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
-        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
-        //存在后一个可设置光标的节点，则更新光标
-        if (nextSelectionNode) {
-          this.setSelectionBefore(nextSelectionNode, 'all')
-        }
-        //存在前一个可设置光标的节点，则更新光标
-        else if (prevSelectionNode) {
-          this.setSelectionAfter(prevSelectionNode, 'all')
-        }
-        //都不存在则删除该不可编辑的节点
-        else {
-          this.delete()
-        }
-        //重新执行
-        this.insertText(text)
-        return
-      }
       const offset = this.selection.start!.offset
       //光标所在节点是文本节点
       if (node.isText()) {
@@ -1338,27 +1323,6 @@ export class Editor {
     if (this.selection.collapsed()) {
       //光标所在节点
       const node = this.selection.start!.node
-      const uneditableNode = node.getUneditable()
-      //在不可编辑的节点里
-      if (!!uneditableNode) {
-        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
-        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
-        //存在后一个可设置光标的节点，则更新光标
-        if (nextSelectionNode) {
-          this.setSelectionBefore(nextSelectionNode, 'all')
-        }
-        //存在前一个可设置光标的节点，则更新光标
-        else if (prevSelectionNode) {
-          this.setSelectionAfter(prevSelectionNode, 'all')
-        }
-        //都不存在则删除该不可编辑的节点
-        else {
-          this.delete()
-        }
-        //重新执行
-        this.insertParagraph()
-        return
-      }
       //光标所在块节点
       const blockNode = node.getBlock()
       //如果在代码块样式内
@@ -1423,27 +1387,6 @@ export class Editor {
     if (this.selection.collapsed()) {
       //光标所在节点
       const selectionNode = this.selection.start!.node
-      const uneditableNode = selectionNode.getUneditable()
-      //在不可编辑的节点里
-      if (!!uneditableNode) {
-        const nextSelectionNode = this.getNextSelectionNode(uneditableNode)
-        const prevSelectionNode = this.getPreviousSelectionNode(uneditableNode)
-        //存在后一个可设置光标的节点，则更新光标
-        if (nextSelectionNode) {
-          this.setSelectionBefore(nextSelectionNode, 'all')
-        }
-        //存在前一个可设置光标的节点，则更新光标
-        else if (prevSelectionNode) {
-          this.setSelectionAfter(prevSelectionNode, 'all')
-        }
-        //都不存在则删除该不可编辑的节点
-        else {
-          this.delete()
-        }
-        //重新执行
-        this.insertNode(node, cover)
-        return
-      }
       //光标偏移值
       const offset = this.selection.start!.offset
       //光标所在节点的块节点
@@ -1523,21 +1466,7 @@ export class Editor {
     //起点和终点在一起
     if (this.selection.collapsed()) {
       const node = this.selection.start!.node
-      const uneditableNode = node.getUneditable()
-      //在不可编辑的节点里
-      if (!!uneditableNode) {
-        //如果该节点是固定块节点，则清空内容
-        if (uneditableNode.isBlock() && uneditableNode.fixed) {
-          emptyFixedBlock.apply(this, [uneditableNode])
-        }
-        //非固定块节点直接删除
-        else if (!uneditableNode.isEmpty()) {
-          uneditableNode.toEmpty()
-        }
-      }
-      //否则走正常删除逻辑
-      else {
-        const offset = this.selection.start!.offset
+      const offset = this.selection.start!.offset
         //前一个可设置光标的节点
         const previousSelectionNode = this.getPreviousSelectionNode(node)
         //光标所在的块节点
@@ -1677,7 +1606,6 @@ export class Editor {
             }
           }
         }
-      }
     }
     //起点和终点不在一起
     else {
@@ -1692,41 +1620,26 @@ export class Editor {
       const endBlockNode = this.selection.end!.node.getBlock()
       result.forEach(item => {
         const { node, offset } = item
-        const uneditableNode = node.getUneditable()
-        //在不可编辑的节点里
-        if (!!uneditableNode) {
-          //如果该节点是固定块节点，则清空内容
-          if (uneditableNode.isBlock() && uneditableNode.fixed) {
-            emptyFixedBlock.apply(this, [uneditableNode])
-          }
-          //非固定块节点直接删除
-          else if (!uneditableNode.isEmpty()) {
-            uneditableNode.toEmpty()
-          }
+        //是数组的情况，说明node是文本节点，需要进行裁剪
+        if (offset) {
+          node.textContent = node.textContent!.substring(0, offset[0]) + node.textContent!.substring(offset[1])
         }
-        //走正常的删除逻辑
+        //说明节点都在选区内
         else {
-          //是数组的情况，说明node是文本节点，需要进行裁剪
-          if (offset) {
-            node.textContent = node.textContent!.substring(0, offset[0]) + node.textContent!.substring(offset[1])
+          //固定状态的块节点，进行清空处理
+          if (node.isBlock() && node.fixed) {
+            emptyFixedBlock.apply(this, [node])
           }
-          //说明节点都在选区内
+          //其他节点置空进行删除
           else {
-            //固定状态的块节点，进行清空处理
-            if (node.isBlock() && node.fixed) {
-              emptyFixedBlock.apply(this, [node])
-            }
-            //其他节点置空进行删除
-            else {
-              node.toEmpty()
-            }
+            node.toEmpty()
           }
         }
       })
       //起点和终点在同一个块节点下
       if (startBlockNode.isEqual(endBlockNode)) {
-        //块节点为空且不是不可编辑的则创建占位符
-        if (startBlockNode.isEmpty() && !startBlockNode.getUneditable()) {
+        //块节点为空则创建占位符
+        if (startBlockNode.isEmpty()) {
           const placeholder = KNode.createPlaceholder()
           this.addNode(placeholder, startBlockNode)
           this.setSelectionBefore(placeholder)

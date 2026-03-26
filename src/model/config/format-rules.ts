@@ -42,59 +42,6 @@ export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
   }
 }
 
-/**
- * 针对节点自身：处理不可编辑的可见的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
- */
-export const formatUneditableNoodes: RuleFunctionType = ({ editor, node }) => {
-  const uneditableNode = node.getUneditable()
-  if (uneditableNode && !uneditableNode.void && !uneditableNode.isEmpty() && !uneditableNode.isBlock()) {
-    const previousNode = uneditableNode.getPrevious(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
-    const nextNode = node.getNext(uneditableNode.parent ? uneditableNode.parent!.children! : editor.stackNodes)
-    //前一个节点不存在或者不是零宽度空白文本节点
-    if (!previousNode || !previousNode.isZeroWidthText()) {
-      const zeroWidthText = KNode.createZeroWidthText()
-      editor.addNodeBefore(zeroWidthText, uneditableNode)
-    }
-    //后一个节点不存在或者不是零宽度空白文本节点
-    if (!nextNode || !nextNode.isZeroWidthText()) {
-      const zeroWidthText = KNode.createZeroWidthText()
-      editor.addNodeAfter(zeroWidthText, uneditableNode)
-    }
-    //需要更新光标位置
-    //起点和终点都在不可编辑的节点里
-    if (editor.isSelectionInTargetNode(uneditableNode, 'all')) {
-      const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
-      const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
-      //起点和终点在一起
-      if (editor.selection.collapsed()) {
-        //如果光标在不可编辑节点的最前面，则移动到前一个可设置光标的节点的后面
-        const firstNode = editor.getFirstSelectionNode(uneditableNode)!
-        if (firstNode.isEqual(editor.selection.start!.node) && editor.selection.start!.offset == 0) {
-          editor.setSelectionAfter(previousSelectionNode, 'all')
-        }
-        //否则一律设置到后一个可设置光标的节点的前面
-        else {
-          editor.setSelectionBefore(nexteSelectionNode, 'all')
-        }
-      }
-      //起点和终点不在一起，则选中该不可编辑的节点
-      else {
-        editor.setSelectionAfter(previousSelectionNode, 'start')
-        editor.setSelectionBefore(nexteSelectionNode, 'end')
-      }
-    }
-    //起点在不可编辑的节点里，则更新起点位置
-    else if (editor.isSelectionInTargetNode(uneditableNode, 'start')) {
-      const nexteSelectionNode = editor.getNextSelectionNode(uneditableNode)!
-      editor.setSelectionBefore(nexteSelectionNode, 'start')
-    }
-    //终点在不可编辑的节点里，则更新终点位置
-    else if (editor.isSelectionInTargetNode(uneditableNode, 'end')) {
-      const previousSelectionNode = editor.getPreviousSelectionNode(uneditableNode)!
-      editor.setSelectionAfter(previousSelectionNode, 'end')
-    }
-  }
-}
 
 /**
  * 针对节点的子节点数组：处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）

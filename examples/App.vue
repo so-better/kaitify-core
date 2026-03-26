@@ -320,7 +320,7 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: '<p kaitify-node="6"><span kaitify-node="7">kai ling33333333</span><my-component url="https://www.baidu.com" contenteditable="false" kaitify-node="407"><span>https://www.baidu.com</span></my-component><span kaitify-node="455">4444</span></p>',
+    value: '<p>hello</p><pre><span kaitify-code-span><span>const a = 1;\nconst a = 1;</span></span></pre><p>kai ling</p>',
     extensions: [
       CodeBlockExtension({
         handleCopy: code => {
