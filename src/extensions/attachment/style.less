@@ -1,26 +1,35 @@
 @import url(../link/var.less);
 
 .kaitify {
-  span[kaitify-attachment] {
+  kaitify-attachment {
     display: inline-flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    gap: var(--kaitify-sides-between);
     align-items: center;
-    margin: 0 var(--kaitify-sides-between);
+    padding: 0 var(--kaitify-sides-between);
     color: @color;
-    background-position: left center;
-    background-repeat: no-repeat;
-    background-size: 20px;
-    padding-left: 25px;
+    vertical-align: middle;
+    font-size: var(--kaitify-font-size);
+    line-height: var(--kaitify-line-height);
 
     &:hover {
-      cursor: pointer !important;
+      cursor: pointer;
+    }
+
+    span[is-icon] {
+      display: inline-flex;
+      width: 20px;
+      height: 20px;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
     }
   }
 
   //非编辑状态下
   &:not([contenteditable='true']) {
-    span[kaitify-attachment]:hover {
+    kaitify-attachment:hover {
       text-decoration: underline;
     }
   }

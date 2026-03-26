@@ -1,21 +1,30 @@
-import { event as DapEvent } from 'dap-util'
-import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
+import { KNode, KNodeMarksType } from '@/model'
 import { Extension } from '../Extension'
+import './element'
 import defaultIcon from './icon.svg?raw'
 import './style.less'
 
+/**
+ * 设置附件的参数类型
+ */
 export type SetAttachmentOptionType = {
   url: string
   text: string
   icon?: string
 }
 
+/**
+ * 更新附件的参数类型
+ */
 export type UpdateAttachmentOptionType = {
   url?: string
   text?: string
   icon?: string
 }
 
+/**
+ * 附件扩展入参类型
+ */
 export type AttachmentExtensionPropsType = {
   icon: string
 }
@@ -23,7 +32,7 @@ export type AttachmentExtensionPropsType = {
 declare module '../../model' {
   interface EditorCommandsType {
     /**
-     * 获取光标所在的附件节点，如果光标不在一个附件节点内，返回null
+     * 获取光标所在的附件节点
      */
     getAttachment?: () => KNode | null
     /**
@@ -46,225 +55,94 @@ declare module '../../model' {
 }
 
 /**
- * 下载附件
+ * 默认的附件图标地址
  */
-const downloadAttachment = (editor: Editor) => {
-  DapEvent.off(editor.$el!, 'click.attachment')
-  DapEvent.on(editor.$el!, 'click.attachment', async e => {
-    //可编辑状态下无法下载
-    if (editor.isEditable()) {
-      return
-    }
-    const event = e as MouseEvent
-    const elm = event.target as HTMLElement
-    if (elm === editor.$el) {
-      return
-    }
-    const node = editor.findNode(elm)
-    const matchNode = node.getMatchNode({
-      tag: 'span',
-      marks: {
-        'kaitify-attachment': true
-      }
-    })
-    //点击的是附件
-    if (matchNode) {
-      //获取文件地址
-      const url = matchNode.marks!['kaitify-attachment'] as string
-      //使用fetch读取文件地址
-      const res = await fetch(url, {
-        method: 'GET'
-      })
-      //获取blob数据
-      const blob = await res.blob()
-      //创建a标签进行下载
-      const a = document.createElement('a')
-      a.setAttribute('target', '_blank')
-      a.setAttribute('href', URL.createObjectURL(blob))
-      a.setAttribute(
-        'download',
-        matchNode.children!.reduce((val, item) => {
-          return val + item.textContent
-        }, '')
-      )
-      a.click()
-    }
-  })
-}
-
-/**
- * 设置附件选中
- */
-const attachmentFocus = (editor: Editor) => {
-  DapEvent.off(editor.$el!, 'click.attachment_focus')
-  DapEvent.on(editor.$el!, 'click.attachment_focus', e => {
-    //编辑器不可编辑状态下不设置
-    if (!editor.isEditable()) {
-      return
-    }
-    const event = e as MouseEvent
-    const elm = event.target as HTMLElement
-    if (elm === editor.$el) {
-      return
-    }
-    const node = editor.findNode(elm)
-    const matchNode = node.getMatchNode({
-      tag: 'span',
-      marks: {
-        'kaitify-attachment': true
-      }
-    })
-    if (matchNode) {
-      const previousNode = editor.getPreviousSelectionNode(matchNode)
-      const nextNode = editor.getNextSelectionNode(matchNode)
-      if (previousNode && nextNode) {
-        editor.setSelectionAfter(previousNode, 'start')
-        editor.setSelectionBefore(nextNode, 'end')
-        editor.updateRealSelection()
-      }
-    }
-  })
-}
+const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
 
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
   Extension.create({
     name: 'attachment',
-    onPasteKeepStyles(node) {
-      const styles: KNodeStylesType = {}
-      if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
-        styles.backgroundImage = node.styles!.backgroundImage
-      }
-      return styles
-    },
+    extraKeepTags: ['kaitify-attachment'],
     onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
-      if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
-        marks['kaitify-attachment'] = node.marks!['kaitify-attachment']
+      if (node.isMatch({ tag: 'kaitify-attachment' }) && node.hasMarks()) {
+        marks['data-url'] = node.marks!['data-url']
+        marks['data-text'] = node.marks!['data-text']
+        marks['data-icon'] = node.marks!['data-icon']
       }
       return marks
     },
     onDomParseNode(node) {
+      // 必须是闭合节点
+      if (node.isMatch({ tag: 'kaitify-attachment' })) {
+        node.type = 'closed'
+        node.children = undefined
+      }
+      // 兼容老格式：<span kaitify-attachment="url" contenteditable="false"><span>filename</span></span>
       if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
-        //锁定节点
-        node.locked = true
-        //设为行内
-        node.type = 'inline'
-        //处理子孙节点
-        KNode.flat(node.children!).forEach(item => {
-          //锁定节点
-          item.locked = true
-          //非文本节点
-          if (!item.isText()) {
-            //有子节点转为行内
-            if (item.hasChildren()) {
-              item.type = 'inline'
-            }
-            //无子节点转为闭合
-            else {
-              item.type = 'closed'
-            }
-          }
-        })
+        const url = node.marks!['kaitify-attachment'] as string
+        // 从子节点提取文件名
+        const text = KNode.flat(node.children ?? [])
+          .filter(n => n.isText())
+          .map(n => n.textContent)
+          .join('')
+        const icon = node.styles?.backgroundImage?.match(/url\(["']?(.*?)["']?\)/)?.[1]!
+        // 改造成新的闭合节点格式
+        node.type = 'closed'
+        node.tag = 'kaitify-attachment'
+        node.children = undefined
+        node.marks = { 'data-url': url, 'data-text': text, 'data-icon': icon }
+        node.styles = {}
       }
       return node
     },
     formatRules: [
-      ({ editor, node }) => {
+      ({ node }) => {
         if (
-          !node.isEmpty() &&
           node.isMatch({
-            tag: 'span',
-            marks: {
-              'kaitify-attachment': true
-            }
+            tag: 'kaitify-attachment'
           })
         ) {
-          //附件节点必须是锁定的
-          node.locked = true
-          //附件节点必须行内
-          node.type = 'inline'
-          //保持子孙节点的类型
-          KNode.flat(node.children!).forEach(item => {
-            //锁定节点
-            item.locked = true
-            //非文本节点
-            if (!item.isText()) {
-              //有子节点转为行内
-              if (item.hasChildren()) {
-                item.type = 'inline'
-              }
-              //无子节点转为闭合
-              else {
-                item.type = 'closed'
-              }
-            }
-          })
-          //设置不可编辑标记
-          node.marks!['contenteditable'] = 'false'
-          //两侧设置空白元素
-          const previousNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-          const nextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-          //前一个节点不存在或者不是零宽度空白文本节点
-          if (!previousNode || !previousNode.isZeroWidthText()) {
-            const zeroWidthText = KNode.createZeroWidthText()
-            editor.addNodeBefore(zeroWidthText, node)
-          }
-          //后一个节点不存在或者不是零宽度空白文本节点
-          if (!nextNode || !nextNode.isZeroWidthText()) {
-            const zeroWidthText = KNode.createZeroWidthText()
-            editor.addNodeAfter(zeroWidthText, node)
-          }
-          //重置光标
-          if (editor.isSelectionInTargetNode(node, 'start')) {
-            //如果起点位置在该附件的开始处
-            if (editor.selection.start && editor.selection.start.offset === 0) {
-              const newTextNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-              if (newTextNode) editor.setSelectionAfter(newTextNode, 'start')
-            }
-            //不在开始处，则说明在末尾处
-            else {
-              const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-              if (newTextNode) editor.setSelectionBefore(newTextNode, 'start')
-            }
-          }
-          if (editor.isSelectionInTargetNode(node, 'end')) {
-            //如果终点位置在该附件的开始处
-            if (editor.selection.end && editor.selection.end.offset === 0) {
-              const newTextNode = node.getPrevious(node.parent ? node.parent!.children! : editor.stackNodes)
-              if (newTextNode) editor.setSelectionAfter(newTextNode, 'end')
-            }
-            //不在开始处，则说明在末尾处
-            else {
-              const newTextNode = node.getNext(node.parent ? node.parent!.children! : editor.stackNodes)
-              if (newTextNode) editor.setSelectionBefore(newTextNode, 'end')
-            }
-          }
+          //必须是闭合节点
+          node.type = 'closed'
         }
       }
     ],
-    onAfterUpdateView() {
-      //下载附件
-      downloadAttachment(this)
-      //点击选中
-      attachmentFocus(this)
-    },
     addCommands() {
       const getAttachment = () => {
-        return this.getMatchNodeBySelection({
-          tag: 'span',
-          marks: {
-            'kaitify-attachment': true
-          }
-        })
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return null
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        if (startNode.isEqual(endNode) && startNode.isMatch({ tag: 'kaitify-attachment' }) && startOffset == 0 && endOffset == 1) {
+          return startNode
+        }
+        return null
       }
 
       const hasAttachment = () => {
-        return this.isSelectionNodesSomeMatch({
-          tag: 'span',
-          marks: {
-            'kaitify-attachment': true
-          }
-        })
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return false
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        // 起点从附件头部开始
+        if (startNode.isMatch({ tag: 'kaitify-attachment' }) && startOffset === 0) {
+          return true
+        }
+        // 终点到附件尾部结束
+        if (endNode.isMatch({ tag: 'kaitify-attachment' }) && endOffset === 1) {
+          return true
+        }
+        // 选区中间完整包含的附件（排除边界节点）
+        return this.getFocusNodesBySelection('all')
+          .filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
+          .some(n => n.isMatch({ tag: 'kaitify-attachment' }))
       }
 
       const setAttachment = async (options: SetAttachmentOptionType) => {
@@ -274,13 +152,17 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         if (!options.url || !options.text) {
           return
         }
-        const defaultIconBase64 = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
-        //设置html内容
-        const html = `<span kaitify-attachment="${options.url}" contenteditable="false" style="background-image:url(${options.icon || props?.icon || defaultIconBase64})"><span>${options.text}</span></span>`
-        //html内容转为节点数组
-        const nodes = this.htmlParseNode(html)
+        const node = KNode.create({
+          type: 'closed',
+          tag: 'kaitify-attachment',
+          marks: {
+            'data-url': options.url,
+            'data-text': options.text,
+            'data-icon': options.icon || props?.icon || DEFAULT_ICON_URL
+          }
+        })
         //插入节点
-        this.insertNode(nodes[0])
+        this.insertNode(node)
         //更新视图
         await this.updateView()
       }
@@ -298,19 +180,15 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         }
         //更新url
         if (options.url) {
-          attachmentNode.marks!['kaitify-attachment'] = options.url
+          attachmentNode.marks!['data-url'] = options.url
         }
         //更新text
         if (options.text) {
-          const textNode = KNode.create({
-            type: 'text',
-            textContent: options.text
-          })
-          textNode.parent = attachmentNode
-          attachmentNode.children = [textNode]
+          attachmentNode.marks!['data-text'] = options.text
         }
+        //更新icon
         if (options.icon) {
-          attachmentNode.styles!['backgroundImage'] = `url(${options.icon})`
+          attachmentNode.marks!['data-icon'] = options.icon
         }
         //更新视图
         await this.updateView()
@@ -324,11 +202,9 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         if (!attachmentNode) {
           return null
         }
-        const url = attachmentNode.marks!['kaitify-attachment'] as string
-        const text = attachmentNode.children!.reduce((val, item) => {
-          return val + item.textContent
-        }, '')
-        const icon = attachmentNode.styles!['backgroundImage']!.match(/url\(["']?(.*?)["']?\)/)?.[1]!
+        const url = attachmentNode.marks!['data-url'] as string
+        const text = attachmentNode.marks!['data-text'] as string
+        const icon = attachmentNode.marks!['data-icon'] as string
         return { url, text, icon }
       }
 

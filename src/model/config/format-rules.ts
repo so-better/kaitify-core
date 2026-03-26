@@ -42,7 +42,6 @@ export const formatBlockInChildren: RuleFunctionType = ({ editor, node }) => {
   }
 }
 
-
 /**
  * 针对节点的子节点数组：处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）
  */
