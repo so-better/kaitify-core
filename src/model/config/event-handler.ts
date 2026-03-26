@@ -129,8 +129,8 @@ export const onComposition = async function (this: Editor, e: Event) {
         updateSelection.apply(this)
       }
     }
-    //不是文本节点
-    else if (!parentNode.isText()) {
+    //是块级节点和行内节点，闭合节点不需要考虑因为它的内部是黑盒的
+    else if (parentNode.isBlock() || parentNode.isInline()) {
       //子元素在父元素中的位置
       const index = Array.from(parentElement.childNodes).findIndex(item => item === element)
       //将子元素转为节点

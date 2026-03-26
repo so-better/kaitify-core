@@ -622,80 +622,41 @@ export const updateSelection = function (this: Editor) {
     const range = realSelection.getRangeAt(0)
     //光标在编辑器内
     if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
-      //如果光标起点是文本
-      if (range.startContainer.nodeType == 3) {
-        this.selection.start = {
-          node: this.findNode(range.startContainer.parentNode as HTMLElement),
-          offset: range.startOffset
+      //处理单侧光标（起点或终点）的辅助函数
+      const resolvePoint = (container: Node, rangeOffset: number, type: 'start' | 'end') => {
+        //根据元素找到对应的KNode
+        const containerNode = container.nodeType == 3 ? this.findNode(container.parentNode as HTMLElement) : this.findNode(container as HTMLElement)
+        //光标在闭合节点内部（闭合节点对应的真实dom的内部是黑盒）
+        if (containerNode.isClosed()) {
+          this.selection[type] = { node: containerNode, offset: type == 'start' ? 0 : 1 }
         }
-      }
-      //如果光标起点是元素
-      else if (range.startContainer.nodeType == 1) {
-        const childDoms = Array.from(range.startContainer.childNodes)
-        //存在子元素
-        if (childDoms.length) {
-          const dom = childDoms[range.startOffset] ? childDoms[range.startOffset] : childDoms[range.startOffset - 1]
-          //元素
-          if (dom.nodeType == 1) {
-            if (childDoms[range.startOffset]) {
-              this.setSelectionBefore(this.findNode(dom as HTMLElement), 'start')
-            } else {
-              this.setSelectionAfter(this.findNode(dom as HTMLElement), 'start')
+        //是文本
+        else if (container.nodeType == 3) {
+          this.selection[type] = { node: containerNode, offset: rangeOffset }
+        }
+        //是元素
+        else if (container.nodeType == 1) {
+          const childDoms = Array.from(container.childNodes)
+          //存在子元素
+          if (childDoms.length) {
+            const dom = childDoms[rangeOffset] ? childDoms[rangeOffset] : childDoms[rangeOffset - 1]
+            //元素
+            if (dom.nodeType == 1) {
+              childDoms[rangeOffset] ? this.setSelectionBefore(this.findNode(dom as HTMLElement), type) : this.setSelectionAfter(this.findNode(dom as HTMLElement), type)
+            }
+            //文本
+            else if (dom.nodeType == 3) {
+              this.selection[type] = { node: containerNode, offset: childDoms[rangeOffset] ? 0 : dom.textContent!.length }
             }
           }
-          //文本
-          else if (dom.nodeType == 3) {
-            this.selection.start = {
-              node: this.findNode(dom.parentNode as HTMLElement),
-              offset: childDoms[range.startOffset] ? 0 : dom.textContent!.length
-            }
-          }
-        }
-        //没有子元素，应当是闭合节点
-        else {
-          this.selection.start = {
-            node: this.findNode(range.startContainer as HTMLElement),
-            offset: 0
+          //没有子元素，应当是闭合节点
+          else {
+            this.selection[type] = { node: containerNode, offset: type == 'start' ? 0 : 1 }
           }
         }
       }
-      //如果光标终点是文本
-      if (range.endContainer.nodeType == 3) {
-        this.selection.end = {
-          node: this.findNode(range.endContainer.parentNode as HTMLElement),
-          offset: range.endOffset
-        }
-      }
-      //如果光标终点是元素
-      else if (range.endContainer.nodeType == 1) {
-        const childDoms = Array.from(range.endContainer.childNodes)
-        //存在子元素
-        if (childDoms.length) {
-          const dom = childDoms[range.endOffset] ? childDoms[range.endOffset] : childDoms[range.endOffset - 1]
-          //元素
-          if (dom.nodeType == 1) {
-            if (childDoms[range.endOffset]) {
-              this.setSelectionBefore(this.findNode(dom as HTMLElement), 'end')
-            } else {
-              this.setSelectionAfter(this.findNode(dom as HTMLElement), 'end')
-            }
-          }
-          //文本
-          else if (dom.nodeType == 3) {
-            this.selection.end = {
-              node: this.findNode(dom.parentNode as HTMLElement),
-              offset: childDoms[range.endOffset] ? 0 : dom.textContent!.length
-            }
-          }
-        }
-        //没有子元素，应当是闭合节点
-        else {
-          this.selection.end = {
-            node: this.findNode(range.endContainer as HTMLElement),
-            offset: 1
-          }
-        }
-      }
+      resolvePoint(range.startContainer, range.startOffset, 'start')
+      resolvePoint(range.endContainer, range.endOffset, 'end')
       return true
     }
   }

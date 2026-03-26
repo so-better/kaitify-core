@@ -381,7 +381,7 @@ export declare class Editor {
      */
     scrollViewToSelection(): void;
     /**
-     * 根据dom查找到编辑内的对应节点
+     * 根据dom查找到编辑内的对应节点。如果是闭合节点内的dom，此时可能无标记或者无对应的节点，则会向上查找，最终找到闭合节点并返回
      */
     findNode(dom: HTMLElement): KNode;
     /**

@@ -312,6 +312,7 @@ import { onMounted, ref } from 'vue'
 import { Editor, KNode, CodeBlockExtension } from '../src'
 import { delay, isContains } from '../src/tools'
 import { content, simpleContent } from './content'
+import { MyComponentExtension } from './my-component'
 
 const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
@@ -319,13 +320,14 @@ const html = ref('')
 
 onMounted(() => {
   Editor.configure({
-    value: '<p>hello</p><pre><span kaitify-code-span><span>const a = 1;\nconst a = 1;</span></span></pre><p>kai ling</p>',
+    value: '<p kaitify-node="6"><span kaitify-node="7">kai ling33333333</span><my-component url="https://www.baidu.com" contenteditable="false" kaitify-node="407"><span>https://www.baidu.com</span></my-component><span kaitify-node="455">4444</span></p>',
     extensions: [
       CodeBlockExtension({
         handleCopy: code => {
           console.log('复制的code', code)
         }
-      })
+      }),
+      MyComponentExtension
     ],
     el: '#editor',
     editable: true,
@@ -336,12 +338,18 @@ onMounted(() => {
     },
     onCreate(ed) {
       editor.value = ed
+    },
+    onSelectionUpdate(selection) {
+      console.log('onSelectionUpdate')
+    },
+    onRedressSelection() {
+      console.log('onRedressSelection', this.selection)
     }
   })
 })
 
 const insertNode = () => {
-  const change_content = `<p>bbbb</p>`
+  const change_content = `<my-component url="https://www.baidu.com"></my-component>`
   const theNodes = editor.value!.htmlParseNode(change_content)
   console.log(1122, theNodes)
   for (const theNode of theNodes) {
@@ -351,38 +359,27 @@ const insertNode = () => {
 }
 
 const getHtml = async () => {
-  // html.value = editor.value!.getHTML()
-  if (editor.value) {
-    editor.value.destroy()
-    editor.value = null
-  } else {
-    Editor.configure({
-      value: `<p>这里输入正文</p>`,
-      extensions: [],
-      el: '#editor',
-      editable: true,
-      allowPasteHtml: true,
-      placeholder: '请输入内容...',
-      onAfterUpdateView() {
-        count.value = Array.from(this.getContent(true, true).trim()).length
-      },
-      onCreate(ed) {
-        editor.value = ed
-      }
-    })
-  }
-
-  // setTimeout(async () => {
-  //   debugger
-  //   editor.value = await Editor.configure({
+  html.value = editor.value!.getHTML()
+  console.log(html.value)
+  // if (editor.value) {
+  //   editor.value.destroy()
+  //   editor.value = null
+  // } else {
+  //   Editor.configure({
   //     value: `<p>这里输入正文</p>`,
   //     extensions: [],
   //     el: '#editor',
   //     editable: true,
   //     allowPasteHtml: true,
-  //     placeholder: '请输入内容...'
+  //     placeholder: '请输入内容...',
+  //     onAfterUpdateView() {
+  //       count.value = Array.from(this.getContent(true, true).trim()).length
+  //     },
+  //     onCreate(ed) {
+  //       editor.value = ed
+  //     }
   //   })
-  // }, 3000)
+  // }
 }
 
 const illegaInsert = async (num: 0 | 1) => {
