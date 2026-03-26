@@ -220,7 +220,7 @@
       <fieldset>
         <legend>图片</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setImage!({ src: 'https://bpic.588ku.com/back_origin_min_pic/24/07/20/e9c6eadf8dd571483c69372b7c21aaa5.jpg', alt: '图片加载失败', width: '200px' })">插入图片</button>
+          <button @click="editor?.commands.setImage!({ src: 'https://www.so-better.cn/logo.png', alt: '图片加载失败', width: '200px' })">插入图片</button>
         </div>
       </fieldset>
       <fieldset>
@@ -272,8 +272,8 @@
       <fieldset>
         <legend>附件</legend>
         <div class="toolbar">
-          <button @click="editor?.commands.setAttachment!({ url: 'https://img1.baidu.com/it/u=1097951435,212878480&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1428', text: '附件图片' })">上传附件</button>
-          <button @click="editor?.commands.updateAttachment!({ url: 'https://img0.baidu.com/it/u=269587204,3994517811&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1345', text: '附件图片2' })">更新附件</button>
+          <button @click="editor?.commands.setAttachment!({ url: 'https://www.so-better.cn/logo.png', text: '附件图片' })">上传附件</button>
+          <button @click="editor?.commands.updateAttachment!({ url: 'https://www.so-better.cn/logo.png', text: '附件图片2' })">更新附件</button>
         </div>
       </fieldset>
       <fieldset>
