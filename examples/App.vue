@@ -341,7 +341,7 @@ onMounted(() => {
       editor.value = ed
     },
     onSelectionUpdate(selection) {
-      console.log('onSelectionUpdate')
+      console.log('onSelectionUpdate', this)
     },
     onRedressSelection() {
       console.log('onRedressSelection', this.selection)

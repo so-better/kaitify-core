@@ -10,6 +10,17 @@ import { applyMergeNode, convertToBlock, getAllowMergeNode } from './function'
 export type RuleFunctionType = (state: { editor: Editor; node: KNode }) => void
 
 /**
+ * 针对节点自身：将带有 contenteditable="false" 标记的节点统一转为闭合节点，并移除该标记（渲染时由框架统一添加）
+ */
+export const formatContenteditableToClosed: RuleFunctionType = ({ node }) => {
+  if (node.hasMarks() && node.marks!['contenteditable'] === 'false') {
+    node.type = 'closed'
+    node.children = undefined
+    delete node.marks!['contenteditable']
+  }
+}
+
+/**
  * 针对节点自身：处理块节点的标签，部分块节点需要转为默认块节点标签
  */
 export const fomratBlockTagParse: RuleFunctionType = ({ editor, node }) => {

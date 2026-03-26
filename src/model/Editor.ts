@@ -3,7 +3,7 @@ import { KNode, KNodeCreateOptionType, KNodeMarksType, KNodeMatchOptionType, KNo
 import { createGuid, delay, getDomAttributes, getDomStyles, getZeroWidthText, initEditorDom, isContains, isZeroWidthText } from '../tools'
 import { Selection } from './Selection'
 import { History } from './History'
-import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText } from './config/format-rules'
+import { formatSiblingNodesMerge, formatPlaceholderMerge, formatZeroWidthTextMerge, RuleFunctionType, formatParentNodeMerge, formatBlockInChildren, fomratBlockTagParse, formatLineBreakSpaceText, formatContenteditableToClosed } from './config/format-rules'
 import { patchNodes } from './config/format-patch'
 import { onBeforeInput, onBlur, onComposition, onCopy, onCut, onFocus, onKeyboard, onSelectionChange } from './config/event-handler'
 import { Extension, HistoryExtension, ImageExtension, TextExtension, BoldExtension, ItalicExtension, StrikethroughExtension, UnderlineExtension, SuperscriptExtension, SubscriptExtension, CodeExtension, FontSizeExtension, VideoExtension, FontFamilyExtension, ColorExtension, BackColorExtension, LinkExtension, AlignExtension, LineHeightExtension, IndentExtension, HorizontalExtension, BlockquoteExtension, HeadingExtension, ListExtension, TaskExtension, MathExtension, CodeBlockExtension, AttachmentExtension, TableExtension } from '@/extensions'
@@ -267,7 +267,7 @@ export class Editor {
   /**
    * 编辑器的节点数组格式化规则【初始化后不可修改】【open】
    */
-  formatRules: RuleFunctionType[] = [fomratBlockTagParse, formatBlockInChildren, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakSpaceText, formatSiblingNodesMerge, formatParentNodeMerge]
+  formatRules: RuleFunctionType[] = [formatContenteditableToClosed, fomratBlockTagParse, formatBlockInChildren, formatPlaceholderMerge, formatZeroWidthTextMerge, formatLineBreakSpaceText, formatSiblingNodesMerge, formatParentNodeMerge]
   /**
    * 自定义dom转为非文本节点的后续处理【初始化后不可修改】
    */
@@ -622,7 +622,7 @@ export class Editor {
       config.type = 'inline'
       config.children = []
     }
-    //默认的自闭合节点
+    //默认的闭合节点
     else if (['br'].includes(tag)) {
       config.type = 'closed'
     }
@@ -651,12 +651,6 @@ export class Editor {
     //转换后的回调处理，在这里可以自定义处理节点（扩展可在此对老格式做兼容迁移）
     if (typeof this.onDomParseNode == 'function') {
       node = this.onDomParseNode.apply(this, [node])
-    }
-    //如果元素带有 contenteditable="false"，强制转为闭合节点，并移除该属性（渲染时由框架统一添加）
-    if (node.hasMarks() && node.marks!['contenteditable'] === 'false') {
-      node.type = 'closed'
-      node.children = undefined
-      delete node.marks!['contenteditable']
     }
     return node
   }
