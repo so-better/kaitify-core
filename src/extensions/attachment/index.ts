@@ -1,6 +1,7 @@
-import { KNode, KNodeMarksType } from '@/model'
+import { event as DapEvent } from 'dap-util'
+import { Editor, KNode, KNodeMarksType } from '@/model'
 import { Extension } from '../Extension'
-import './element'
+import { ATTACHMENT_NODE_TAG } from './element'
 import defaultIcon from './icon.svg?raw'
 import './style.less'
 
@@ -59,28 +60,70 @@ declare module '../../model' {
  */
 const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
 
+/**
+ * 附件点击事件
+ */
+const handlewAttachmentClick = (editor: Editor) => {
+  DapEvent.off(editor.$el!, 'click.attachment')
+  DapEvent.on(editor.$el!, 'click.attachment', async e => {
+    const event = e as MouseEvent
+    const elm = event.target as HTMLElement
+    if (elm === editor.$el) {
+      return
+    }
+    const node = editor.findNode(elm)
+    const matchNode = node.getMatchNode({
+      tag: ATTACHMENT_NODE_TAG
+    })
+    //获取到附件节点
+    if (matchNode) {
+      //可编辑状态，设置附件选中
+      if (editor.isEditable()) {
+        editor.updateRealSelection()
+      }
+      //不可编辑状态，点击附件下载
+      else {
+        const url = matchNode.marks!['data-url'] as string
+        const text = matchNode.marks!['data-text'] as string
+        //使用fetch读取文件地址
+        const res = await fetch(url, {
+          method: 'GET'
+        })
+        //获取blob数据
+        const blob = await res.blob()
+        //创建a标签进行下载
+        const a = document.createElement('a')
+        a.setAttribute('target', '_blank')
+        a.setAttribute('href', URL.createObjectURL(blob))
+        a.setAttribute('download', text)
+        a.click()
+      }
+    }
+  })
+}
+
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
   Extension.create({
     name: 'attachment',
-    extraKeepTags: ['kaitify-attachment'],
+    extraKeepTags: [ATTACHMENT_NODE_TAG],
     onPasteKeepMarks(node) {
       const marks: KNodeMarksType = {}
-      if (node.isMatch({ tag: 'kaitify-attachment' }) && node.hasMarks()) {
-        marks['data-url'] = node.marks!['data-url']
-        marks['data-text'] = node.marks!['data-text']
-        marks['data-icon'] = node.marks!['data-icon']
+      if (node.isMatch({ tag: ATTACHMENT_NODE_TAG }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('data-url')) marks['data-url'] = node.marks!['data-url']
+        if (node.marks!.hasOwnProperty('data-text')) marks['data-text'] = node.marks!['data-text']
+        if (node.marks!.hasOwnProperty('data-icon')) marks['data-icon'] = node.marks!['data-icon']
       }
       return marks
     },
     onDomParseNode(node) {
       // 必须是闭合节点
-      if (node.isMatch({ tag: 'kaitify-attachment' })) {
+      if (node.isMatch({ tag: ATTACHMENT_NODE_TAG })) {
         node.type = 'closed'
         node.children = undefined
       }
       // 兼容老格式：<span kaitify-attachment="url" contenteditable="false"><span>filename</span></span>
-      if (node.isMatch({ tag: 'span', marks: { 'kaitify-attachment': true } })) {
-        const url = node.marks!['kaitify-attachment'] as string
+      if (node.isMatch({ tag: 'span', marks: { [ATTACHMENT_NODE_TAG]: true } })) {
+        const url = node.marks![ATTACHMENT_NODE_TAG] as string
         // 从子节点提取文件名
         const text = KNode.flat(node.children ?? [])
           .filter(n => n.isText())
@@ -89,7 +132,7 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         const icon = node.styles?.backgroundImage?.match(/url\(["']?(.*?)["']?\)/)?.[1]!
         // 改造成新的闭合节点格式
         node.type = 'closed'
-        node.tag = 'kaitify-attachment'
+        node.tag = ATTACHMENT_NODE_TAG
         node.children = undefined
         node.marks = { 'data-url': url, 'data-text': text, 'data-icon': icon }
         node.styles = {}
@@ -100,14 +143,18 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
       ({ node }) => {
         if (
           node.isMatch({
-            tag: 'kaitify-attachment'
+            tag: ATTACHMENT_NODE_TAG
           })
         ) {
           //必须是闭合节点
           node.type = 'closed'
+          node.children = undefined
         }
       }
     ],
+    onAfterUpdateView() {
+      handlewAttachmentClick(this)
+    },
     addCommands() {
       const getAttachment = () => {
         if (!this.selection.focused() || this.selection.collapsed()) {
@@ -117,7 +164,7 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         const endNode = this.selection.end!.node
         const startOffset = this.selection.start!.offset
         const endOffset = this.selection.end!.offset
-        if (startNode.isEqual(endNode) && startNode.isMatch({ tag: 'kaitify-attachment' }) && startOffset == 0 && endOffset == 1) {
+        if (startNode.isEqual(endNode) && startNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
           return startNode
         }
         return null
@@ -132,17 +179,17 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         const startOffset = this.selection.start!.offset
         const endOffset = this.selection.end!.offset
         // 起点从附件头部开始
-        if (startNode.isMatch({ tag: 'kaitify-attachment' }) && startOffset === 0) {
+        if (startNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && startOffset === 0) {
           return true
         }
         // 终点到附件尾部结束
-        if (endNode.isMatch({ tag: 'kaitify-attachment' }) && endOffset === 1) {
+        if (endNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && endOffset === 1) {
           return true
         }
         // 选区中间完整包含的附件（排除边界节点）
         return this.getFocusNodesBySelection('all')
           .filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
-          .some(n => n.isMatch({ tag: 'kaitify-attachment' }))
+          .some(n => n.isMatch({ tag: ATTACHMENT_NODE_TAG }))
       }
 
       const setAttachment = async (options: SetAttachmentOptionType) => {
@@ -154,7 +201,7 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
         }
         const node = KNode.create({
           type: 'closed',
-          tag: 'kaitify-attachment',
+          tag: ATTACHMENT_NODE_TAG,
           marks: {
             'data-url': options.url,
             'data-text': options.text,

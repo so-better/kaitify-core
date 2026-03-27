@@ -202,7 +202,7 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
         return true
       }
       //文本内容不一致
-      if (domPre.textContent != textContent) {
+      if (domPre.querySelector('span[kaitify-code-span]')?.textContent != textContent) {
         return true
       }
       //子孙节点数量不一致（防止在代码块里插入非文本节点，比如图片等）
@@ -272,7 +272,6 @@ export const CodeBlockExtension = (props?: CodeBlockExtensionPropsType) =>
       if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
         node.type = 'closed'
         node.void = true
-        node.marks!['contenteditable'] = 'false'
       }
       return node
     },
@@ -311,7 +310,6 @@ export const CodeBlockExtension = (props?: CodeBlockExtensionPropsType) =>
         if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
           node.type = 'closed'
           node.void = true
-          node.marks!['contenteditable'] = 'false'
         }
       },
       //代码块结构处理

@@ -76,7 +76,8 @@ export const CodeExtension = () =>
         if (this.selection.collapsed()) {
           const codeNode = KNode.create({
             type: 'inline',
-            tag: 'code'
+            tag: 'code',
+            children: []
           })
           const zeroWidthText = KNode.createZeroWidthText()
           this.addNode(zeroWidthText, codeNode)

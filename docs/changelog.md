@@ -7,14 +7,10 @@ title: 更新日志
 
 ## v0.0.2-beta.19 <Badge type="tip" text='2026.03.26' />
 
-- 闭合节点设计更新：现在针对闭合节点，其对应的真实dom内部被视为黑盒，即编辑器不管理闭合节点对应的真实dom的内部元素
-- 针对闭合节点的新设计，优化 `findNode` 方法设计
-- 针对闭合节点的新设计，优化了根据真实光标更新虚拟光标的方法设计
-- 在渲染阶段会给 `closed` 节点统一加上 `contenteditable="false"` 属性
-- `Editor` 中 `insertText`、`insertParagraph`、`insertNode`、`delete` 的 `uneditable` 检测逻辑移除
-- 移除 `KNode.getUneditable()` 方法
+- 闭合节点架构逻辑优化：现在针对闭合节点，其对应的真实dom内允许存在子元素，且真实dom内部被视为黑盒，即编辑器不管理闭合节点对应的真实dom的内部元素。与此同时， `Editor`的 `findNode` 方法进行了适配优化，根据真实光标更新虚拟光标的逻辑也进行了优化处理
+- 新增 `formatContenteditableToClosed` 格式化规则：将带有 `contenteditable="false"` 标记的节点统一转为闭合节点，并移除该标记（在渲染阶段会给 `closed` 节点统一加上 `contenteditable="false"` 属性）
+- 整个编辑器的不可编辑节点的逻辑判断全部去除，如 `Editor` 中 `insertText`、`insertParagraph`、`insertNode`、`delete` 的 `uneditable` 检测逻辑移除，`KNode.getUneditable()` 方法移除
 - 移除 `formatUneditableNoodes` 格式化规则：如果节点是不可编辑的，则查找使其不可编辑的目标节点，针对该目标节点，如果是非块节点且可见，则在两侧加上零宽度空白文本节点，且保证光标始终不在不可编辑的节点内部
-- 新增 `formatContenteditableToClosed` 格式化规则：将带有 `contenteditable="false"` 标记的节点统一转为闭合节点，并移除该标记
 - `Attachment` 附件扩展基于新的闭合节点设计进行重构
 
 ## v0.0.2-beta.18 <Badge type="tip" text='2026.03.19' />
