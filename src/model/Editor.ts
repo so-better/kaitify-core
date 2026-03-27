@@ -2023,7 +2023,7 @@ export class Editor {
       //遍历
       for (let i = 0; i < mutationList.length; i++) {
         const mutationRecord = mutationList[i]
-        //文本变更和属性变更
+        //文本变更
         if (mutationRecord.type == 'characterData') {
           //更新数据里不存在则加入
           if (!updateRecords.find(item => item.type === 'update' && item.elm === mutationRecord.target)) {

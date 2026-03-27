@@ -1,8 +1,8 @@
 import { KNode, KNodeMarksType } from '@/model'
 import { splitNodeToNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
-import './style.less'
 import { deleteProperty } from '@/tools'
+import './style.less'
 
 /**
  * 插入链接方法入参类型

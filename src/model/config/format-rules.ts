@@ -1,5 +1,5 @@
 import { string as DapString } from 'dap-util'
-import { getZeroWidthText, isZeroWidthText } from '@/tools'
+import { deleteProperty, getZeroWidthText, isZeroWidthText } from '@/tools'
 import { Editor } from '../Editor'
 import { KNode } from '../KNode'
 import { applyMergeNode, convertToBlock, getAllowMergeNode } from './function'
@@ -16,7 +16,7 @@ export const formatContenteditableToClosed: RuleFunctionType = ({ node }) => {
   if (node.hasMarks() && node.marks!['contenteditable'] === 'false') {
     node.type = 'closed'
     node.children = undefined
-    delete node.marks!['contenteditable']
+    node.marks = deleteProperty(node.marks, 'contenteditable')
   }
 }
 
