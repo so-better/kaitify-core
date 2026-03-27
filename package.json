@@ -21,7 +21,6 @@
 		"highlight.js": "^11.10.0",
 		"interactjs": "^1.10.27",
 		"katex": "^0.16.11",
-		"lit-html": "^3.3.2",
 		"vue": "^3.3.13"
 	},
 	"devDependencies": {

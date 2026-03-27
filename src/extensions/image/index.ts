@@ -1,9 +1,10 @@
 import interact from 'interactjs'
 import { event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
+import { deleteProperty } from '@/tools'
+import { Image_NODE_TAG } from './element'
 import { Extension } from '../Extension'
 import './style.less'
-import { deleteProperty } from '@/tools'
 
 /**
  * 插入图片方法入参类型
@@ -44,48 +45,21 @@ declare module '../../model' {
 }
 
 /**
- * 设置图片选中
+ * 设置图片拖拽改变大小
  */
-const imageFocus = (editor: Editor) => {
-  DapEvent.off(editor.$el!, 'click.image_focus')
-  DapEvent.on(editor.$el!, 'click.image_focus', e => {
-    //编辑器不可编辑状态下不设置
-    if (!editor.isEditable()) {
-      return
-    }
-    const event = e as MouseEvent
-    const elm = event.target as HTMLElement
-    if (elm === editor.$el) {
-      return
-    }
-    const node = editor.findNode(elm)
-    const matchNode = node.getMatchNode({
-      tag: 'img'
-    })
-    if (matchNode) {
-      editor.setSelectionBefore(matchNode, 'start')
-      editor.setSelectionAfter(matchNode, 'end')
-      editor.updateRealSelection()
-    }
-  })
-}
-/**
- * 设置图片拖拽
- */
-const imageResizable = (editor: Editor) => {
-  //设置拖拽改变大小的功能
-  interact('.kaitify img').unset()
-  interact('.kaitify img').resizable({
+const handleResizable = (editor: Editor) => {
+  if (DapData.get(editor.$el!, 'image-interact-init')) {
+    return
+  }
+  DapData.set(editor.$el!, 'image-interact-init', true)
+  interact(`.kaitify ${Image_NODE_TAG}`, { context: editor.$el }).unset()
+  interact(`.kaitify ${Image_NODE_TAG}`, { context: editor.$el }).resizable({
     //是否启用
     enabled: true,
     //指定可以调整大小的边缘
     edges: { left: false, right: true, bottom: false, top: false },
     //设置可拖拽区域宽度
     margin: 5,
-    //设置鼠标样式
-    cursorChecker() {
-      return editor.isEditable() ? 'ew-resize' : 'default'
-    },
     //启用惯性效果
     inertia: false,
     //调整大小时的自动滚动功能
@@ -143,55 +117,131 @@ const imageResizable = (editor: Editor) => {
   })
 }
 
+/**
+ * 图片选中样式设置
+ */
+const handleSelected = (editor: Editor) => {
+  editor.removeDomObserve()
+  // 先清除所有图片的选中状态
+  editor.$el!.querySelectorAll(`${Image_NODE_TAG} > img`).forEach(el => {
+    el.removeAttribute('is-selected')
+  })
+  if (!editor.selection.focused()) return
+  const flag = editor.commands.hasImage?.()
+  if (flag) {
+    const doms = editor
+      .getFocusNodesBySelection('closed')
+      .filter(item => item.isMatch({ tag: Image_NODE_TAG }))
+      .map(item => editor.findDom(item))
+    doms.forEach(dom => dom.querySelector('img')?.setAttribute('is-selected', ''))
+  }
+  editor.setDomObserve()
+}
+
 export const ImageExtension = () =>
   Extension.create({
     name: 'image',
-    extraKeepTags: ['img'],
-    onDomParseNode(node) {
-      if (node.isMatch({ tag: 'img' })) {
-        node.type = 'closed'
-      }
-      return node
-    },
-    formatRules: [
-      ({ node }) => {
-        if (node.isMatch({ tag: 'img' })) {
-          node.type = 'closed'
-        }
-      }
-    ],
-    onPasteKeepMarks(node) {
-      const marks: KNodeMarksType = {}
-      if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
-        if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
-        if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
-      }
-      return marks
-    },
+    extraKeepTags: [Image_NODE_TAG, 'img'],
     onPasteKeepStyles(node) {
       const styles: KNodeStylesType = {}
+      if (node.isMatch({ tag: Image_NODE_TAG }) && node.hasStyles()) {
+        styles['width'] = node.styles!['width'] || 'auto'
+      }
       if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
         styles['width'] = node.styles!['width'] || 'auto'
       }
       return styles
     },
+    onPasteKeepMarks(node) {
+      const marks: KNodeMarksType = {}
+      if (node.isMatch({ tag: Image_NODE_TAG }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('data-src')) marks['data-src'] = node.marks!['data-src']
+        if (node.marks!.hasOwnProperty('data-alt')) marks['data-alt'] = node.marks!['data-alt']
+      }
+      if (node.isMatch({ tag: 'img' }) && node.hasMarks()) {
+        if (node.marks!.hasOwnProperty('src')) marks['src'] = node.marks!['src']
+        if (node.marks!.hasOwnProperty('alt')) marks['alt'] = node.marks!['alt']
+      }
+      return marks
+    },
+    onDomParseNode(node) {
+      if (node.isMatch({ tag: Image_NODE_TAG })) {
+        node.type = 'closed'
+        node.children = undefined
+      }
+      if (node.isMatch({ tag: 'img' })) {
+        node.type = 'closed'
+        node.tag = Image_NODE_TAG
+        node.children = undefined
+        if (node.hasMarks()) {
+          node.marks!['data-src'] = node.marks?.['src'] ?? ''
+          node.marks!['data-alt'] = node.marks?.['alt'] ?? ''
+          node.marks = deleteProperty(node.marks, 'src')
+          node.marks = deleteProperty(node.marks, 'alt')
+        }
+      }
+      return node
+    },
+    formatRules: [
+      ({ node }) => {
+        if (node.isMatch({ tag: Image_NODE_TAG })) {
+          node.type = 'closed'
+          node.children = undefined
+        }
+        if (node.isMatch({ tag: 'img' })) {
+          node.type = 'closed'
+          node.tag = Image_NODE_TAG
+          node.children = undefined
+          if (node.hasMarks()) {
+            node.marks!['data-src'] = node.marks?.['src'] ?? ''
+            node.marks!['data-alt'] = node.marks?.['alt'] ?? ''
+            node.marks = deleteProperty(node.marks, 'src')
+            node.marks = deleteProperty(node.marks, 'alt')
+          }
+        }
+      }
+    ],
     onAfterUpdateView() {
-      //图片选中
-      imageFocus(this)
-      //图片拖拽改变大小
-      imageResizable(this)
+      handleResizable(this)
+    },
+    onSelectionUpdate() {
+      handleSelected(this)
     },
     addCommands() {
       const getImage = () => {
-        return this.getMatchNodeBySelection({
-          tag: 'img'
-        })
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return null
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        if (startNode.isEqual(endNode) && startNode.isMatch({ tag: Image_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
+          return startNode
+        }
+        return null
       }
 
       const hasImage = () => {
-        return this.isSelectionNodesSomeMatch({
-          tag: 'img'
-        })
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return false
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        // 起点从图片头部开始
+        if (startNode.isMatch({ tag: Image_NODE_TAG }) && startOffset === 0) {
+          return true
+        }
+        // 终点到图片尾部结束
+        if (endNode.isMatch({ tag: Image_NODE_TAG }) && endOffset === 1) {
+          return true
+        }
+        // 选区中间完整包含的图片（排除边界节点）
+        return this.getFocusNodesBySelection('all')
+          .filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
+          .some(n => n.isMatch({ tag: Image_NODE_TAG }))
       }
 
       const setImage = async (options: SetImageOptionType) => {
@@ -203,10 +253,10 @@ export const ImageExtension = () =>
         }
         const imageNode = KNode.create({
           type: 'closed',
-          tag: 'img',
+          tag: Image_NODE_TAG,
           marks: {
-            src: options.src,
-            alt: options.alt || ''
+            'data-src': options.src,
+            'data-alt': options.alt || ''
           },
           styles: {
             width: options.width || 'auto'
@@ -221,7 +271,7 @@ export const ImageExtension = () =>
         if (!this.selection.focused()) {
           return
         }
-        if (!options.src && !options.alt) {
+        if (options.src === undefined && options.alt === undefined) {
           return
         }
         const imageNode = getImage()
@@ -229,14 +279,12 @@ export const ImageExtension = () =>
           return
         }
         //更新url
-        if (options.src) {
-          imageNode.marks!.src = options.src
+        if (options.src !== undefined) {
+          imageNode.marks!['data-src'] = options.src
         }
         //更新alt
-        if (options.alt) {
-          imageNode.marks!.alt = options.alt
-        } else {
-          imageNode.marks = deleteProperty(imageNode.marks!, 'alt')
+        if (options.alt !== undefined) {
+          imageNode.marks!['data-alt'] = options.alt
         }
         await this.updateView()
       }

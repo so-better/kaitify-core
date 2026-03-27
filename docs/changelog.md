@@ -11,6 +11,7 @@ title: 更新日志
 - 新增 `formatContenteditableToClosed` 格式化规则：将带有 `contenteditable="false"` 标记的节点统一转为闭合节点，并移除该标记（在渲染阶段会给 `closed` 节点统一加上 `contenteditable="false"` 属性）
 - 整个编辑器的不可编辑节点的逻辑判断全部去除，如 `Editor` 中 `insertText`、`insertParagraph`、`insertNode`、`delete` 的 `uneditable` 检测逻辑移除，`KNode.getUneditable()` 方法移除
 - 移除 `formatUneditableNoodes` 格式化规则：如果节点是不可编辑的，则查找使其不可编辑的目标节点，针对该目标节点，如果是非块节点且可见，则在两侧加上零宽度空白文本节点，且保证光标始终不在不可编辑的节点内部
+- `Editor` 新增实例方法 `isDomInClosedNode`：用于判断某个dom是否在闭合节点内
 - `Attachment` 附件扩展基于新的闭合节点设计进行重构
 - `Horizontal` 附件扩展基于新的闭合节点设计进行重构，新增 `getHorizontal` 和 `hasHorizontal` 方法
 

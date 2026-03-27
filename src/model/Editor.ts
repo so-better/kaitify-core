@@ -527,6 +527,22 @@ export class Editor {
   }
 
   /**
+   * 判断某个dom是否在闭合节点对应的真实dom之内。
+   * - includeSelf 为 true（默认）时，闭合节点的根 dom 自身也算"在内"；
+   * - includeSelf 为 false 时，只有闭合节点内部的子孙 dom 才算"在内"，根 dom 自身返回 false。
+   */
+  isDomInClosedNode(el: HTMLElement, includeSelf: boolean = true) {
+    try {
+      const node = this.findNode(el)
+      if (!node.isClosed()) return false
+      if (!includeSelf && el.getAttribute(NODE_MARK) === String(node.key)) return false
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
+  /**
    * 设置编辑器是否可编辑
    */
   setEditable(editable: boolean) {
@@ -2025,6 +2041,10 @@ export class Editor {
         const mutationRecord = mutationList[i]
         //文本变更
         if (mutationRecord.type == 'characterData') {
+          //是闭合节点内的文本变更
+          if (this.isDomInClosedNode(mutationRecord.target.parentNode as HTMLElement)) {
+            continue
+          }
           //更新数据里不存在则加入
           if (!updateRecords.find(item => item.type === 'update' && item.elm === mutationRecord.target)) {
             updateRecords.push({
@@ -2035,6 +2055,10 @@ export class Editor {
         }
         //属性变更
         else if (mutationRecord.type == 'attributes') {
+          //是闭合节点内的属性变更
+          if (this.isDomInClosedNode(mutationRecord.target as HTMLElement, false)) {
+            continue
+          }
           //不是编辑器容器的属性变更且更新数据里不存在则加入
           if (mutationRecord.target != this.$el && !updateRecords.find(item => item.type === 'update' && item.elm === mutationRecord.target)) {
             updateRecords.push({
@@ -2045,6 +2069,10 @@ export class Editor {
         }
         //子元素变更
         else if (mutationRecord.type == 'childList') {
+          //是闭合节点内的子元素变更
+          if (this.isDomInClosedNode(mutationRecord.target as HTMLElement)) {
+            continue
+          }
           //新增子元素
           if (mutationRecord.addedNodes.length > 0) {
             mutationRecord.addedNodes.forEach(addNode => {

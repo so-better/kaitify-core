@@ -1,9 +1,21 @@
-.kaitify img {
-  display: inline-block;
-  position: relative;
-  width: auto;
-  min-width: 20px;
-  max-width: 100%;
-  padding: 0 var(--kaitify-sides-between);
-  text-indent: 0;
+.kaitify {
+  kaitify-image {
+    display: inline-flex;
+    position: relative;
+    width: auto;
+    min-width: 20px;
+    max-width: 100%;
+    padding: 0 var(--kaitify-sides-between);
+    text-indent: 0;
+
+    img {
+      display: inline-block;
+      width: 100%;
+      height: auto;
+
+      &[is-selected] {
+        border: 1px solid var(--kaitify-lighter-theme);
+      }
+    }
+  }
 }
