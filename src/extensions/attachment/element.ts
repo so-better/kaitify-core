@@ -1,22 +1,8 @@
-import { Editor } from '@/model'
-
 export const ATTACHMENT_NODE_TAG = 'kaitify-attachment'
 
 class AttachmentElement extends HTMLElement {
   constructor() {
     super()
-  }
-
-  /**
-   * 获取编辑器元素
-   */
-  get editor(): Editor | null {
-    let el: HTMLElement | null = this.parentElement
-    while (el) {
-      if (Editor.instanceMap.has(el)) return Editor.instanceMap.get(el)!
-      el = el.parentElement
-    }
-    return null
   }
 
   /**

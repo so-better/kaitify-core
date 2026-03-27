@@ -1879,8 +1879,6 @@ export class Editor {
     //取消dom监听
     this.removeDomObserve()
     if (this.$el) {
-      //移除实例缓存
-      Editor.instanceMap.delete(this.$el)
       //移除初始化标记
       DapData.remove(this.$el, 'kaitify-init')
       //移除class
@@ -2175,11 +2173,6 @@ export class Editor {
   }
 
   /**
-   * 以编辑器根元素为 key 缓存 Editor 实例，供外部（如 Web Component）通过 DOM 反查编辑器
-   */
-  static instanceMap = new WeakMap<HTMLElement, Editor>()
-
-  /**
    * 配置编辑器，返回创建的编辑器
    */
   static async configure(options: EditorConfigureOptionType) {
@@ -2258,8 +2251,6 @@ export class Editor {
     DapEvent.on(editor.$el, 'cut.kaitify', onCut.bind(editor))
     //onCreated事件触发
     if (options.onCreated) options.onCreated(editor)
-    //注册实例缓存
-    Editor.instanceMap.set(editor.$el, editor)
     //返回编辑器实例
     return editor
   }
