@@ -174,8 +174,8 @@ export const ImageExtension = () =>
         node.tag = Image_NODE_TAG
         node.children = undefined
         if (node.hasMarks()) {
-          node.marks!['data-src'] = node.marks?.['src'] ?? ''
-          node.marks!['data-alt'] = node.marks?.['alt'] ?? ''
+          node.marks!['data-src'] = node.marks!['src']
+          node.marks!['data-alt'] = node.marks!['alt']
           node.marks = deleteProperty(node.marks, 'src')
           node.marks = deleteProperty(node.marks, 'alt')
         }
@@ -193,8 +193,8 @@ export const ImageExtension = () =>
           node.tag = Image_NODE_TAG
           node.children = undefined
           if (node.hasMarks()) {
-            node.marks!['data-src'] = node.marks?.['src'] ?? ''
-            node.marks!['data-alt'] = node.marks?.['alt'] ?? ''
+            node.marks!['data-src'] = node.marks!['src']
+            node.marks!['data-alt'] = node.marks!['alt']
             node.marks = deleteProperty(node.marks, 'src')
             node.marks = deleteProperty(node.marks, 'alt')
           }
