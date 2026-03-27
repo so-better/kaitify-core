@@ -63,7 +63,7 @@ const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
 /**
  * 附件点击事件
  */
-const handlewAttachmentClick = (editor: Editor) => {
+const handleClick = (editor: Editor) => {
   DapEvent.off(editor.$el!, 'click.attachment')
   DapEvent.on(editor.$el!, 'click.attachment', async e => {
     const event = e as MouseEvent
@@ -75,31 +75,46 @@ const handlewAttachmentClick = (editor: Editor) => {
     const matchNode = node.getMatchNode({
       tag: ATTACHMENT_NODE_TAG
     })
-    //获取到附件节点
-    if (matchNode) {
-      //可编辑状态，设置附件选中
-      if (editor.isEditable()) {
-        editor.updateRealSelection()
-      }
-      //不可编辑状态，点击附件下载
-      else {
-        const url = matchNode.marks!['data-url'] as string
-        const text = matchNode.marks!['data-text'] as string
-        //使用fetch读取文件地址
-        const res = await fetch(url, {
-          method: 'GET'
-        })
-        //获取blob数据
-        const blob = await res.blob()
-        //创建a标签进行下载
-        const a = document.createElement('a')
-        a.setAttribute('target', '_blank')
-        a.setAttribute('href', URL.createObjectURL(blob))
-        a.setAttribute('download', text)
-        a.click()
-      }
+    //附件节点不存在或者编辑器可编辑
+    if (!matchNode || editor.isEditable()) {
+      return
     }
+    const url = matchNode.marks!['data-url'] as string
+    const text = matchNode.marks!['data-text'] as string
+    //使用fetch读取文件地址
+    const res = await fetch(url, {
+      method: 'GET'
+    })
+    //获取blob数据
+    const blob = await res.blob()
+    //创建a标签进行下载
+    const a = document.createElement('a')
+    a.setAttribute('target', '_blank')
+    a.setAttribute('href', URL.createObjectURL(blob))
+    a.setAttribute('download', text)
+    a.click()
   })
+}
+
+/**
+ * 附件选中样式设置
+ */
+const handleSelected = (editor: Editor) => {
+  editor.removeDomObserve()
+  // 先清除所有水平线的选中状态
+  editor.$el!.querySelectorAll(`${ATTACHMENT_NODE_TAG} > span`).forEach(el => {
+    el.removeAttribute('is-selected')
+  })
+  if (!editor.selection.focused()) return
+  const flag = editor.commands.hasAttachment?.()
+  if (flag) {
+    const doms = editor
+      .getFocusNodesBySelection('closed')
+      .filter(item => item.isMatch({ tag: ATTACHMENT_NODE_TAG }))
+      .map(item => editor.findDom(item))
+    doms.forEach(dom => dom.querySelector('span')?.setAttribute('is-selected', ''))
+  }
+  editor.setDomObserve()
 }
 
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
@@ -153,7 +168,10 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
       }
     ],
     onAfterUpdateView() {
-      handlewAttachmentClick(this)
+      handleClick(this)
+    },
+    onSelectionUpdate() {
+      handleSelected(this)
     },
     addCommands() {
       const getAttachment = () => {

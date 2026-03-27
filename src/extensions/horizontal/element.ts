@@ -9,7 +9,7 @@ class HorizontalElement extends HTMLElement {
    * dom挂载，首次渲染，设置事件
    */
   connectedCallback() {
-    this.innerHTML = `<hr />`
+    this.innerHTML = `<span><hr /></span>`
   }
 }
 

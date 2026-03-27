@@ -9,7 +9,7 @@ class AttachmentElement extends HTMLElement {
    * dom挂载，首次渲染
    */
   connectedCallback() {
-    this.innerHTML = `<span is-icon></span><span is-text></span>`
+    this.innerHTML = `<span><span is-icon></span><span is-text></span></span>`
     this.querySelector('span[is-icon]')!.setAttribute('style', `background-image:url(${this.getAttribute('data-icon')})`)
     this.querySelector('span[is-text]')!.textContent = this.getAttribute('data-text')
   }

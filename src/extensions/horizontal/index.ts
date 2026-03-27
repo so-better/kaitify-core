@@ -1,4 +1,3 @@
-import { event as DapEvent } from 'dap-util'
 import { Editor, KNode } from '@/model'
 import { Extension } from '../Extension'
 import { HORIZONTAL_NODE_TAG } from './element'
@@ -7,35 +6,39 @@ import './style.less'
 declare module '../../model' {
   interface EditorCommandsType {
     /**
-     * 设置分隔线
+     * 获取光标所在的水平线节点
+     */
+    getHorizontal?: () => KNode | null
+    /**
+     * 判断光标范围内是否有水平线节点
+     */
+    hasHorizontal?: () => boolean
+    /**
+     * 设置水平线
      */
     setHorizontal?: () => Promise<void>
   }
 }
 
 /**
- * 水平线点击设置
+ * 水平线选中样式设置
  */
-const handleHorizontalClick = (editor: Editor) => {
-  DapEvent.off(editor.$el!, 'click.horizontal')
-  DapEvent.on(editor.$el!, 'click.horizontal', e => {
-    //编辑器不可编辑状态下不设置
-    if (!editor.isEditable()) {
-      return
-    }
-    const event = e as MouseEvent
-    const elm = event.target as HTMLElement
-    if (elm === editor.$el) {
-      return
-    }
-    const node = editor.findNode(elm)
-    const matchNode = node.getMatchNode({
-      tag: HORIZONTAL_NODE_TAG
-    })
-    if (matchNode) {
-      editor.updateRealSelection()
-    }
+const handleSelected = (editor: Editor) => {
+  editor.removeDomObserve()
+  // 先清除所有水平线的选中状态
+  editor.$el!.querySelectorAll(`${HORIZONTAL_NODE_TAG} > span`).forEach(el => {
+    el.removeAttribute('is-selected')
   })
+  if (!editor.selection.focused()) return
+  const flag = editor.commands.hasHorizontal?.()
+  if (flag) {
+    const doms = editor
+      .getFocusNodesBySelection('closed')
+      .filter(item => item.isMatch({ tag: HORIZONTAL_NODE_TAG }))
+      .map(item => editor.findDom(item))
+    doms.forEach(dom => dom.querySelector('span')?.setAttribute('is-selected', ''))
+  }
+  editor.setDomObserve()
 }
 
 export const HorizontalExtension = () =>
@@ -67,10 +70,46 @@ export const HorizontalExtension = () =>
         }
       }
     ],
-    onAfterUpdateView() {
-      handleHorizontalClick(this)
+    onSelectionUpdate() {
+      handleSelected(this)
     },
     addCommands() {
+      const getHorizontal = () => {
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return null
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        if (startNode.isEqual(endNode) && startNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
+          return startNode
+        }
+        return null
+      }
+
+      const hasHorizontal = () => {
+        if (!this.selection.focused() || this.selection.collapsed()) {
+          return false
+        }
+        const startNode = this.selection.start!.node
+        const endNode = this.selection.end!.node
+        const startOffset = this.selection.start!.offset
+        const endOffset = this.selection.end!.offset
+        // 起点从水平线头部开始
+        if (startNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && startOffset === 0) {
+          return true
+        }
+        // 终点到水平线尾部结束
+        if (endNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && endOffset === 1) {
+          return true
+        }
+        // 选区中间完整包含的水平线（排除边界节点）
+        return this.getFocusNodesBySelection('all')
+          .filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
+          .some(n => n.isMatch({ tag: HORIZONTAL_NODE_TAG }))
+      }
+
       const setHorizontal = async () => {
         const node = KNode.create({
           type: 'closed',
@@ -81,6 +120,8 @@ export const HorizontalExtension = () =>
       }
 
       return {
+        getHorizontal,
+        hasHorizontal,
         setHorizontal
       }
     }

@@ -3,27 +3,37 @@
 .kaitify {
   kaitify-attachment {
     display: inline-flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: var(--kaitify-sides-between);
     align-items: center;
+    justify-content: center;
     padding: 0 var(--kaitify-sides-between);
-    color: @color;
     vertical-align: bottom;
-    font-size: var(--kaitify-font-size);
-    line-height: var(--kaitify-line-height);
 
     &:hover {
       cursor: pointer;
     }
 
-    span[is-icon] {
+    & > span {
       display: inline-flex;
-      width: 20px;
-      height: 20px;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: var(--kaitify-sides-between);
+      align-items: center;
+      color: @color;
+      font-size: var(--kaitify-font-size);
+      line-height: var(--kaitify-line-height);
+
+      &[is-selected] {
+        background: var(--kaitify-lighter-theme);
+      }
+
+      & > span[is-icon] {
+        display: inline-flex;
+        width: 20px;
+        height: 20px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
     }
   }
 
