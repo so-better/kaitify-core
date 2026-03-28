@@ -5,10 +5,7 @@
 		color: @color;
 		text-decoration: none;
 		pointer-events: none;
-
-		&:hover {
-			text-decoration: underline;
-		}
+		cursor: default;
 	}
 
 	//非编辑状态下
@@ -18,6 +15,7 @@
 			transition: all 300ms;
 
 			&:hover {
+				text-decoration: underline;
 				cursor: pointer;
 				color: fade(@color, 80%);
 			}
