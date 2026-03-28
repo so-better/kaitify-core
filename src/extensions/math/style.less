@@ -2,27 +2,26 @@
 @darkBackColor: #2a2a2a;
 
 .kaitify {
-	span[kaitify-math] {
-		display: inline-block;
-		padding: var(--kaitify-small-padding);
+	kaitify-math {
+		display: inline-flex;
+		padding: 0 var(--kaitify-small-padding);
 		border-radius: var(--kaitify-border-radius);
-		margin: 0 var(--kaitify-sides-between);
 		transition: all 300ms;
 		max-width: 100%;
 		text-indent: 0;
 
 		&:hover {
-			cursor: pointer !important;
 			background: fade(@backColor, 50%);
+			cursor: default;
 		}
 
-		.katex {
+		span.katex {
 			overflow: hidden;
 			font-size: 1.4em;
 		}
 	}
 
-	&.kaitify-dark span[kaitify-math] {
+	&.kaitify-dark kaitify-math {
 		&:hover {
 			background: fade(@darkBackColor, 50%);
 		}

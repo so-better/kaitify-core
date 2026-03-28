@@ -237,7 +237,7 @@ export const ImageExtension = () =>
 				if (!options.src) {
 					return
 				}
-				const imageNode = KNode.create({
+				const node = KNode.create({
 					type: 'closed',
 					tag: IMAGE_NODE_TAG,
 					marks: {
@@ -248,8 +248,8 @@ export const ImageExtension = () =>
 						width: options.width || 'auto'
 					}
 				})
-				this.insertNode(imageNode)
-				this.setSelectionAfter(imageNode)
+				this.insertNode(node)
+				this.setSelectionAfter(node)
 				await this.updateView()
 			}
 
@@ -260,17 +260,17 @@ export const ImageExtension = () =>
 				if (options.src === undefined && options.alt === undefined) {
 					return
 				}
-				const imageNode = getImage()
-				if (!imageNode) {
+				const node = getImage()
+				if (!node) {
 					return
 				}
 				//更新url
 				if (options.src !== undefined) {
-					imageNode.marks!['data-src'] = options.src
+					node.marks!['data-src'] = options.src
 				}
 				//更新alt
 				if (options.alt !== undefined) {
-					imageNode.marks!['data-alt'] = options.alt
+					node.marks!['data-alt'] = options.alt
 				}
 				await this.updateView()
 			}
