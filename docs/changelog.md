@@ -12,6 +12,8 @@ title: 更新日志
 - 整个编辑器的不可编辑节点的逻辑判断全部去除，如 `Editor` 中 `insertText`、`insertParagraph`、`insertNode`、`delete` 的 `uneditable` 检测逻辑移除，`KNode.getUneditable()` 方法移除
 - 移除 `formatUneditableNoodes` 格式化规则：如果节点是不可编辑的，则查找使其不可编辑的目标节点，针对该目标节点，如果是非块节点且可见，则在两侧加上零宽度空白文本节点，且保证光标始终不在不可编辑的节点内部
 - `Editor` 新增实例方法 `isDomInClosedNode`：用于判断某个dom是否在闭合节点内
+- `Editor` 新增实例方法 `getClosedNodeBySelection`：用于判断光标是否在某个闭合节点上，是的话返回该闭合节点
+- `Editor` 新增实例方法 `hasClosedNodeBySelection`：判断光标范围内是否有闭合节点
 - `Attachment` 附件扩展基于新的闭合节点设计进行重构
 - `Horizontal` 水平线扩展基于新的闭合节点设计进行重构，新增 `getHorizontal` 和 `hasHorizontal` 方法
 - `Image` 图片扩展基于新的闭合节点设计进行重构
