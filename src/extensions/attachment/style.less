@@ -1,46 +1,43 @@
 @import url(../link/var.less);
 
 .kaitify {
-  kaitify-attachment {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 var(--kaitify-sides-between);
-    vertical-align: bottom;
+	kaitify-attachment {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 var(--kaitify-sides-between);
+		vertical-align: bottom;
+		color: @color;
+		font-size: var(--kaitify-font-size);
+		line-height: var(--kaitify-line-height);
 
-    &:hover {
-      cursor: pointer;
-    }
+		&:hover {
+			cursor: default;
+		}
 
-    & > span {
-      display: inline-flex;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: var(--kaitify-sides-between);
-      align-items: center;
-      color: @color;
-      font-size: var(--kaitify-font-size);
-      line-height: var(--kaitify-line-height);
+		& > span {
+			display: inline-flex;
+			justify-content: flex-start;
+			flex-wrap: wrap;
+			gap: var(--kaitify-sides-between);
+			align-items: center;
 
-      &[is-selected] {
-        background: var(--kaitify-lighter-theme);
-      }
+			& > span[is-icon] {
+				display: inline-flex;
+				width: 20px;
+				height: 20px;
+				background-size: cover;
+				background-repeat: no-repeat;
+				background-position: center;
+			}
+		}
+	}
 
-      & > span[is-icon] {
-        display: inline-flex;
-        width: 20px;
-        height: 20px;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-      }
-    }
-  }
-
-  //非编辑状态下
-  &:not([contenteditable='true']) {
-    kaitify-attachment:hover {
-      text-decoration: underline;
-    }
-  }
+	//非编辑状态下
+	&:not([contenteditable='true']) {
+		kaitify-attachment:hover {
+			text-decoration: underline;
+			cursor: pointer;
+		}
+	}
 }

@@ -1,32 +1,31 @@
 .kaitify {
-  kaitify-horizontal {
-    display: inline-flex;
-    width: 100%;
-    cursor: pointer;
+	kaitify-horizontal {
+		display: inline-flex;
+		width: 100%;
 
-    & > span {
-      display: block;
-      width: 100%;
-      padding: var(--kaitify-large-margin) 0;
+		& > span {
+			display: block;
+			width: 100%;
+			padding: var(--kaitify-large-margin) 0;
 
-      &[is-selected] {
-        background: var(--kaitify-lighter-theme);
-      }
+			&[is-selected] {
+				background: var(--kaitify-lighter-theme);
+			}
 
-      hr {
-        display: block;
-        width: 100%;
-        height: 2px;
-        appearance: none;
-        background: fade(#000, 10%);
-        border: none;
-        margin: 0;
-        padding: 0;
-      }
-    }
-  }
+			hr {
+				display: block;
+				width: 100%;
+				height: 2px;
+				appearance: none;
+				background: fade(#000, 10%);
+				border: none;
+				margin: 0;
+				padding: 0;
+			}
+		}
+	}
 
-  &.kaitify-dark kaitify-horizontal > span > hr {
-    background: fade(#fff, 10%);
-  }
+	&.kaitify-dark kaitify-horizontal > span > hr {
+		background: fade(#fff, 10%);
+	}
 }

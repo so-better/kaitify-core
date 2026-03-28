@@ -1,33 +1,51 @@
 export const Image_NODE_TAG = 'kaitify-image'
 
 class ImageElement extends HTMLElement {
-  constructor() {
-    super()
-  }
+	constructor() {
+		super()
+	}
 
-  /**
-   * dom挂载，首次渲染
-   */
-  connectedCallback() {
-    this.innerHTML = `<img />`
-    const img = this.querySelector('img')!
-    img.src = this.getAttribute('data-src') ?? ''
-    img.alt = this.getAttribute('data-alt') ?? ''
-  }
+	/**
+	 * dom挂载，首次渲染
+	 */
+	connectedCallback() {
+		this.innerHTML = `<img />`
+		const image = this.querySelector('img')!
+		const src = this.getAttribute('data-src')
+		const alt = this.getAttribute('data-alt')
+		if (src) {
+			image.setAttribute('src', src)
+		}
+		if (alt) {
+			image.setAttribute('alt', alt)
+		}
+	}
 
-  /**
-   * 属性更新时更新内容
-   */
-  attributeChangedCallback(name: string, _: string, newValue: string) {
-    const img = this.querySelector('img')
-    if (!img) return
-    if (name === 'data-src') img.src = newValue ?? ''
-    if (name === 'data-alt') img.alt = newValue ?? ''
-  }
+	/**
+	 * 属性更新时更新内容
+	 */
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		const image = this.querySelector('img')
+		if (!image) return
+		if (name === 'data-src') {
+			if (newValue) {
+				image.setAttribute('src', newValue)
+			} else {
+				image.removeAttribute('src')
+			}
+		}
+		if (name === 'data-alt') {
+			if (newValue) {
+				image.setAttribute('alt', newValue)
+			} else {
+				image.removeAttribute('alt')
+			}
+		}
+	}
 
-  static get observedAttributes() {
-    return ['data-src', 'data-alt']
-  }
+	static get observedAttributes() {
+		return ['data-src', 'data-alt']
+	}
 }
 
 customElements.define(Image_NODE_TAG, ImageElement)
