@@ -223,39 +223,11 @@ export const ImageExtension = () =>
 		},
 		addCommands() {
 			const getImage = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return null
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				if (startNode.isEqual(endNode) && startNode.isMatch({ tag: IMAGE_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
-					return startNode
-				}
-				return null
+				return this.getClosedNodeBySelection({ tag: IMAGE_NODE_TAG })
 			}
 
 			const hasImage = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return false
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				// 起点从图片头部开始
-				if (startNode.isMatch({ tag: IMAGE_NODE_TAG }) && startOffset === 0) {
-					return true
-				}
-				// 终点到图片尾部结束
-				if (endNode.isMatch({ tag: IMAGE_NODE_TAG }) && endOffset === 1) {
-					return true
-				}
-				// 选区中间完整包含的图片（排除边界节点）
-				return this.getFocusNodesBySelection('all')
-					.filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
-					.some(n => n.isMatch({ tag: IMAGE_NODE_TAG }))
+				return this.hasClosedNodeBySelection({ tag: IMAGE_NODE_TAG })
 			}
 
 			const setImage = async (options: SetImageOptionType) => {

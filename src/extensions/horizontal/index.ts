@@ -73,42 +73,17 @@ export const HorizontalExtension = () =>
 		},
 		addCommands() {
 			const getHorizontal = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return null
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				if (startNode.isEqual(endNode) && startNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
-					return startNode
-				}
-				return null
+				return this.getClosedNodeBySelection({ tag: HORIZONTAL_NODE_TAG })
 			}
 
 			const hasHorizontal = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return false
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				// 起点从水平线头部开始
-				if (startNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && startOffset === 0) {
-					return true
-				}
-				// 终点到水平线尾部结束
-				if (endNode.isMatch({ tag: HORIZONTAL_NODE_TAG }) && endOffset === 1) {
-					return true
-				}
-				// 选区中间完整包含的水平线（排除边界节点）
-				return this.getFocusNodesBySelection('all')
-					.filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
-					.some(n => n.isMatch({ tag: HORIZONTAL_NODE_TAG }))
+				return this.hasClosedNodeBySelection({ tag: HORIZONTAL_NODE_TAG })
 			}
 
 			const setHorizontal = async () => {
+				if (!this.selection.focused()) {
+					return
+				}
 				const node = KNode.create({
 					type: 'closed',
 					tag: HORIZONTAL_NODE_TAG

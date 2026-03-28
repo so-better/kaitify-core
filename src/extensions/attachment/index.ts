@@ -161,43 +161,15 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
 		},
 		addCommands() {
 			const getAttachment = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return null
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				if (startNode.isEqual(endNode) && startNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
-					return startNode
-				}
-				return null
+				return this.getClosedNodeBySelection({ tag: ATTACHMENT_NODE_TAG })
 			}
 
 			const hasAttachment = () => {
-				if (!this.selection.focused() || this.selection.collapsed()) {
-					return false
-				}
-				const startNode = this.selection.start!.node
-				const endNode = this.selection.end!.node
-				const startOffset = this.selection.start!.offset
-				const endOffset = this.selection.end!.offset
-				// 起点从附件头部开始
-				if (startNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && startOffset === 0) {
-					return true
-				}
-				// 终点到附件尾部结束
-				if (endNode.isMatch({ tag: ATTACHMENT_NODE_TAG }) && endOffset === 1) {
-					return true
-				}
-				// 选区中间完整包含的附件（排除边界节点）
-				return this.getFocusNodesBySelection('all')
-					.filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
-					.some(n => n.isMatch({ tag: ATTACHMENT_NODE_TAG }))
+				return this.hasClosedNodeBySelection({ tag: ATTACHMENT_NODE_TAG })
 			}
 
 			const setAttachment = async (options: SetAttachmentOptionType) => {
-				if (!this.selection.focused() || hasAttachment()) {
+				if (!this.selection.focused()) {
 					return
 				}
 				if (!options.url || !options.text) {
@@ -225,21 +197,21 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
 				if (!options.url && !options.text && !options.icon) {
 					return
 				}
-				const attachmentNode = getAttachment()
-				if (!attachmentNode) {
+				const node = getAttachment()
+				if (!node) {
 					return
 				}
 				//更新url
 				if (options.url) {
-					attachmentNode.marks!['data-url'] = options.url
+					node.marks!['data-url'] = options.url
 				}
 				//更新text
 				if (options.text) {
-					attachmentNode.marks!['data-text'] = options.text
+					node.marks!['data-text'] = options.text
 				}
 				//更新icon
 				if (options.icon) {
-					attachmentNode.marks!['data-icon'] = options.icon
+					node.marks!['data-icon'] = options.icon
 				}
 				//更新视图
 				await this.updateView()
@@ -249,13 +221,13 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
 				if (!this.selection.focused()) {
 					return null
 				}
-				const attachmentNode = getAttachment()
-				if (!attachmentNode) {
+				const node = getAttachment()
+				if (!node) {
 					return null
 				}
-				const url = attachmentNode.marks!['data-url'] as string
-				const text = attachmentNode.marks!['data-text'] as string
-				const icon = attachmentNode.marks!['data-icon'] as string
+				const url = node.marks!['data-url'] as string
+				const text = node.marks!['data-text'] as string
+				const icon = node.marks!['data-icon'] as string
 				return { url, text, icon }
 			}
 
