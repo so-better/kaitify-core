@@ -75,34 +75,24 @@ const handleClick = (editor: Editor) => {
 		const matchNode = node.getMatchNode({
 			tag: ATTACHMENT_NODE_TAG
 		})
-		//附件节点不存在
-		if (!matchNode) {
+		//附件节点不存在或者编辑器在可编辑器状态下
+		if (!matchNode || editor.isEditable()) {
 			return
 		}
-		//编辑器在可编辑器状态下
-		if (editor.isEditable()) {
-			//附件本身在被光标选择时是有选中样式的，所以只需要更新真实光标使其可以呈现选中效果即可
-			editor.setSelectionBefore(matchNode, 'start')
-			editor.setSelectionAfter(matchNode, 'end')
-			editor.updateRealSelection()
-		}
-		//编辑器在不可编辑器状态下
-		else {
-			const url = matchNode.marks!['data-url'] as string
-			const text = matchNode.marks!['data-text'] as string
-			//使用fetch读取文件地址
-			const res = await fetch(url, {
-				method: 'GET'
-			})
-			//获取blob数据
-			const blob = await res.blob()
-			//创建a标签进行下载
-			const a = document.createElement('a')
-			a.setAttribute('target', '_blank')
-			a.setAttribute('href', URL.createObjectURL(blob))
-			a.setAttribute('download', text)
-			a.click()
-		}
+		const url = matchNode.marks!['data-url'] as string
+		const text = matchNode.marks!['data-text'] as string
+		//使用fetch读取文件地址
+		const res = await fetch(url, {
+			method: 'GET'
+		})
+		//获取blob数据
+		const blob = await res.blob()
+		//创建a标签进行下载
+		const a = document.createElement('a')
+		a.setAttribute('target', '_blank')
+		a.setAttribute('href', URL.createObjectURL(blob))
+		a.setAttribute('download', text)
+		a.click()
 	})
 }
 

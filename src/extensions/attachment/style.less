@@ -2,34 +2,39 @@
 
 .kaitify {
 	kaitify-attachment {
-		display: inline-flex;
-		justify-content: flex-start;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: var(--kaitify-sides-between);
-		padding: 0 var(--kaitify-sides-between);
-		color: @color;
-		font-size: var(--kaitify-font-size);
-		line-height: var(--kaitify-line-height);
-		vertical-align: middle;
+		display: inline-block;
 
-		&:hover {
-			cursor: default;
+		::selection {
+			background: none;
 		}
 
-		& > span[is-icon] {
+		& > span {
 			display: inline-block;
-			width: 20px;
-			height: 20px;
-			background-size: cover;
-			background-repeat: no-repeat;
-			background-position: center;
+			padding: 0 var(--kaitify-sides-between);
+			color: @color;
+			font-size: var(--kaitify-font-size);
+			line-height: var(--kaitify-line-height);
+
+			&:hover {
+				cursor: default;
+			}
+
+			& > span[is-icon] {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				background-size: cover;
+				background-repeat: no-repeat;
+				background-position: center;
+				vertical-align: bottom;
+				margin-right: var(--kaitify-sides-between);
+			}
 		}
 	}
 
 	//非编辑状态下
 	&:not([contenteditable='true']) {
-		kaitify-attachment:hover {
+		kaitify-attachment > span:hover {
 			text-decoration: underline;
 			cursor: pointer;
 		}
