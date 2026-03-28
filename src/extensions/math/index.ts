@@ -1,4 +1,3 @@
-import { event as DapEvent } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { Extension } from '../Extension'
 import { MATH_NODE_TAG } from './element'
@@ -26,28 +25,22 @@ declare module '../../model' {
 }
 
 /**
- * 数学公式获取焦点设置（数据公式有选中样式，所以只需要使它聚焦即可）
+ * 数学公式选中样式设置（禁用默认选中样式，另外重新设置））
  */
-const handleFoucs = (editor: Editor) => {
-	DapEvent.off(editor.$el!, 'click.math')
-	DapEvent.on(editor.$el!, 'click.math', async e => {
-		const event = e as MouseEvent
-		const elm = event.target as HTMLElement
-		if (elm === editor.$el) {
-			return
-		}
-		const node = editor.findNode(elm)
-		const matchNode = node.getMatchNode({
-			tag: MATH_NODE_TAG
-		})
-		//数据公式节点不存在或者编辑器不可编辑
-		if (!matchNode || !editor.isEditable()) {
-			return
-		}
-		editor.setSelectionBefore(matchNode, 'start')
-		editor.setSelectionAfter(matchNode, 'end')
-		editor.updateRealSelection()
+const handleSelected = (editor: Editor) => {
+	// 先清除所有水平线的选中状态
+	editor.$el!.querySelectorAll(`${MATH_NODE_TAG} > span`).forEach(el => {
+		el.removeAttribute('is-selected')
 	})
+	if (!editor.selection.focused()) return
+	const flag = editor.commands.hasMath?.()
+	if (flag) {
+		const doms = editor
+			.getFocusNodesBySelection('closed')
+			.filter(item => item.isMatch({ tag: MATH_NODE_TAG }))
+			.map(item => editor.findDom(item))
+		doms.forEach(dom => dom.querySelector('span')?.setAttribute('is-selected', ''))
+	}
 }
 
 export const MathExtension = () =>
@@ -92,8 +85,8 @@ export const MathExtension = () =>
 				}
 			}
 		],
-		onAfterUpdateView() {
-			handleFoucs(this)
+		onSelectionUpdate() {
+			handleSelected(this)
 		},
 		addCommands() {
 			const getMath = () => {

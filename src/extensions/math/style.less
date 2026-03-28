@@ -1,29 +1,26 @@
-@backColor: #f1f2f3;
-@darkBackColor: #2a2a2a;
-
 .kaitify {
 	kaitify-math {
-		display: inline-flex;
-		padding: 0 var(--kaitify-small-padding);
-		border-radius: var(--kaitify-border-radius);
-		transition: all 300ms;
+		display: inline-block;
 		max-width: 100%;
 		text-indent: 0;
+		vertical-align: baseline;
 
-		&:hover {
-			background: fade(@backColor, 50%);
-			cursor: default;
+		::selection {
+			background: none;
 		}
 
-		span.katex {
-			overflow: hidden;
-			font-size: 1.4em;
-		}
-	}
+		& > span {
+			display: inline-block;
+			padding: var(--kaitify-small-padding);
 
-	&.kaitify-dark kaitify-math {
-		&:hover {
-			background: fade(@darkBackColor, 50%);
+			&[is-selected] {
+				background: var(--kaitify-lighter-theme);
+			}
+
+			span.katex {
+				overflow: hidden;
+				font-size: 1.4em;
+			}
 		}
 	}
 }

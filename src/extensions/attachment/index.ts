@@ -97,7 +97,7 @@ const handleClick = (editor: Editor) => {
 }
 
 /**
- * 附件选中样式设置
+ * 附件选中样式设置（禁用默认选中样式，另外重新设置）
  */
 const handleSelected = (editor: Editor) => {
 	// 先清除所有附件的选中状态

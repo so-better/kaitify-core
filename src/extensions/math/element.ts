@@ -11,10 +11,10 @@ class MathElement extends HTMLElement {
 	 * dom挂载，首次渲染
 	 */
 	connectedCallback() {
-		this.innerHTML = KaTex.renderToString(this.getAttribute('data-value') ?? '', {
+		this.innerHTML = `<span>${KaTex.renderToString(this.getAttribute('data-value') ?? '', {
 			output: 'html',
 			throwOnError: true
-		})
+		})}</span>`
 	}
 
 	/**
@@ -22,10 +22,10 @@ class MathElement extends HTMLElement {
 	 */
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		if (name === 'data-value') {
-			this.innerHTML = KaTex.renderToString(newValue, {
+			this.innerHTML = `<span>${KaTex.renderToString(newValue, {
 				output: 'html',
 				throwOnError: true
-			})
+			})}</span>`
 		}
 	}
 

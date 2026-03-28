@@ -122,7 +122,7 @@ const handleResizable = (editor: Editor) => {
 }
 
 /**
- * 图片获取焦点设置（图片本身在点击时是无法获取聚焦的，但是有选中样式，所以只需要使它聚焦即可）
+ * 图片获取焦点设置（使用默认选中样式，但是图片本身在点击时是无法获取聚焦的，所以只需要使它聚焦即可）
  */
 const handleFoucs = (editor: Editor) => {
 	DapEvent.off(editor.$el!, 'click.image')
