@@ -96,6 +96,25 @@ const handleClick = (editor: Editor) => {
 	})
 }
 
+/**
+ * 附件选中样式设置
+ */
+const handleSelected = (editor: Editor) => {
+	// 先清除所有附件的选中状态
+	editor.$el!.querySelectorAll(`${ATTACHMENT_NODE_TAG} > span`).forEach(el => {
+		el.removeAttribute('is-selected')
+	})
+	if (!editor.selection.focused()) return
+	const flag = editor.commands.hasAttachment?.()
+	if (flag) {
+		const doms = editor
+			.getFocusNodesBySelection('closed')
+			.filter(item => item.isMatch({ tag: ATTACHMENT_NODE_TAG }))
+			.map(item => editor.findDom(item))
+		doms.forEach(dom => dom.querySelector('span')?.setAttribute('is-selected', ''))
+	}
+}
+
 export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
 	Extension.create({
 		name: 'attachment',
@@ -148,6 +167,9 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
 		],
 		onAfterUpdateView() {
 			handleClick(this)
+		},
+		onSelectionUpdate() {
+			handleSelected(this)
 		},
 		addCommands() {
 			const getAttachment = () => {
