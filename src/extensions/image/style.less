@@ -6,6 +6,18 @@
 		min-width: 20px;
 		max-width: 100%;
 		text-indent: 0;
+		position: relative;
+
+		span {
+			position: absolute;
+			right: 0;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 5px;
+			height: 5px;
+			background: var(--kaitify-theme);
+			pointer-events: none;
+		}
 
 		img {
 			display: inline-block;

@@ -1,26 +1,26 @@
-@import url(./var.less);
+@color: #06c27c;
 
 .kaitify {
-  a {
-    color: @color;
-    text-decoration: none;
-    pointer-events: none;
+	a {
+		color: @color;
+		text-decoration: none;
+		pointer-events: none;
 
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
-  //非编辑状态下
-  &:not([contenteditable='true']) {
-    a {
-      pointer-events: all;
-      transition: all 300ms;
+	//非编辑状态下
+	&:not([contenteditable='true']) {
+		a {
+			pointer-events: all;
+			transition: all 300ms;
 
-      &:hover {
-        cursor: pointer;
-        color: fade(@color, 80%);
-      }
-    }
-  }
+			&:hover {
+				cursor: pointer;
+				color: fade(@color, 80%);
+			}
+		}
+	}
 }

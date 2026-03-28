@@ -9,7 +9,7 @@ class ImageElement extends HTMLElement {
 	 * dom挂载，首次渲染
 	 */
 	connectedCallback() {
-		this.innerHTML = `<img />`
+		this.innerHTML = `<span is-indicator></span><img />`
 		const image = this.querySelector('img')!
 		const src = this.getAttribute('data-src')
 		const alt = this.getAttribute('data-alt')
