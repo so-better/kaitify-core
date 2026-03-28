@@ -18,6 +18,7 @@ title: 更新日志
 - `Horizontal` 水平线扩展基于新的闭合节点设计进行重构，新增 `getHorizontal` 和 `hasHorizontal` 方法
 - `Image` 图片扩展基于新的闭合节点设计进行重构
 - `Math` 数学公式扩展基于新的闭合节点设计进行重构
+- `Video` 视频扩展基于新的闭合节点设计进行重构
 
 ## v0.0.2-beta.18 <Badge type="tip" text='2026.03.19' />
 
