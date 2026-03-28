@@ -9,7 +9,7 @@
 		position: relative;
 		vertical-align: baseline;
 
-		span {
+		span[is-indicator] {
 			position: absolute;
 			right: 0;
 			top: 50%;
@@ -25,6 +25,13 @@
 			width: 100%;
 			height: auto;
 			padding: 0 var(--kaitify-small-padding);
+		}
+	}
+
+	//非编辑状态下
+	&:not([contenteditable='true']) {
+		kaitify-image > span[is-indicator] {
+			display: none;
 		}
 	}
 }

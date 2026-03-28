@@ -249,7 +249,6 @@ export const ImageExtension = () =>
 					}
 				})
 				this.insertNode(node)
-				this.setSelectionAfter(node)
 				await this.updateView()
 			}
 

@@ -1846,9 +1846,6 @@ export class Editor {
 	 * 根据selection更新编辑器真实光标
 	 */
 	async updateRealSelection() {
-		if (!this.isEditable()) {
-			return
-		}
 		const realSelection = window.getSelection()
 		if (!realSelection) {
 			return
