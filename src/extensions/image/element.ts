@@ -1,4 +1,4 @@
-export const Image_NODE_TAG = 'kaitify-image'
+export const IMAGE_NODE_TAG = 'kaitify-image'
 
 class ImageElement extends HTMLElement {
 	constructor() {
@@ -48,4 +48,4 @@ class ImageElement extends HTMLElement {
 	}
 }
 
-customElements.define(Image_NODE_TAG, ImageElement)
+customElements.define(IMAGE_NODE_TAG, ImageElement)

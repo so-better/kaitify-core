@@ -2,7 +2,7 @@ import interact from 'interactjs'
 import { event as DapEvent, data as DapData } from 'dap-util'
 import { Editor, KNode, KNodeMarksType, KNodeStylesType } from '@/model'
 import { deleteProperty } from '@/tools'
-import { Image_NODE_TAG } from './element'
+import { IMAGE_NODE_TAG } from './element'
 import { Extension } from '../Extension'
 import './style.less'
 
@@ -52,8 +52,8 @@ const handleResizable = (editor: Editor) => {
 		return
 	}
 	DapData.set(editor.$el!, 'kaitify-image-interact-init', true)
-	interact(`.kaitify ${Image_NODE_TAG} img`, { context: editor.$el }).unset()
-	interact(`.kaitify ${Image_NODE_TAG} img`, { context: editor.$el }).resizable({
+	interact(`.kaitify ${IMAGE_NODE_TAG} img`, { context: editor.$el }).unset()
+	interact(`.kaitify ${IMAGE_NODE_TAG} img`, { context: editor.$el }).resizable({
 		//是否启用
 		enabled: true,
 		//指定可以调整大小的边缘
@@ -134,7 +134,7 @@ const handleFoucs = (editor: Editor) => {
 		}
 		const node = editor.findNode(elm)
 		const matchNode = node.getMatchNode({
-			tag: Image_NODE_TAG
+			tag: IMAGE_NODE_TAG
 		})
 		//图片节点不存在或者编辑器不可编辑
 		if (!matchNode || !editor.isEditable()) {
@@ -149,10 +149,10 @@ const handleFoucs = (editor: Editor) => {
 export const ImageExtension = () =>
 	Extension.create({
 		name: 'image',
-		extraKeepTags: [Image_NODE_TAG, 'img'],
+		extraKeepTags: [IMAGE_NODE_TAG, 'img'],
 		onPasteKeepStyles(node) {
 			const styles: KNodeStylesType = {}
-			if (node.isMatch({ tag: Image_NODE_TAG }) && node.hasStyles()) {
+			if (node.isMatch({ tag: IMAGE_NODE_TAG }) && node.hasStyles()) {
 				styles['width'] = node.styles!['width'] || 'auto'
 			}
 			if (node.isMatch({ tag: 'img' }) && node.hasStyles()) {
@@ -162,7 +162,7 @@ export const ImageExtension = () =>
 		},
 		onPasteKeepMarks(node) {
 			const marks: KNodeMarksType = {}
-			if (node.isMatch({ tag: Image_NODE_TAG }) && node.hasMarks()) {
+			if (node.isMatch({ tag: IMAGE_NODE_TAG }) && node.hasMarks()) {
 				if (node.marks!.hasOwnProperty('data-src')) marks['data-src'] = node.marks!['data-src']
 				if (node.marks!.hasOwnProperty('data-alt')) marks['data-alt'] = node.marks!['data-alt']
 			}
@@ -173,13 +173,13 @@ export const ImageExtension = () =>
 			return marks
 		},
 		onDomParseNode(node) {
-			if (node.isMatch({ tag: Image_NODE_TAG })) {
+			if (node.isMatch({ tag: IMAGE_NODE_TAG })) {
 				node.type = 'closed'
 				node.children = undefined
 			}
 			if (node.isMatch({ tag: 'img' })) {
 				node.type = 'closed'
-				node.tag = Image_NODE_TAG
+				node.tag = IMAGE_NODE_TAG
 				node.children = undefined
 				if (node.hasMarks()) {
 					if (node.marks!['src']) {
@@ -196,13 +196,13 @@ export const ImageExtension = () =>
 		},
 		formatRules: [
 			({ node }) => {
-				if (node.isMatch({ tag: Image_NODE_TAG })) {
+				if (node.isMatch({ tag: IMAGE_NODE_TAG })) {
 					node.type = 'closed'
 					node.children = undefined
 				}
 				if (node.isMatch({ tag: 'img' })) {
 					node.type = 'closed'
-					node.tag = Image_NODE_TAG
+					node.tag = IMAGE_NODE_TAG
 					node.children = undefined
 					if (node.hasMarks()) {
 						if (node.marks!['src']) {
@@ -230,7 +230,7 @@ export const ImageExtension = () =>
 				const endNode = this.selection.end!.node
 				const startOffset = this.selection.start!.offset
 				const endOffset = this.selection.end!.offset
-				if (startNode.isEqual(endNode) && startNode.isMatch({ tag: Image_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
+				if (startNode.isEqual(endNode) && startNode.isMatch({ tag: IMAGE_NODE_TAG }) && startOffset == 0 && endOffset == 1) {
 					return startNode
 				}
 				return null
@@ -245,17 +245,17 @@ export const ImageExtension = () =>
 				const startOffset = this.selection.start!.offset
 				const endOffset = this.selection.end!.offset
 				// 起点从图片头部开始
-				if (startNode.isMatch({ tag: Image_NODE_TAG }) && startOffset === 0) {
+				if (startNode.isMatch({ tag: IMAGE_NODE_TAG }) && startOffset === 0) {
 					return true
 				}
 				// 终点到图片尾部结束
-				if (endNode.isMatch({ tag: Image_NODE_TAG }) && endOffset === 1) {
+				if (endNode.isMatch({ tag: IMAGE_NODE_TAG }) && endOffset === 1) {
 					return true
 				}
 				// 选区中间完整包含的图片（排除边界节点）
 				return this.getFocusNodesBySelection('all')
 					.filter(n => !n.isEqual(startNode) && !n.isEqual(endNode))
-					.some(n => n.isMatch({ tag: Image_NODE_TAG }))
+					.some(n => n.isMatch({ tag: IMAGE_NODE_TAG }))
 			}
 
 			const setImage = async (options: SetImageOptionType) => {
@@ -267,7 +267,7 @@ export const ImageExtension = () =>
 				}
 				const imageNode = KNode.create({
 					type: 'closed',
-					tag: Image_NODE_TAG,
+					tag: IMAGE_NODE_TAG,
 					marks: {
 						'data-src': options.src,
 						'data-alt': options.alt || ''
