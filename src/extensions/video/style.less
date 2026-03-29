@@ -1,37 +1,37 @@
 .kaitify {
-	kaitify-video {
-		display: inline-block;
-		position: relative;
-		width: auto;
-		min-width: 100px;
-		max-width: 100%;
-		text-indent: 0;
-		position: relative;
-		vertical-align: baseline;
+  kaitify-video {
+    display: inline-flex;
+    position: relative;
+    width: auto;
+    min-width: 100px;
+    max-width: 100%;
+    text-indent: 0;
+    position: relative;
+    vertical-align: baseline;
 
-		span[is-indicator] {
-			position: absolute;
-			right: 0;
-			top: 50%;
-			transform: translateY(-50%);
-			width: 5px;
-			height: 5px;
-			background: var(--kaitify-light-theme);
-			pointer-events: none;
-		}
+    span[is-indicator] {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 100%;
+      background: var(--kaitify-lightest-theme);
+      pointer-events: none;
+    }
 
-		video {
-			display: inline-block;
-			width: 100%;
-			height: auto;
-			padding: 0 var(--kaitify-small-padding);
-		}
-	}
+    video {
+      display: inline-block;
+      width: 100%;
+      height: auto;
+      padding: 0 var(--kaitify-small-padding);
+    }
+  }
 
-	//非编辑状态下
-	&:not([contenteditable='true']) {
-		kaitify-video > span[is-indicator] {
-			display: none;
-		}
-	}
+  //非编辑状态下
+  &:not([contenteditable='true']) {
+    kaitify-video > span[is-indicator] {
+      display: none;
+    }
+  }
 }

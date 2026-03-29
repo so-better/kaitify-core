@@ -1,26 +1,26 @@
 .kaitify {
-	kaitify-math {
-		display: inline-block;
-		max-width: 100%;
-		text-indent: 0;
-		vertical-align: baseline;
+  kaitify-math {
+    display: inline-flex;
+    max-width: 100%;
+    text-indent: 0;
+    vertical-align: baseline;
 
-		::selection {
-			background: none;
-		}
+    ::selection {
+      background: none;
+    }
 
-		& > span {
-			display: inline-block;
-			padding: var(--kaitify-small-padding);
+    & > span {
+      display: inline-block;
+      padding: var(--kaitify-small-padding);
 
-			&[is-selected] {
-				background: var(--kaitify-lighter-theme);
-			}
+      &[is-selected] {
+        background: var(--kaitify-lighter-theme);
+      }
 
-			span.katex {
-				overflow: hidden;
-				font-size: 1.4em;
-			}
-		}
-	}
+      span.katex {
+        overflow: hidden;
+        font-size: 1.4em;
+      }
+    }
+  }
 }

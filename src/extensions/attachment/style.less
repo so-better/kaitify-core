@@ -1,46 +1,46 @@
 @color: #06c27c;
 
 .kaitify {
-	kaitify-attachment {
-		display: inline-block;
+  kaitify-attachment {
+    display: inline-flex;
 
-		::selection {
-			background: none;
-		}
+    ::selection {
+      background: none;
+    }
 
-		& > span {
-			display: inline-block;
-			padding: 0 var(--kaitify-sides-between);
-			color: @color;
-			font-size: var(--kaitify-font-size);
-			line-height: var(--kaitify-line-height);
+    & > span {
+      display: inline-block;
+      padding: 0 var(--kaitify-sides-between);
+      color: @color;
+      font-size: var(--kaitify-font-size);
+      line-height: var(--kaitify-line-height);
 
-			&:hover {
-				cursor: default;
-			}
+      &:hover {
+        cursor: default;
+      }
 
-			&[is-selected] {
-				background: var(--kaitify-lighter-theme);
-			}
+      &[is-selected] {
+        background: var(--kaitify-lighter-theme);
+      }
 
-			& > span[is-icon] {
-				display: inline-block;
-				width: 20px;
-				height: 20px;
-				background-size: cover;
-				background-repeat: no-repeat;
-				background-position: center;
-				vertical-align: bottom;
-				margin-right: var(--kaitify-sides-between);
-			}
-		}
-	}
+      & > span[is-icon] {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        vertical-align: bottom;
+        margin-right: var(--kaitify-sides-between);
+      }
+    }
+  }
 
-	//非编辑状态下
-	&:not([contenteditable='true']) {
-		kaitify-attachment > span:hover {
-			text-decoration: underline;
-			cursor: pointer;
-		}
-	}
+  //非编辑状态下
+  &:not([contenteditable='true']) {
+    kaitify-attachment > span:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
 }
