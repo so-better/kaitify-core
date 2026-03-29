@@ -16,9 +16,11 @@ title: 更新日志
 - `Editor` 新增实例方法 `hasClosedNodeBySelection`：判断光标范围内是否有闭合节点
 - `Attachment` 附件扩展基于新的闭合节点设计进行重构
 - `Horizontal` 水平线扩展基于新的闭合节点设计进行重构，新增 `getHorizontal` 和 `hasHorizontal` 方法
-- `Image` 图片扩展基于新的闭合节点设计进行重构
+- `Image` 图片扩展基于新的闭合节点设计进行重构，同时优化了改变尺寸的拖拽设计
 - `Math` 数学公式扩展基于新的闭合节点设计进行重构
 - `Video` 视频扩展基于新的闭合节点设计进行重构
+- `Table` 表格扩展优化了改变列宽的拖拽设计
+- `Task` 待办扩展优化了复选框的结构设计
 
 ## v0.0.2-beta.18 <Badge type="tip" text='2026.03.19' />
 

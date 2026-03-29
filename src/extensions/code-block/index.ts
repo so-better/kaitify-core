@@ -119,7 +119,7 @@ const toCodeBlock = (editor: Editor, node: KNode) => {
     })
     //转为代码块节点
     node.tag = 'pre'
-    //将codeSpan加入到代码块节点
+    //将codeSpan和codeCopy加入到代码块节点
     node.children = [codeSpanNode, codeCopyNode]
     codeSpanNode.parent = node
     codeCopyNode.parent = node
@@ -342,6 +342,11 @@ export const CodeBlockExtension = (props?: CodeBlockExtensionPropsType) =>
             node.children = [codeSpanNode, codeCopyNode]
             codeSpanNode.parent = node
             codeCopyNode.parent = node
+          }
+        }
+        if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
+          if (!node.getMatchNode({ tag: 'pre' })) {
+            node.toEmpty()
           }
         }
       },

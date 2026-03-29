@@ -257,7 +257,6 @@ export class KNode {
     return false
   }
 
-
   /**
    * 【API】当前节点是否只包含占位符
    */
