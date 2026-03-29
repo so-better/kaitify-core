@@ -28,7 +28,7 @@ declare module '../../model' {
  * 数学公式选中样式设置（禁用默认选中样式，另外重新设置））
  */
 const handleSelected = (editor: Editor) => {
-	// 先清除所有水平线的选中状态
+	// 先清除所有数学公式的选中状态
 	editor.$el!.querySelectorAll(`${MATH_NODE_TAG} > span`).forEach(el => {
 		el.removeAttribute('is-selected')
 	})

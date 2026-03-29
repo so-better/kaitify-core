@@ -132,7 +132,12 @@ const handleFoucs = (editor: Editor) => {
 		if (elm === editor.$el) {
 			return
 		}
-		const node = editor.findNode(elm)
+		let node = null
+		try {
+			node = editor.findNode(elm)
+		} catch (_) {
+			return
+		}
 		const matchNode = node.getMatchNode({
 			tag: IMAGE_NODE_TAG
 		})
