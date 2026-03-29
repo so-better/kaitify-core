@@ -403,87 +403,89 @@ const getMaxWidth = (element: HTMLElement): number => {
  */
 const tableResizable = (editor: Editor) => {
   //设置拖拽改变大小的功能
-  interact('.kaitify table td').unset()
-  interact('.kaitify table td').resizable({
-    //是否启用
-    enabled: true,
-    //指定可以调整大小的边缘
-    edges: { left: false, right: true, bottom: false, top: false },
-    //设置可拖拽区域宽度
-    margin: 5,
-    //设置鼠标样式
-    cursorChecker(_action, _interactable, element, _interacting) {
-      return editor.isEditable() && element.nextElementSibling ? 'ew-resize' : 'default'
-    },
-    //启用惯性效果
-    inertia: false,
-    //调整大小时的自动滚动功能
-    autoScroll: true,
-    //保持宽高比
-    preserveAspectRatio: true,
-    //水平调整
-    axis: 'x',
-    //事件
-    listeners: {
-      //开始拖拽
-      start(event) {
-        //最后一列不能拖拽、不可编辑状态下不能拖拽
-        if (!event.target.nextElementSibling || !editor.isEditable()) {
-          event.interaction.stop()
-          return
-        }
-        //取消dom监听
-        editor.removeDomObserve()
-        //禁用dragstart
-        DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
-        //获取单元格节点
-        const node = editor.findNode(event.target)
-        //获取单元格在父节点中的序列
-        const index = node.parent!.children!.findIndex(item => item.isEqual(node))
-        //获取单元格所在的表格
-        const table = node.getMatchNode({ tag: 'table' })!
-        //获取表格的colgroup节点
-        const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
-        //获取对应的col节点
-        const col = colgroup.children![index]
-        //获取对应的真实dom
-        const colDom = editor.findDom(col)
-        //暂存
-        DapData.set(event.target, 'col', col)
-        DapData.set(event.target, 'colDom', colDom)
-      },
-      //拖拽
-      move(event) {
-        //获取宽度
-        const { width } = event.rect
-        //获取暂存的col元素
-        const colDom = DapData.get<HTMLElement>(event.target, 'colDom')
-        //设置宽度
-        colDom.setAttribute('width', `${width}px`)
-      },
-      //结束拖拽
-      end(event) {
-        //恢复dragstart
-        DapEvent.off(event.target, 'dragstart')
-        //获取宽度
-        const { width } = event.rect
-        //设置百分比宽度
-        const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
-        //获取暂存的col节点
-        const col = DapData.get<KNode>(event.target, 'col')
-        //设置节点的styles
-        if (col.hasStyles()) {
-          col.marks!.width = `${percentWidth}%`
-        } else {
-          col.marks = {
-            width: `${percentWidth}%`
+  interact('.kaitify table td', { context: editor.$el }).unset()
+  interact('.kaitify table td', { context: editor.$el })
+    .resizable({
+      //是否启用
+      enabled: true,
+      //指定可以调整大小的边缘
+      edges: { left: false, right: true, bottom: false, top: false },
+      //设置可拖拽区域宽度
+      margin: 5,
+      //启用惯性效果
+      inertia: false,
+      //调整大小时的自动滚动功能
+      autoScroll: true,
+      //保持宽高比
+      preserveAspectRatio: true,
+      //水平调整
+      axis: 'x',
+      //事件
+      listeners: {
+        //开始拖拽
+        start(event) {
+          //最后一列不能拖拽、不可编辑状态下不能拖拽
+          if (!event.target.nextElementSibling || !editor.isEditable()) {
+            event.interaction.stop()
+            return
           }
+          //取消dom监听
+          editor.removeDomObserve()
+          //锁定全局光标样式
+          document.body.style.cursor = 'ew-resize'
+          //禁用dragstart
+          DapEvent.on(event.target, 'dragstart', e => e.preventDefault())
+          //获取单元格节点
+          const node = editor.findNode(event.target)
+          //获取单元格在父节点中的序列
+          const index = node.parent!.children!.findIndex(item => item.isEqual(node))
+          //获取单元格所在的表格
+          const table = node.getMatchNode({ tag: 'table' })!
+          //获取表格的colgroup节点
+          const colgroup = table.children!.find(item => item.isMatch({ tag: 'colgroup' }))!
+          //获取对应的col节点
+          const col = colgroup.children![index]
+          //获取对应的真实dom
+          const colDom = editor.findDom(col)
+          //暂存
+          DapData.set(event.target, 'col', col)
+          DapData.set(event.target, 'colDom', colDom)
+        },
+        //拖拽
+        move(event) {
+          //获取宽度
+          const { width } = event.rect
+          //获取暂存的col元素
+          const colDom = DapData.get<HTMLElement>(event.target, 'colDom')
+          //设置宽度
+          colDom.setAttribute('width', `${width}px`)
+        },
+        //结束拖拽
+        end(event) {
+          //释放全局光标样式
+          document.body.style.cursor = ''
+          //恢复dragstart
+          DapEvent.off(event.target, 'dragstart')
+          //获取宽度
+          const { width } = event.rect
+          //设置百分比宽度
+          const percentWidth = Number(((width / event.target.parentElement.offsetWidth) * 100).toFixed(2))
+          //获取暂存的col节点
+          const col = DapData.get<KNode>(event.target, 'col')
+          //设置节点的marks
+          if (col.hasMarks()) {
+            col.marks!.width = `${percentWidth}%`
+          } else {
+            col.marks = {
+              width: `${percentWidth}%`
+            }
+          }
+          //更新视图
+          editor.updateView()
         }
-        //更新视图
-        editor.updateView()
       }
-    }
-  })
+    })
+    .styleCursor(false)
 }
 
 export const TableExtension = () =>

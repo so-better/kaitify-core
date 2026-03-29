@@ -43,6 +43,24 @@
     }
   }
 
+  //仅在编辑状态下
+  &[contenteditable='true'] {
+    table td {
+      position: relative;
+
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 5px;
+        height: 100%;
+        cursor: ew-resize;
+        background: var(--kaitify-lightest-theme);
+      }
+    }
+  }
+
   &.kaitify-dark {
     table {
       tr:first-child {
