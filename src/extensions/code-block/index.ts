@@ -222,7 +222,7 @@ const isNeedUpdate = (editor: Editor, node: KNode, language: string, textContent
  */
 const handleCodeCopy = (editor: Editor, handleCopy?: CodeBlockExtensionPropsType['handleCopy']) => {
   DapEvent.off(editor.$el!, 'click.codeBlock_copy')
-  DapEvent.on(editor.$el!, 'click.codeBlock_copy', async e => {
+  DapEvent.on(editor.$el!, 'click.codeBlock_copy', e => {
     //可编辑状态下无法点击
     if (editor.isEditable()) {
       return
@@ -232,7 +232,12 @@ const handleCodeCopy = (editor: Editor, handleCopy?: CodeBlockExtensionPropsType
     if (elm === editor.$el) {
       return
     }
-    const node = editor.findNode(elm)
+    let node = null
+    try {
+      node = editor.findNode(elm)
+    } catch (_) {
+      return
+    }
     const codeCopyNode = node.getMatchNode({
       tag: 'span',
       marks: {

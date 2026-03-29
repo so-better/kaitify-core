@@ -61,7 +61,7 @@ declare module '../../model' {
 const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${btoa(defaultIcon)}`
 
 /**
- * 附件点击事件
+ * 点击事件
  */
 const handleClick = (editor: Editor) => {
   DapEvent.off(editor.$el!, 'click.attachment')
@@ -80,27 +80,34 @@ const handleClick = (editor: Editor) => {
     const matchNode = node.getMatchNode({
       tag: ATTACHMENT_NODE_TAG
     })
-    //附件节点不存在或者编辑器在可编辑器状态下
-    if (!matchNode || editor.isEditable()) {
+    //节点不存在
+    if (!matchNode) {
       return
     }
-    const url = matchNode.marks!['data-url'] as string
-    const text = matchNode.marks!['data-text'] as string
-    //使用fetch读取文件地址
-    const res = await fetch(url, { method: 'GET' })
-    //获取blob数据
-    const blob = await res.blob()
-    //创建a标签进行下载
-    const a = document.createElement('a')
-    a.setAttribute('target', '_blank')
-    a.setAttribute('href', URL.createObjectURL(blob))
-    a.setAttribute('download', text)
-    a.click()
+    //设置光标到节点两侧
+    editor.setSelectionBefore(matchNode, 'start')
+    editor.setSelectionAfter(matchNode, 'end')
+    editor.updateRealSelection()
+    //不可编辑状态下，进行下载操作
+    if (!editor.isEditable()) {
+      const url = matchNode.marks!['data-url'] as string
+      const text = matchNode.marks!['data-text'] as string
+      //使用fetch读取文件地址
+      const res = await fetch(url, { method: 'GET' })
+      //获取blob数据
+      const blob = await res.blob()
+      //创建a标签进行下载
+      const a = document.createElement('a')
+      a.setAttribute('target', '_blank')
+      a.setAttribute('href', URL.createObjectURL(blob))
+      a.setAttribute('download', text)
+      a.click()
+    }
   })
 }
 
 /**
- * 附件选中样式设置（禁用默认选中样式，另外重新设置）
+ * 选择样式设置
  */
 const handleSelected = (editor: Editor) => {
   // 先清除所有附件的选中状态
