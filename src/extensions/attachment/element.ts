@@ -32,4 +32,6 @@ class AttachmentElement extends HTMLElement {
   }
 }
 
-customElements.define(ATTACHMENT_NODE_TAG, AttachmentElement)
+if (!customElements.get(ATTACHMENT_NODE_TAG)) {
+  customElements.define(ATTACHMENT_NODE_TAG, AttachmentElement)
+}

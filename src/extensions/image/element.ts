@@ -48,4 +48,6 @@ class ImageElement extends HTMLElement {
   }
 }
 
-customElements.define(IMAGE_NODE_TAG, ImageElement)
+if (!customElements.get(IMAGE_NODE_TAG)) {
+  customElements.define(IMAGE_NODE_TAG, ImageElement)
+}

@@ -13,4 +13,6 @@ class HorizontalElement extends HTMLElement {
   }
 }
 
-customElements.define(HORIZONTAL_NODE_TAG, HorizontalElement)
+if (customElements.get(HORIZONTAL_NODE_TAG)) {
+  customElements.define(HORIZONTAL_NODE_TAG, HorizontalElement)
+}

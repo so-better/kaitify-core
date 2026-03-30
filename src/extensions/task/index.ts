@@ -3,6 +3,7 @@ import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
 import { getZeroWidthText } from '@/tools'
+import { TASK_CHECKBOX_NODE_TAG } from './element'
 import './style.less'
 
 declare module '../../model' {
@@ -70,11 +71,8 @@ const createTaskSpanNode = () => {
 const createTaskCheckboxNode = () => {
   return KNode.create({
     type: 'closed',
-    tag: 'span',
-    void: true,
-    marks: {
-      'kaitify-task-checkbox': ''
-    }
+    tag: TASK_CHECKBOX_NODE_TAG,
+    void: true
   })
 }
 
@@ -148,10 +146,7 @@ const handleCheckboxToggle = function (editor: Editor) {
       return
     }
     const taskCheckboxNode = node.getMatchNode({
-      tag: 'span',
-      marks: {
-        'kaitify-task-checkbox': true
-      }
+      tag: TASK_CHECKBOX_NODE_TAG
     })
     const taskNode = taskCheckboxNode?.getMatchNode({
       tag: 'div',
@@ -172,9 +167,33 @@ const handleCheckboxToggle = function (editor: Editor) {
   })
 }
 
+/**
+ * 调整复选框与顶部的距离，使其与内容第一行垂直居中
+ */
+const resizeCheckboxTop = (editor: Editor) => {
+  editor.$el!.querySelectorAll<HTMLElement>('div[kaitify-task]').forEach(taskDom => {
+    const checkboxDom = taskDom.querySelector<HTMLElement>('kaitify-task-checkbox')
+    const spanDom = taskDom.querySelector<HTMLElement>('span[kaitify-task-span]')
+    if (!checkboxDom || !spanDom) return
+    const range = document.createRange()
+    range.selectNodeContents(spanDom)
+    const rects = range.getClientRects()
+    if (!rects.length) return
+    // 第一行内可能有多个 rect（如零宽字符 + 正文），取最大高度
+    const firstTop = rects[0].top
+    let firstLineHeight = 0
+    for (const rect of rects) {
+      if (rect.top - firstTop > 2) break
+      firstLineHeight = Math.max(firstLineHeight, rect.height)
+    }
+    checkboxDom.querySelector<HTMLElement>('span')!.style.marginTop = `${(firstLineHeight - checkboxDom.offsetHeight) / 2}px`
+  })
+}
+
 export const TaskExtension = () =>
   Extension.create({
     name: 'task',
+    extraKeepTags: [TASK_CHECKBOX_NODE_TAG],
     onDomParseNode(node) {
       if (
         node.isMatch({
@@ -190,7 +209,7 @@ export const TaskExtension = () =>
         node.type = 'inline'
         node.locked = true
       }
-      if (node.isMatch({ tag: 'span', marks: { 'kaitify-task-checkbox': true } })) {
+      if (node.isMatch({ tag: TASK_CHECKBOX_NODE_TAG })) {
         node.type = 'closed'
         node.void = true
         node.children = undefined
@@ -212,13 +231,11 @@ export const TaskExtension = () =>
       if (node.isMatch({ tag: 'span' }) && node.hasMarks() && node.marks!.hasOwnProperty('kaitify-task-span')) {
         marks['kaitify-task-span'] = node.marks!['kaitify-task-span']
       }
-      if (node.isMatch({ tag: 'span' }) && node.hasMarks() && node.marks!.hasOwnProperty('kaitify-task-checkbox')) {
-        marks['kaitify-task-checkbox'] = node.marks!['kaitify-task-checkbox']
-      }
       return marks
     },
     onAfterUpdateView() {
       handleCheckboxToggle(this)
+      resizeCheckboxTop(this)
     },
     formatRules: [
       //待办相关的节点类型设置
@@ -237,7 +254,7 @@ export const TaskExtension = () =>
           node.type = 'inline'
           node.locked = true
         }
-        if (node.isMatch({ tag: 'span', marks: { 'kaitify-task-checkbox': true } })) {
+        if (node.isMatch({ tag: TASK_CHECKBOX_NODE_TAG })) {
           node.type = 'closed'
           node.void = true
           node.children = undefined
@@ -256,7 +273,7 @@ export const TaskExtension = () =>
           //存在子节点
           if (node.hasChildren()) {
             let taskSpanNode = node.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-task-span': true } }))
-            let taskCheckboxNode = node.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-task-checkbox': true } }))
+            let taskCheckboxNode = node.children!.find(item => item.isMatch({ tag: TASK_CHECKBOX_NODE_TAG }))
             if (!taskSpanNode) taskSpanNode = createTaskSpanNode()
             if (!taskCheckboxNode) taskCheckboxNode = createTaskCheckboxNode()
             const otherChildren = node.children!.filter(item => !item.isEqual(taskSpanNode) && !item.isEqual(taskCheckboxNode))
@@ -277,7 +294,7 @@ export const TaskExtension = () =>
             taskCheckboxNode.parent = node
           }
         }
-        if (node.isMatch({ tag: 'span', marks: { 'kaitify-task-checkbox': true } })) {
+        if (node.isMatch({ tag: TASK_CHECKBOX_NODE_TAG })) {
           if (
             !node.getMatchNode({
               tag: 'div',

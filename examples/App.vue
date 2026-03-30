@@ -312,7 +312,6 @@ import { onMounted, ref } from 'vue'
 import { Editor, KNode, CodeBlockExtension } from '../src'
 import { delay, isContains } from '../src/tools'
 import { content, simpleContent } from './content'
-import { MyComponentExtension } from './my-component'
 
 const count = ref<number>(0)
 const editor = ref<Editor | null>(null)
@@ -327,8 +326,7 @@ onMounted(() => {
         handleCopy: code => {
           console.log('复制的code', code)
         }
-      }),
-      MyComponentExtension
+      })
     ],
     el: '#editor',
     editable: true,

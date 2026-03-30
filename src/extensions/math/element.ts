@@ -34,4 +34,6 @@ class MathElement extends HTMLElement {
   }
 }
 
-customElements.define(MATH_NODE_TAG, MathElement)
+if (!customElements.get(MATH_NODE_TAG)) {
+  customElements.define(MATH_NODE_TAG, MathElement)
+}
