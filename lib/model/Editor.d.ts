@@ -389,6 +389,20 @@ export declare class Editor {
      */
     findDom(node: KNode): HTMLElement;
     /**
+     * 判断某个dom是否在闭合节点对应的真实dom之内。
+     * - includeSelf 为 true（默认）时，闭合节点的根 dom 自身也算"在内"；
+     * - includeSelf 为 false 时，只有闭合节点内部的子孙 dom 才算"在内"，根 dom 自身返回 false。
+     */
+    isDomInClosedNode(el: HTMLElement, includeSelf?: boolean): boolean;
+    /**
+     * 获取光标所在的闭合节点，仅当光标在闭合节点的两侧，即offset分别是0和1时，才会返回该闭合节点
+     */
+    getClosedNodeBySelection(options?: KNodeMatchOptionType): KNode | null;
+    /**
+     * 判断光标范围内是否有闭合节点，必须完整包含的闭合节点才会被返回在内
+     */
+    hasClosedNodeBySelection(options?: KNodeMatchOptionType): boolean;
+    /**
      * 设置编辑器是否可编辑
      */
     setEditable(editable: boolean): void;

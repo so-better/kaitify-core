@@ -93,6 +93,82 @@ title: Editor 方法
   const dom = editor.findDom(node)
   ```
 
+##### isDomInClosedNode()
+
+判断某个 `dom` 是否在闭合节点对应的真实 `dom` 之内。
+
+- 类型
+
+  ```ts
+  isDomInClosedNode(el: HTMLElement, includeSelf: boolean = true): boolean
+  ```
+
+- 详细信息
+  第一个入参表示 `dom` 元素，第二个入参表示闭合节点自身的 `dom` 是否计算在内，该方法返回一个布尔值
+
+- 示例
+
+  ```ts
+  const flag = editor.isDomInClosedNode(element, true)
+  ```
+
+##### getClosedNodeBySelection()
+
+获取光标所在的闭合节点
+
+- 类型
+
+  ```ts
+  getClosedNodeBySelection(options?: KNodeMatchOptionType): KNode | null
+  ```
+
+- 详细信息
+
+  提供一个可选入参，类型为 `KNodeMatchOptionType`，表示节点的匹配条件，包含 `tag`、`marks`、`styles` 三个属性，默认为空对象（不限制条件）。
+
+  仅当光标的起点和终点同时位于同一个闭合节点的两侧（即起点 offset 为 `0`、终点 offset 为 `1`）时，才返回该闭合节点，否则返回 `null`。光标未聚焦或处于折叠状态时同样返回 `null`。
+
+  > 该方法常用于扩展内判断当前选中的是否恰好是某个特定的闭合节点，例如图片、附件、数学公式等
+
+- 示例
+
+  ```ts
+  //判断当前选中的是否是 tag 为 img 的闭合节点
+  const node = editor.getClosedNodeBySelection({ tag: 'img' })
+  if (node) {
+    //当前光标恰好选中了该闭合节点
+  }
+  ```
+
+##### hasClosedNodeBySelection()
+
+判断光标范围内是否包含符合条件的闭合节点
+
+- 类型
+
+  ```ts
+  hasClosedNodeBySelection(options?: KNodeMatchOptionType): boolean
+  ```
+
+- 详细信息
+
+  提供一个可选入参，类型为 `KNodeMatchOptionType`，表示节点的匹配条件，包含 `tag`、`marks`、`styles` 三个属性，默认为空对象（不限制条件）。
+
+  该方法返回一个布尔值，用以判断当前光标范围内是否存在被完整包含的符合条件的闭合节点。所谓"完整包含"，包括以下几种情形：
+
+  - 光标起点位于某个闭合节点的头部（offset 为 `0`）
+  - 光标终点位于某个闭合节点的尾部（offset 为 `1`）
+  - 选区中间存在被完整覆盖的闭合节点
+
+  光标未聚焦或处于折叠状态时返回 `false`。
+
+- 示例
+
+  ```ts
+  //判断光标范围内是否包含 tag 为 img 的闭合节点
+  const flag = editor.hasClosedNodeBySelection({ tag: 'img' })
+  ```
+
 ##### setEditable()
 
 设置编辑器是否可编辑

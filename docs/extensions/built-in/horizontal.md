@@ -8,6 +8,46 @@ title: horizontal 水平线
 
 ## Commands 命令
 
+##### getHorizontal()
+
+获取光标所在的水平线节点
+
+- 类型
+
+  ```ts
+  getHorizontal(): KNode | null
+  ```
+
+- 详细信息
+
+  仅当光标恰好选中了一个水平线节点（起点和终点分别位于该节点的两侧）时，返回该节点，否则返回 `null`
+
+- 示例
+
+  ```ts
+  const node = editor.commands.getHorizontal()
+  ```
+
+##### hasHorizontal()
+
+判断光标范围内是否包含水平线节点
+
+- 类型
+
+  ```ts
+  hasHorizontal(): boolean
+  ```
+
+- 详细信息
+
+  返回一个布尔值，表示当前光标范围内是否存在被完整包含的水平线节点
+
+- 示例
+
+  ```ts
+  const flag = editor.commands.hasHorizontal()
+  ```
+
 ##### setHorizontal()
 
 在光标内插入水平线

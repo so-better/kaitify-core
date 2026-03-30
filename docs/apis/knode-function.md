@@ -85,14 +85,14 @@ title: KNode 方法
 
   ```ts
   const node = KNode.create({
-  	type: 'block',
-  	tag: 'p',
-  	children: [
-  		{
-  			type: 'text',
-  			textContent: 'hello'
-  		}
-  	]
+    type: 'block',
+    tag: 'p',
+    children: [
+      {
+        type: 'text',
+        textContent: 'hello'
+      }
+    ]
   })
   ```
 
@@ -134,9 +134,9 @@ title: KNode 方法
 
   ```ts
   const node = KNode.createZeroWidthText({
-  	styles: {
-  		fontSize: '20px'
-  	}
+    styles: {
+      fontSize: '20px'
+    }
   })
   ```
 
@@ -410,27 +410,6 @@ title: KNode 方法
   const hasStyles = node.hasStyles()
   ```
 
-##### getUneditable()
-
-判断节点是否不可编辑的
-
-- 类型
-
-  ```ts
-  getUneditable(): KNode | null
-  ```
-
-- 详细信息
-
-  判断当前节点是否不可编辑的，如果是则返回设置了不可编辑的那个节点，否则返回 `null`
-
-- 示例
-
-  ```ts
-  //当前节点不可编辑，不一定是这个节点设置了不可编辑，也有可能是父节点或者祖先节点设置了不可编辑的效果
-  const uneditableNode = node.getUneditable()
-  ```
-
 ##### allIsPlaceholder()
 
 当前节点是否只包含占位符
@@ -489,18 +468,18 @@ title: KNode 方法
 
   ```ts
   const node = KNode.create({
-  	type: 'text',
-  	styles: {
-  		fontWeight: 'bold'
-  	},
-  	textContent: 'hello，我是node'
+    type: 'text',
+    styles: {
+      fontWeight: 'bold'
+    },
+    textContent: 'hello，我是node'
   })
   const targetNode = KNode.create({
-  	type: 'text',
-  	styles: {
-  		color: '#f30'
-  	},
-  	textContent: 'hello，我是targetNode'
+    type: 'text',
+    styles: {
+      color: '#f30'
+    },
+    textContent: 'hello，我是targetNode'
   })
   const isEqualStyles = node.isEqualStyles(targetNode) //false
   ```
@@ -523,18 +502,18 @@ title: KNode 方法
 
   ```ts
   const node = KNode.create({
-  	type: 'text',
-  	marks: {
-  		'data-index': '1'
-  	},
-  	textContent: 'hello，我是node'
+    type: 'text',
+    marks: {
+      'data-index': '1'
+    },
+    textContent: 'hello，我是node'
   })
   const targetNode = KNode.create({
-  	type: 'text',
-  	marks: {
-  		'data-index': '2'
-  	},
-  	textContent: 'hello，我是targetNode'
+    type: 'text',
+    marks: {
+      'data-index': '2'
+    },
+    textContent: 'hello，我是targetNode'
   })
   const isEqualMarks = node.isEqualMarks(targetNode) //false
   ```
@@ -734,17 +713,17 @@ title: KNode 方法
   ```ts
   //判断节点是否p标签且拥有fontSize="20px"的样式
   const match = node.isMatch({
-  	tag: 'p',
-  	styles: {
-  		fontSize: '20px'
-  	}
+    tag: 'p',
+    styles: {
+      fontSize: '20px'
+    }
   })
   //判断节点是否拥有p标签且拥有fontSize样式
   const match = node.isMatch({
-  	tag: 'p',
-  	styles: {
-  		fontSize: true
-  	}
+    tag: 'p',
+    styles: {
+      fontSize: true
+    }
   })
   ```
 
@@ -769,7 +748,7 @@ title: KNode 方法
   ```ts
   //判断当前节点是否在p节点下，如果是返回这个p节点
   const matchNode = node.getMatchNode({
-  	tag: 'p'
+    tag: 'p'
   })
   ```
 

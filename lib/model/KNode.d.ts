@@ -169,10 +169,6 @@ export declare class KNode {
      */
     hasStyles(): boolean;
     /**
-     * 【API】判断节点是否不可编辑的，如果是返回设置不可编辑的那个节点，否则返回null
-     */
-    getUneditable(): KNode | null;
-    /**
      * 【API】当前节点是否只包含占位符
      */
     allIsPlaceholder(): boolean;

@@ -23,7 +23,7 @@ export const formatContenteditableToClosed: RuleFunctionType = ({ node }) => {
 /**
  * 针对节点自身：处理块节点的标签，部分块节点需要转为默认块节点标签
  */
-export const fomratBlockTagParse: RuleFunctionType = ({ editor, node }) => {
+export const formatBlockTagParse: RuleFunctionType = ({ editor, node }) => {
   if (node.isMatch({ tag: 'address' }) || node.isMatch({ tag: 'article' }) || node.isMatch({ tag: 'aside' }) || node.isMatch({ tag: 'nav' }) || node.isMatch({ tag: 'section' })) {
     editor.toParagraph(node)
   }

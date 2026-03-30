@@ -8,19 +8,19 @@ export type RuleFunctionType = (state: {
     node: KNode;
 }) => void;
 /**
+ * 针对节点自身：将带有 contenteditable="false" 标记的节点统一转为闭合节点，并移除该标记（渲染时由框架统一添加）
+ */
+export declare const formatContenteditableToClosed: RuleFunctionType;
+/**
  * 针对节点自身：处理块节点的标签，部分块节点需要转为默认块节点标签
  */
-export declare const fomratBlockTagParse: RuleFunctionType;
+export declare const formatBlockTagParse: RuleFunctionType;
 /**
  * 针对子节点中的块节点：
  * 1. 子节点中含有块节点则该节点转为块节点；
  * 2. 子节点中含有块节点，则其他节点也转为块节点
  */
 export declare const formatBlockInChildren: RuleFunctionType;
-/**
- * 针对节点自身：处理不可编辑的可见的非块级节点：在两侧添加零宽度空白字符 & 重置不可编辑节点内的光标位置
- */
-export declare const formatUneditableNoodes: RuleFunctionType;
 /**
  * 针对节点的子节点数组：处理子节点中的占位符，如果占位符和其他节点共存则删除占位符，如果只存在占位符则将多个占位符合并为一个（光标可能会更新）
  */

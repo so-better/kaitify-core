@@ -14,7 +14,7 @@ export declare const onComposition: (this: Editor, e: Event) => Promise<void>;
 /**
  * 监听键盘事件
  */
-export declare const onKeyboard: (this: Editor, e: Event) => void;
+export declare const onKeyboard: (this: Editor, e: Event) => Promise<void>;
 /**
  * 监听编辑器获取焦点
  */

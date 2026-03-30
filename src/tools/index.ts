@@ -109,7 +109,7 @@ export const initEditorDom = (dom: HTMLElement | string) => {
 		dom = document.body.querySelector(dom) as HTMLElement
 	}
 	dom = dom as HTMLElement
-	//如何node不是元素则抛出异常
+	//如果node不是元素则抛出异常
 	if (!DapElement.isElement(dom)) {
 		throw new Error('You must specify a dom container to initialize the editor')
 	}

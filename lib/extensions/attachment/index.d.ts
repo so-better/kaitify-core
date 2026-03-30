@@ -1,22 +1,31 @@
 import { KNode } from '../../model';
 import { Extension } from '../Extension';
+/**
+ * 设置附件的参数类型
+ */
 export type SetAttachmentOptionType = {
     url: string;
     text: string;
     icon?: string;
 };
+/**
+ * 更新附件的参数类型
+ */
 export type UpdateAttachmentOptionType = {
     url?: string;
     text?: string;
     icon?: string;
 };
+/**
+ * 附件扩展入参类型
+ */
 export type AttachmentExtensionPropsType = {
     icon: string;
 };
 declare module '../../model' {
     interface EditorCommandsType {
         /**
-         * 获取光标所在的附件节点，如果光标不在一个附件节点内，返回null
+         * 获取光标所在的附件节点
          */
         getAttachment?: () => KNode | null;
         /**
