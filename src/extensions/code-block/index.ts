@@ -1,7 +1,7 @@
 import { event as DapEvent, common as DapCommon } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
-import { getZeroWidthText, isOnlyTab, isZeroWidthText } from '@/tools'
+import { deleteProperty, getZeroWidthText, isOnlyTab, isZeroWidthText } from '@/tools'
 import { Extension } from '../Extension'
 import { getHljsHtml, HljsLanguages, HljsLanguageType } from './hljs'
 import './style.less'
@@ -347,6 +347,12 @@ export const CodeBlockExtension = (props?: CodeBlockExtensionPropsType) =>
         if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-copy': true } })) {
           if (!node.getMatchNode({ tag: 'pre' })) {
             node.toEmpty()
+          }
+        }
+        if (node.isMatch({ tag: 'span', marks: { 'kaitify-code-span': true } })) {
+          if (!node.getMatchNode({ tag: 'pre' })) {
+            node.marks = deleteProperty(node.marks, 'kaitify-code-span')
+            node.locked = false
           }
         }
       },

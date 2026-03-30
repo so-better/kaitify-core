@@ -2,7 +2,7 @@ import { event as DapEvent } from 'dap-util'
 import { Editor, KNode, KNodeMarksType } from '@/model'
 import { getSelectionBlockNodes } from '@/model/config/function'
 import { Extension } from '../Extension'
-import { getZeroWidthText } from '@/tools'
+import { deleteProperty, getZeroWidthText } from '@/tools'
 import { TASK_CHECKBOX_NODE_TAG } from './element'
 import './style.less'
 
@@ -304,6 +304,12 @@ export const TaskExtension = () =>
             })
           ) {
             node.toEmpty()
+          }
+        }
+        if (node.isMatch({ tag: 'span', marks: { 'kaitify-task-span': true } })) {
+          if (!node.getMatchNode({ tag: 'div', marks: { 'kaitify-task': true } })) {
+            node.marks = deleteProperty(node.marks, 'kaitify-task-span')
+            node.locked = false
           }
         }
       }
