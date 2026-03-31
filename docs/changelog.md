@@ -5,7 +5,12 @@ title: 更新日志
 
 # 更新日志
 
-## v0.0.2-beta.20 <Badge type="tip" text='2026.03.30' />
+## v0.0.3-beta.1 <Badge type="tip" text='2026.03.31' />
+
+- 修复一个选区bug
+- 部分代码逻辑优化
+
+## v0.0.2 <Badge type="tip" text='2026.03.30' />
 
 - 闭合节点架构逻辑优化：现在针对闭合节点，其对应的真实dom内允许存在子元素，且真实dom内部被视为黑盒，即编辑器不管理闭合节点对应的真实dom的内部元素。与此同时， `Editor`的 `findNode` 方法进行了适配优化，根据真实光标更新虚拟光标的逻辑也进行了优化处理
 - 新增 `formatContenteditableToClosed` 格式化规则：将带有 `contenteditable="false"` 标记的节点统一转为闭合节点，并移除该标记（在渲染阶段会给 `closed` 节点统一加上 `contenteditable="false"` 属性）

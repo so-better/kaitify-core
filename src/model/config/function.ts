@@ -616,6 +616,17 @@ export const updateSelection = function (this: Editor) {
     if (isContains(this.$el!, range.startContainer) && isContains(this.$el!, range.endContainer)) {
       //处理单侧光标（起点或终点）的辅助函数
       const resolvePoint = (container: Node, rangeOffset: number, type: 'start' | 'end') => {
+        //container 是编辑器根元素本身，findNode 无法处理，直接按子节点偏移定位
+        if (container === this.$el) {
+          const childDoms = Array.from((container as Element).childNodes)
+          if (childDoms.length) {
+            const dom = childDoms[rangeOffset] ? childDoms[rangeOffset] : childDoms[rangeOffset - 1]
+            if (dom.nodeType == 1) {
+              childDoms[rangeOffset] ? this.setSelectionBefore(this.findNode(dom as HTMLElement), type) : this.setSelectionAfter(this.findNode(dom as HTMLElement), type)
+            }
+          }
+          return
+        }
         //根据元素找到对应的KNode
         const containerNode = container.nodeType == 3 ? this.findNode(container.parentNode as HTMLElement) : this.findNode(container as HTMLElement)
         //光标在闭合节点内部（闭合节点对应的真实dom的内部是黑盒）
@@ -839,7 +850,7 @@ export const handlerForPasteDrop = async function (this: Editor, dataTransfer: D
     //是否走默认逻辑
     const useDefault = typeof this.onPasteHtml == 'function' ? await this.onPasteHtml.apply(this, [nodes, html]) : true
     //走默认逻辑
-    if (useDefault) {
+    if (useDefault && nodes.length > 0) {
       this.insertNode(nodes[0])
       for (let i = nodes.length - 1; i >= 1; i--) {
         this.addNodeAfter(nodes[i], nodes[0])

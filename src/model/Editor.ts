@@ -411,12 +411,11 @@ export class Editor {
         const scrollWidth = DapElement.getScrollWidth(scrollEl)
         //存在横向或者垂直滚动条
         if (scrollEl.clientHeight < scrollHeight || scrollEl.clientWidth < scrollWidth) {
-          const selection = window.getSelection()!
-          const range = selection.getRangeAt(0)
-          const rects = range.getClientRects()
-          let target: Range | HTMLElement = range
-          if (rects.length == 0) {
-            target = focusDom
+          let target: Range | HTMLElement = focusDom
+          const sel = window.getSelection()
+          const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null
+          if (range && range.getClientRects().length > 0) {
+            target = range
           }
           const childRect = target.getBoundingClientRect()
           const parentRect = scrollEl.getBoundingClientRect()
@@ -2009,12 +2008,11 @@ export class Editor {
         const scrollWidth = DapElement.getScrollWidth(scrollElement)
         //存在横向或者垂直滚动条
         if (scrollElement.clientHeight < scrollHeight || scrollElement.clientWidth < scrollWidth) {
-          const selection = window.getSelection()!
-          const range = selection.getRangeAt(0)
-          const rects = range.getClientRects()
-          let target: Range | HTMLElement = range
-          if (rects.length == 0) {
-            target = focusDom
+          let target: Range | HTMLElement = focusDom
+          const sel = window.getSelection()
+          const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null
+          if (range && range.getClientRects().length > 0) {
+            target = range
           }
           const childRect = target.getBoundingClientRect()
           const parentRect = scrollElement.getBoundingClientRect()
