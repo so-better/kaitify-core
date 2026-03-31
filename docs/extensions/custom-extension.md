@@ -32,7 +32,7 @@ const redExtension = Extension.create({
 })
 const editor = await Editor.configure({
   value: '<p><br/></p>',
-  extension: [redExtension]
+  extensions: [redExtension]
 })
 ```
 
@@ -56,7 +56,7 @@ const editor = await Editor.configure({
 
 自定义节点数组格式化规则，同编辑器构建参数 `formatRules`
 
-##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
+##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
 
 自定义 `dom` 转为非文本节点的后续处理，同编辑器构建参数 `onDomParseNode`
 
@@ -139,7 +139,7 @@ const setTextExtension = Extension.create({
 })
 const editor = await Editor.configure({
   value: '<p><br/></p>',
-  extension: [setTextExtension]
+  extensions: [setTextExtension]
 })
 ```
 

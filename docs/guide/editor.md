@@ -78,7 +78,7 @@ editor.updateView()
 
 ##### dark <Badge type="danger" text="boolean" />
 
-是否深色模式，默认值为 `true`
+是否深色模式，默认值为 `false`
 
 ##### allowCopy <Badge type="danger" text="boolean" />
 
@@ -124,7 +124,7 @@ editor.updateView()
 
 自定义节点数组格式化规则，可参考 [格式化规则](/guide/format-rules) 一节的内容
 
-##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode[]" />
+##### onDomParseNode <Badge type="danger" text="(this: Editor, node: KNode) => KNode" />
 
 自定义 `dom` 转为非文本节点的后续处理，该属性方法主要作用于编辑器将字符串内容转为 KNode 节点数组时，生成每个节点的回调时期，在该方法里你可以对该节点进行自定义操作，修改内容，只需要将最终的节点返回即可
 

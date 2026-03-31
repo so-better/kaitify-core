@@ -96,10 +96,7 @@ title: link 链接
 - 示例
 
   ```ts
-  await editor.commands.setLink({
-    href: 'https://www.baidu.com',
-    text: '百度一下，你就知道'
-  })
+  await editor.commands.unsetLink()
   ```
 
 ##### updateLink()
@@ -117,7 +114,7 @@ title: link 链接
   提供一个入参，类型为 `UpdateLinkOptionType`，包含以下 2 个属性：
 
   - href <Badge type="danger" text="string" />：链接的地址，可选，不设置则不更新此属性
-  - newOpen <Badge type="danger" text="string" />：链接是否新窗口打开，可选，不设置则不更新此属性
+  - newOpen <Badge type="danger" text="boolean" />：链接是否新窗口打开，可选，不设置则不更新此属性
 
   该方法可以自由地更新链接的地址、文本等，并且在更新完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 

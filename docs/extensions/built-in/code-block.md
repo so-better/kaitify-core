@@ -157,7 +157,7 @@ const editor = await Editor.configure({
 
 配置项：
 
-##### handleCopy <Badge type="danger" text="string" />
+##### handleCopy <Badge type="danger" text="(code: string) => void" />
 
 默认的代码复制逻辑仅在本地运行或者https安全域名上才能进行复制，不过你可以通过该属性来自定义复制的逻辑，回调参数是当前代码块的代码内容
 

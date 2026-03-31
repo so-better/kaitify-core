@@ -206,7 +206,7 @@ title: KNode 方法
 
 ##### isText()
 
-是否闭合节点
+是否文本节点
 
 - 类型
 
@@ -643,7 +643,7 @@ title: KNode 方法
 - 示例
 
   ```ts
-  const isFirst = node.lastInTargetNode(targetNode)
+  const isLast = node.lastInTargetNode(targetNode)
   ```
 
 ##### getPrevious()

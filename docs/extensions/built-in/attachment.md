@@ -68,8 +68,6 @@ title: attachment 附件
 
   该方法会向编辑器内插入附件节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 
-  需要注意：当光标范围内包含其他的附件节点时，无法插入新的附件节点
-
 - 示例
 
   ```ts
@@ -116,7 +114,7 @@ title: attachment 附件
 - 类型
 
   ```ts
-  getAttachmentInfo():
+  getAttachmentInfo(): {
     url: string;
     text: string;
     icon: string;

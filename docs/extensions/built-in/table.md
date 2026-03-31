@@ -119,7 +119,7 @@ title: table 表格
 - 类型
 
   ```ts
-  mergeTableCell(direction: TableCellsMergeDirectionType): boolean
+  mergeTableCell(direction: TableCellsMergeDirectionType): Promise<void>
   ```
 
 - 详细信息

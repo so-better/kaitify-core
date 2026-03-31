@@ -419,7 +419,7 @@ title: Editor 方法
 - 示例
 
   ```ts
-  //假设node是编辑器内已知的一个节点，这里将新创建的节点添加到它前面
+  //假设node是编辑器内已知的一个节点，这里将新创建的节点添加到它后面
   const newNode = KNode.create({
     type: 'text',
     textContent: '新节点'
@@ -464,7 +464,7 @@ title: Editor 方法
 - 示例
 
   ```ts
-  const node = editor.getLastSelectionNode(targetNode)
+  const node = editor.getFirstSelectionNode(targetNode)
   ```
 
 ##### getPreviousSelectionNode()
@@ -751,7 +751,7 @@ title: Editor 方法
 
 ##### getFocusSplitNodesBySelection()
 
-获取所有在光标范围内的可聚焦节点
+获取所有在光标范围内的可聚焦节点（会对文本节点进行分割）
 
 - 类型
 

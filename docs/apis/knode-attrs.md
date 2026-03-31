@@ -52,7 +52,7 @@ title: KNode 属性
 
 ##### void <Badge type="danger" text='boolean' />
 
-只读属性，表示是否不可见节点，意味着此类节点在编辑器内视图内无法看到，如`colgroup`、`col`等
+表示是否不可见节点，意味着此类节点在编辑器内视图内无法看到，如`colgroup`、`col`等
 
 ##### namespace <Badge type="danger" text='string' />
 

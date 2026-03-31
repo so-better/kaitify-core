@@ -1,8 +1,8 @@
 ---
-title: hading 标题
+title: heading 标题
 ---
 
-# hading 标题
+# heading 标题
 
 支持标题的渲染，提供插入标题的能力
 
@@ -100,7 +100,7 @@ title: hading 标题
 - 类型
 
   ```ts
-  unsetHeading(): Promise<void>
+  unsetHeading(level: HeadingLevelType): Promise<void>
   ```
 
 - 详细信息
@@ -112,7 +112,7 @@ title: hading 标题
 - 示例
 
   ```ts
-  await editor.commands.unsetHeading()
+  await editor.commands.unsetHeading(1)
   ```
 
 ## 代码示例
