@@ -72,7 +72,7 @@ const canRedo = editor.history.redoRecords.length > 0
     //更新到编辑器
     editor.stackNodes = record.nodes
     editor.selection = record.selection
-    //渲染到视图，但是不加入历史记录
+    //渲染到视图（第一个true：更新真实光标；第二个true：不加入历史记录）
     await editor.updateView(true, true)
   }
   ```
@@ -101,7 +101,7 @@ const canRedo = editor.history.redoRecords.length > 0
     //更新到编辑器
     editor.stackNodes = record.nodes
     editor.selection = record.selection
-    //更新到视图，但是不加入历史记录
+    //更新到视图（第一个true：更新真实光标；第二个true：不加入历史记录）
     await editor.updateView(true, true)
   }
   ```

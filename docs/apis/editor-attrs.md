@@ -42,7 +42,7 @@ title: Editor 属性
 
 ##### blockRenderTag <Badge type="danger" text="string" />
 
-此为只读属性，表示编辑内渲染默认块级节点的真实标签，即段落标签，默认值由创建编辑器时提供的对应参数确定，如果没有设置，则默认为 `p`
+此为只读属性，表示编辑器内渲染默认块级节点的真实标签，即段落标签，默认值由创建编辑器时提供的对应参数确定，如果没有设置，则默认为 `p`
 
 ##### emptyRenderTags <Badge type="danger" text="string[]" />
 

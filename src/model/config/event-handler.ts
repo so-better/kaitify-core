@@ -92,7 +92,7 @@ export const onBeforeInput = async function (this: Editor, e: Event) {
  * 监听中文输入
  */
 export const onComposition = async function (this: Editor, e: Event) {
-  const event = e as InputEvent
+  const event = e as CompositionEvent
   //不可编辑
   if (!this.isEditable()) {
     return

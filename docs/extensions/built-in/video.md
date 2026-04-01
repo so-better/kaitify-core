@@ -63,8 +63,8 @@ title: video 视频
   提供一个入参，类型为 `SetVideoOptionType`，包含 3 个属性：
 
   - src <Badge type="danger" text="string" />：视频的链接地址
-  - autoplay <Badge type="danger" text="boolean" />：视频加载完成是否自动播放
-  - width <Badge type="danger" text="string" />：视频的初始宽度
+  - autoplay <Badge type="tip" text="boolean?" />：视频加载完成是否自动播放，可选
+  - width <Badge type="tip" text="string?" />：视频的初始宽度，可选
 
   该方法会向编辑器内插入视频节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 

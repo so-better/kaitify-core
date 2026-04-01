@@ -602,6 +602,26 @@ title: KNode 方法
   const cloneNode = node.clone(false) //仅克隆自身
   ```
 
+##### fullClone()
+
+完全复制节点
+
+- 类型
+
+  ```ts
+  fullClone(): KNode
+  ```
+
+- 详细信息
+
+  与 `clone()` 不同的是，`fullClone()` 会完全复制节点的所有属性，包括 `key`，即复制后的节点与原节点的 `key` 相同，且会深度复制所有子节点
+
+- 示例
+
+  ```ts
+  const cloneNode = node.fullClone()
+  ```
+
 ##### firstInTargetNode()
 
 如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有可聚焦节点中的第一个
@@ -609,7 +629,7 @@ title: KNode 方法
 - 类型
 
   ```ts
-  firstInTargetNode: (node: KNode) => boolean
+  firstInTargetNode(node: KNode): boolean
   ```
 
 - 详细信息
@@ -631,7 +651,7 @@ title: KNode 方法
 - 类型
 
   ```ts
-  lastInTargetNode: (node: KNode) => boolean
+  lastInTargetNode(node: KNode): boolean
   ```
 
 - 详细信息

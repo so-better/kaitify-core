@@ -64,7 +64,7 @@ title: attachment 附件
 
   - url <Badge type="danger" text="string" />：附件的下载地址
   - text <Badge type="danger" text="string" />：附件的显示名称
-  - icon <Badge type="danger" text="string" />：可选，自定义附件图标，这里填写图片地址
+  - icon <Badge type="tip" text="string?" />：可选，自定义附件图标，这里填写图片地址
 
   该方法会向编辑器内插入附件节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 

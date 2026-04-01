@@ -141,12 +141,12 @@ export const formatLineBreakSpaceText: RuleFunctionType = ({ editor, node }) => 
       }
     }
     //执行第4点的替换逻辑：给\n后面加上零宽度空白字符
-    node.textContent = node.textContent!.replace(/\n/g, (chart, index) => {
-      const nextChart = node.textContent![index + 1]
-      if (!nextChart || !isZeroWidthText(nextChart)) {
-        chart = chart + getZeroWidthText()
+    node.textContent = node.textContent!.replace(/\n/g, (char, index) => {
+      const nextChar = node.textContent![index + 1]
+      if (!nextChar || !isZeroWidthText(nextChar)) {
+        char = char + getZeroWidthText()
       }
-      return chart
+      return char
     })
     //起点前面有几个\n\u200B则往后移动对应单位
     if (startPrevNumber > 0) {
@@ -168,10 +168,10 @@ export const formatZeroWidthTextMerge: RuleFunctionType = ({ editor, node }) => 
     let val = node.textContent!
     let i = 0
     while (i < val.length) {
-      //获取当前字符串
-      const chart = val.charAt(i)
+      //获取当前字符
+      const char = val.charAt(i)
       //如果当前字符是空白字符并且前一个字符也是空白字符
-      if (i > 0 && isZeroWidthText(chart) && isZeroWidthText(val.charAt(i - 1))) {
+      if (i > 0 && isZeroWidthText(char) && isZeroWidthText(val.charAt(i - 1))) {
         //如果起点在节点上并且起点在当前这个空白字符上或者后面
         if (editor.isSelectionInTargetNode(node, 'start') && editor.selection.start!.offset >= i + 1) {
           editor.selection.start!.offset -= 1

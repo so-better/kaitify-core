@@ -94,7 +94,7 @@ const handleResizable = (editor: Editor) => {
       move(event) {
         //获取宽度
         const { width } = event.rect
-        //设置dom的宽度
+        //设置容器的宽度
         event.target.parentElement.style.width = `${width}px`
       },
       //结束拖拽

@@ -152,7 +152,7 @@ export const AttachmentExtension = (props?: AttachmentExtensionPropsType) =>
           .filter(n => n.isText())
           .map(n => n.textContent)
           .join('')
-        const icon = node.styles?.backgroundImage?.match(/url\(["']?(.*?)["']?\)/)?.[1]!
+        const icon = node.styles?.backgroundImage?.match(/url\(["']?(.*?)["']?\)/)?.[1] ?? ''
         // 改造成新的闭合节点格式
         node.type = 'closed'
         node.tag = ATTACHMENT_NODE_TAG

@@ -103,7 +103,7 @@ export declare class KNode {
      * - 编辑器在处理节点时会忽略此类节点
      * - 通常意味着无法看到的或者无法编辑的
      */
-    void?: boolean;
+    void: boolean;
     /**
      * 命名空间【可以修改】
      */
@@ -207,7 +207,7 @@ export declare class KNode {
     /**
      * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
      */
-    firstInTargetNode: (node: KNode) => boolean;
+    firstInTargetNode(node: KNode): boolean;
     /**
      * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的最后一个
      */

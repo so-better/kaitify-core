@@ -16,7 +16,7 @@ title: Selection
 
 ##### end <Badge type="danger" text="SelectionPointType" />
 
-虚拟光标的终点，包含 2 个属性：`node` 和 `offset`，其中 `node` 表示起点光标所在的 `KNode` 节点，只能是文本节点或者闭合节点，`offset` 表示光标在节点内的偏移值
+虚拟光标的终点，包含 2 个属性：`node` 和 `offset`，其中 `node` 表示终点光标所在的 `KNode` 节点，只能是文本节点或者闭合节点，`offset` 表示光标在节点内的偏移值
 
 > 对于可以作为起点和终点的节点，通常称之为“<b>可以设置为光标点的节点</b>”或者“<b>可聚焦节点</b>”
 

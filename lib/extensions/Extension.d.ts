@@ -60,7 +60,7 @@ export type ExtensionCreateOptionType = {
      */
     onPasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
     /**
-     * 视频更新前回调
+     * 视图更新前回调
      */
     onBeforeUpdateView?: (this: Editor) => void;
     /**
@@ -68,7 +68,7 @@ export type ExtensionCreateOptionType = {
      */
     onAfterUpdateView?: (this: Editor) => void;
     /**
-     * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
+     * 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
      */
     onDetachMentBlockFromParent?: (this: Editor, node: KNode) => boolean;
     /**
@@ -149,7 +149,7 @@ export declare class Extension {
      */
     onPasteKeepStyles?: (this: Editor, node: KNode) => KNodeStylesType;
     /**
-     * 视频更新前回调
+     * 视图更新前回调
      */
     onBeforeUpdateView?: (this: Editor) => void;
     /**
@@ -157,7 +157,7 @@ export declare class Extension {
      */
     onAfterUpdateView?: (this: Editor) => void;
     /**
-     * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
+     * 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理
      */
     onDetachMentBlockFromParent?: (this: Editor, node: KNode) => boolean;
     /**

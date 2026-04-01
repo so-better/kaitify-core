@@ -90,11 +90,11 @@ export const CodeExtension = () =>
           const length = focusNodes.length
           for (let i = 0; i < length; i++) {
             const node = focusNodes[i]
-            const isExsitInCode = !!node.getMatchNode({
+            const isExistInCode = !!node.getMatchNode({
               tag: 'code'
             })
             //该节点已经在行内代码内跳过本次循环
-            if (isExsitInCode) {
+            if (isExistInCode) {
               continue
             }
             //复制该节点

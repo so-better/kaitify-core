@@ -325,7 +325,7 @@ export const TaskExtension = () =>
       ) {
         //换行后统一改成待办状态
         node.marks!['kaitify-task'] = 'undo'
-        //或取前一个元素是否空的待办节点，则转为段落
+        //获取前一个元素，若是空的待办节点则转为段落
         const previousNode = node.getPrevious(this.stackNodes)
         if (previousNode && previousNode.isMatch({ tag: 'div', marks: { 'kaitify-task': true } })) {
           const taskSpanNode = previousNode.children!.find(item => item.isMatch({ tag: 'span', marks: { 'kaitify-task-span': true } }))

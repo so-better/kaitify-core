@@ -57,11 +57,11 @@ export const kebabToCamel = (val: string) => {
 export const getDomAttributes = (dom: HTMLElement) => {
 	const attributes = Array.from(dom.attributes)
 	const length = attributes.length
-	const regExp = new RegExp(`(^on)|(^style$)|(^${NODE_MARK}$)`, 'g')
+	const regExp = new RegExp(`(^on)|(^style$)|(^${NODE_MARK}$)`)
 	const result: KNodeMarksType = {}
 	for (let i = 0; i < length; i++) {
 		const { nodeName, nodeValue } = attributes[i]
-		//匹配事件、样式和face外的属性
+		//排除事件、样式和节点标记属性
 		if (!regExp.test(nodeName)) {
 			result[nodeName] = nodeValue ?? ''
 		}

@@ -76,7 +76,7 @@ title: line-height 行高
 
 <div style="margin:0 0 10px 0">
   <button class="demo-button" @click="editor?.commands.setLineHeight('3')">设置行高</button>
-   <button class="demo-button" @click="editor?.commands.unsetLineHeight('3')">取消行高</button>
+  <button class="demo-button" @click="editor?.commands.unsetLineHeight('3')">取消行高</button>
 </div>
 <div ref="editorRef" style="width:100%;height:100px;"></div>
 

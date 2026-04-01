@@ -260,7 +260,7 @@ export const TextExtension = () =>
           else {
             //新建一个空白文本节点
             const newTextNode = KNode.createZeroWidthText()
-            //设置样式
+            //设置标记
             newTextNode.marks = DapCommon.clone(marks)
             //插入空白文本节点
             this.insertNode(newTextNode)

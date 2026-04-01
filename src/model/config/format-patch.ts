@@ -28,7 +28,7 @@ export const patchNodes = (newNodes: KNode[], oldNodes: (KNode | null)[]) => {
 	//旧节点全部移除
 	if (newNodes.length === 0) {
 		return oldNodes
-			.filter(node => !node)
+			.filter(node => !!node)
 			.map(oldNode => ({
 				oldNode,
 				newNode: null

@@ -680,16 +680,16 @@ export const TableExtension = () =>
       //td内无段落则加入段落
       ({ node, editor }) => {
         if (node.isMatch({ tag: 'td' }) && !node.children!.some(item => item.isBlock())) {
-          const pararaph = KNode.create({
+          const paragraph = KNode.create({
             type: 'block',
             tag: editor.blockRenderTag
           })
-          pararaph.children = node.children!.map(item => {
-            item.parent = pararaph
+          paragraph.children = node.children!.map(item => {
+            item.parent = paragraph
             return item
           })
-          node.children = [pararaph]
-          pararaph.parent = node
+          node.children = [paragraph]
+          paragraph.parent = node
         }
       },
       //针对跨行跨列的单元格，增加隐藏单元格
@@ -729,7 +729,7 @@ export const TableExtension = () =>
           blockNode.toEmpty()
           pBlock.toEmpty()
           //创建段落添加到表格后
-          const pararaph = KNode.create({
+          const paragraph = KNode.create({
             type: 'block',
             tag: this.blockRenderTag,
             children: [
@@ -739,9 +739,9 @@ export const TableExtension = () =>
               }
             ]
           })
-          this.addNodeAfter(pararaph, tableNode)
+          this.addNodeAfter(paragraph, tableNode)
           //重新设置光标
-          this.setSelectionBefore(pararaph)
+          this.setSelectionBefore(paragraph)
         }
       }
     },

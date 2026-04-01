@@ -63,8 +63,8 @@ title: link 链接
   提供一个入参，类型为 `SetLinkOptionType`，包含 3 个属性：
 
   - href <Badge type="danger" text="string" />：链接的地址
-  - text <Badge type="danger" text="string" />：链接的文本，如果光标选择了一段内容，则使用光标选择的内容
-  - newOpen <Badge type="danger" text="boolean" />：链接是否新窗口打开
+  - text <Badge type="tip" text="string?" />：链接的文本，如果光标选择了一段内容，则使用光标选择的内容，可选
+  - newOpen <Badge type="tip" text="boolean?" />：链接是否新窗口打开，可选
 
   该方法会向编辑器内插入链接节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 

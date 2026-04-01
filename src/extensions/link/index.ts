@@ -32,7 +32,7 @@ declare module '../../model' {
      */
     hasLink?: () => boolean
     /**
-     * 设置连接
+     * 设置链接
      */
     setLink?: (options: SetLinkOptionType) => Promise<void>
     /**

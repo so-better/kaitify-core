@@ -18,7 +18,7 @@ title: KNode 属性
 
 ##### tag <Badge type="danger" text="string" />
 
-节点的渲染标签，文本节点此属性无效，此值可以修改，初始值由创建节点时提供的对应参数确定，
+节点的渲染标签，文本节点此属性无效，此值可以修改，初始值由创建节点时提供的对应参数确定
 
 ##### textContent <Badge type="danger" text="string" />
 
@@ -52,7 +52,7 @@ title: KNode 属性
 
 ##### void <Badge type="danger" text='boolean' />
 
-表示是否不可见节点，意味着此类节点在编辑器内视图内无法看到，如`colgroup`、`col`等
+表示是否不可见节点，编辑器在处理节点时会忽略此类节点，意味着此类节点在编辑器内视图内无法看到，如`colgroup`、`col`等，此值可以修改，初始值由创建节点时提供的对应参数确定，如果没有设置则默认为 `false`
 
 ##### namespace <Badge type="danger" text='string' />
 

@@ -63,8 +63,8 @@ title: image 图片
   提供一个入参，类型为 `SetImageOptionType`，包含 3 个属性：
 
   - src <Badge type="danger" text="string" />：图片的链接地址
-  - alt <Badge type="danger" text="string" />：图片加载失败显示的值
-  - width <Badge type="danger" text="string" />：图片的初始宽度
+  - alt <Badge type="tip" text="string?" />：图片加载失败显示的值，可选
+  - width <Badge type="tip" text="string?" />：图片的初始宽度，可选
 
   该方法会向编辑器内插入图片节点，在插入完毕后会更新视图和光标的渲染，所以调用该命令你无需主动 `updateView`
 

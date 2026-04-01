@@ -114,7 +114,7 @@ export class KNode {
    * - 编辑器在处理节点时会忽略此类节点
    * - 通常意味着无法看到的或者无法编辑的
    */
-  void?: boolean = false
+  void: boolean = false
   /**
    * 命名空间【可以修改】
    */
@@ -414,7 +414,7 @@ export class KNode {
   /**
    * 【API】如果当前节点是文本节点或者闭合节点，则判断是不是指定节点后代中所有文本节点和闭合节点中的第一个
    */
-  firstInTargetNode = (node: KNode): boolean => {
+  firstInTargetNode(node: KNode): boolean {
     //不是闭合节点和文本节点
     if (!this.isText() && !this.isClosed()) {
       return false

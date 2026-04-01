@@ -76,7 +76,7 @@ export type EditorConfigureOptionType = {
    */
   textRenderTag?: string
   /**
-   * 自定义编辑内渲染默认块级节点的真实标签，即段落标签
+   * 自定义编辑器内渲染默认块级节点的真实标签，即段落标签
    */
   blockRenderTag?: string
   /**
@@ -249,7 +249,7 @@ export class Editor {
    */
   textRenderTag: string = 'span'
   /**
-   * 编辑内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】【open】
+   * 编辑器内渲染默认块级节点的真实标签，即段落标签【初始化后不建议修改】【open】
    */
   blockRenderTag: string = 'p'
   /**
@@ -345,7 +345,7 @@ export class Editor {
    */
   onAfterUpdateView?: (this: Editor) => void
   /**
-   * 在删除和换行操作中块节点节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
+   * 在删除和换行操作中块节点从其父节点中抽离出去成为与父节点同级的节点后触发，如果返回true则表示继续使用默认逻辑，会将该节点转为段落，返回false则不走默认逻辑，需要自定义处理【初始化后不可修改】
    */
   onDetachMentBlockFromParent?: (this: Editor, node: KNode) => boolean
   /**
@@ -392,7 +392,7 @@ export class Editor {
     newHtml: undefined
   }
   /**
-   * 是否编辑器内部渲染真实光标引起selctionChange事件【不可修改】
+   * 是否编辑器内部渲染真实光标引起selectionChange事件【不可修改】
    */
   internalCauseSelectionChange: boolean = false
   /**
@@ -978,7 +978,7 @@ export class Editor {
         }
       }
     }
-    //指定到文档前面
+    //指定到文档末尾
     else {
       //获取最后一个节点
       const lastNode = this.stackNodes[this.stackNodes.length - 1]
@@ -1360,8 +1360,7 @@ export class Editor {
 
   /**
    * 向选区进行换行
-   * 1. 所在块节点只有占位符并且块节点不是段落则会转为段落
-   * 2. 非代码块样式内换行是插入换行符\n
+   * 1. 在代码块样式内换行是插入换行符\n
    * 2. 光标所在块节点是固定块节点，则无法换行
    * 3. 光标所在块节点只有占位符，并且其存在父节点，且父节点不是固定块节点，会从父节点抽离到与父节点同级
    * 4. 光标所在块节点只有占位符，并且不存在父节点，且不是段落，则会转为段落

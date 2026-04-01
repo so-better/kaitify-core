@@ -26,7 +26,7 @@ declare module '../../model' {
         /**
          * 更新光标所在代码块的语言类型
          */
-        updateCodeBlockLanguage?: (language: HljsLanguageType) => Promise<void>;
+        updateCodeBlockLanguage?: (language?: HljsLanguageType) => Promise<void>;
     }
 }
 export type CodeBlockExtensionPropsType = {

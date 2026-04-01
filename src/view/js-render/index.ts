@@ -62,11 +62,11 @@ const insertDom = (editor: Editor, newNode: KNode) => {
 	//获取后一个dom
 	const nextDom = nextNode ? findDom(editor, nextNode) : null
 	//前一个dom存在则插入到前一个dom之后
-	if (previousDom && Array.from(parentDom.childNodes).some(item => item === previousDom)) {
+	if (previousDom && isContains(parentDom, previousDom)) {
 		previousDom.nextElementSibling ? parentDom.insertBefore(newDom, previousDom.nextElementSibling) : parentDom.appendChild(newDom)
 	}
 	//后一个dom存在则插入到后一个dom之前
-	else if (nextDom && Array.from(parentDom.childNodes).some(item => item === nextDom)) {
+	else if (nextDom && isContains(parentDom, nextDom)) {
 		parentDom.insertBefore(newDom, nextDom)
 	}
 	//其他情况
@@ -126,7 +126,7 @@ const moveDom = (editor: Editor, node: KNode) => {
  */
 const replaceDom = (editor: Editor, newNode: KNode, oldNode: KNode) => {
 	//旧节点对应的dom
-	const oldDom = findDom(editor, oldNode)!
+	const oldDom = findDom(editor, oldNode)
 	//插入新节点
 	insertDom(editor, newNode)
 	//移除旧dom

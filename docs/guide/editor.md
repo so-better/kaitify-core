@@ -106,7 +106,7 @@ editor.updateView()
 
 ##### blockRenderTag <Badge type="danger" text="string" />
 
-自定义编辑内渲染默认块级节点的真实标签，即段落标签，默认值为 `“p”`
+自定义编辑器内渲染默认块级节点的真实标签，即段落标签，默认值为 `”p”`
 
 ##### emptyRenderTags <Badge type="danger" text="string[]" />
 
