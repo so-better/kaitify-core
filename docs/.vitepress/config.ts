@@ -46,7 +46,7 @@ export default defineConfig({
       { text: '更新日志', link: '/changelog' },
       {
         text: '在线体验',
-        link: 'https://www.so-better.cn/run?lib=kaitify-core',
+        link: 'https://www.so-better.cn/playground?lib=kaitify-core',
         target: '_blank'
       },
       {
